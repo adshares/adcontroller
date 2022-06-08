@@ -12,7 +12,7 @@ class InfoController extends AbstractController
     public function index(string $appName, string $appVersion): JsonResponse
     {
         return $this->json([
-            'module' => 'adcontrol',
+            'module' => 'adcontroller',
             'name' => $appName,
             'version' => $appVersion,
         ]);
