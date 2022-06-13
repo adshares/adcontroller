@@ -14,8 +14,10 @@ AdController is a web application which manages other services' configuration.
 ```
 git clone https://github.com/adshares/adcontroller.git
 cd adcontroller
+composer install ## DO NOT MIND DATABASE ERROR
 composer dump-env dev
 vi .env.local.php
 composer install
+php bin/console lexik:jwt:generate-keypair
 composer dev
 ```

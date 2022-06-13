@@ -8,6 +8,45 @@
             "ref": "64d8583af5ea57b7afa4aba4b159907f3a148b05"
         }
     },
+    "doctrine/doctrine-bundle": {
+        "version": "2.6",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.4",
+            "ref": "ddddd8249dd55bbda16fa7a45bb7499ef6f8e90e"
+        },
+        "files": [
+            "config/packages/doctrine.yaml",
+            "src/Entity/.gitignore",
+            "src/Repository/.gitignore"
+        ]
+    },
+    "doctrine/doctrine-migrations-bundle": {
+        "version": "3.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "3.1",
+            "ref": "ee609429c9ee23e22d6fa5728211768f51ed2818"
+        },
+        "files": [
+            "config/packages/doctrine_migrations.yaml",
+            "migrations/.gitignore"
+        ]
+    },
+    "lexik/jwt-authentication-bundle": {
+        "version": "2.15",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.5",
+            "ref": "5b2157bcd5778166a5696e42f552ad36529a07a6"
+        },
+        "files": [
+            "config/packages/lexik_jwt_authentication.yaml"
+        ]
+    },
     "symfony/console": {
         "version": "6.1",
         "recipe": {
@@ -71,6 +110,75 @@
         "files": [
             "config/packages/routing.yaml",
             "config/routes.yaml"
+        ]
+    },
+    "symfony/security-bundle": {
+        "version": "6.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.0",
+            "ref": "8a5b112826f7d3d5b07027f93786ae11a1c7de48"
+        },
+        "files": [
+            "config/packages/security.yaml"
+        ]
+    },
+    "symfony/twig-bundle": {
+        "version": "6.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.4",
+            "ref": "bb2178c57eee79e6be0b297aa96fc0c0def81387"
+        },
+        "files": [
+            "config/packages/twig.yaml",
+            "templates/base.html.twig"
+        ]
+    },
+    "symfony/validator": {
+        "version": "6.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.3",
+            "ref": "c32cfd98f714894c4f128bb99aa2530c1227603c"
+        },
+        "files": [
+            "config/packages/validator.yaml"
+        ]
+    },
+    "symfony/web-profiler-bundle": {
+        "version": "6.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.3",
+            "ref": "24bbc3d84ef2f427f82104f766014e799eefcc3e"
+        },
+        "files": [
+            "config/packages/web_profiler.yaml",
+            "config/routes/web_profiler.yaml"
+        ]
+    },
+    "symfony/webpack-encore-bundle": {
+        "version": "1.14",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.10",
+            "ref": "642c9239e1c76e037f5b65446d09eba836ea147f"
+        },
+        "files": [
+            "assets/app.js",
+            "assets/bootstrap.js",
+            "assets/controllers.json",
+            "assets/controllers/hello_controller.js",
+            "assets/styles/app.css",
+            "config/packages/webpack_encore.yaml",
+            "package.json",
+            "webpack.config.js"
         ]
     }
 }
