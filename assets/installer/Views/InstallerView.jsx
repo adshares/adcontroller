@@ -32,7 +32,7 @@ const installerElements = [
   },
 ]
 
-export const InstallerComponent = () => {
+export const InstallerView = () => {
   const [step, setStep] = useState(0)
   const nextStep = (currentIndex, navTo) => {
     const nextElement = installerElements.find(e => e.index === currentIndex + 1)
