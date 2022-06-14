@@ -1,9 +1,10 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom'
 
-import { SimpleForm, TextInput, SaveButton } from 'react-admin'
+import { SimpleForm, TextInput } from 'react-admin'
 
-import { Card, CardContent, CardHeader, Toolbar } from '@mui/material'
+import { Card, CardContent, CardHeader } from '@mui/material'
+import { FormToolBar } from './FormToolBar'
 
 const formValidation = (values) => {
   const errors = {}
@@ -23,22 +24,30 @@ const formValidation = (values) => {
 }
 
 
-export const FirstStep = ({ setState }) => {
+export const SecondStep = ({ nextStep, prevStep, el }) => {
   const navigate = useNavigate()
 
   const handleSubmit = (e) => {
-    console.log(e)
-    setState(prevState => [...prevState, e])
-    navigate(`/second`)
-    console.log(location)
+    nextStep(el.index, navigate)
+
   }
 
+  const handleBackClick = () => {
+    prevStep(el.index, navigate)
+
+  }
 
   return (
     <Card>
-      <CardHeader title="Step 1" />
+      <CardHeader title="Step 2" />
       <CardContent>Lorem ipsum sic dolor amet...</CardContent>
-      <SimpleForm onSubmit={handleSubmit} validate={formValidation}>
+      <SimpleForm
+        onSubmit={handleSubmit}
+        validate={formValidation}
+        toolbar={<FormToolBar
+          handleBackClick={handleBackClick}
+        />
+      }>
         <TextInput
           label='Domain name'
           source='domain'
@@ -47,13 +56,13 @@ export const FirstStep = ({ setState }) => {
         <TextInput
           label='Email to support'
           source='supportEmail'
-          type='email'
+          type='text'
         />
         <TextInput
           label='Email to contact'
           source='contactEmail'
-          type='email'
+          type='text'
         />
       </SimpleForm>
     </Card>
-)};
+  )};

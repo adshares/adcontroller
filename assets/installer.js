@@ -2,7 +2,7 @@
 import './styles/app.scss';
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import AdminComponent from './AdminComponent'
+import { InstallerComponent } from './installer/Views/InstallerComponent'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<AdminComponent />);
+root.render(<InstallerComponent />);
