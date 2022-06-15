@@ -1,36 +1,31 @@
-<!DOCTYPE html>
-<html lang="">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {% block stylesheets %}
-            {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
-                {# installation #}
-                {{ encore_entry_link_tags('app') }}
-            {% elseif state is constant('App\\Entity\\Configuration::APP_STATE_INSTALLATION_COMPLETED') %}
-                {# configuration #}
-                {{ encore_entry_link_tags('app') }}
-            {% else %}
-                {# account creation #}
-                {{ encore_entry_link_tags('app') }}
-            {% endif %}
-        {% endblock %}
+{% extends 'base.html.twig' %}
 
-        {% block javascripts %}
-            {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
-                {# installation #}
-                {{ encore_entry_script_tags('app') }}
-            {% elseif state is constant('App\\Entity\\Configuration::APP_STATE_INSTALLATION_COMPLETED') %}
-                {# configuration #}
-                {{ encore_entry_script_tags('app') }}
-            {% else %}
-                {# account creation #}
-                {{ encore_entry_script_tags('app') }}
-            {% endif %}
-        {% endblock %}
-    </head>
-    <body>
-        <div id="root"></div>
-    </body>
-</html>
+{% block stylesheets %}
+    {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
+        {# installation #}
+        {{ encore_entry_link_tags('app') }}
+    {% elseif state is constant('App\\Entity\\Configuration::APP_STATE_INSTALLATION_COMPLETED') %}
+        {# configuration #}
+        {{ encore_entry_link_tags('app') }}
+    {% else %}
+        {# account creation #}
+        {{ encore_entry_link_tags('app') }}
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
+        {# installation #}
+        {{ encore_entry_script_tags('app') }}
+    {% elseif state is constant('App\\Entity\\Configuration::APP_STATE_INSTALLATION_COMPLETED') %}
+        {# configuration #}
+        {{ encore_entry_script_tags('app') }}
+    {% else %}
+        {# account creation #}
+        {{ encore_entry_script_tags('app') }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% include 'root.html.twig' %}
+{% endblock %}
