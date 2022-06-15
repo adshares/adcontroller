@@ -47,7 +47,7 @@ export const InstallerView = () => {
   const prevStep = (currentIndex, navTo) => {
     const isFirstStep = currentIndex === 1
     const prevElement = installerElements.find(e => e.index === currentIndex - 1)
-    setStep(currentIndex - 1)
+    // setStep(currentIndex - 1)
     if(isFirstStep){
       navTo('/start')
       return
@@ -76,8 +76,7 @@ export const InstallerView = () => {
   })
 
   return (
-    <Admin
-    >
+    <Admin>
       <Resource
         name="start"
         options={{label: 'Start'}}

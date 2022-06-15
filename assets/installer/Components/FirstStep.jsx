@@ -42,6 +42,7 @@ export const FirstStep = ({ nextStep, prevStep, el }) => {
       <CardHeader title="Step 1" />
       <CardContent>Lorem ipsum sic dolor amet...</CardContent>
       <SimpleForm
+
         onSubmit={handleSubmit}
         validate={formValidation}
         toolbar={<FormToolBar

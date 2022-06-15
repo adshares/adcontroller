@@ -6,7 +6,7 @@ export const FormToolBar = ({handleBackClick}) => {
 
   return (
     <Toolbar>
-      <Button onClick={handleBackClick} variant='contained'>Back</Button>
+      <Button sx={{marginRight: '8px'}} onClick={handleBackClick} variant='contained'>Back</Button>
       <SaveButton>Next</SaveButton>
     </Toolbar>
   )
