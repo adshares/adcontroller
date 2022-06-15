@@ -7,13 +7,18 @@ use Symfony\Component\Process\Process;
 
 class AdserverAdminCreator
 {
+    private string $adserverHomeDirectory;
+
+    public function __construct(string $adserverHomeDirectory)
+    {
+        $this->adserverHomeDirectory = $adserverHomeDirectory;
+    }
+
     public function create(string $email, string $password): void
     {
-        $adserverHomeDirectory = '/home/pp/repo/adserver';
-
         $process = new Process(
             ['php7.4', 'artisan', 'ops:admin:create', '--password', $password],
-            $adserverHomeDirectory,
+            $this->adserverHomeDirectory,
             null,
             $email,
             5
