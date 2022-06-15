@@ -35,20 +35,20 @@ const installerElements = [
 export const InstallerView = () => {
   const [step, setStep] = useState(0)
   const nextStep = (currentIndex, navTo) => {
+    const isLastStep = currentIndex === installerElements.length
     const nextElement = installerElements.find(e => e.index === currentIndex + 1)
-    const lastStep = currentIndex === installerElements.length
     setStep(currentIndex + 1)
-    if(lastStep){
+    if(isLastStep){
       navTo('/final')
       return
     }
     navTo('/' + nextElement.name)
   }
   const prevStep = (currentIndex, navTo) => {
-    const firstStep = currentIndex === 1
+    const isFirstStep = currentIndex === 1
     const prevElement = installerElements.find(e => e.index === currentIndex - 1)
     setStep(currentIndex - 1)
-    if(firstStep){
+    if(isFirstStep){
       navTo('/start')
       return
     }
@@ -57,7 +57,7 @@ export const InstallerView = () => {
 
   const sortedInstallerElements = installerElements.sort((a, b) => a.index - b.index)
 
-  const orderComponents = sortedInstallerElements.map(el =>{
+  const orderedComponents = sortedInstallerElements.map(el =>{
     const components = {
       FirstStep: <FirstStep nextStep={nextStep} prevStep={prevStep} el={el}/>,
       SecondStep: <SecondStep nextStep={nextStep} prevStep={prevStep} el={el}/>,
@@ -83,8 +83,8 @@ export const InstallerView = () => {
         options={{label: 'Start'}}
         list={<StartComponent nextStep={nextStep} />}
       />
-      {orderComponents}
-      {step > orderComponents.length && (
+      {orderedComponents}
+      {step > orderedComponents.length && (
         <Resource
           name={'final'}
           options={{label: 'Final'}}

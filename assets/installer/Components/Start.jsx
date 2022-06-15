@@ -7,9 +7,7 @@ export const StartComponent = ({nextStep}) => {
   const navigate = useNavigate()
 
   const handleStart = () => {
-    console.log('start')
     nextStep(0, navigate)
-    // navigate('/first')
   }
 
   return(
