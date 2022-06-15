@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-
+    env(ADSERVER_HOME_DIRECTORY): /opt/adshares/adserver/
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -13,6 +13,7 @@ services:
         bind:
             string $appName: '%env(APP_NAME)%'
             string $appVersion: '%env(APP_VERSION)%'
+            string $adserverHomeDirectory: '%env(ADSERVER_HOME_DIRECTORY)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
