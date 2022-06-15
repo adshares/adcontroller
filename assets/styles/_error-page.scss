@@ -1,0 +1,34 @@
+.error-page-container {
+  display: flex;
+  justify-content: center;
+  padding: 100px 100px;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  background-color: rgb(22, 11, 11);
+  padding: 8px 16px;
+  color: rgb(244, 199, 199);
+
+  &-icon--container {
+    color: rgb(244, 67, 54);
+    margin-right: 16px;
+    padding: 8px 0;
+    display: flex;
+    font-size: 24px;
+  }
+
+  &-icon--svg {
+    width: 2em;
+    height: 2em;
+    fill: currentColor;
+  }
+
+  &-message {
+    margin: 0;
+    padding: 8px 0;
+    min-width: 0;
+  }
+}
