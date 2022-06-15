@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Container, Grid, Typography, TextField } from '@mui/material'
+import { Button, Container, Grid, Typography, TextField, Alert } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 
 const useStyles = makeStyles(() => ({
@@ -13,6 +13,7 @@ export const UserCreatorView = () => {
   const classes = useStyles()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isFormDisabled, setFormStatus] = useState(false)
   // const dispatch = useDispatch()
   // const [createNewUser] = useCreateNewUserMutation()
 
@@ -23,6 +24,7 @@ export const UserCreatorView = () => {
       password
     }
     console.log(userData)
+    setFormStatus(!isFormDisabled)
   }
 
   const handleInputChange = e => {
@@ -43,49 +45,56 @@ export const UserCreatorView = () => {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <div className={classes.paper}>
-        <Typography component="h1" variant="h5" color="primary">
+    <Container component="main" maxWidth="sm" className={classes.paper}>
+      <Typography component="h1" variant="h5" color={isFormDisabled ? 'grey.500' : 'primary'}>
           Create user
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                variant="standard"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="standard"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item />
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              disabled={isFormDisabled}
+              variant="standard"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              // type='email'
+              onChange={handleInputChange}
+            />
           </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-          >
-            Create
-          </Button>
-        </form>
-      </div>
+          <Grid item xs={12}>
+            <TextField
+              disabled={isFormDisabled}
+              variant="standard"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              onChange={handleInputChange}
+            />
+          </Grid>
+          <Grid item />
+        </Grid>
+        <Button
+          disabled={isFormDisabled}
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+        >
+          Create
+        </Button>
+      </form>
+      {isFormDisabled && (
+        <Alert severity='success' sx={{marginTop: '8px'}}>
+          User was successfully created. Please refresh page to login.
+        </Alert>
+      )}
     </Container>
   )
 }
