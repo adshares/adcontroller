@@ -79,20 +79,42 @@ class ConfigurationRepository extends ServiceEntityRepository
         }
     }
 
-    public function findOneByName(string $key): ?Configuration
+    public function fetchValueByName(string $name): ?string
+    {
+        if (null === ($configuration = $this->findOneBy(['name' => $name]))) {
+            return null;
+        }
+        return $configuration->getValue();
+    }
+
+    /**
+     * @param array $names
+     * @return array<string, string>
+     */
+    public function fetchValuesByNames(array $names): array
+    {
+        $entities = $this->findByNames($names);
+        $data = [];
+        foreach ($entities as $entity) {
+            $data[$entity->getName()] = $entity->getValue();
+        }
+        return $data;
+    }
+
+    private function findOneByName(string $key): ?Configuration
     {
         return $this->findOneBy(['name' => $key]);
     }
 
     /**
-     * @param array $keys
+     * @param array $names
      * @return Configuration[]
      */
-    public function findByNames(array $keys): array
+    private function findByNames(array $names): array
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.name IN (:names)')
-            ->setParameter('names', $keys)
+            ->setParameter('names', $names)
             ->getQuery()
             ->getResult();
     }
