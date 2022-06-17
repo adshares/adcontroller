@@ -9,6 +9,17 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
+const createUser = (userData) => {
+  const formData = new FormData()
+  const request = new XMLHttpRequest()
+
+  formData.append('email', userData.email)
+  formData.append('password', userData.password)
+
+  request.open('POST', 'http://localhost:8030/api/accounts')
+  request.send(formData)
+}
+
 export const UserCreatorView = () => {
   const classes = useStyles()
   const [email, setEmail] = useState('')
@@ -23,7 +34,7 @@ export const UserCreatorView = () => {
       email,
       password
     }
-    console.log(userData)
+    createUser(userData)
     setFormStatus(!isFormDisabled)
   }
 
