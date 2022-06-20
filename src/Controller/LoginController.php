@@ -17,6 +17,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LoginController extends AbstractController
 {
+    private const ADSERVER_LOG_IN_URI = '/auth/jwt/login';
+    private const ADSERVER_BASE_URI = 'http://localhost:8010';
+
     #[Route('/api/login', name: 'api_login')]
     public function index(
         Request $request,
@@ -52,7 +55,7 @@ class LoginController extends AbstractController
 
         $response = $httpClient->request(
             'POST',
-            'http://localhost:8010/auth/jwt/login',
+            self::ADSERVER_BASE_URI . self::ADSERVER_LOG_IN_URI,
             [
                 'json' => ['email' => $email, 'password' => $password],
             ]
