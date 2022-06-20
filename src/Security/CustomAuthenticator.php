@@ -15,7 +15,7 @@ class CustomAuthenticator extends JWTAuthenticator
         $payload = $passport->getAttribute('payload');
         $isAdmin = $payload['admin'] ?? false;
         if (!$isAdmin) {
-            throw new JWTInvalidUser('admin');
+            throw new JWTInvalidUser();
         }
 
         return $passport;
