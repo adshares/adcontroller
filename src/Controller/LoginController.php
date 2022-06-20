@@ -7,37 +7,48 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-#[Route('/api', name: 'api_')]
-class ApiLoginController extends AbstractController
+class LoginController extends AbstractController
 {
-    #[Route('/login', name: 'login')]
+    #[Route('/api/login', name: 'api_login')]
     public function index(
         Request $request,
         HttpClientInterface $httpClient,
         JWTEncoderInterface $tokenEncoder,
         ValidatorInterface $validator
     ): JsonResponse {
-        $email = $request->get('email');
-        $password = $request->get('password');
+        $content = json_decode($request->getContent(), true);
 
-        $constraints = new Assert\Collection([
-            'email' => [
-                new Assert\NotBlank(['message' => 'Field `email` should not be blank']),
-                new Assert\Email(['message' => 'Field `email` should be an e-mail']),
+        $constraints = new Assert\Collection(
+            [
+                'email' => [
+                    new Assert\NotBlank(['message' => 'Field `email` should not be blank']),
+                    new Assert\Email(['message' => 'Field `email` should be an e-mail']),
+                ],
+                'password' => new Assert\NotBlank(['message' => 'Field `password` should not be blank']),
             ],
-            'password' => new Assert\NotBlank(['message' => 'Field `password` should not be blank']),
-        ]);
-        $errors = $validator->validate(['email' => $email, 'password' => $password], $constraints);
+            null,
+            null,
+            false,
+            false,
+            'Only fields `email` and `password` are allowed',
+            'Fields `email` and `password` are required'
+        );
+        $errors = $validator->validate($content, $constraints);
         if (0 !== count($errors)) {
             $errorMessage = $errors[0]->getMessage();
             throw new UnprocessableEntityHttpException($errorMessage);
         }
+
+        $email = $content['email'];
+        $password = $content['password'];
 
         $response = $httpClient->request(
             'POST',
@@ -48,7 +59,7 @@ class ApiLoginController extends AbstractController
         );
 
         if (Response::HTTP_UNAUTHORIZED === $response->getStatusCode()) {
-            return $this->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            throw new UnauthorizedHttpException('RS512', 'Unauthorized');
         }
         if (Response::HTTP_OK !== $response->getStatusCode()) {
             throw new UnprocessableEntityHttpException('Unexpected response from adserver');
@@ -60,7 +71,7 @@ class ApiLoginController extends AbstractController
         $isAdmin = $decoded['admin'] ?? false;
 
         if (!$isAdmin) {
-            return $this->json(['error' => 'Forbidden'], Response::HTTP_FORBIDDEN);
+            throw new AccessDeniedHttpException('Forbidden');
         }
 
         return $this->json(['token' => $token]);
