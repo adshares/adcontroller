@@ -10,14 +10,15 @@ const useStyles = makeStyles(() => ({
 }))
 
 const createUser = (userData) => {
-  const formData = new FormData()
   const request = new XMLHttpRequest()
 
-  formData.append('email', userData.email)
-  formData.append('password', userData.password)
+  //Form Data
+  // const formData = new FormData()
+  // formData.append('email', userData.email)
+  // formData.append('password', userData.password)
 
   request.open('POST', 'http://localhost:8030/api/accounts')
-  request.send(formData)
+  request.send(JSON.stringify(userData))
 }
 
 export const UserCreatorView = () => {
