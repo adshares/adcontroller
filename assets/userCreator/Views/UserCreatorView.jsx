@@ -11,14 +11,10 @@ const useStyles = makeStyles(() => ({
 
 const createUser = (userData) => {
   const request = new XMLHttpRequest()
-
-  //Form Data
-  // const formData = new FormData()
-  // formData.append('email', userData.email)
-  // formData.append('password', userData.password)
-
   request.open('POST', 'http://localhost:8030/api/accounts')
+  request.setRequestHeader('Content-type', 'application/json')
   request.send(JSON.stringify(userData))
+  return request
 }
 
 export const UserCreatorView = () => {
@@ -26,8 +22,7 @@ export const UserCreatorView = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isFormDisabled, setFormStatus] = useState(false)
-  // const dispatch = useDispatch()
-  // const [createNewUser] = useCreateNewUserMutation()
+  const [response, setResponse] = useState(null)
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -35,7 +30,7 @@ export const UserCreatorView = () => {
       email,
       password
     }
-    createUser(userData)
+    setResponse(createUser(userData))
     setFormStatus(!isFormDisabled)
   }
 
@@ -56,6 +51,18 @@ export const UserCreatorView = () => {
     }
   }
 
+  const showAlert = (status) => {
+    return status === 201 ? (
+      <Alert severity='success' sx={{marginTop: '8px'}}>
+        User was successfully created. Please refresh page to login.
+      </Alert>
+    ) : (
+      <Alert severity='error' sx={{marginTop: '8px'}}>
+        Something went wrong. Please refresh page
+      </Alert>
+    )
+  }
+
   return (
     <Container component="main" maxWidth="sm" className={classes.paper}>
       <Typography component="h1" variant="h5" color={isFormDisabled ? 'grey.500' : 'primary'}>
@@ -73,7 +80,7 @@ export const UserCreatorView = () => {
               label="Email Address"
               name="email"
               autoComplete="email"
-              // type='email'
+              type='email'
               onChange={handleInputChange}
             />
           </Grid>
@@ -102,11 +109,9 @@ export const UserCreatorView = () => {
           Create
         </Button>
       </form>
-      {isFormDisabled && (
-        <Alert severity='success' sx={{marginTop: '8px'}}>
-          User was successfully created. Please refresh page to login.
-        </Alert>
-      )}
+      {response && showAlert(response.status)}
     </Container>
   )
+
 }
+
