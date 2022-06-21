@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import configuration from '../../controllerConfig/configuration'
 import { Alert, Button, Container, Grid, TextField, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 
@@ -9,14 +10,20 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
-const createUser = (userData) => {
-  return fetch('http://localhost:8030/api/accounts', {
+const createUser = async (userData) => {
+
+  const response = await fetch (`${configuration.baseUrl}/api/accounts`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(userData)
   })
+  const body = await response.json()
+  return {
+    status: response.status,
+    message: body.message
+  }
 }
 
 export const UserCreatorView = () => {
@@ -26,24 +33,33 @@ export const UserCreatorView = () => {
   const [isFormDisabled, setFormStatus] = useState(false)
   const [alert, setAlert] = useState({
     show: false,
-    type: 'success',
-    message:' User was successfully created. Please refresh page to login'
+    type: '',
+    message:'',
   })
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
     const userData = {
       email,
       password
     }
-    const response = createUser(userData)
-    response.then(r => r.status === 201 ? setAlert({...alert, show: true}) : setAlert({
-      show: true,
-      type: 'error',
-      message:' Something went wrong. Please refresh page.'
-    }))
+    const response = await createUser(userData)
+      if (response.status !== 201) {
+        setAlert({
+          show: true,
+          type: 'error',
+          message: response.message
+        })
+        return
+      }
 
+    setAlert({
+      show: true,
+      type: 'success',
+      message: response.message
+    })
     setFormStatus(!isFormDisabled)
+    window.location.reload()
   }
 
   const handleInputChange = e => {
