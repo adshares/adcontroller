@@ -63,6 +63,6 @@ class AccountController extends AbstractController
         }
         $repository->insertOrUpdateOne(Configuration::APP_STATE, Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED);
 
-        return $this->json(sprintf('Account %s created', $email), Response::HTTP_CREATED);
+        return $this->json(['message' => sprintf('Account %s created', $email)], Response::HTTP_CREATED);
     }
 }
