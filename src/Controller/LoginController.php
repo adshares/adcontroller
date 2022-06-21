@@ -18,10 +18,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class LoginController extends AbstractController
 {
     private const ADSERVER_LOG_IN_URI = '/auth/jwt/login';
-    private const ADSERVER_BASE_URI = 'http://localhost:8010';
+    private const ADSERVER_LOG_OUT_URI = '/auth/jwt/logout';
 
-    #[Route('/api/login', name: 'api_login')]
-    public function index(
+    private string $adserverBaseUri;
+
+    public function __construct(string $adserverBaseUri)
+    {
+        $this->adserverBaseUri = $adserverBaseUri;
+    }
+
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    public function logIn(
         Request $request,
         HttpClientInterface $httpClient,
         JWTEncoderInterface $tokenEncoder,
@@ -55,7 +62,7 @@ class LoginController extends AbstractController
 
         $response = $httpClient->request(
             'POST',
-            self::ADSERVER_BASE_URI . self::ADSERVER_LOG_IN_URI,
+            $this->adserverBaseUri . self::ADSERVER_LOG_IN_URI,
             [
                 'json' => ['email' => $email, 'password' => $password],
             ]
@@ -79,4 +86,27 @@ class LoginController extends AbstractController
 
         return $this->json(['token' => $token]);
     }
+
+    #[Route('/api/logout', name: 'api_logout')]
+    public function logOut(Request $request, HttpClientInterface $httpClient): JsonResponse
+    {
+        $response = $httpClient->request(
+            'POST',
+            $this->adserverBaseUri . self::ADSERVER_LOG_OUT_URI,
+            [
+                'headers' => [
+                    'Authorization' => $request->headers->get('Authorization'),
+                ],
+            ]
+        );
+
+        if (Response::HTTP_OK !== $response->getStatusCode()) {
+            throw new UnprocessableEntityHttpException(
+                sprintf('User log out failed. Error (%d)', $response->getStatusCode())
+            );
+        }
+
+        return $this->json(['message' => 'User logged out successfully']);
+    }
+
 }
