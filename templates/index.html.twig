@@ -1,5 +1,13 @@
 {% extends 'base.html.twig' %}
 
+        {% block stylesheets %}
+            {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
+                {# installation #}
+                {{ encore_entry_link_tags('js/installer') }}
+            {% endif %}
+
+        {% endblock %}
+
 {% block javascripts %}
     {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
         {# installation #}
