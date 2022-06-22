@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { SimpleForm, TextInput } from 'react-admin'
 
 import { Card, CardContent, CardHeader } from '@mui/material'
-import { FormToolBar } from './FormToolBar'
+import { FormToolBar } from '../FoormToolbarComponent/FormToolBar'
 
 const formValidation = (values) => {
   const errors = {}
@@ -24,12 +24,11 @@ const formValidation = (values) => {
 }
 
 
-export const BaseComponent = ({ nextStep, prevStep, el }) => {
+export const DnsComponent = ({ nextStep, prevStep, el }) => {
   const navigate = useNavigate()
 
-  const handleSubmit = (data) => {
+  const handleSubmit = (e) => {
     nextStep(el.index, navigate)
-    console.log(data)
 
   }
 
@@ -40,31 +39,30 @@ export const BaseComponent = ({ nextStep, prevStep, el }) => {
 
   return (
     <Card>
-      <CardHeader title="Base information" />
+      <CardHeader title="DNS" />
       <CardContent>Lorem ipsum sic dolor amet...</CardContent>
       <SimpleForm
         onSubmit={handleSubmit}
         validate={formValidation}
-        toolbar={<FormToolBar handleBackClick={handleBackClick} />}
-      >
+        toolbar={<FormToolBar
+          handleBackClick={handleBackClick}
+        />
+      }>
         <TextInput
-          name='domain'
           label='Domain name'
           source='domain'
           type='text'
         />
         <TextInput
-          name='supportEmail'
           label='Email to support'
           source='supportEmail'
-          type='email'
+          type='text'
         />
         <TextInput
-          name='contactEmail'
           label='Email to contact'
           source='contactEmail'
-          type='email'
+          type='text'
         />
       </SimpleForm>
     </Card>
-)};
+  )};

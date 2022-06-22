@@ -2,8 +2,11 @@ import React from 'react'
 import { Button, Card, CardContent, CardHeader } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 
+import { useAuthenticated } from 'react-admin';
+
 
 export const StartComponent = ({nextStep}) => {
+  useAuthenticated()
   const navigate = useNavigate()
 
   const handleStart = () => {

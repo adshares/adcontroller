@@ -1,39 +1,39 @@
 import React, { useState } from 'react'
 
 import { Admin, Resource } from 'react-admin'
+import authProvider from '../providers/authProvider'
 
-import { FirstStep } from '../Components/FirstStep'
-import { SecondStep } from '../Components/SecondStep'
-import { StartComponent } from '../Components/Start'
-import { ThirdStep } from '../Components/ThirdStep'
-import { Final } from '../Components/Final'
+import { StartComponent } from '../Components/StartComponent/Start'
+import { BaseComponent } from '../Components/BaseComponent/BaseComponent'
+import { DnsComponent } from '../Components/DnsComponent/DnsComponent'
+import { Final } from '../Components/FinalComponent/Final'
+// import { ThirdStep } from '../Components/ThirdStep'
+
 
 const installerElements = [
   {
-    name: 'first',
-    options: {label: 'First step'},
-    component: 'FirstStep',
-    props: {},
-    index: 3
-  },
-  {
-    name: 'second',
-    options: {label: 'Second step'},
-    component: 'SecondStep',
-    props: {},
+    name: 'base',
+    options: {label: 'Base'},
+    component: 'Base',
     index: 1
   },
   {
-    name: 'third',
-    options: {label: 'Third step'},
-    component: 'ThirdStep',
-    props: {},
+    name: 'dns',
+    options: {label: 'DNS'},
+    component: 'DNS',
     index: 2
   },
+  // {
+  //   name: 'third',
+  //   options: {label: 'Third step'},
+  //   component: 'ThirdStep',
+  //   index: 2
+  // },
 ]
 
 export const InstallerView = () => {
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(2)
+
   const nextStep = (currentIndex, navTo) => {
     const isLastStep = currentIndex === installerElements.length
     const nextElement = installerElements.find(e => e.index === currentIndex + 1)
@@ -59,9 +59,9 @@ export const InstallerView = () => {
 
   const orderedComponents = sortedInstallerElements.map(el =>{
     const components = {
-      FirstStep: <FirstStep nextStep={nextStep} prevStep={prevStep} el={el}/>,
-      SecondStep: <SecondStep nextStep={nextStep} prevStep={prevStep} el={el}/>,
-      ThirdStep: <ThirdStep nextStep={nextStep} prevStep={prevStep} el={el}/>
+      Base: <BaseComponent nextStep={nextStep} prevStep={prevStep} el={el}/>,
+      DNS: <DnsComponent nextStep={nextStep} prevStep={prevStep} el={el}/>,
+      // ThirdStep: <ThirdStep nextStep={nextStep} prevStep={prevStep} el={el}/>
     }
     if(el.index <= step){
       return (
@@ -76,7 +76,9 @@ export const InstallerView = () => {
   })
 
   return (
-    <Admin>
+    <Admin
+      authProvider={authProvider}
+    >
       <Resource
         name="start"
         options={{label: 'Start'}}
