@@ -26,19 +26,25 @@ class ServicePresenceChecker
         }
     }
 
+    public function getEnvFile(string $module): string
+    {
+        switch ($module) {
+            case 'adserver':
+                return self::canonicalize($this->adserverHomeDirectory) . '.env';
+            default:
+                throw new ServiceNotPresent('Unsupported service');
+        }
+    }
+
     private function checkAdserver(): void
     {
         $filesystem = new Filesystem();
-        $homeDirectory = $this->adserverHomeDirectory;
 
-        if (!$filesystem->exists($homeDirectory)) {
+        if (!$filesystem->exists($this->adserverHomeDirectory)) {
             throw new ServiceNotPresent('Home directory does not exists');
         }
 
-        if (!str_ends_with($homeDirectory, '/')) {
-            $homeDirectory .= '/';
-        }
-
+        $homeDirectory = self::canonicalize($this->adserverHomeDirectory);
         $files = [
             'artisan',
             '.env'
@@ -57,5 +63,13 @@ class ServicePresenceChecker
         if (!$process->isSuccessful()) {
             throw new ServiceNotPresent('Cannot execute `artisan` command');
         }
+    }
+
+    private static function canonicalize(string $homeDirectory): string
+    {
+        if (!str_ends_with($homeDirectory, '/')) {
+            return $homeDirectory . '/';
+        }
+        return $homeDirectory;
     }
 }
