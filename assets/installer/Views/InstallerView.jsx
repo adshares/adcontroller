@@ -7,8 +7,6 @@ import { StartComponent } from '../Components/StartComponent/Start'
 import { BaseComponent } from '../Components/BaseComponent/BaseComponent'
 import { DnsComponent } from '../Components/DnsComponent/DnsComponent'
 import { Final } from '../Components/FinalComponent/Final'
-// import { ThirdStep } from '../Components/ThirdStep'
-
 
 const installerElements = [
   {
@@ -22,13 +20,7 @@ const installerElements = [
     options: {label: 'DNS'},
     component: 'DNS',
     index: 2
-  },
-  // {
-  //   name: 'third',
-  //   options: {label: 'Third step'},
-  //   component: 'ThirdStep',
-  //   index: 2
-  // },
+  }
 ]
 
 export const InstallerView = () => {
@@ -47,7 +39,6 @@ export const InstallerView = () => {
   const prevStep = (currentIndex, navTo) => {
     const isFirstStep = currentIndex === 1
     const prevElement = installerElements.find(e => e.index === currentIndex - 1)
-    // setStep(currentIndex - 1)
     if(isFirstStep){
       navTo('/start')
       return
@@ -61,7 +52,6 @@ export const InstallerView = () => {
     const components = {
       Base: <BaseComponent nextStep={nextStep} prevStep={prevStep} el={el}/>,
       DNS: <DnsComponent nextStep={nextStep} prevStep={prevStep} el={el}/>,
-      // ThirdStep: <ThirdStep nextStep={nextStep} prevStep={prevStep} el={el}/>
     }
     if(el.index <= step){
       return (
