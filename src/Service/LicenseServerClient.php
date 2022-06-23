@@ -45,7 +45,7 @@ class LicenseServerClient
      *
      * @param string $email e-mail address
      * @param string $adserverName AdServer's name
-     * @return string secret
+     * @return string license key (secret)
      */
     public function createCommunityLicense(string $email, string $adserverName): string
     {

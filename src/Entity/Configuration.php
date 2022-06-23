@@ -35,7 +35,7 @@ class Configuration
     public const LICENSE_CONTACT_EMAIL = 'license_contact_email';
     public const LICENSE_END_DATE = 'license_end_date';
     public const LICENSE_OWNER = 'license_owner';
-    public const LICENSE_SECRET = 'license_secret';
+    public const LICENSE_KEY = 'license_key';
     public const LICENSE_START_DATE = 'license_start_date';
     public const LICENSE_TYPE = 'license_type';
     public const SMTP_HOST = 'smtp_host';
