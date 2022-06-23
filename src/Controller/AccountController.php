@@ -58,7 +58,7 @@ class AccountController extends AbstractController
 
         try {
             $accountCreator->create($email, $password);
-        } catch (ProcessFailedException|ProcessRuntimeException) {
+        } catch (ProcessFailedException | ProcessRuntimeException) {
             throw new UnprocessableEntityHttpException('Account cannot be created');
         }
         $repository->insertOrUpdateOne(Configuration::APP_STATE, Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED);

@@ -152,8 +152,15 @@ class BaseStep implements InstallerStep
 
             $commonDomainParts = [];
             $i = 0;
-            while (isset($invertedDomains['panel'][$i]) && isset($invertedDomains['app'][$i]) && isset($invertedDomains['au'][$i])) {
-                if ($invertedDomains['panel'][$i] !== $invertedDomains['app'][$i] || $invertedDomains['panel'][$i] !== $invertedDomains['au'][$i]) {
+            while (
+                isset($invertedDomains['panel'][$i])
+                && isset($invertedDomains['app'][$i])
+                && isset($invertedDomains['au'][$i])
+            ) {
+                if (
+                    $invertedDomains['panel'][$i] !== $invertedDomains['app'][$i]
+                    || $invertedDomains['panel'][$i] !== $invertedDomains['au'][$i]
+                ) {
                     break;
                 }
                 $commonDomainParts[] = $invertedDomains['panel'][$i];

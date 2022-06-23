@@ -40,7 +40,7 @@ class InstallerController extends AbstractController
 
         try {
             $service = $this->container->get($step . '_step');
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface) {
             throw new UnprocessableEntityHttpException(sprintf('Unsupported step (%s)', $step));
         }
 
@@ -65,7 +65,7 @@ class InstallerController extends AbstractController
 
         try {
             $service = $this->container->get($step . '_step');
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface) {
             throw new UnprocessableEntityHttpException(sprintf('Unsupported step (%s)', $step));
         }
 

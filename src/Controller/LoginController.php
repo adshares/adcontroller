@@ -111,5 +111,4 @@ class LoginController extends AbstractController
 
         return $this->json(['message' => 'User logged out successfully']);
     }
-
 }
