@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 
 import apiService from '../../utils/apiService'
 
-import { Button, Container, TextField } from '@mui/material'
-import styles from './styles.scss'
+import { Button, TextField } from '@mui/material'
+import { WindowCard } from '../../Components/WindowCard/WindowCard'
 
-export default function LoginComponent ({setToken}) {
+export default function Login ({setToken}) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -33,7 +33,7 @@ export default function LoginComponent ({setToken}) {
   }
 
   return (
-    <Container className={styles.container} maxWidth="sm">
+    <WindowCard title='Please login'>
       <form onSubmit={handleSubmit}>
         <TextField
           color="primary"
@@ -71,6 +71,6 @@ export default function LoginComponent ({setToken}) {
           Login
         </Button>
       </form>
-    </Container>
+    </WindowCard>
   )
 }
