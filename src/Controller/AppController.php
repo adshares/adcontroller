@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AppController extends AbstractController
 {
-    #[Route('/', name: 'app')]
+    #[Route('/{match_all}', name: 'app', requirements: ['match_all' => '.*'], priority:-1)]
     public function index(ConfigurationRepository $repository, ServicePresenceChecker $servicePresenceChecker): Response
     {
         $state = $repository->fetchValueByName(Configuration::APP_STATE);
