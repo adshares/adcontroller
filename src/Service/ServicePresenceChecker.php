@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Exception\ServiceNotPresent;
+use App\ValueObject\Module;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -15,9 +16,9 @@ class ServicePresenceChecker
         $this->adserverHomeDirectory = $adserverHomeDirectory;
     }
 
-    public function check(string $module): void
+    public function check(Module $module): void
     {
-        switch ($module) {
+        switch ($module->toString()) {
             case 'adserver':
                 $this->checkAdserver();
                 break;
@@ -26,9 +27,9 @@ class ServicePresenceChecker
         }
     }
 
-    public function getEnvFile(string $module): string
+    public function getEnvFile(Module $module): string
     {
-        switch ($module) {
+        switch ($module->toString()) {
             case 'adserver':
                 return self::canonicalize($this->adserverHomeDirectory) . '.env';
             default:
