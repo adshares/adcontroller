@@ -67,12 +67,15 @@ class LoginController extends AbstractController
                 'json' => ['email' => $email, 'password' => $password],
             ]
         );
+        $statusCode = $response->getStatusCode();
 
-        if (Response::HTTP_UNAUTHORIZED === $response->getStatusCode()) {
+        if (Response::HTTP_UNAUTHORIZED === $statusCode) {
             throw new UnauthorizedHttpException('RS512', 'Unauthorized');
         }
-        if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new UnprocessableEntityHttpException('Unexpected response from adserver');
+        if (Response::HTTP_OK !== $statusCode) {
+            throw new UnprocessableEntityHttpException(
+                sprintf('Unexpected response from adserver (%d)', $statusCode)
+            );
         }
 
         $token = json_decode($response->getContent(), true)['token'];
