@@ -16,6 +16,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -45,7 +46,12 @@ class InstallerController extends AbstractController
 
         $data = $service->fetchData();
 
-        return $this->json($data);
+        return new JsonResponse(
+            json_encode($data, JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_FORCE_OBJECT),
+            Response::HTTP_OK,
+            [],
+            true
+        );
     }
 
     #[Route('/step/{step}', name: 'set_step', methods: ['POST'])]
