@@ -6,6 +6,18 @@ use RuntimeException;
 
 class EnvEditor
 {
+    public const ADSERVER_ADPANEL_URL = 'ADPANEL_URL';
+    public const ADSERVER_ADSHARES_OPERATOR_EMAIL = 'ADSHARES_OPERATOR_EMAIL';
+    public const ADSERVER_ADUSER_BASE_URL = 'ADUSER_BASE_URL';
+    public const ADSERVER_ADUSER_INTERNAL_URL = 'ADUSER_INTERNAL_URL';
+    public const ADSERVER_APP_HOST = 'APP_HOST';
+    public const ADSERVER_APP_NAME = 'APP_NAME';
+    public const ADSERVER_APP_URL = 'APP_URL';
+    public const ADSERVER_MAIL_FROM_ADDRESS = 'MAIL_FROM_ADDRESS';
+    public const ADSERVER_MAIL_FROM_NAME = 'MAIL_FROM_NAME';
+    public const ADSERVER_MAIN_JS_BASE_URL = 'MAIN_JS_BASE_URL';
+    public const ADSERVER_SERVE_BASE_URL = 'SERVE_BASE_URL';
+
     private string $envFile;
 
     public function __construct(string $envFile)
@@ -21,7 +33,7 @@ class EnvEditor
             return null;
         }
 
-        return explode('=', $matches[0], 2)[1] ?? null;
+        return self::unescapeSpecialCharacters(explode('=', $matches[0], 2)[1]);
     }
 
     public function get(array $keys): array
@@ -31,7 +43,7 @@ class EnvEditor
         $result = [];
         foreach ($keys as $key) {
             if (1 === preg_match(self::pattern($key), $contents, $matches)) {
-                $result[$key] = explode('=', $matches[0], 2)[1] ?? null;
+                $result[$key] = self::unescapeSpecialCharacters(explode('=', $matches[0], 2)[1]);
             } else {
                 $result[$key] = null;
             }
@@ -46,7 +58,7 @@ class EnvEditor
         $append = '';
 
         foreach ($data as $key => $value) {
-            $replacement = $key . '=' . $value;
+            $replacement = $key . '=' . self::escapeSpecialCharacters($value);
             $contents = preg_replace(self::pattern($key), $replacement, $contents, 1, $count);
             if (0 === $count) {
                 $append .= "\n" . $replacement;
@@ -61,7 +73,7 @@ class EnvEditor
     public function setOne(string $key, string $value): void
     {
         $contents = $this->getFileContents();
-        $replacement = $key . '=' . $value;
+        $replacement = $key . '=' . self::escapeSpecialCharacters($value);
 
         $contents = preg_replace(self::pattern($key), $replacement, $contents, 1, $count);
 
@@ -86,5 +98,23 @@ class EnvEditor
         }
 
         return $contents;
+    }
+
+    private static function escapeSpecialCharacters(string $value): string
+    {
+        if (1 === preg_match('/^\d+(\.\d+)?$/', $value)) {
+            return $value;
+        }
+
+        return sprintf('"%s"', str_replace('"', '\\"', str_replace('\\', '\\\\', $value)));
+    }
+
+    private static function unescapeSpecialCharacters(string $value): string
+    {
+        if (1 === preg_match('/^\d+(\.\d+)?$/', $value)) {
+            return $value;
+        }
+
+        return str_replace('\\\\', '\\', str_replace('\\"', '"', trim($value, '"')));
     }
 }
