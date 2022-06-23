@@ -19,6 +19,7 @@ class Configuration
     public const INSTALLER_STEP_LICENSE = 'license';
     public const INSTALLER_STEP_CLASSIFIER = 'classifier';
     public const INSTALLER_STEP_SMTP = 'smtp';
+    public const INSTALLER_STEP_STATUS = 'status';
 
     public const BASE_ADSERVER_NAME = 'base_adserver_name';
     public const BASE_CONTACT_EMAIL = 'base_contact_email';

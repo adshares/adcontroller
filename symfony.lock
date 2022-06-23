@@ -36,7 +36,7 @@
         ]
     },
     "lexik/jwt-authentication-bundle": {
-        "version": "2.15",
+        "version": "2.16",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
