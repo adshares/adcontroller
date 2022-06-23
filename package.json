@@ -20,6 +20,7 @@
     "dependencies": {
         "@emotion/react": "^11.9.3",
         "@emotion/styled": "^11.9.3",
+        "@mui/icons-material": "^5.8.4",
         "@mui/material": "^5.8.3",
         "@mui/styles": "^5.8.4",
         "prop-types": "^15.8.1",
