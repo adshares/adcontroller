@@ -12,12 +12,12 @@ class LicenseServerClient
     private const FETCH_URI = '/api/v1/license/';
 
     private HttpClientInterface $httpClient;
-    private string $licenseServerBaseUri;
+    private string $baseUri;
 
     public function __construct(HttpClientInterface $httpClient, string $licenseServerBaseUri)
     {
         $this->httpClient = $httpClient;
-        $this->licenseServerBaseUri = $licenseServerBaseUri;
+        $this->baseUri = $licenseServerBaseUri;
     }
 
     /**
@@ -30,7 +30,7 @@ class LicenseServerClient
     {
         $response = $this->httpClient->request(
             'GET',
-            $this->licenseServerBaseUri . self::FETCH_URI . $id
+            $this->baseUri . self::FETCH_URI . $id
         );
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
@@ -51,7 +51,7 @@ class LicenseServerClient
     {
         $response = $this->httpClient->request(
             'POST',
-            $this->licenseServerBaseUri . self::CREATE_URI,
+            $this->baseUri . self::CREATE_URI,
             [
                 'json' => ['email' => $email, 'name' => $adserverName]
             ]

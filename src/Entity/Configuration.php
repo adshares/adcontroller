@@ -32,6 +32,8 @@ class Configuration
     public const BASE_CONTACT_EMAIL = 'base_contact_email';
     public const BASE_DOMAIN = 'base_domain';
     public const BASE_SUPPORT_EMAIL = 'base_support_email';
+    public const CLASSIFIER_API_KEY_NAME = 'classifier_ext_api_key_name';
+    public const CLASSIFIER_API_KEY_SECRET = 'classifier_ext_api_key_secret';
     public const COMMON_DATA_REQUIRED = 'data_required';
     public const LICENSE_CONTACT_EMAIL = 'license_contact_email';
     public const LICENSE_END_DATE = 'license_end_date';
