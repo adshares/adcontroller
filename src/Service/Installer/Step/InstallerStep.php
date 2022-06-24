@@ -8,5 +8,7 @@ interface InstallerStep
 
     public function getName(): string;
 
+    public function isDataRequired(): bool;
+
     public function process(array $content): void;
 }

@@ -49,7 +49,9 @@ class DnsStep implements InstallerStep
 
         $values = $envEditor->get(array_values($config));
 
-        $data = [];
+        $data = [
+            Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
+        ];
         foreach ($config as $service => $key) {
             $url = $values[$key] ?? null;
             $status = $this->getServiceStatus($url);
@@ -77,5 +79,10 @@ class DnsStep implements InstallerStep
         }
 
         return $status;
+    }
+
+    public function isDataRequired(): bool
+    {
+        return false;
     }
 }

@@ -28,4 +28,9 @@ class ClassifierStep implements InstallerStep
     {
         return [];
     }
+
+    public function isDataRequired(): bool
+    {
+        return false;
+    }
 }

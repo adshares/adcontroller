@@ -18,6 +18,10 @@ class EnvEditor
     public const ADSERVER_APP_URL = 'APP_URL';
     public const ADSERVER_MAIL_FROM_ADDRESS = 'MAIL_FROM_ADDRESS';
     public const ADSERVER_MAIL_FROM_NAME = 'MAIL_FROM_NAME';
+    public const ADSERVER_MAIL_HOST = 'MAIL_HOST';
+    public const ADSERVER_MAIL_PASSWORD = 'MAIL_PASSWORD';
+    public const ADSERVER_MAIL_PORT = 'MAIL_PORT';
+    public const ADSERVER_MAIL_USERNAME = 'MAIL_USERNAME';
     public const ADSERVER_MAIN_JS_BASE_URL = 'MAIN_JS_BASE_URL';
     public const ADSERVER_SERVE_BASE_URL = 'SERVE_BASE_URL';
 

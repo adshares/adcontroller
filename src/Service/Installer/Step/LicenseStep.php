@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class LicenseStep implements InstallerStep
 {
+    private const DEFAULT_ENV_ADSHARES_LICENSE_KEY = 'SRV-000000';
     private const FIELDS = [
         Configuration::LICENSE_CONTACT_EMAIL,
     ];
@@ -33,7 +34,7 @@ class LicenseStep implements InstallerStep
 
     public function process(array $content): void
     {
-        if ($this->omitStep($content)) {
+        if (empty($content) && !$this->isDataRequired()) {
             $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
             return;
         }
@@ -102,7 +103,7 @@ class LicenseStep implements InstallerStep
 
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
         $licenseKey = $envEditor->getOne(EnvEditor::ADSERVER_ADSHARES_LICENSE_KEY);
-        if (null !== $licenseKey && 'SRV-000000' !== $licenseKey) {
+        if ($this->isLicenseKeySet($licenseKey)) {
             $id = substr($licenseKey, 0, 10);
             $encodedData = $this->licenseServerClient->fetchEncodedLicenseData($id);
             $license = (new LicenseDecoder($licenseKey))->decode($encodedData);
@@ -115,19 +116,16 @@ class LicenseStep implements InstallerStep
         return $data;
     }
 
-    private function omitStep(array $content): bool
+    public function isDataRequired(): bool
     {
-        if (!empty($content)) {
-            return false;
-        }
-
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
         $licenseKey = $envEditor->getOne(EnvEditor::ADSERVER_ADSHARES_LICENSE_KEY);
 
-        if (null === $licenseKey || 'SRV-000000' === $licenseKey) {
-            return false;
-        }
+        return !$this->isLicenseKeySet($licenseKey);
+    }
 
-        return true;
+    private function isLicenseKeySet(?string $licenseKey): bool
+    {
+        return null !== $licenseKey && self::DEFAULT_ENV_ADSHARES_LICENSE_KEY !== $licenseKey;
     }
 }

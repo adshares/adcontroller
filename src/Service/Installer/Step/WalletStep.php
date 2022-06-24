@@ -13,6 +13,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WalletStep implements InstallerStep
 {
+    private const DEFAULT_ENV_ADSHARES_ADDRESS = '0001-00000000-9B6F';
     private const FIELDS = [
         Configuration::WALLET_ADDRESS,
         Configuration::WALLET_SECRET_KEY,
@@ -34,7 +35,7 @@ class WalletStep implements InstallerStep
 
     public function process(array $content): void
     {
-        if ($this->omitStep($content)) {
+        if (empty($content) && !$this->isDataRequired()) {
             $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
             return;
         }
@@ -92,23 +93,18 @@ class WalletStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-
-        $values = $envEditor->get(
-            [
-                EnvEditor::ADSERVER_ADSHARES_ADDRESS,
-                EnvEditor::ADSERVER_ADSHARES_SECRET,
-            ]
-        );
-
-        foreach ($values as $value) {
-            if (!$value) {
-                return [];
-            }
+        if ($this->isDataRequired()) {
+            return [
+                Configuration::COMMON_DATA_REQUIRED => true,
+            ];
         }
 
+        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+        $address = $envEditor->getOne(EnvEditor::ADSERVER_ADSHARES_ADDRESS);
+
         return [
-            Configuration::WALLET_ADDRESS => $values[EnvEditor::ADSERVER_ADSHARES_ADDRESS],
+            Configuration::COMMON_DATA_REQUIRED => false,
+            Configuration::WALLET_ADDRESS => $address,
         ];
     }
 
@@ -138,12 +134,8 @@ class WalletStep implements InstallerStep
         return strtoupper(json_decode($response->getContent(), true)['result']['network_account']['public_key']);
     }
 
-    private function omitStep(array $content): bool
+    public function isDataRequired(): bool
     {
-        if (!empty($content)) {
-            return false;
-        }
-
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
 
         $values = $envEditor->get(
@@ -155,10 +147,14 @@ class WalletStep implements InstallerStep
 
         foreach ($values as $value) {
             if (!$value) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        if (self::DEFAULT_ENV_ADSHARES_ADDRESS === $values[EnvEditor::ADSERVER_ADSHARES_ADDRESS]) {
+            return true;
+        }
+
+        return false;
     }
 }

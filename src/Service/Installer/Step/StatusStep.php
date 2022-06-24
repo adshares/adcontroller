@@ -33,4 +33,9 @@ class StatusStep implements InstallerStep
     {
         return [];
     }
+
+    public function isDataRequired(): bool
+    {
+        return false;
+    }
 }
