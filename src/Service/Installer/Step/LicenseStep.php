@@ -95,8 +95,8 @@ class LicenseStep implements InstallerStep
         }
 
         $data = [
-            Configuration::BASE_ADSERVER_NAME =>
-                $localData[Configuration::BASE_ADSERVER_NAME],
+            Configuration::BASE_ADSERVER_NAME => $localData[Configuration::BASE_ADSERVER_NAME],
+            Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
             Configuration::LICENSE_CONTACT_EMAIL =>
                 $localData[Configuration::LICENSE_CONTACT_EMAIL] ?? $localData[Configuration::BASE_CONTACT_EMAIL],
         ];

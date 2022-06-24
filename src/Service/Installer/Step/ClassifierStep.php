@@ -26,7 +26,9 @@ class ClassifierStep implements InstallerStep
 
     public function fetchData(): array
     {
-        return [];
+        return [
+            Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
+        ];
     }
 
     public function isDataRequired(): bool

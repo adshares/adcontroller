@@ -8,6 +8,9 @@ use App\Service\EnvEditor;
 use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -42,9 +45,9 @@ class DnsStep implements InstallerStep
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
 
         $config = [
-            'AdPanel' => EnvEditor::ADSERVER_ADPANEL_URL,
-            'AdServer' => EnvEditor::ADSERVER_APP_URL,
-            'AdUser' => EnvEditor::ADSERVER_ADUSER_BASE_URL,
+            Module::ADPANEL => EnvEditor::ADSERVER_ADPANEL_URL,
+            Module::ADSERVER => EnvEditor::ADSERVER_APP_URL,
+            Module::ADUSER => EnvEditor::ADSERVER_ADUSER_BASE_URL,
         ];
 
         $values = $envEditor->get(array_values($config));
@@ -52,33 +55,46 @@ class DnsStep implements InstallerStep
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
-        foreach ($config as $service => $key) {
+        foreach ($config as $moduleName => $key) {
             $url = $values[$key] ?? null;
-            $status = $this->getServiceStatus($url);
-            $data[strtolower($service)] = [
-                'module' => $service,
-                'url' => $url,
-                'code' => $status,
-            ];
+            $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
         }
 
         return $data;
     }
 
-    private function getServiceStatus(?string $url): int
+    private function getModuleStatus(Module $module, ?string $url): array
     {
         if (!$url) {
-            return Response::HTTP_BAD_GATEWAY;
+            return [
+                'module' => $module->getDisplayableName(),
+                'url' => $url,
+                'code' => Response::HTTP_PRECONDITION_FAILED,
+            ];
         }
 
         try {
             $response = $this->httpClient->request('GET', $url . '/info.json');
-            $status = $response->getStatusCode();
-        } catch (TransportExceptionInterface) {
+            $infoModule = json_decode($response->getContent())->module ?? null;
+            if ($module->getInfoName() !== $infoModule) {
+                $status = Response::HTTP_NOT_IMPLEMENTED;
+            } else {
+                $status = $response->getStatusCode();
+            }
+        } catch (
+            ClientExceptionInterface |
+            RedirectionExceptionInterface |
+            ServerExceptionInterface |
+            TransportExceptionInterface
+        ) {
             $status = Response::HTTP_BAD_GATEWAY;
         }
 
-        return $status;
+        return [
+            'module' => $module->getDisplayableName(),
+            'url' => $url,
+            'code' => $status,
+        ];
     }
 
     public function isDataRequired(): bool
