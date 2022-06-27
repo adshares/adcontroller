@@ -23,8 +23,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'api_')]
 class InstallerController extends AbstractController
 {
-    #[Route('/step', name: 'current_step', methods: ['GET'])]
-    public function currentStep(ConfigurationRepository $repository): JsonResponse
+    #[Route('/step', name: 'previous_step', methods: ['GET'])]
+    public function previousStep(ConfigurationRepository $repository): JsonResponse
     {
         $step = $repository->fetchValueByName(Configuration::INSTALLER_STEP);
 
