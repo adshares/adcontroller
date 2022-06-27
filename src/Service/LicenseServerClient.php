@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use RuntimeException;
+use App\Exception\UnexpectedResponseException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -34,7 +34,7 @@ class LicenseServerClient
         );
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new RuntimeException();
+            throw new UnexpectedResponseException(sprintf('Unexpected status code (%d)', $response->getStatusCode()));
         }
 
         return json_decode($response->getContent())->data;
@@ -58,7 +58,7 @@ class LicenseServerClient
         );
 
         if (Response::HTTP_CREATED !== $response->getStatusCode()) {
-            throw new RuntimeException();
+            throw new UnexpectedResponseException(sprintf('Unexpected status code (%d)', $response->getStatusCode()));
         }
 
         return json_decode($response->getContent())->key;

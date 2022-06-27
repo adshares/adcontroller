@@ -3,6 +3,7 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\EnvEditor;
 use App\Service\LicenseDecoder;
@@ -17,6 +18,7 @@ class LicenseStep implements InstallerStep
     private const FIELDS = [
         Configuration::LICENSE_CONTACT_EMAIL,
     ];
+    private const LICENSE_KEY_PATTERN = '/^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/i';
 
     private ConfigurationRepository $repository;
     private LicenseServerClient $licenseServerClient;
@@ -39,14 +41,40 @@ class LicenseStep implements InstallerStep
             return;
         }
 
+        if (isset($content[Configuration::LICENSE_KEY])) {
+            $licenseKey = $content[Configuration::LICENSE_KEY];
+
+            if (!is_string($licenseKey) || 1 !== preg_match(self::LICENSE_KEY_PATTERN, $licenseKey)) {
+                throw new UnprocessableEntityHttpException(
+                    sprintf('Field `%s` must be a valid license key', Configuration::LICENSE_KEY)
+                );
+            }
+
+            try {
+                $this->licenseServerClient->fetchEncodedLicenseData($this->getLicenseIdFromKey($licenseKey));
+            } catch (UnexpectedResponseException) {
+                throw new UnprocessableEntityHttpException(
+                    sprintf('Field `%s` must be an existing license key', Configuration::LICENSE_KEY)
+                );
+            }
+
+            $this->repository->insertOrUpdate(
+                [
+                    Configuration::INSTALLER_STEP => $this->getName(),
+                    Configuration::LICENSE_KEY => $licenseKey,
+                ]
+            );
+            return;
+        }
+
         if (null === ($name = $this->repository->fetchValueByName(Configuration::BASE_ADSERVER_NAME))) {
             throw new UnprocessableEntityHttpException('AdServer\'s name must be set');
         }
 
         $this->validate($content);
 
-        $message = $content[Configuration::LICENSE_CONTACT_EMAIL];
-        $licenseKey = $this->licenseServerClient->createCommunityLicense($message, $name);
+        $email = $content[Configuration::LICENSE_CONTACT_EMAIL];
+        $licenseKey = $this->licenseServerClient->createCommunityLicense($email, $name);
 
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
         $envEditor->setOne(EnvEditor::ADSERVER_ADSHARES_LICENSE_KEY, $licenseKey);
@@ -54,7 +82,7 @@ class LicenseStep implements InstallerStep
         $this->repository->insertOrUpdate(
             [
                 Configuration::INSTALLER_STEP => $this->getName(),
-                Configuration::LICENSE_CONTACT_EMAIL => $message,
+                Configuration::LICENSE_CONTACT_EMAIL => $email,
                 Configuration::LICENSE_KEY => $licenseKey,
             ]
         );
@@ -104,7 +132,7 @@ class LicenseStep implements InstallerStep
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
         $licenseKey = $envEditor->getOne(EnvEditor::ADSERVER_ADSHARES_LICENSE_KEY);
         if ($this->isLicenseKeySet($licenseKey)) {
-            $id = substr($licenseKey, 0, 10);
+            $id = $this->getLicenseIdFromKey($licenseKey);
             $encodedData = $this->licenseServerClient->fetchEncodedLicenseData($id);
             $license = (new LicenseDecoder($licenseKey))->decode($encodedData);
             $data[Configuration::LICENSE_END_DATE] = $license->getEndDate();
@@ -126,6 +154,11 @@ class LicenseStep implements InstallerStep
 
     private function isLicenseKeySet(?string $licenseKey): bool
     {
-        return null !== $licenseKey && self::DEFAULT_ENV_ADSHARES_LICENSE_KEY !== $licenseKey;
+        return null !== $licenseKey && '' !== $licenseKey && self::DEFAULT_ENV_ADSHARES_LICENSE_KEY !== $licenseKey;
+    }
+
+    private function getLicenseIdFromKey(string $licenseKey): string
+    {
+        return substr($licenseKey, 0, 10);
     }
 }
