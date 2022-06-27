@@ -19,7 +19,7 @@ class ServicePresenceChecker
     public function check(Module $module): void
     {
         switch ($module->toString()) {
-            case 'adserver':
+            case Module::ADSERVER:
                 $this->checkAdserver();
                 break;
             default:
@@ -30,7 +30,7 @@ class ServicePresenceChecker
     public function getEnvFile(Module $module): string
     {
         switch ($module->toString()) {
-            case 'adserver':
+            case Module::ADSERVER:
                 return self::canonicalize($this->adserverHomeDirectory) . '.env';
             default:
                 throw new ServiceNotPresent('Unsupported service');

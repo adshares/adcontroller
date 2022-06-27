@@ -21,3 +21,8 @@ yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
 /assets/installer-old
+
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###

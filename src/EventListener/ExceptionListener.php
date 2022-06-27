@@ -17,7 +17,8 @@ class ExceptionListener implements EventSubscriberInterface
         $exception = $event->getThrowable();
         $request = $event->getRequest();
 
-        if (self::HEADER_JSON_CONTENT === $request->headers->get('Content-Type')
+        if (
+            self::HEADER_JSON_CONTENT === $request->headers->get('Content-Type')
             && $exception instanceof HttpExceptionInterface
         ) {
             $response = new JsonResponse([
