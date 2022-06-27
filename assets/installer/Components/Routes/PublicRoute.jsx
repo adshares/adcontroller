@@ -2,9 +2,8 @@ import React from 'react'
 import { Navigate } from 'react-router-dom';
 
 const PublicRoute = ({
-  component: Component,
   restricted = false,
-  redirectTo = '/base',
+  redirectTo = '/',
   children,
   isLoggedIn
 }) => {
