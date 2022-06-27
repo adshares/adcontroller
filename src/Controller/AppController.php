@@ -8,6 +8,7 @@ use App\Repository\ConfigurationRepository;
 use App\Service\AdserverAdminList;
 use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,22 +19,25 @@ class AppController extends AbstractController
     public function index(
         AdserverAdminList $accountList,
         ConfigurationRepository $repository,
+        LoggerInterface $logger,
         ServicePresenceChecker $servicePresenceChecker
     ): Response {
         try {
             $servicePresenceChecker->check(Module::adserver());
         } catch (ServiceNotPresent $exception) {
-            return $this->render(
-                'error-page.html.twig',
-                [
-                    'message' => sprintf(
-                        <<<MESSAGE
+            $errorMessage = sprintf(
+                <<<MESSAGE
 Adserver not found (%s).
 If you use non-standard location, set ADSERVER_HOME_DIRECTORY in .env file'
 MESSAGE
-                        ,
-                        $exception->getMessage()
-                    )
+                ,
+                $exception->getMessage()
+            );
+            $logger->emergency($errorMessage);
+            return $this->render(
+                'error-page.html.twig',
+                [
+                    'message' => $errorMessage
                 ]
             );
         }
