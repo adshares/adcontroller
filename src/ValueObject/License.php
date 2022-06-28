@@ -8,78 +8,58 @@ use DateTimeInterface;
 
 class License
 {
-    private string $id;
     private string $type;
     private int $status;
     private DateTimeInterface $dateStart;
     private DateTimeInterface $dateEnd;
     private string $owner;
     private AccountId $paymentAddress;
+    private string $paymentMessage;
     private float $fixedFee;
     private float $demandFee;
     private float $supplyFee;
-    private bool $infoBox;
+    private bool $privateLabel;
 
     public function __construct(
-        string $id,
         string $type,
         int $status,
         DateTimeInterface $dateStart,
         DateTimeInterface $dateEnd,
         string $owner,
         AccountId $paymentAddress,
+        string $paymentMessage,
         float $fixedFee,
         float $demandFee,
         float $supplyFee,
-        bool $infoBox
+        bool $privateLabel
     ) {
-        $this->id = $id;
         $this->type = $type;
         $this->status = $status;
         $this->dateStart = $dateStart;
         $this->dateEnd = $dateEnd;
         $this->owner = $owner;
         $this->paymentAddress = $paymentAddress;
+        $this->paymentMessage = $paymentMessage;
         $this->fixedFee = $fixedFee;
         $this->demandFee = $demandFee;
         $this->supplyFee = $supplyFee;
-        $this->infoBox = $infoBox;
+        $this->privateLabel = $privateLabel;
     }
 
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
             'type' => $this->type,
             'status' => $this->status,
-            'dateStart' => $this->dateStart->format(DateTimeInterface::ATOM),
-            'dateEnd' => $this->dateEnd->format(DateTimeInterface::ATOM),
+            'date_start' => $this->dateStart->format(DateTimeInterface::ATOM),
+            'date_end' => $this->dateEnd->format(DateTimeInterface::ATOM),
             'owner' => $this->owner,
-            'paymentAddress' => $this->paymentAddress->toString(),
-            'fixedFee' => $this->fixedFee,
-            'demandFee' => $this->demandFee,
-            'supplyFee' => $this->supplyFee,
-            'infoBox' => $this->infoBox,
+            'payment_address' => $this->paymentAddress->toString(),
+            'payment_message' => $this->paymentMessage,
+            'fixed_fee' => $this->fixedFee,
+            'demand_fee' => $this->demandFee,
+            'supply_fee' => $this->supplyFee,
+            'private_label' => $this->privateLabel,
         ];
-    }
-
-    public function getEndDate(): string
-    {
-        return $this->dateEnd->format(DateTimeInterface::ATOM);
-    }
-
-    public function getOwner(): string
-    {
-        return $this->owner;
-    }
-
-    public function getStartDate(): string
-    {
-        return $this->dateStart->format(DateTimeInterface::ATOM);
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
     }
 }

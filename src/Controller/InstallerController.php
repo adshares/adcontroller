@@ -74,6 +74,14 @@ class InstallerController extends AbstractController
         return $this->json(['message' => 'Data saved successfully']);
     }
 
+    #[Route('/community_license', name: 'claim_license', methods: ['GET'])]
+    public function claimCommunityLicense(LicenseStep $licenseStep): JsonResponse
+    {
+        $licenseStep->claimCommunityLicense();
+
+        return $this->json(['message' => 'Community license saved successfully']);
+    }
+
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [

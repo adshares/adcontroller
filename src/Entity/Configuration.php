@@ -35,12 +35,8 @@ class Configuration
     public const CLASSIFIER_API_KEY_NAME = 'classifier_ext_api_key_name';
     public const CLASSIFIER_API_KEY_SECRET = 'classifier_ext_api_key_secret';
     public const COMMON_DATA_REQUIRED = 'data_required';
-    public const LICENSE_CONTACT_EMAIL = 'license_contact_email';
-    public const LICENSE_END_DATE = 'license_end_date';
-    public const LICENSE_OWNER = 'license_owner';
+    public const LICENSE_DATA = 'license_data';
     public const LICENSE_KEY = 'license_key';
-    public const LICENSE_START_DATE = 'license_start_date';
-    public const LICENSE_TYPE = 'license_type';
     public const SMTP_EMAIL_SENT = 'smtp_email_sent';
     public const SMTP_HOST = 'smtp_host';
     public const SMTP_PASSWORD = 'smtp_password';
