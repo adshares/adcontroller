@@ -126,6 +126,6 @@ class LicenseStep implements InstallerStep
 
     private function isLicenseKeySet(?string $licenseKey): bool
     {
-        return null !== $licenseKey && self::DEFAULT_ENV_ADSHARES_LICENSE_KEY !== $licenseKey;
+        return $licenseKey && self::DEFAULT_ENV_ADSHARES_LICENSE_KEY !== $licenseKey;
     }
 }

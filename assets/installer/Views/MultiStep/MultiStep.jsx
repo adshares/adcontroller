@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
-import BreadCrumbs from '../Components/BreadCrumbs/BreadCrumbs'
+import BreadCrumbs from '../../Components/BreadCrumbs/BreadCrumbs'
 
 const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
   const [currentInstallerStep, setCurrentInstallerStep] = useState(steps.find(el => el.path === lastCompletedStep))
@@ -38,7 +38,13 @@ const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
           <Route
             key={step.path}
             path={step.path}
-            element={ <step.component handleNextStep={handleNextStep} handlePrevStep={handlePrevStep} step={step}/>}
+            element={
+              <step.component
+                handleNextStep={handleNextStep}
+                handlePrevStep={handlePrevStep}
+                step={step}
+              />
+            }
           />
         ))}
         <Route path="*" element={<Navigate to={lastCompletedStep}/>}/>

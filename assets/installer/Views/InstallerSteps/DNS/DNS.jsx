@@ -1,43 +1,82 @@
 import React, { useState, useEffect } from 'react'
 import apiService from '../../../utils/apiService'
-import { WindowCard } from '../../../Components/WindowCard/WindowCard'
-import { Box, Button, CircularProgress, Typography } from '@mui/material'
+import WindowCard from '../../../Components/WindowCard/WindowCard'
+import Spinner from '../../../Components/Spiner/Spinner'
+import { Box, Icon, Table, TableBody, TableCell, TableRow } from '@mui/material'
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 import styles from '../styles.scss'
 
 const DNS = ({handleNextStep, handlePrevStep, step}) => {
   const [isLoading, setIsLoading] = useState(true)
   const [stepData, setStepData] = useState({
-    base_domain: '',
+    adpanel: {module: null, url: null, code: null},
+    adserver: {module: null, url: null, code: null},
+    aduser: {module: null, url: null, code: null},
+    data_required: false,
   })
+
   useEffect(() => {
-    setIsLoading(true)
-    apiService.getCurrentStepData('dns').then(response => {
-      setStepData({...stepData, ...response })
-      setIsLoading(false)
-    })
+    getStepData().catch(error => console.log(error))
   }, [])
+
+  const getStepData = async () => {
+    setIsLoading(true)
+    const response = await apiService.getCurrentStepData(step.path)
+    setIsLoading(false)
+    setStepData({...stepData, ...response})
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await apiService.sendStepData('dns', stepData)
+    await apiService.sendStepData(step.path, {})
     handleNextStep(step)
   }
 
   return (
-    isLoading ?
-      <Box className={styles.spinner} >
-        <CircularProgress/>
-      </Box> :
-    <WindowCard title='DNS information'>
-      <Typography variant='body1'>
-        Base domain address: {stepData.base_domain}
-      </Typography>
-      <div className={styles.formControl}>
-        {step.index > 1 && <Button onClick={() => handlePrevStep(step)} type='button' variant='outlined'>Back</Button> }
-        <Button onClick={handleSubmit} type='submit' variant='contained'>Save</Button>
-      </div>
+    <WindowCard
+      title='Base information'
+      onNextClick={handleSubmit}
+      onBackClick={() => handlePrevStep(step)}
+      disabledNext={isLoading}
+    >
+      {isLoading ?
+        <Spinner/> :
+        <Box className={styles.container}>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell>{stepData.adpanel.module}</TableCell>
+                <TableCell>{stepData.adpanel.url}</TableCell>
+                <TableCell>{
+                    <Icon>{stepData.adpanel.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                  }
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>{stepData.adserver.module}</TableCell>
+                <TableCell>{stepData.adserver.url}</TableCell>
+                <TableCell>{
+                    <Icon>{stepData.adserver.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                  }
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>{stepData.aduser.module}</TableCell>
+                <TableCell>{stepData.aduser.url}</TableCell>
+                <TableCell>{
+                    <Icon>{stepData.aduser.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                  }
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Box>
+      }
     </WindowCard>
   )
 }
 
 export default DNS
+
+
