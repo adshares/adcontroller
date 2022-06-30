@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.form {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.field {
+  width: 50%;
+}
+
+.freeLicense {
+  display: flex;
+}
+
+.editButtonThumb {
+  display: flex;
+  justify-content: end;
+}

@@ -1,162 +1,143 @@
 import React, { useEffect, useState } from 'react'
 import apiService from '../../../utils/apiService'
+import WindowCard  from '../../../Components/WindowCard/WindowCard'
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Button,
-  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
   TextField,
-  Typography
 } from '@mui/material'
-import styles from '../Base/styles.scss'
-import WindowCard  from '../../../Components/WindowCard/WindowCard'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import styles from './styles.scss'
+import Spinner from '../../../Components/Spiner/Spinner'
+import { useForm } from '../../../hooks/hooks'
+
+const InfoTable = ({stepData}) => {
+
+  return(
+    <Table>
+      <TableBody>
+        <TableRow>
+          <TableCell align='left'>License owner</TableCell>
+          <TableCell align='center'>{stepData.owner}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell align='left'>License type</TableCell>
+          <TableCell align='center'>{stepData.type}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell align='left'>License will expire</TableCell>
+          <TableCell align='center'>{stepData.date_end}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell align='left'>Fixed fee</TableCell>
+          <TableCell align='center'>{stepData.fixed_fee} ADS</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell align='left'>Supply fee / Demand fee</TableCell>
+          <TableCell align='center'>{stepData.supply_fee * 100}% / {stepData.demand_fee * 100}%</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  )
+}
 
 const License = ({handleNextStep, handlePrevStep, step}) => {
   const [isLoading, setIsLoading] = useState(true)
   const [stepData, setStepData] = useState({
-    base_adserver_name: null,
-    license_contact_email: null,
-    license_end_date: null,
-    license_start_date: null,
-    license_owner: null,
-    license_type: null
+    demand_fee: 0.01,
+    fixed_fee: 0,
+    supply_fee: 0.01,
+    owner: '',
+    date_end: '',
+    type: '',
+    date_start: '',
+    payment_address: '',
+    payment_message: '',
+    private_label: false,
+    status: 1,
   })
-  const [licenseKey, setLicenseKey] = useState('')
+  const [editMode, setEditMode] = useState(false)
+  const [isFirstTimeConfiguration, setIsFirstTimeConfiguration] = useState(false)
+  const {fields, errorObj, setFields, isFormValid, onFormChange, validate} = useForm({licenseKey: ''})
 
   useEffect(() => {
-    setIsLoading(false)
     getStepData().catch(error => console.log(error))
   }, [])
-
-  console.log(stepData)
 
   const getStepData = async () => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
-    setStepData({ ...stepData, ...response})
+
     setIsLoading(false)
+    // setIsFirstTimeConfiguration(response.data_required)
+    setEditMode(response.data_required)
   }
 
-  const createLicense = async () => {
-    const response = await apiService.sendStepData(step.path, {license_contact_email: stepData.license_contact_email})
-    if (response.message){
-      setIsLoading(true)
-      await getStepData()
-      setIsLoading(false)
-    }
-  }
-
-  const getLicenseByKey = async () => {
-    const response = await apiService.sendStepData(step.path, {license_key: licenseKey})
-    console.log(response)
-  }
-
-  const handleSubmit = async (e) => {
+  const handleGetLicenseClick = (e) => {
     e.preventDefault()
-    console.log(e.target.id)
-    switch (e.target.id){
-      case 'createLicense':
-        createLicense().catch(error => console.log(error))
-        break
-      case 'getLicenseByKey':
-        getLicenseByKey().catch(error => console.log(error))
-        break
-      default:
-        break
-    }
+    e.stopPropagation()
+    setStepData({...stepData, owner: 'ADSERVER'})
   }
 
-  const onNextClick = () => {
-    if(stepData.license_start_date){
-      handleNextStep(step)
-    }
-
+  const handleSubmit = () => {
+    console.log('step submitted')
   }
 
-  const onFormChange = (e) => {
-    const {name, value} = e.target
+  const conditionalRender = (isEditMode) => {
 
-    switch (name){
-      case 'contactEmail':
-        setStepData({...stepData, [name]: value})
-        break
+    return isEditMode ? (
+      <Box className={styles.container}>
+        <Box
+          className={styles.form}
+          component='form'
+          id='getLicenseByKey'
+          onChange={onFormChange}
+          onBlur={(e) => validate(e.target)}
+        >
+          <Box className={styles.field}>
+            <TextField
+              error={!!errorObj.licenseKey}
+              helperText={errorObj.licenseKey}
+              placeholder='XXX-xxxxxx-xxxxx-xxxxx-xxxx-xxxx'
+              size='small'
+              name='licenseKey'
+              label='Your license key'
+              value={fields.licenseKey}
+              type='text'
+              fullWidth
+            />
+          </Box>
+          <Button
+            disabled={!isFormValid}
+            type='button'
+            variant='contained'
+            onClick={handleGetLicenseClick}
+          >
+            Get license
+          </Button>
+        </Box>
 
-      case 'licenseKey':
-        setLicenseKey(value)
-        break
-      default:
-        break
-    }
-    console.log(name, value)
-  }
+        {(editMode && stepData.owner) && <InfoTable stepData={stepData} />}
 
-  const conditionalRender = (isLicenseExist) => {
-
-    return isLicenseExist ? (
-      <>
-        <Typography variant='body1'>
-          License owner: {stepData.license_owner}
-        </Typography>
-
-        {/* TODO warunek na email*/}
-        <Typography variant='body1'>
-          Contact email: {stepData.license_contact_email}
-        </Typography>
-        <Typography variant='body1'>
-          License start date: {stepData.license_start_date}
-        </Typography>
-        <Typography variant='body1'>
-          License end date: {stepData.license_end_date}
-        </Typography>
-        <Typography variant='body1'>
-          License type: {stepData.license_type}
-        </Typography>
-      </>
-    ) :
-    (
-      <>
-            <Typography variant='body1'>
-              Adserver name: {stepData.base_adserver_name}
-            </Typography>
-            <form
-              id='createLicense'
-              className={styles.form}
-              onChange={onFormChange}
-              onSubmit={handleSubmit}
+        <Box className={styles.freeLicense}>
+          {!stepData.owner &&
+            <Button
+              type="button"
+              variant="text"
             >
-              <TextField
-                margin='normal'
-                size='small'
-                name='contactEmail'
-                label='License contact email'
-                value={stepData.license_contact_email}
-                type='email'
-                required
-              />
-              <Button type='submit' variant='contained'>Create</Button>
-            </form>
-
-
-            <form
-              id='getLicenseByKey'
-              className={styles.form}
-              onChange={onFormChange}
-              onSubmit={handleSubmit}
-            >
-              <TextField
-                margin='normal'
-                size='small'
-                name='licenseKey'
-                label='Your license key'
-                value={licenseKey}
-                type='text'
-              />
-              <Button type='submit' variant='contained'>Get license</Button>
-            </form>
-
+              Get free license
+            </Button>}
+        </Box>
+      </Box>
+    ) : (
+      <>
+        <Box className={styles.editButtonThumb}>
+          {!editMode && <Button onClick={() => (setEditMode(true))} type="button">Edit</Button>}
+        </Box>
+        <InfoTable stepData={stepData} />
       </>
       )
   }
@@ -164,16 +145,61 @@ const License = ({handleNextStep, handlePrevStep, step}) => {
   return (
       <WindowCard
         title='License information'
+        onNextClick={handleSubmit}
         onBackClick={() => handlePrevStep(step)}
+        disabledNext={!stepData.owner || isLoading}
       >
         {isLoading ?
-          <Box className={styles.spinner}>
-            <CircularProgress/>
-          </Box> :
-          conditionalRender(!!stepData.license_start_date)
+          <Spinner /> :
+          conditionalRender(editMode)
         }
       </WindowCard>
   )
 }
 
 export default License
+
+
+// const createLicense = async () => {
+//   const response = await apiService.sendStepData(step.path, {license_contact_email: stepData.license_contact_email})
+//   if (response.message){
+//     setIsLoading(true)
+//     await getStepData()
+//     setIsLoading(false)
+//   }
+// }
+// const getLicenseByKey = async () => {
+//   const response = await apiService.sendStepData(step.path, {license_key: licenseKey})
+//   console.log(response)
+// }
+// const handleSubmit = async (e) => {
+//   e.preventDefault()
+//   console.log(e.target.id)
+//   switch (e.target.id){
+//     case 'createLicense':
+//       createLicense().catch(error => console.log(error))
+//       break
+//     case 'getLicenseByKey':
+//       getLicenseByKey().catch(error => console.log(error))
+//       break
+//     default:
+//       break
+//   }
+// }
+// const onFormChange = (e) => {
+//   const {name, value} = e.target
+//
+//   switch (name){
+//     case 'contactEmail':
+//       setStepData({...stepData, [name]: value})
+//       break
+//
+//     case 'licenseKey':
+//       setLicenseKey(value)
+//       break
+//     default:
+//       break
+//   }
+//   console.log(name, value)
+// }
+
