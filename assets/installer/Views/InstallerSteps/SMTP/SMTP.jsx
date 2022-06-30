@@ -11,7 +11,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import styles from '../styles.scss'
+import styles from '../Base/styles.scss'
 import { WindowCard } from '../../../Components/WindowCard/WindowCard'
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {

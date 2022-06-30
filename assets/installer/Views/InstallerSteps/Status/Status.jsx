@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import apiService from '../../../utils/apiService'
 import { Box, Button, CircularProgress, Typography } from '@mui/material'
-import styles from '../styles.scss'
+import styles from '../Base/styles.scss'
 import { WindowCard } from '../../../Components/WindowCard/WindowCard'
 
 const Status = ({handleNextStep, handlePrevStep, step}) => {

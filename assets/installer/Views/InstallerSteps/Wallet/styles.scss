@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.textField {
+  min-height: 4rem;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}

@@ -5,7 +5,7 @@ import Spinner from '../../../Components/Spiner/Spinner'
 import { Box, Icon, Table, TableBody, TableCell, TableRow } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import styles from '../styles.scss'
+import styles from './styles.scss'
 
 const DNS = ({handleNextStep, handlePrevStep, step}) => {
   const [isLoading, setIsLoading] = useState(true)
