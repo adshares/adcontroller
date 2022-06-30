@@ -3,7 +3,9 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
+use App\Service\AdsCredentialsChecker;
 use App\Service\EnvEditor;
 use App\Service\ServicePresenceChecker;
 use App\ValueObject\AccountId;
@@ -13,21 +15,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WalletStep implements InstallerStep
 {
-    private const DEFAULT_ENV_ADSHARES_ADDRESS = '0001-00000000-9B6F';
     private const FIELDS = [
         Configuration::WALLET_ADDRESS,
         Configuration::WALLET_SECRET_KEY,
     ];
+    private const SECRET_KEY_PATTERN = '/^[0-9A-F]{64}$/i';
 
+    private AdsCredentialsChecker $adsCredentialsChecker;
     private ConfigurationRepository $repository;
     private HttpClientInterface $httpClient;
     private ServicePresenceChecker $servicePresenceChecker;
 
     public function __construct(
+        AdsCredentialsChecker $adsCredentialsChecker,
         ConfigurationRepository $repository,
         HttpClientInterface $httpClient,
         ServicePresenceChecker $servicePresenceChecker
     ) {
+        $this->adsCredentialsChecker = $adsCredentialsChecker;
         $this->repository = $repository;
         $this->httpClient = $httpClient;
         $this->servicePresenceChecker = $servicePresenceChecker;
@@ -42,19 +47,40 @@ class WalletStep implements InstallerStep
 
         $this->validate($content);
 
+        if (!isset($content[Configuration::WALLET_NODE_HOST])) {
+            $accountId = new AccountId($content[Configuration::WALLET_ADDRESS]);
+            $content[Configuration::WALLET_NODE_HOST] = $this->getNodeHostByAccountAddress($accountId);
+        }
+        $content[Configuration::WALLET_NODE_PORT] = (int)($content[Configuration::WALLET_NODE_PORT] ?? 6511);
+
+        try {
+            $this->adsCredentialsChecker->check(
+                $content[Configuration::WALLET_ADDRESS],
+                $content[Configuration::WALLET_SECRET_KEY],
+                $content[Configuration::WALLET_NODE_HOST],
+                $content[Configuration::WALLET_NODE_PORT]
+            );
+        } catch (UnexpectedResponseException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
+        }
+
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
         $envEditor->set(
             [
                 EnvEditor::ADSERVER_ADSHARES_ADDRESS => $content[Configuration::WALLET_ADDRESS],
+                EnvEditor::ADSERVER_ADSHARES_NODE_HOST => $content[Configuration::WALLET_NODE_HOST],
+                EnvEditor::ADSERVER_ADSHARES_NODE_PORT => $content[Configuration::WALLET_NODE_PORT],
                 EnvEditor::ADSERVER_ADSHARES_SECRET => $content[Configuration::WALLET_SECRET_KEY],
             ]
         );
 
-        $data = [];
-        foreach (self::FIELDS as $field) {
-            $data[$field] = strtoupper($content[$field]);
-        }
-        $data[Configuration::INSTALLER_STEP] = $this->getName();
+        $data = [
+            Configuration::WALLET_ADDRESS => $content[Configuration::WALLET_ADDRESS],
+            Configuration::WALLET_NODE_HOST => $content[Configuration::WALLET_NODE_HOST],
+            Configuration::WALLET_NODE_PORT => $content[Configuration::WALLET_NODE_PORT],
+            Configuration::WALLET_SECRET_KEY => $content[Configuration::WALLET_SECRET_KEY],
+            Configuration::INSTALLER_STEP => $this->getName(),
+        ];
         $this->repository->insertOrUpdate($data);
     }
 
@@ -65,7 +91,7 @@ class WalletStep implements InstallerStep
                 throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field));
             }
         }
-        if (1 !== preg_match('/^[0-9A-F]{64}$/i', $content[Configuration::WALLET_SECRET_KEY])) {
+        if (1 !== preg_match(self::SECRET_KEY_PATTERN, $content[Configuration::WALLET_SECRET_KEY])) {
             throw new UnprocessableEntityHttpException(
                 sprintf('Field `%s` must be a hexadecimal string of 64 characters', Configuration::WALLET_SECRET_KEY)
             );
@@ -79,10 +105,44 @@ class WalletStep implements InstallerStep
             );
         }
 
-        $address = $content[Configuration::WALLET_ADDRESS];
-        $secret = $content[Configuration::WALLET_SECRET_KEY];
-        if ($this->fetchPublicKeyByAddress($address) !== self::extractPublicKeyFromSecret($secret)) {
-            throw new UnprocessableEntityHttpException('Secret key does not match ADS account\'s address');
+        if (
+            !isset($content[Configuration::WALLET_NODE_HOST]) &&
+            !isset($content[Configuration::WALLET_NODE_PORT])
+        ) {
+            return;
+        }
+
+        if (!isset($content[Configuration::WALLET_NODE_HOST])) {
+            throw new UnprocessableEntityHttpException(
+                sprintf(
+                    'Field `%s` is required if field `%s` is present',
+                    Configuration::WALLET_NODE_HOST,
+                    Configuration::WALLET_NODE_PORT
+                )
+            );
+        }
+        if (!isset($content[Configuration::WALLET_NODE_PORT])) {
+            throw new UnprocessableEntityHttpException(
+                sprintf(
+                    'Field `%s` is required if field `%s` is present',
+                    Configuration::WALLET_NODE_PORT,
+                    Configuration::WALLET_NODE_HOST
+                )
+            );
+        }
+
+        if (
+            !filter_var($content[Configuration::WALLET_NODE_HOST], FILTER_VALIDATE_DOMAIN) &&
+            !filter_var($content[Configuration::WALLET_NODE_HOST], FILTER_VALIDATE_IP)
+        ) {
+            throw new UnprocessableEntityHttpException(
+                sprintf('Field `%s` must be a host', Configuration::WALLET_NODE_HOST)
+            );
+        }
+        if (!filter_var($content[Configuration::WALLET_NODE_PORT], FILTER_VALIDATE_INT)) {
+            throw new UnprocessableEntityHttpException(
+                sprintf('Field `%s` must be an integer', Configuration::WALLET_NODE_PORT)
+            );
         }
     }
 
@@ -100,11 +160,19 @@ class WalletStep implements InstallerStep
         }
 
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $address = $envEditor->getOne(EnvEditor::ADSERVER_ADSHARES_ADDRESS);
+        $values = $envEditor->get(
+            [
+                EnvEditor::ADSERVER_ADSHARES_ADDRESS,
+                EnvEditor::ADSERVER_ADSHARES_NODE_HOST,
+                EnvEditor::ADSERVER_ADSHARES_NODE_PORT,
+            ]
+        );
 
         return [
             Configuration::COMMON_DATA_REQUIRED => false,
-            Configuration::WALLET_ADDRESS => $address,
+            Configuration::WALLET_ADDRESS => $values[EnvEditor::ADSERVER_ADSHARES_ADDRESS],
+            Configuration::WALLET_NODE_HOST => $values[EnvEditor::ADSERVER_ADSHARES_NODE_HOST],
+            Configuration::WALLET_NODE_PORT => $values[EnvEditor::ADSERVER_ADSHARES_NODE_PORT],
         ];
     }
 
@@ -141,6 +209,8 @@ class WalletStep implements InstallerStep
         $values = $envEditor->get(
             [
                 EnvEditor::ADSERVER_ADSHARES_ADDRESS,
+                EnvEditor::ADSERVER_ADSHARES_NODE_HOST,
+                EnvEditor::ADSERVER_ADSHARES_NODE_PORT,
                 EnvEditor::ADSERVER_ADSHARES_SECRET,
             ]
         );
@@ -151,10 +221,60 @@ class WalletStep implements InstallerStep
             }
         }
 
-        if (self::DEFAULT_ENV_ADSHARES_ADDRESS === $values[EnvEditor::ADSERVER_ADSHARES_ADDRESS]) {
+        try {
+            $this->adsCredentialsChecker->check(
+                $values[EnvEditor::ADSERVER_ADSHARES_ADDRESS],
+                $values[EnvEditor::ADSERVER_ADSHARES_SECRET],
+                $values[EnvEditor::ADSERVER_ADSHARES_NODE_HOST],
+                $values[EnvEditor::ADSERVER_ADSHARES_NODE_PORT],
+            );
+        } catch (UnexpectedResponseException) {
             return true;
         }
 
-        return false;
+        return true;
+    }
+
+    public function getNodeHostByAccountAddress(AccountId $accountId): string
+    {
+        $nodeId = $accountId->getNodeId();
+
+        if ($this->isNodeSupportedByAdshares($nodeId)) {
+            return $this->getAdsharesNodeHostById($nodeId);
+        }
+
+        $response = $this->httpClient->request(
+            'POST',
+            'https://rpc.adshares.net',
+            [
+                'json' => [
+                    'id' => 2,
+                    'jsonrpc' => '2.0',
+                    'method' => 'get_block',
+                ]
+            ]
+        );
+
+        $nodes = json_decode($response->getContent(), true)['result']['block']['nodes'];
+        foreach ($nodes as $node) {
+            if ($nodeId === $node['id']) {
+                return $node['ipv4'];
+            }
+        }
+
+        return throw new UnprocessableEntityHttpException(sprintf('Node (%s) does not exist', $nodeId));
+    }
+
+    private function isNodeSupportedByAdshares(string $nodeId): bool
+    {
+        $lastNodeSupportedByAdshares = 34;
+        $decimalNodeId = hexdec($nodeId);
+
+        return $decimalNodeId > 0 && $decimalNodeId <= $lastNodeSupportedByAdshares;
+    }
+
+    private function getAdsharesNodeHostById(string $nodeId): string
+    {
+        return sprintf('n%s.e11.click', substr($nodeId, 2, 2));
     }
 }

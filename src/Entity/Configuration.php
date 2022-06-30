@@ -44,6 +44,8 @@ class Configuration
     public const SMTP_SENDER = 'smtp_sender';
     public const SMTP_USERNAME = 'smtp_username';
     public const WALLET_ADDRESS = 'wallet_address';
+    public const WALLET_NODE_HOST = 'wallet_node_host';
+    public const WALLET_NODE_PORT = 'wallet_node_port';
     public const WALLET_SECRET_KEY = 'wallet_secret_key';
 
     #[ORM\Id]
