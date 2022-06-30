@@ -106,8 +106,8 @@ class WalletStep implements InstallerStep
         }
 
         if (
-            !isset($content[Configuration::WALLET_NODE_HOST]) &&
-            !isset($content[Configuration::WALLET_NODE_PORT])
+            !isset($content[Configuration::WALLET_NODE_HOST])
+            && !isset($content[Configuration::WALLET_NODE_PORT])
         ) {
             return;
         }
@@ -132,8 +132,8 @@ class WalletStep implements InstallerStep
         }
 
         if (
-            !filter_var($content[Configuration::WALLET_NODE_HOST], FILTER_VALIDATE_DOMAIN) &&
-            !filter_var($content[Configuration::WALLET_NODE_HOST], FILTER_VALIDATE_IP)
+            !filter_var($content[Configuration::WALLET_NODE_HOST], FILTER_VALIDATE_DOMAIN)
+            && !filter_var($content[Configuration::WALLET_NODE_HOST], FILTER_VALIDATE_IP)
         ) {
             throw new UnprocessableEntityHttpException(
                 sprintf('Field `%s` must be a host', Configuration::WALLET_NODE_HOST)

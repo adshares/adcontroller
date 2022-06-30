@@ -121,6 +121,10 @@ class LicenseStep implements InstallerStep
             return null;
         }
 
+        if (!$license->isValid()) {
+            return null;
+        }
+
         return $license;
     }
 

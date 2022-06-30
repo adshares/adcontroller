@@ -25,7 +25,7 @@ class AdsCredentialsChecker
         try {
             $adsClient->getMe();
         } catch (CommandException $exception) {
-            $this->logger->debug(sprintf('Invalid credentials (%s)' ,$exception->getMessage()));
+            $this->logger->debug(sprintf('Invalid credentials (%s)', $exception->getMessage()));
             throw new UnexpectedResponseException('Invalid credentials');
         }
     }
