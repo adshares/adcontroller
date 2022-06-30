@@ -4,8 +4,76 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "499321d7508e73ddce73d5261c0f6a0b",
+    "content-hash": "2369b561dbcd226acfc5f5d3c88d8134",
     "packages": [
+        {
+            "name": "adshares/ads-client",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/adshares/ads-php-client.git",
+                "reference": "202979685b4fff428b229828c2ad78da789c18ba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/adshares/ads-php-client/zipball/202979685b4fff428b229828c2ad78da789c18ba",
+                "reference": "202979685b4fff428b229828c2ad78da789c18ba",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.4|^8.0",
+                "psr/log": "^1.0|^2.0|^3.0",
+                "symfony/process": "^4.0|^5.0|^6.0"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+                "php-parallel-lint/php-parallel-lint": "^1.0",
+                "phpcompatibility/php-compatibility": "^9.0",
+                "phpstan/phpstan": "^1.0",
+                "phpunit/phpunit": "^9.0",
+                "squizlabs/php_codesniffer": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Adshares\\Ads\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Adshares",
+                    "homepage": "https://adshares.pl"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/adshares/ads-php-client/graphs/contributors"
+                }
+            ],
+            "description": "PHP client for the ADS blockchain",
+            "homepage": "https://github.com/adshares/ads-php-client",
+            "keywords": [
+                "ads",
+                "adshares",
+                "blockchain",
+                "esc",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/adshares/ads-php-client/issues",
+                "source": "https://github.com/adshares/ads-php-client"
+            },
+            "time": "2022-06-07T15:03:10+00:00"
+        },
         {
             "name": "doctrine/annotations",
             "version": "1.13.2",

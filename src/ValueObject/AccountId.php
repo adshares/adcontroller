@@ -32,7 +32,7 @@ class AccountId
 
     private static function checksum(string $value): string
     {
-        $nodeId = substr($value, 0, 4);
+        $nodeId = self::getNodeIdFromAddress($value);
         $userId = substr($value, 5, 8);
 
         return sprintf('%04X', self::crc16(sprintf('%04X%08X', hexdec($nodeId), hexdec($userId))));
@@ -53,6 +53,16 @@ class AccountId
         }
 
         return $crc;
+    }
+
+    private static function getNodeIdFromAddress(string $address): string
+    {
+        return substr($address, 0, 4);
+    }
+
+    public function getNodeId(): string
+    {
+        return self::getNodeIdFromAddress($this->value);
     }
 
     public function toString(): string

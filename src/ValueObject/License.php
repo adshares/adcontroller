@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\ValueObject;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 
 class License
@@ -44,6 +45,11 @@ class License
         $this->demandFee = $demandFee;
         $this->supplyFee = $supplyFee;
         $this->privateLabel = $privateLabel;
+    }
+
+    public function isValid(): bool
+    {
+        return (new DateTimeImmutable())->getTimestamp() < $this->dateEnd->getTimestamp();
     }
 
     public function toArray(): array

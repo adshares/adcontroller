@@ -11,6 +11,7 @@ use App\Service\Installer\Step\LicenseStep;
 use App\Service\Installer\Step\SmtpStep;
 use App\Service\Installer\Step\StatusStep;
 use App\Service\Installer\Step\WalletStep;
+use App\ValueObject\AccountId;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,7 +62,7 @@ class InstallerController extends AbstractController
             throw new UnprocessableEntityHttpException(sprintf('Invalid step (%s)', $step));
         }
 
-        $content = json_decode($request->getContent(), true);
+        $content = json_decode($request->getContent(), true) ?? [];
 
         try {
             $service = $this->container->get($step . '_step');
@@ -74,12 +75,46 @@ class InstallerController extends AbstractController
         return $this->json(['message' => 'Data saved successfully']);
     }
 
+    #[Route('/node_host', name: 'node_host', methods: ['GET'])]
+    public function getNodeHost(Request $request, WalletStep $walletStep): JsonResponse
+    {
+        $content = json_decode($request->getContent(), true);
+        if (
+            !isset($content[Configuration::WALLET_ADDRESS]) ||
+            !is_string($content[Configuration::WALLET_ADDRESS]) ||
+            !AccountId::isValid($content[Configuration::WALLET_ADDRESS])
+        ) {
+            throw new UnprocessableEntityHttpException(
+                sprintf('Field `%s` must be a valid ADS account', Configuration::WALLET_ADDRESS)
+            );
+        }
+
+        $accountId = new AccountId($content[Configuration::WALLET_ADDRESS]);
+        $nodeHost = $walletStep->getNodeHostByAccountAddress($accountId);
+
+        return $this->json(
+            [
+                Configuration::WALLET_NODE_HOST => $nodeHost,
+                Configuration::WALLET_NODE_PORT => '6511',
+            ]
+        );
+    }
+
+    #[Route('/license_key', name: 'set_license_key', methods: ['POST'])]
+    public function setLicenseKey(Request $request, LicenseStep $licenseStep): Response
+    {
+        $content = json_decode($request->getContent(), true);
+        $licenseStep->setLicenseKey($content);
+
+        return $this->redirectToRoute('api_get_step', ['step' => 'license']);
+    }
+
     #[Route('/community_license', name: 'claim_license', methods: ['GET'])]
-    public function claimCommunityLicense(LicenseStep $licenseStep): JsonResponse
+    public function claimCommunityLicense(LicenseStep $licenseStep): Response
     {
         $licenseStep->claimCommunityLicense();
 
-        return $this->json(['message' => 'Community license saved successfully']);
+        return $this->redirectToRoute('api_get_step', ['step' => 'license']);
     }
 
     public static function getSubscribedServices(): array
