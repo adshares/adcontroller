@@ -2,7 +2,8 @@
 
 namespace App\Service;
 
-use RuntimeException;
+use App\Exception\UnexpectedResponseException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -12,11 +13,13 @@ class LicenseServerClient
     private const FETCH_URI = '/api/v1/license/';
 
     private HttpClientInterface $httpClient;
+    private LoggerInterface $logger;
     private string $baseUri;
 
-    public function __construct(HttpClientInterface $httpClient, string $licenseServerBaseUri)
+    public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger, string $licenseServerBaseUri)
     {
         $this->httpClient = $httpClient;
+        $this->logger = $logger;
         $this->baseUri = $licenseServerBaseUri;
     }
 
@@ -34,7 +37,9 @@ class LicenseServerClient
         );
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new RuntimeException();
+            $errorMessage = sprintf('Unexpected status code (%d)', $response->getStatusCode());
+            $this->logger->debug($errorMessage);
+            throw new UnexpectedResponseException($errorMessage);
         }
 
         return json_decode($response->getContent())->data;
@@ -58,7 +63,9 @@ class LicenseServerClient
         );
 
         if (Response::HTTP_CREATED !== $response->getStatusCode()) {
-            throw new RuntimeException();
+            $errorMessage = sprintf('Unexpected status code (%d)', $response->getStatusCode());
+            $this->logger->debug($errorMessage);
+            throw new UnexpectedResponseException($errorMessage);
         }
 
         return json_decode($response->getContent())->key;

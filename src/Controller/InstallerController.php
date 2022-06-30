@@ -23,8 +23,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'api_')]
 class InstallerController extends AbstractController
 {
-    #[Route('/step', name: 'current_step', methods: ['GET'])]
-    public function currentStep(ConfigurationRepository $repository): JsonResponse
+    #[Route('/step', name: 'previous_step', methods: ['GET'])]
+    public function previousStep(ConfigurationRepository $repository): JsonResponse
     {
         $step = $repository->fetchValueByName(Configuration::INSTALLER_STEP);
 
@@ -72,6 +72,14 @@ class InstallerController extends AbstractController
         $service->process($content);
 
         return $this->json(['message' => 'Data saved successfully']);
+    }
+
+    #[Route('/community_license', name: 'claim_license', methods: ['GET'])]
+    public function claimCommunityLicense(LicenseStep $licenseStep): JsonResponse
+    {
+        $licenseStep->claimCommunityLicense();
+
+        return $this->json(['message' => 'Community license saved successfully']);
     }
 
     public static function getSubscribedServices(): array

@@ -5,10 +5,14 @@ namespace App\Security;
 use App\Exception\JWTInvalidUser;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Authenticator\JWTAuthenticator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 class CustomAuthenticator extends JWTAuthenticator
 {
-    public function doAuthenticate(Request $request)
+    /**
+     * @return Passport
+     */
+    public function doAuthenticate(Request $request) /*: Passport */
     {
         $passport = parent::doAuthenticate($request);
 

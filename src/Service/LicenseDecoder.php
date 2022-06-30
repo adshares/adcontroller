@@ -6,7 +6,7 @@ namespace App\Service;
 
 use App\ValueObject\AccountId;
 use App\ValueObject\License;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use RuntimeException;
 
@@ -48,17 +48,17 @@ class LicenseDecoder
         $data = json_decode($data, true);
 
         return new License(
-            substr($this->licenseKey, 0, 10),
             $data['type'],
             $data['status'],
-            DateTime::createFromFormat(DateTimeInterface::ATOM, $data['beginDate']),
-            DateTime::createFromFormat(DateTimeInterface::ATOM, $data['endDate']),
+            DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $data['beginDate']),
+            DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $data['endDate']),
             $data['owner'],
             new AccountId($data['paymentAddress']),
+            $data['paymentMessage'],
             $data['fixedFee'],
             $data['demandFee'],
             $data['supplyFee'],
-            !($data['privateLabel'] ?? false)
+            $data['privateLabel'] ?? false
         );
     }
 }
