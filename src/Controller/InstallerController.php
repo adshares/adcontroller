@@ -62,7 +62,7 @@ class InstallerController extends AbstractController
             throw new UnprocessableEntityHttpException(sprintf('Invalid step (%s)', $step));
         }
 
-        $content = json_decode($request->getContent(), true);
+        $content = json_decode($request->getContent(), true) ?? [];
 
         try {
             $service = $this->container->get($step . '_step');
@@ -100,12 +100,21 @@ class InstallerController extends AbstractController
         );
     }
 
+    #[Route('/license_key', name: 'set_license_key', methods: ['POST'])]
+    public function setLicenseKey(Request $request, LicenseStep $licenseStep): Response
+    {
+        $content = json_decode($request->getContent(), true);
+        $licenseStep->setLicenseKey($content);
+
+        return $this->redirectToRoute('api_get_step', ['step' => 'license']);
+    }
+
     #[Route('/community_license', name: 'claim_license', methods: ['GET'])]
-    public function claimCommunityLicense(LicenseStep $licenseStep): JsonResponse
+    public function claimCommunityLicense(LicenseStep $licenseStep): Response
     {
         $licenseStep->claimCommunityLicense();
 
-        return $this->json(['message' => 'Community license saved successfully']);
+        return $this->redirectToRoute('api_get_step', ['step' => 'license']);
     }
 
     public static function getSubscribedServices(): array

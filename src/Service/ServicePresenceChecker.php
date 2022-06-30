@@ -58,7 +58,7 @@ class ServicePresenceChecker
         }
 
         $process = new Process(['php7.4', 'artisan'], $homeDirectory);
-        $process->setTimeout(1);
+        $process->setTimeout(5);
         $process->run();
         $process->wait();
         if (!$process->isSuccessful()) {

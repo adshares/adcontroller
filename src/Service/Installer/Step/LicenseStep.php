@@ -38,11 +38,15 @@ class LicenseStep implements InstallerStep
 
     public function process(array $content): void
     {
-        if (empty($content) && !$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
-            return;
+        if ($this->isDataRequired()) {
+            throw new UnprocessableEntityHttpException('License key not set');
         }
 
+        $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+    }
+
+    public function setLicenseKey(array $content): void
+    {
         $this->validate($content);
 
         $licenseKey = $content[Configuration::LICENSE_KEY];
