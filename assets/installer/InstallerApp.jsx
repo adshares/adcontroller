@@ -11,11 +11,11 @@ import NotFoundView from './Views/NotFound/NotFoundView'
 import AppWindow from './Components/AppWindow/AppWindow'
 import DNS from './Views/InstallerSteps/DNS/DNS'
 import Wallet from './Views/InstallerSteps/Wallet/Wallet'
-import MultiStep from './Views/MultiStep'
+import MultiStep from './Views/MultiStep/MultiStep'
 import License from './Views/InstallerSteps/License/License'
 import Classifier from './Views/InstallerSteps/Classifier/Classifier'
 import SMTP from './Views/InstallerSteps/SMTP/SMTP'
-import Status from './Views/Status/Status'
+import Status from './Views/InstallerSteps/Status/Status'
 
 const installerSteps = [
   {

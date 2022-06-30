@@ -4,7 +4,7 @@ const request = (url, method, withAuthorization = true, _body) => {
   return fetch(url, {
     method: method,
     headers: {
-    ...(method === 'POST' ? {'Content-Type': 'application/json'} : {}),
+      'Content-Type': 'application/json',
     ...(withAuthorization ? {'Authorization': 'Bearer ' + localStorage.getItem('authToken')} : {}),
     },
     ...(method === 'POST' ? {body: JSON.stringify(_body)} : {})
@@ -27,6 +27,7 @@ const login = async (body) => {
 
 const logout = () => {
   localStorage.removeItem('authToken')
+  location.reload()
 }
 
 const sendStepData = async (stepName, body) => {
@@ -36,6 +37,7 @@ const sendStepData = async (stepName, body) => {
 
 const getPrevStep = async () => {
   const apiCall = await request(`${configuration.baseUrl}/api/step/`, 'GET', true)
+
   if(apiCall.status === 401){
     logout()
     return
@@ -46,6 +48,7 @@ const getPrevStep = async () => {
 
 const getCurrentStepData = async (stepName) => {
   const apiCall = await request(`${configuration.baseUrl}/api/step/${stepName}`, 'GET', true)
+
   if(apiCall.status === 401){
     logout()
     return

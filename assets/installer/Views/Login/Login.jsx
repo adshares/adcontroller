@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import apiService from '../../utils/apiService'
 
 import { Button, TextField } from '@mui/material'
-import { WindowCard } from '../../Components/WindowCard/WindowCard'
+import WindowCard from '../../Components/WindowCard/WindowCard'
 
 export default function Login ({setToken}) {
   const [email, setEmail] = useState('')
@@ -11,7 +11,6 @@ export default function Login ({setToken}) {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    console.log(email, password)
     apiService.login({email, password}).then(response => setToken(response))
   }
 
@@ -33,33 +32,31 @@ export default function Login ({setToken}) {
   }
 
   return (
-    <WindowCard title='Please login'>
+    <WindowCard
+      title='Please login'
+      isFirstCard
+      isLastCard
+    >
       <form onSubmit={handleSubmit}>
         <TextField
-          color="primary"
-          variant="standard"
+          variant='standard'
           margin="normal"
           required
           fullWidth
-          id="email"
           type="email"
           label="Email Address"
           name="email"
           autoComplete="email"
           onChange={handleInputChange}
-          autoFocus
         />
         <TextField
-          color="primary"
-          variant="standard"
+          variant='standard'
           margin="normal"
           required
           fullWidth
-          name="password"
-          label="Password"
           type="password"
-          id="password"
-          autoComplete="current-password"
+          label="Password"
+          name="password"
           onChange={handleInputChange}
         />
         <Button
