@@ -232,7 +232,7 @@ class WalletStep implements InstallerStep
             return true;
         }
 
-        return true;
+        return false;
     }
 
     public function getNodeHostByAccountAddress(AccountId $accountId): string
