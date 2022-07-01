@@ -1,16 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import apiService from '../../../utils/apiService'
-import { Box, Button, TextField, Typography, } from '@mui/material'
+import { Box, Button, Collapse, TextField, Typography, } from '@mui/material'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
 import Spinner from '../../../Components/Spiner/Spinner'
 import styles from './styles.scss'
-import { useForm } from '../../../hooks/hooks'
+import { useForm, useSkipFirstRenderEffect } from '../../../hooks/hooks'
 
 const Wallet = ({handleNextStep, handlePrevStep, step}) => {
   const [isLoading, setIsLoading] = useState(true)
+  const [isHostVerification, setIsHostVerification] = useState(false)
   const {fields, errorObj, setFields, isFormValid, onFormChange, validate} = useForm({
     wallet_address: '',
     wallet_secret_key: '',
+  })
+  const {
+    fields: nodeHost,
+    setFields: setNodeHost,
+    errorObj: nodeHostError,
+    isFormValid: isNodeHostValid,
+    onFormChange: onNodeHostChange
+  } = useForm({
+    wallet_node_host: '',
+    wallet_node_port: '',
+    message: '',
+    code: null,
   })
   const [editMode, setEditMode] = useState(false)
 
@@ -18,16 +31,37 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
     getStepData().catch(error => console.log(error))
 
   }, [])
+  useSkipFirstRenderEffect(() => {
+    if(!errorObj.wallet_address){
+      getWalletNodes().catch(error => console.log(error))
+    }
+  }, [errorObj.wallet_address])
 
   const getStepData = async () => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
-    setIsLoading(false)
-    setFields({...fields, ...response})
     setEditMode(response.data_required)
-
+    console.log(response)
+    setFields({...fields, ...response})
+    setIsLoading(false)
   }
 
+  const getWalletNodes = async () => {
+    setIsHostVerification(true)
+    const response = await apiService.getWalletNodeHost({wallet_address: fields.wallet_address })
+    setIsHostVerification(false)
+    if(response.code){
+      setNodeHost({
+        ...response,
+        ...{wallet_node_host: '', wallet_node_port: ''}
+      })
+      return
+    }
+    setNodeHost({
+      ...response,
+      ...{message: '', code: null}
+    })
+  }
   const handleSubmit = async () => {
     if(!editMode){
       await apiService.sendStepData(step.path, {})
@@ -38,9 +72,14 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
     if(!isFormValid) {
       return
     }
-    console.log(isFormValid)
     setIsLoading(true)
-    await apiService.sendStepData(step.path, fields)
+    const body = {
+      wallet_address: fields.wallet_address,
+      wallet_secret_key: fields.wallet_secret_key,
+      wallet_node_host: nodeHost.wallet_node_host,
+      wallet_node_port: Number(nodeHost.wallet_node_port),
+    }
+    await apiService.sendStepData(step.path, body)
     handleNextStep(step)
     setIsLoading(false)
   }
@@ -50,7 +89,7 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
       <Box className={styles.container}>
         <Box
           component='form'
-          className={styles.container}
+          className={styles.formBlock}
           onChange={onFormChange}
           onBlur={(e) => validate(e.target)}
         >
@@ -74,6 +113,7 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
             size='small'
             name='wallet_secret_key'
             label='Wallet private key'
+            type='password'
             required
           />
           <Button
@@ -83,6 +123,40 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
             Cancel
           </Button>
         </Box>
+        <Collapse
+          className={styles.formBlock}
+          component='form'
+          in={Object.values(nodeHost).some(el => !!el)}
+          timeout='auto'
+          unmountOnExit
+          onChange={onNodeHostChange}
+        >
+          <TextField
+            error={!!nodeHostError.wallet_node_host}
+            helperText={nodeHostError.wallet_node_host}
+            value={nodeHost.wallet_node_host}
+            disabled={!!nodeHost.code}
+            margin='normal'
+            size='small'
+            name='wallet_node_host'
+            label='Wallet node host'
+            fullWidth
+          />
+          <TextField
+            error={!!nodeHostError.wallet_node_port}
+            helperText={nodeHostError.wallet_node_port}
+            value={nodeHost.wallet_node_port}
+            disabled={!!nodeHost.code}
+            margin='normal'
+            size='small'
+            name='wallet_node_port'
+            label='Wallet node port'
+            fullWidth
+          />
+          <Typography variant='body2' color='error'>
+            {nodeHost.message}
+          </Typography>
+        </Collapse>
       </Box>
     ) : (
       <Box className={styles.container}>
@@ -100,12 +174,15 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
       </Box>
     )
   }
-
+// console.log(isNodeHostValid)
   return (
     <WindowCard
       title='Wallet information'
       onNextClick={handleSubmit}
-      disabledNext={editMode ? !isFormValid || isLoading : isLoading}
+      disabledNext={editMode ?
+        !isFormValid || !isNodeHostValid || isLoading || isHostVerification || nodeHost.code === 422:
+        isLoading
+      }
       onBackClick={() => handlePrevStep(step)}
     >
       {isLoading ?

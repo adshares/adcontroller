@@ -75,7 +75,7 @@ class InstallerController extends AbstractController
         return $this->json(['message' => 'Data saved successfully']);
     }
 
-    #[Route('/node_host', name: 'node_host', methods: ['GET'])]
+    #[Route('/node_host', name: 'node_host', methods: ['POST'])]
     public function getNodeHost(Request $request, WalletStep $walletStep): JsonResponse
     {
         $content = json_decode($request->getContent(), true);

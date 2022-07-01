@@ -15,37 +15,37 @@ import Spinner from '../../../Components/Spiner/Spinner'
 import { useForm } from '../../../hooks/hooks'
 
 const InfoTable = ({stepData}) => {
-
   return(
-    <Table>
-      <TableBody>
-        <TableRow>
-          <TableCell align='left'>License owner</TableCell>
-          <TableCell align='center'>{stepData.owner}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align='left'>License type</TableCell>
-          <TableCell align='center'>{stepData.type}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align='left'>License will expire</TableCell>
-          <TableCell align='center'>{stepData.date_end}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align='left'>Fixed fee</TableCell>
-          <TableCell align='center'>{stepData.fixed_fee} ADS</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align='left'>Supply fee / Demand fee</TableCell>
-          <TableCell align='center'>{stepData.supply_fee * 100}% / {stepData.demand_fee * 100}%</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell align='left'>License owner</TableCell>
+            <TableCell align='left'>{stepData.owner}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell align='left'>License type</TableCell>
+            <TableCell align='left'>{stepData.type}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell align='left'>License will expire</TableCell>
+            <TableCell align='left'>{stepData.date_end}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell align='left'>Fixed fee</TableCell>
+            <TableCell align='left'>{stepData.fixed_fee} ADS</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell align='left'>Supply fee / Demand fee</TableCell>
+            <TableCell align='left'>{stepData.supply_fee * 100}% / {stepData.demand_fee * 100}%</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
   )
 }
 
 const License = ({handleNextStep, handlePrevStep, step}) => {
   const [isLoading, setIsLoading] = useState(true)
+  const [isLicenseLoading, setIsLicenseLoading] = useState(true)
   const [stepData, setStepData] = useState({
     demand_fee: 0.01,
     fixed_fee: 0,
@@ -60,8 +60,7 @@ const License = ({handleNextStep, handlePrevStep, step}) => {
     status: 1,
   })
   const [editMode, setEditMode] = useState(false)
-  const [isFirstTimeConfiguration, setIsFirstTimeConfiguration] = useState(false)
-  const {fields, errorObj, setFields, isFormValid, onFormChange, validate} = useForm({licenseKey: ''})
+  const {fields, errorObj, isFormValid, onFormChange, validate} = useForm({licenseKey: ''})
 
   useEffect(() => {
     getStepData().catch(error => console.log(error))
@@ -70,20 +69,34 @@ const License = ({handleNextStep, handlePrevStep, step}) => {
   const getStepData = async () => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
-
-    setIsLoading(false)
-    // setIsFirstTimeConfiguration(response.data_required)
+    setStepData({...stepData, ...response.license_data})
     setEditMode(response.data_required)
+    setIsLoading(false)
+    setIsLicenseLoading(false)
   }
 
-  const handleGetLicenseClick = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setStepData({...stepData, owner: 'ADSERVER'})
+  const handleGetLicenseClick = async () => {
+    setIsLicenseLoading(true)
+    const response = await apiService.getLicenseByKey({license_key: fields.licenseKey})
+    setIsLicenseLoading(false)
+    setStepData({...response.license_data})
   }
 
-  const handleSubmit = () => {
-    console.log('step submitted')
+  const handleGetFreeLicenseClick = async () => {
+    if(stepData.owner) {
+      return
+    }
+    setIsLicenseLoading(true)
+    const response = await apiService.getCommunityLicense()
+    setIsLicenseLoading(false)
+    setStepData({...response.license_data})
+  }
+
+  const handleSubmit = async () => {
+    setIsLoading(true)
+    await apiService.sendStepData(step.path, {})
+    handleNextStep(step)
+    setIsLoading(false)
   }
 
   const conditionalRender = (isEditMode) => {
@@ -120,24 +133,40 @@ const License = ({handleNextStep, handlePrevStep, step}) => {
           </Button>
         </Box>
 
-        {(editMode && stepData.owner) && <InfoTable stepData={stepData} />}
+        {editMode && (
+          isLicenseLoading ?
+            <Spinner /> :
+            (stepData.owner) && <InfoTable stepData={stepData}/>
+        )}
 
         <Box className={styles.freeLicense}>
           {!stepData.owner &&
             <Button
+              onClick={handleGetFreeLicenseClick}
               type="button"
               variant="text"
             >
               Get free license
-            </Button>}
+            </Button>
+          }
         </Box>
       </Box>
     ) : (
       <>
         <Box className={styles.editButtonThumb}>
-          {!editMode && <Button onClick={() => (setEditMode(true))} type="button">Edit</Button>}
+          {!editMode &&
+            <Button
+              onClick={() => (setEditMode(true))}
+              type="button"
+            >
+              Edit
+            </Button>
+          }
         </Box>
-        <InfoTable stepData={stepData} />
+        {isLicenseLoading ?
+          <Spinner/> :
+          <InfoTable stepData={stepData}/>
+        }
       </>
       )
   }
@@ -158,48 +187,3 @@ const License = ({handleNextStep, handlePrevStep, step}) => {
 }
 
 export default License
-
-
-// const createLicense = async () => {
-//   const response = await apiService.sendStepData(step.path, {license_contact_email: stepData.license_contact_email})
-//   if (response.message){
-//     setIsLoading(true)
-//     await getStepData()
-//     setIsLoading(false)
-//   }
-// }
-// const getLicenseByKey = async () => {
-//   const response = await apiService.sendStepData(step.path, {license_key: licenseKey})
-//   console.log(response)
-// }
-// const handleSubmit = async (e) => {
-//   e.preventDefault()
-//   console.log(e.target.id)
-//   switch (e.target.id){
-//     case 'createLicense':
-//       createLicense().catch(error => console.log(error))
-//       break
-//     case 'getLicenseByKey':
-//       getLicenseByKey().catch(error => console.log(error))
-//       break
-//     default:
-//       break
-//   }
-// }
-// const onFormChange = (e) => {
-//   const {name, value} = e.target
-//
-//   switch (name){
-//     case 'contactEmail':
-//       setStepData({...stepData, [name]: value})
-//       break
-//
-//     case 'licenseKey':
-//       setLicenseKey(value)
-//       break
-//     default:
-//       break
-//   }
-//   console.log(name, value)
-// }
-

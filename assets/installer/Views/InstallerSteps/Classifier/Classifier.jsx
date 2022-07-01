@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import apiService from '../../../utils/apiService'
 import { Box, Button, CircularProgress, Typography } from '@mui/material'
 import styles from '../Base/styles.scss'
-import { WindowCard } from '../../../Components/WindowCard/WindowCard'
+import WindowCard from '../../../Components/WindowCard/WindowCard'
 
 const Classifier = ({handleNextStep, handlePrevStep, step}) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -31,10 +31,7 @@ const Classifier = ({handleNextStep, handlePrevStep, step}) => {
         <CircularProgress/>
       </Box> :
       <WindowCard title='Classifier information'>
-        <div className={styles.formControl}>
-          {step.index > 1 && <Button onClick={() => handlePrevStep(step)} type='button' variant='outlined'>Back</Button> }
-          <Button onClick={handleSubmit} type='submit' variant='contained'>Save</Button>
-        </div>
+
       </WindowCard>
   )
 }

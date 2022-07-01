@@ -35,7 +35,7 @@ const DNS = ({handleNextStep, handlePrevStep, step}) => {
 
   return (
     <WindowCard
-      title='Base information'
+      title='DNS information'
       onNextClick={handleSubmit}
       onBackClick={() => handlePrevStep(step)}
       disabledNext={isLoading}

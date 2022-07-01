@@ -48,7 +48,33 @@ const getPrevStep = async () => {
 
 const getCurrentStepData = async (stepName) => {
   const apiCall = await request(`${configuration.baseUrl}/api/step/${stepName}`, 'GET', true)
+  if(apiCall.status === 401){
+    logout()
+    return
+  }
+  return await apiCall.json()
+}
 
+const getCommunityLicense = async () => {
+  const apiCall = await request(`${configuration.baseUrl}/api/community_license`, 'GET', true)
+  if(apiCall.status === 401){
+    logout()
+    return
+  }
+  return await apiCall.json()
+}
+
+const getLicenseByKey = async (body) => {
+  const apiCall = await request(`${configuration.baseUrl}/api/license_key`, 'POST', true, body)
+  if(apiCall.status === 401){
+    logout()
+    return
+  }
+  return await apiCall.json()
+}
+
+const getWalletNodeHost = async (body) => {
+  const apiCall = await request(`${configuration.baseUrl}/api/node_host`, 'POST', true, body)
   if(apiCall.status === 401){
     logout()
     return
@@ -61,5 +87,8 @@ export default {
   logout,
   sendStepData,
   getPrevStep,
-  getCurrentStepData
+  getCurrentStepData,
+  getCommunityLicense,
+  getLicenseByKey,
+  getWalletNodeHost
 }
