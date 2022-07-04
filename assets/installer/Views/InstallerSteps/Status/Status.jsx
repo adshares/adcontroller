@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import apiService from '../../../utils/apiService'
-import { Box, Button, CircularProgress, Typography } from '@mui/material'
-import styles from '../Base/styles.scss'
-import { WindowCard } from '../../../Components/WindowCard/WindowCard'
+import {
+  Icon,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Tooltip,
+} from '@mui/material'
+import WindowCard from '../../../Components/WindowCard/WindowCard'
+import Spinner from '../../../Components/Spiner/Spinner'
+import CheckIcon from '@mui/icons-material/Check'
+import CloseIcon from '@mui/icons-material/Close'
 
 const Status = ({handleNextStep, handlePrevStep, step}) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -33,33 +42,81 @@ const Status = ({handleNextStep, handlePrevStep, step}) => {
   console.log(stepData)
 
   return (
-    isLoading ?
-      <Box className={styles.spinner} >
-        <CircularProgress/>
-      </Box> :
-      <WindowCard title='SMTP information'>
-        <Typography variant='body1'>
-          {stepData.adclassify.module} - version: {stepData.adclassify.version} - {stepData.adclassify.url} - {stepData.adclassify.code}
-        </Typography>
-        <Typography variant='body1'>
-          {stepData.adpanel.module} - version: {stepData.adpanel.version} - {stepData.adpanel.url} - {stepData.adpanel.code}
-        </Typography>
-        <Typography variant='body1'>
-          {stepData.adpay.module} - version: {stepData.adpay.version} - {stepData.adpay.url} - {stepData.adpay.code}
-        </Typography>
-        <Typography variant='body1'>
-          {stepData.adserver.module} - version: {stepData.adserver.version} - {stepData.adserver.url} - {stepData.adserver.code}
-        </Typography>
-        <Typography variant='body1'>
-          {stepData.adserver.module} - version: {stepData.adserver.version} - {stepData.adserver.url} - {stepData.adserver.code}
-        </Typography>
-        <Typography variant='body1'>
-          {stepData.aduser.module} - version: {stepData.aduser.version} - {stepData.aduser.url} - {stepData.aduser.code}
-        </Typography>
-        <div className={styles.formControl}>
-          {step.index > 1 && <Button onClick={() => handlePrevStep(step)} type='button' variant='outlined'>Back</Button> }
-          <Button onClick={handleSubmit} type='submit' variant='contained'>Save</Button>
-        </div>
+    <WindowCard
+      title='Status'
+      // onNextClick={handleSubmit}
+      disabledNext
+      onBackClick={() => handlePrevStep(step)}
+    >
+      {isLoading ?
+        <Spinner/> :
+      (
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell align='left'>{stepData.adserver.module}</TableCell>
+              <TableCell align='left'>{stepData.adserver.version}</TableCell>
+              <TableCell align='left'>{stepData.adserver.url}</TableCell>
+              <TableCell>
+                <Tooltip title={stepData.adserver.code}>
+                  <Icon>{stepData.adserver.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align='left'>{stepData.adpanel.module}</TableCell>
+              <TableCell align='left'>{stepData.adpanel.version}</TableCell>
+              <TableCell align='left'>{stepData.adpanel.url}</TableCell>
+              <TableCell>
+                <Tooltip title={stepData.adpanel.code}>
+                  <Icon>{stepData.adpanel.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align='left'>{stepData.aduser.module}</TableCell>
+              <TableCell align='left'>{stepData.aduser.version}</TableCell>
+              <TableCell align='left'>{stepData.aduser.url}</TableCell>
+              <TableCell>
+                <Tooltip title={stepData.aduser.code}>
+                  <Icon>{stepData.aduser.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align='left'>{stepData.adselect.module}</TableCell>
+              <TableCell align='left'>{stepData.adselect.version}</TableCell>
+              <TableCell align='left'>{stepData.adselect.url}</TableCell>
+              <TableCell>
+                <Tooltip title={stepData.adselect.code}>
+                  <Icon>{stepData.adselect.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align='left'>{stepData.adclassify.module}</TableCell>
+              <TableCell align='left'>{stepData.adclassify.version}</TableCell>
+              <TableCell align='left'>{stepData.adclassify.url}</TableCell>
+              <TableCell>
+                <Tooltip title={stepData.adclassify.code}>
+                  <Icon>{stepData.adclassify.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align='left'>{stepData.adpay.module}</TableCell>
+              <TableCell align='left'>{stepData.adpay.version}</TableCell>
+              <TableCell align='left'>{stepData.adpay.url}</TableCell>
+              <TableCell>
+                <Tooltip title={stepData.adpay.code}>
+                  <Icon>{stepData.adpay.code === 200 ? <CheckIcon color='success'/> : <CloseIcon color='error' />}</Icon>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      )
+}
       </WindowCard>
   )
 }

@@ -106,7 +106,6 @@ const License = ({handleNextStep, handlePrevStep, step}) => {
         <Box
           className={styles.form}
           component='form'
-          id='getLicenseByKey'
           onChange={onFormChange}
           onBlur={(e) => validate(e.target)}
         >

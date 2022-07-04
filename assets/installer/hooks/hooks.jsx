@@ -21,7 +21,7 @@ export const useForm = (defFields) => {
     const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g
     const walletAddressRegEx = /^[0-9A-F]{4}-[0-9A-F]{8}-([0-9A-F]{4})$/g
     const walletSecretRegEx = /^[0-9A-F]{64}$/g
-    const licenseKeyRegEx = /^(COM|SRV)-[\da-zA-Z]{6}-[\da-zA-Z]{5}-[\da-zA-Z]{5}-[\da-zA-Z]{4}-[\da-zA-Z]{4}$/g
+    const licenseKeyRegEx = /^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/ig
     const integer = /^\d*$/
     const errors = {}
 

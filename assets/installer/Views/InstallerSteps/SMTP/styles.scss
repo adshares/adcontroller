@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.formBlock {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.textField {
+  min-height: 4rem;
+}
+
+.editButtonThumb {
+  display: flex;
+  justify-content: end;
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import apiService from '../../../utils/apiService'
 import { Box, Button, Collapse, TextField, Typography, } from '@mui/material'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
@@ -41,9 +41,9 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
     setEditMode(response.data_required)
-    console.log(response)
     setFields({...fields, ...response})
     setIsLoading(false)
+    console.log(response)
   }
 
   const getWalletNodes = async () => {
@@ -61,6 +61,7 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
       ...response,
       ...{message: '', code: null}
     })
+    console.log(response)
   }
   const handleSubmit = async () => {
     if(!editMode){
@@ -174,7 +175,7 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
       </Box>
     )
   }
-// console.log(isNodeHostValid)
+
   return (
     <WindowCard
       title='Wallet information'
@@ -194,3 +195,8 @@ const Wallet = ({handleNextStep, handlePrevStep, step}) => {
 }
 
 export default Wallet
+
+
+{
+
+}
