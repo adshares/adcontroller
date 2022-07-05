@@ -24,7 +24,8 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
     message: '',
     code: null,
   })
-  const [editMode, setEditMode] = useState(true)
+  const [editMode, setEditMode] = useState(false)
+  const [dataRequired, setDataRequired] = useState(false)
 
   useEffect(() => {
     getStepData().catch(error => console.log(error))
@@ -40,8 +41,9 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const getStepData = async () => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
-    setEditMode(response.data_required)
     setFields({ ...fields, ...response })
+    setEditMode(response.data_required)
+    setDataRequired(response.data_required)
     setIsLoading(false)
   }
 
@@ -63,7 +65,6 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   }
   const handleSubmit = async () => {
     if (!editMode) {
-      await apiService.sendStepData(step.path, {})
       handleNextStep(step)
       setIsLoading(false)
       return
@@ -94,6 +95,15 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
       }
       onBackClick={() => handlePrevStep(step)}
     >
+      <Box className={styles.editButtonThumb}>
+        <Button
+          className={(dataRequired ? styles.hidden : styles.visible)}
+          onClick={() => (setEditMode(!editMode))}
+          type="button"
+        >
+          {editMode ? 'Cancel' : 'Edit'}
+        </Button>
+      </Box>
       {editMode && (
         <Box className={styles.container}>
           <Box
@@ -125,12 +135,12 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
               type="password"
               required
             />
-            <Button
-              onClick={() => setEditMode(!editMode)}
-              className={(editMode && !fields.data_required) ? styles.visible : styles.hidden}
-            >
-              Cancel
-            </Button>
+            {/*<Button*/}
+            {/*  onClick={() => setEditMode(!editMode)}*/}
+            {/*  className={(editMode && !fields.data_required) ? styles.visible : styles.hidden}*/}
+            {/*>*/}
+            {/*  Cancel*/}
+            {/*</Button>*/}
           </Box>
           <Collapse
             className={styles.formBlock}
@@ -172,15 +182,15 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
       {!editMode && (
         <Box className={styles.container}>
           <Box className={styles.content}>
-            <Typography>
+            <Typography variant="body1">
               Your wallet address: {fields.wallet_address}
             </Typography>
-            <Button
-              onClick={() => setEditMode(!editMode)}
-              className={(editMode ? styles.hidden : styles.visible)}
-            >
-              Edit
-            </Button>
+            {/*<Button*/}
+            {/*  onClick={() => setEditMode(!editMode)}*/}
+            {/*  className={(editMode ? styles.hidden : styles.visible)}*/}
+            {/*>*/}
+            {/*  Edit*/}
+            {/*</Button>*/}
           </Box>
         </Box>
       )}

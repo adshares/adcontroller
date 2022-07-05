@@ -50,7 +50,6 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
 
   const handleSubmit = async () => {
     if (!editMode) {
-      await apiService.sendStepData(step.path, {})
       handleNextStep(step)
       setIsLoading(false)
       return
@@ -94,9 +93,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 className={styles.textField}
                 error={!!errorObj.smtp_host}
                 helperText={errorObj.smtp_host}
-                name='smtp_host'
+                name="smtp_host"
                 value={fields.smtp_host}
-                label='SMTP host'
+                label="SMTP host"
                 size="small"
                 type="text"
                 fullWidth
@@ -105,9 +104,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 className={styles.textField}
                 error={!!errorObj.smtp_port}
                 helperText={errorObj.smtp_port}
-                name='smtp_port'
+                name="smtp_port"
                 value={fields.smtp_port}
-                label='SMTP port'
+                label="SMTP port"
                 size="small"
                 type="text"
                 fullWidth
@@ -116,9 +115,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 className={styles.textField}
                 error={!!errorObj.smtp_sender}
                 helperText={errorObj.smtp_sender}
-                name='smtp_sender'
+                name="smtp_sender"
                 value={fields.smtp_sender}
-                label='SMTP sender'
+                label="SMTP sender"
                 size="small"
                 type="text"
                 fullWidth
@@ -127,9 +126,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 className={styles.textField}
                 error={!!errorObj.smtp_username}
                 helperText={errorObj.smtp_username}
-                name='smtp_username'
+                name="smtp_username"
                 value={fields.smtp_username}
-                label='SMTP username'
+                label="SMTP username"
                 size="small"
                 type="text"
                 fullWidth

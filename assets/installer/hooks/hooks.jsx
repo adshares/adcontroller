@@ -10,13 +10,13 @@ export const useForm = (defFields) => {
   }, [fields, errorObj])
 
   const onFormChange = (e) => {
-    const {name, value} = e.target
-    setFields({...fields, [name]: value})
+    const { name, value } = e.target
+    setFields({ ...fields, [name]: value })
     validate(e.target)
   }
 
   const validate = (target) => {
-    const {name, value} = target
+    const { name, value } = target
     const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g
     const walletAddressRegEx = /^[0-9A-F]{4}-[0-9A-F]{8}-([0-9A-F]{4})$/g
     const walletSecretRegEx = /^[0-9A-F]{64}$/g
@@ -24,29 +24,23 @@ export const useForm = (defFields) => {
     const integer = /^\d*$/
     const errors = {}
 
-    if(!name){
+    if (!name) {
       return
     }
 
-    if(!value) {
+    if (!value) {
       errors[name] = 'Required field'
-    }
-    else if(name.includes('email') && !emailRegEx.test(value)) {
+    } else if (name.includes('email') && !emailRegEx.test(value)) {
       errors[name] = 'Field must be an email'
-    }
-    else if(name === 'wallet_address' && !walletAddressRegEx.test(value)){
+    } else if (name === 'wallet_address' && !walletAddressRegEx.test(value)) {
       errors[name] = 'Invalid wallet address format'
-    }
-    else if(name === 'wallet_secret_key' && !walletSecretRegEx.test(value)){
+    } else if (name === 'wallet_secret_key' && !walletSecretRegEx.test(value)) {
       errors[name] = 'Invalid secret key'
-    }
-    else if (name === 'licenseKey' && !licenseKeyRegEx.test(value)){
+    } else if (name === 'licenseKey' && !licenseKeyRegEx.test(value)) {
       errors[name] = 'Invalid license key'
-    }
-    else if (name === 'wallet_node_port' && !integer.test(value)){
+    } else if (name === 'wallet_node_port' && !integer.test(value)) {
       errors[name] = 'Port must be an number'
-    }
-    else {
+    } else {
       errors[name] = ''
     }
 
@@ -55,7 +49,7 @@ export const useForm = (defFields) => {
 
   const checkIsFormValid = () => {
     const isEmptyFields = Object.keys(fields).some(el => {
-      if(el === 'data_required' || el === 'message' || el === 'code'){
+      if (el === 'data_required' || el === 'message' || el === 'code') {
         return
       }
       return !fields[el]
@@ -75,12 +69,12 @@ export const useForm = (defFields) => {
 }
 
 export const useSkipFirstRenderEffect = (func, deps) => {
-  const didMount = useRef(false);
+  const didMount = useRef(false)
 
   useEffect(() => {
-    if (didMount.current) func();
-    else didMount.current = true;
-  }, deps);
+    if (didMount.current) func()
+    else didMount.current = true
+  }, deps)
 }
 
-export default useSkipFirstRenderEffect;
+export default useSkipFirstRenderEffect

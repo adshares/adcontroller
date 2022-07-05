@@ -10,7 +10,7 @@ const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
   const handleNextStep = (step) => {
     const nextEl = steps.find(el => el.index === step.index + 1)
     setCurrentInstallerStep(nextEl)
-    if(!unlockedSteps.find(el => nextEl.index === el.index)){
+    if (!unlockedSteps.find(el => nextEl.index === el.index)) {
       setUnlockedSteps([...unlockedSteps, nextEl])
     }
     navigate(nextEl.path)

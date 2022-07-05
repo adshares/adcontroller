@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import apiService from '../../../utils/apiService'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
-import Spinner from '../../../Components/Spiner/Spinner'
+import { Box, Typography } from '@mui/material'
+import styles from './styles.scss'
 
-const Classifier = ({handleNextStep, handlePrevStep, step}) => {
+const Classifier = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [stepData, setStepData] = useState({})
 
@@ -15,32 +16,34 @@ const Classifier = ({handleNextStep, handlePrevStep, step}) => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
     setIsLoading(false)
-    setStepData({...stepData, ...response})
+    setStepData({ ...stepData, ...response })
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const response = await apiService.sendStepData('classifier', {})
+    await apiService.sendStepData(step.path, {})
     handleNextStep(step)
   }
 
-  console.log(stepData)
-
   return (
     <WindowCard
-      title='Classifier information'
+      dataLoading={isLoading}
+      title="Classifier information"
       onNextClick={handleSubmit}
       disabledNext={false}
       onBackClick={() => handlePrevStep(step)}
     >
-      {isLoading ?
-        <Spinner/> :
-        <h1>
+
+      <Box className={styles.container}>
+        <Typography variant="h5">
           Registration in AdClassify
-        </h1>
-      }
+        </Typography>
+      </Box>
+
     </WindowCard>
   )
 }
 
 export default Classifier
+
+

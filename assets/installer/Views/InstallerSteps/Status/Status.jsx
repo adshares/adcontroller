@@ -13,7 +13,7 @@ import Spinner from '../../../Components/Spiner/Spinner'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 
-const Status = ({ handleNextStep, handlePrevStep, step }) => {
+const Status = ({ handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [stepData, setStepData] = useState({
     adclassify: { module: null, version: null, url: null, code: null },
@@ -43,18 +43,9 @@ const Status = ({ handleNextStep, handlePrevStep, step }) => {
     })
   }
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault()
-  //   await apiService.sendStepData('status', stepData)
-  //   handleNextStep(step)
-  // }
-  //
-  // console.log(stepData)
-
   return (
     <WindowCard
       title="Status"
-      // onNextClick={handleSubmit}
       disabledNext
       onBackClick={() => handlePrevStep(step)}
     >

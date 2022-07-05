@@ -5,7 +5,7 @@ import styles from './styles.scss'
 const Spinner = () => {
   return (
     <Box className={styles.container}>
-      <CircularProgress />
+      <CircularProgress/>
     </Box>
   )
 }

@@ -33,7 +33,7 @@ const WindowCard = ({
           <Button
             disabled={disabledNext || dataLoading}
             onClick={onNextClick}
-            type='button'
+            type="button"
             variant="contained"
           >
             Next

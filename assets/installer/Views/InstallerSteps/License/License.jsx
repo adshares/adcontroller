@@ -62,7 +62,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
 
   const handleSubmit = async () => {
     setIsLoading(true)
-    await apiService.sendStepData(step.path, {})
+    // await apiService.sendStepData(step.path, {})
     handleNextStep(step)
     setIsLoading(false)
   }

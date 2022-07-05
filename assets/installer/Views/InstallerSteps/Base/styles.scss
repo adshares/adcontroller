@@ -24,3 +24,16 @@
 .textField {
   min-height: 4rem;
 }
+
+.editButtonThumb {
+  display: flex;
+  justify-content: end;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}

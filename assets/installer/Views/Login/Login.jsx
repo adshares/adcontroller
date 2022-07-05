@@ -5,13 +5,13 @@ import apiService from '../../utils/apiService'
 import { Button, TextField } from '@mui/material'
 import WindowCard from '../../Components/WindowCard/WindowCard'
 
-export default function Login ({setToken}) {
+export default function Login ({ setToken }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
   const handleSubmit = async e => {
     e.preventDefault()
-    apiService.login({email, password}).then(response => setToken(response))
+    apiService.login({ email, password }).then(response => setToken(response))
   }
 
   const handleInputChange = e => {
@@ -33,13 +33,13 @@ export default function Login ({setToken}) {
 
   return (
     <WindowCard
-      title='Please login'
+      title="Please login"
       isFirstCard
       isLastCard
     >
       <form onSubmit={handleSubmit}>
         <TextField
-          variant='standard'
+          variant="standard"
           margin="normal"
           required
           fullWidth
@@ -50,7 +50,7 @@ export default function Login ({setToken}) {
           onChange={handleInputChange}
         />
         <TextField
-          variant='standard'
+          variant="standard"
           margin="normal"
           required
           fullWidth

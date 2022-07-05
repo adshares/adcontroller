@@ -5,9 +5,9 @@ const request = (url, method, withAuthorization = true, _body) => {
     method: method,
     headers: {
       'Content-Type': 'application/json',
-    ...(withAuthorization ? {'Authorization': 'Bearer ' + localStorage.getItem('authToken')} : {}),
+      ...(withAuthorization ? { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') } : {}),
     },
-    ...(method === 'POST' ? {body: JSON.stringify(_body)} : {})
+    ...(method === 'POST' ? { body: JSON.stringify(_body) } : {})
   })
 }
 
@@ -15,11 +15,11 @@ const login = async (body) => {
   const apiCall = await request(`${configuration.baseUrl}/api/login`, 'POST', false, body)
   const response = await apiCall.json()
 
-  if(apiCall.status !== 200){
+  if (apiCall.status !== 200) {
     return false
   }
 
-  if(response.token?.length){
+  if (response.token?.length) {
     localStorage.setItem('authToken', response.token)
     return response.token
   }
@@ -38,7 +38,7 @@ const sendStepData = async (stepName, body) => {
 const getPrevStep = async () => {
   const apiCall = await request(`${configuration.baseUrl}/api/step/`, 'GET', true)
 
-  if(apiCall.status === 401){
+  if (apiCall.status === 401) {
     logout()
     return
   }
@@ -48,7 +48,7 @@ const getPrevStep = async () => {
 
 const getCurrentStepData = async (stepName) => {
   const apiCall = await request(`${configuration.baseUrl}/api/step/${stepName}`, 'GET', true)
-  if(apiCall.status === 401){
+  if (apiCall.status === 401) {
     logout()
     return
   }
@@ -57,7 +57,7 @@ const getCurrentStepData = async (stepName) => {
 
 const getCommunityLicense = async () => {
   const apiCall = await request(`${configuration.baseUrl}/api/community_license`, 'GET', true)
-  if(apiCall.status === 401){
+  if (apiCall.status === 401) {
     logout()
     return
   }
@@ -66,7 +66,7 @@ const getCommunityLicense = async () => {
 
 const getLicenseByKey = async (body) => {
   const apiCall = await request(`${configuration.baseUrl}/api/license_key`, 'POST', true, body)
-  if(apiCall.status === 401){
+  if (apiCall.status === 401) {
     logout()
     return
   }
@@ -75,7 +75,7 @@ const getLicenseByKey = async (body) => {
 
 const getWalletNodeHost = async (body) => {
   const apiCall = await request(`${configuration.baseUrl}/api/node_host`, 'POST', true, body)
-  if(apiCall.status === 401){
+  if (apiCall.status === 401) {
     logout()
     return
   }

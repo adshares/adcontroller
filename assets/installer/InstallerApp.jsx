@@ -60,14 +60,14 @@ export default function InstallerApp () {
   const [currentStep, setCurrentStep] = useState(null)
 
   useEffect(() => {
-    if(token){
+    if (token) {
       getCurrentStep().catch(error => console.log(error))
     }
   }, [token])
 
   const getCurrentStep = async () => {
-    const {installer_step: installerStep} = await apiService.getPrevStep()
-    if(!installerStep){
+    const { installer_step: installerStep } = await apiService.getPrevStep()
+    if (!installerStep) {
       const firstStep = installerSteps.find(el => el.index === 1)
       setCurrentStep(firstStep.path)
       return
@@ -91,7 +91,7 @@ export default function InstallerApp () {
             }
           />
           <Route
-            path='steps/*'
+            path="steps/*"
             element={
               <PrivateRoute isLoggedIn={!!token}>
                 {currentStep ?
