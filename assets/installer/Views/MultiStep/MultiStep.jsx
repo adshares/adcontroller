@@ -25,7 +25,6 @@ const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
     navigate(step.path)
   }
 
-
   return (
     <>
       <BreadCrumbs

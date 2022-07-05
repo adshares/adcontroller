@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import apiService from '../../../utils/apiService'
-import { Box, Button, CircularProgress, Typography } from '@mui/material'
-import styles from '../Base/styles.scss'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
 import Spinner from '../../../Components/Spiner/Spinner'
 
@@ -23,7 +21,6 @@ const Classifier = ({handleNextStep, handlePrevStep, step}) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const response = await apiService.sendStepData('classifier', {})
-    console.log(response)
     handleNextStep(step)
   }
 

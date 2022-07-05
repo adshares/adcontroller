@@ -5,7 +5,6 @@ export const useForm = (defFields) => {
   const [errorObj, setErrorOnj] = useState({})
   const [isFormValid, setIsFormValid] = useState(false)
 
-
   useEffect(() => {
     checkIsFormValid()
   }, [fields, errorObj])

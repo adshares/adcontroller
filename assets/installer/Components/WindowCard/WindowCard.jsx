@@ -1,8 +1,10 @@
 import React from 'react'
 import styles from './styles.scss'
 import { Button, Card, CardActions, CardContent, CardHeader } from '@mui/material'
+import Spinner from '../Spiner/Spinner'
 
 const WindowCard = ({
+  dataLoading = false,
   children,
   title,
   onNextClick,
@@ -14,7 +16,9 @@ const WindowCard = ({
   return (
     <Card className={styles.container}>
       <CardHeader title={title}/>
-      <CardContent className={styles.content}>{children}</CardContent>
+      <CardContent className={styles.content}>
+        {dataLoading ? <Spinner/> : children}
+      </CardContent>
       <CardActions className={styles.controls}>
         {!isFirstCard &&
           <Button
@@ -27,7 +31,7 @@ const WindowCard = ({
         }
         {!isLastCard &&
           <Button
-            disabled={disabledNext}
+            disabled={disabledNext || dataLoading}
             onClick={onNextClick}
             type='button'
             variant="contained"
