@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -17,17 +18,22 @@ class ExceptionListener implements EventSubscriberInterface
         $exception = $event->getThrowable();
         $request = $event->getRequest();
 
-        if (
-            self::HEADER_JSON_CONTENT === $request->headers->get('Content-Type')
-            && $exception instanceof HttpExceptionInterface
-        ) {
-            $response = new JsonResponse([
-                'message' => $exception->getMessage(),
-                'code' => $exception->getStatusCode(),
-            ]);
+        if (self::HEADER_JSON_CONTENT === $request->headers->get('Content-Type')) {
+            if ($exception instanceof HttpExceptionInterface) {
+                $response = new JsonResponse([
+                    'message' => $exception->getMessage(),
+                    'code' => $exception->getStatusCode(),
+                ]);
+                $response->setStatusCode($exception->getStatusCode());
+                $response->headers->replace($exception->getHeaders());
+            } else {
+                $response = new JsonResponse([
+                    'message' => 'Internal Server Error',
+                    'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                ]);
+                $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
 
-            $response->setStatusCode($exception->getStatusCode());
-            $response->headers->replace($exception->getHeaders());
             $response->headers->set('Content-Type', self::HEADER_JSON_CONTENT);
             $event->setResponse($response);
         }

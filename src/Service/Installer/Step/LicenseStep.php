@@ -14,6 +14,7 @@ use App\ValueObject\Module;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class LicenseStep implements InstallerStep
 {
@@ -116,6 +117,9 @@ class LicenseStep implements InstallerStep
         } catch (UnexpectedResponseException $exception) {
             $this->logger->debug(sprintf('Unexpected response from license server (%s)', $exception->getMessage()));
             return null;
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->critical(sprintf('License server is not accessible (%s)', $exception->getMessage()));
+            return null;
         }
 
         try {
@@ -157,6 +161,9 @@ class LicenseStep implements InstallerStep
             $licenseKey = $this->licenseServerClient->createCommunityLicense($email, $name);
         } catch (UnexpectedResponseException) {
             throw new UnprocessableEntityHttpException('License cannot be obtained');
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->critical(sprintf('License server is not accessible (%s)', $exception->getMessage()));
+            throw new UnprocessableEntityHttpException('License server is not accessible');
         }
 
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));

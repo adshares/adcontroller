@@ -9,21 +9,26 @@ use App\Service\AdClassifyClient;
 use App\Service\EnvEditor;
 use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ClassifierStep implements InstallerStep
 {
     private AdClassifyClient $adClassifyClient;
     private ConfigurationRepository $repository;
+    private LoggerInterface $logger;
     private ServicePresenceChecker $servicePresenceChecker;
 
     public function __construct(
         AdClassifyClient $adClassifyClient,
         ConfigurationRepository $repository,
+        LoggerInterface $logger,
         ServicePresenceChecker $servicePresenceChecker
     ) {
         $this->adClassifyClient = $adClassifyClient;
         $this->repository = $repository;
+        $this->logger = $logger;
         $this->servicePresenceChecker = $servicePresenceChecker;
     }
 
@@ -45,6 +50,9 @@ class ClassifierStep implements InstallerStep
             $apiKey = $this->adClassifyClient->createAccount($email, $name);
         } catch (UnexpectedResponseException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage());
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->critical(sprintf('AdClassify is not accessible (%s)', $exception->getMessage()));
+            throw new UnprocessableEntityHttpException('AdClassify is not accessible');
         }
 
         $apiKeyName = $apiKey['name'];

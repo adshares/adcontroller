@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Exception\UnexpectedResponseException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LicenseServerClient
@@ -28,6 +29,7 @@ class LicenseServerClient
      *
      * @param string $id license id
      * @return string encoded license data
+     * @throws TransportExceptionInterface
      */
     public function fetchEncodedLicenseData(string $id): string
     {
@@ -51,6 +53,7 @@ class LicenseServerClient
      * @param string $email e-mail address
      * @param string $adserverName AdServer's name
      * @return string license key (secret)
+     * @throws TransportExceptionInterface
      */
     public function createCommunityLicense(string $email, string $adserverName): string
     {

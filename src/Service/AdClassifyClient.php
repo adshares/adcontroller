@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Exception\UnexpectedResponseException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AdClassifyClient
@@ -19,6 +20,9 @@ class AdClassifyClient
         $this->baseUri = $adclassifyBaseUri;
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     public function createAccount(string $email, string $adserverName): array
     {
         $response = $this->httpClient->request(
