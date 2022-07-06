@@ -1,17 +1,29 @@
 import React, { useState } from 'react'
-
 import apiService from '../../utils/apiService'
-
 import { Button, TextField } from '@mui/material'
 import WindowCard from '../../Components/WindowCard/WindowCard'
 
 export default function Login ({ setToken }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [alert, setAlert] = useState({type: '', message: ''})
 
   const handleSubmit = async e => {
     e.preventDefault()
-    apiService.login({ email, password }).then(response => setToken(response))
+    await login()
+    // apiService.login({ email, password }).then(response => setToken(response))
+  }
+
+  const login = async () => {
+    const response = await apiService.login({ email, password })
+    if(response.code === 401){
+      setAlert({
+        type: 'error',
+        message: response.message
+      })
+      return
+    }
+    setToken(response)
   }
 
   const handleInputChange = e => {
@@ -33,6 +45,7 @@ export default function Login ({ setToken }) {
 
   return (
     <WindowCard
+      alert={alert}
       title="Please login"
       isFirstCard
       isLastCard

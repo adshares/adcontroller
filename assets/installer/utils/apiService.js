@@ -16,7 +16,7 @@ const login = async (body) => {
   const response = await apiCall.json()
 
   if (apiCall.status !== 200) {
-    return false
+    return response
   }
 
   if (response.token?.length) {
