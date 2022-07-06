@@ -58,7 +58,8 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       return
     }
     setIsLoading(true)
-    await apiService.sendStepData(step.path, { ...fields, ...newPassword })
+    const {smtp_password} = newPassword
+    await apiService.sendStepData(step.path, { ...fields, ...(!!smtp_password ? newPassword : {}) })
     handleNextStep(step)
     setIsLoading(false)
   }
