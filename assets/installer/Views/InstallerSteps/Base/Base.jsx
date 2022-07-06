@@ -9,16 +9,19 @@ const Base = ({ handleNextStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false)
   const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
-    base_adpanel_host_prefix: '',
-    base_adserver_host_prefix: '',
     base_adserver_name: '',
-    base_aduser_host_prefix: '',
     base_contact_email: '',
     base_domain: '',
     base_support_email: '',
   })
+  const { fields: advancedFields, setFields: setAdvancedFields, onFormChange: onAdvancedFieldsChange } = useForm({
+    base_adpanel_host_prefix: '',
+    base_adserver_host_prefix: '',
+    base_aduser_host_prefix: '',
+  })
   const [editMode, setEditMode] = useState(false)
   const [dataRequired, setDataRequired] = useState(false)
+  const [alert, setAlert] = useState({type: '', message: ''})
 
   useEffect(() => {
     getStepData().catch(error => console.log(error))
@@ -27,9 +30,28 @@ const Base = ({ handleNextStep, step }) => {
   const getStepData = async () => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
-    setFields({ ...fields, ...response })
-    setEditMode(response.data_required)
-    setDataRequired(response.data_required)
+    const {
+      base_adserver_name,
+      base_contact_email,
+      base_domain,
+      base_support_email,
+      base_adpanel_host_prefix,
+      base_adserver_host_prefix,
+      base_aduser_host_prefix,
+      data_required
+    } = response
+    setFields({
+      ...fields,
+      ...{
+        base_adserver_name: base_adserver_name || '',
+        base_contact_email: base_contact_email || '',
+        base_domain: base_domain || '',
+        base_support_email: base_support_email || ''
+      }
+    })
+    setAdvancedFields({ ...advancedFields, ...{ base_adpanel_host_prefix, base_adserver_host_prefix, base_aduser_host_prefix} })
+    setEditMode(data_required)
+    setDataRequired(data_required)
     setIsLoading(false)
   }
 
@@ -44,13 +66,22 @@ const Base = ({ handleNextStep, step }) => {
       return
     }
     setIsLoading(true)
-    await apiService.sendStepData(step.path, fields)
+    const response = await apiService.sendStepData(step.path, { ...fields, ...advancedFields })
+    if(response.code > 300){
+      setAlert({
+        type: 'error',
+        message: response.message
+      })
+      setIsLoading(false)
+      return
+    }
     handleNextStep(step)
     setIsLoading(false)
   }
 
   return (
     <WindowCard
+      alert={alert}
       dataLoading={isLoading}
       title="Base information"
       onNextClick={handleSubmit}
@@ -66,14 +97,15 @@ const Base = ({ handleNextStep, step }) => {
           {editMode ? 'Cancel' : 'Edit'}
         </Button>
       </Box>
+
       {editMode && (
-        <Box
-          component="form"
-          className={styles.container}
-          onChange={onFormChange}
-          onBlur={(e) => validate(e.target)}
-        >
-          <Box className={styles.formBase}>
+        <Box className={styles.container}>
+          <Box
+            className={styles.formBase}
+            component="form"
+            onChange={onFormChange}
+            onBlur={(e) => validate(e.target)}
+          >
             <Box className={styles.formBlock}>
               <TextField
                 className={styles.textField}
@@ -81,7 +113,7 @@ const Base = ({ handleNextStep, step }) => {
                 helperText={errorObj.base_adserver_name}
                 size="small"
                 name="base_adserver_name"
-                label="Adserver name"
+                label="AdServer name"
                 value={fields.base_adserver_name}
                 type="text"
                 required
@@ -126,42 +158,38 @@ const Base = ({ handleNextStep, step }) => {
             </Box>
           </Box>
 
-          <Box className={styles.formAdvanced}>
-            <Button type="button" onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>Advanced options</Button>
+          <Button type="button" onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>Advanced options</Button>
+
+          <Box
+            className={styles.formAdvanced}
+            component="form"
+            onChange={onAdvancedFieldsChange}
+          >
             <Collapse in={showAdvancedOptions} timeout="auto" unmountOnExit>
               <Box sx={{ marginTop: '8px' }} className={styles.formBlock}>
                 <TextField
                   className={styles.textField}
-                  error={!!errorObj.base_adpanel_host_prefix}
-                  helperText={errorObj.base_adpanel_host_prefix}
                   size="small"
                   name="base_adpanel_host_prefix"
-                  label="Adpanel host prefix"
-                  value={fields.base_adpanel_host_prefix}
+                  label="AdPanel host prefix"
+                  value={advancedFields.base_adpanel_host_prefix}
                   type="text"
-                  required
                 />
                 <TextField
                   className={styles.textField}
-                  error={!!errorObj.base_aduser_host_prefix}
-                  helperText={errorObj.base_aduser_host_prefix}
                   size="small"
                   name="base_aduser_host_prefix"
-                  label="Aduser host prefix"
-                  value={fields.base_aduser_host_prefix}
+                  label="AdUser host prefix"
+                  value={advancedFields.base_aduser_host_prefix}
                   type="text"
-                  required
                 />
                 <TextField
                   className={styles.textField}
-                  error={!!errorObj.base_adserver_host_prefix}
-                  helperText={errorObj.base_adserver_host_prefix}
                   size="small"
                   name="base_adserver_host_prefix"
-                  label="Adserver host prefix"
-                  value={fields.base_adserver_host_prefix}
+                  label="AdServer host prefix"
+                  value={advancedFields.base_adserver_host_prefix}
                   type="text"
-                  required
                 />
               </Box>
             </Collapse>
@@ -170,7 +198,7 @@ const Base = ({ handleNextStep, step }) => {
       )}
 
       {!editMode && (
-        <InfoTable stepData={fields}/>
+        <InfoTable stepData={{ ...fields, ...advancedFields }}/>
       )}
 
     </WindowCard>
@@ -184,7 +212,7 @@ const InfoTable = ({ stepData }) => {
     <Table>
       <TableBody>
         <TableRow>
-          <TableCell align="left">Adserver name</TableCell>
+          <TableCell align="left">AdServer name</TableCell>
           <TableCell align="left">{stepData.base_adserver_name}</TableCell>
         </TableRow>
         <TableRow>
@@ -200,15 +228,15 @@ const InfoTable = ({ stepData }) => {
           <TableCell align="left">{stepData.base_contact_email}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Adpanel host prefix</TableCell>
+          <TableCell align="left">AdPanel host prefix</TableCell>
           <TableCell align="left">{stepData.base_adpanel_host_prefix}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Aduser host prefix</TableCell>
+          <TableCell align="left">AdUser host prefix</TableCell>
           <TableCell align="left">{stepData.base_aduser_host_prefix}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Adserver host prefix</TableCell>
+          <TableCell align="left">AdServer host prefix</TableCell>
           <TableCell align="left">{stepData.base_adserver_host_prefix}</TableCell>
         </TableRow>
       </TableBody>
