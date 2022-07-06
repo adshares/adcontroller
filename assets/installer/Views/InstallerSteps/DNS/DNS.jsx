@@ -21,6 +21,7 @@ const DNS = ({ handleNextStep, handlePrevStep, step }) => {
   const getStepData = async () => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
+    console.log(response)
     setIsLoading(false)
     setStepData({
       adpanel: response.adpanel,
@@ -69,7 +70,7 @@ const TableInfo = ({ stepData }) => {
             <TableCell>{stepData.adserver.url}</TableCell>
             <TableCell>
               <Tooltip title={stepData.adserver.code}>
-                <Icon>{stepData.adpanel.code === 200 ? <CheckIcon color="success"/> : <CloseIcon color="error"/>}</Icon>
+                <Icon>{stepData.adserver.code === 200 ? <CheckIcon color="success"/> : <CloseIcon color="error"/>}</Icon>
               </Tooltip>
             </TableCell>
           </TableRow>
@@ -77,7 +78,7 @@ const TableInfo = ({ stepData }) => {
             <TableCell>{stepData.aduser.module}</TableCell>
             <TableCell>{stepData.aduser.url}</TableCell>
             <TableCell>
-              <Tooltip title={stepData.adpanel.code}>
+              <Tooltip title={stepData.aduser.code}>
                 <Icon>{stepData.aduser.code === 200 ? <CheckIcon color="success"/> : <CloseIcon color="error"/>}</Icon>
               </Tooltip>
             </TableCell>
