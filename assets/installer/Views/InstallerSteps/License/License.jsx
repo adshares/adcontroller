@@ -32,6 +32,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   })
   const [editMode, setEditMode] = useState(false)
   const { fields, errorObj, isFormValid, onFormChange, validate } = useForm({ licenseKey: '' })
+  const [alert, setAlert] = useState({type: '', message: ''})
 
   useEffect(() => {
     getStepData().catch(error => console.log(error))
@@ -49,6 +50,14 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const handleGetLicenseClick = async () => {
     setIsLicenseLoading(true)
     const response = await apiService.getLicenseByKey({ license_key: fields.licenseKey })
+    if(response.code > 300){
+      setAlert({
+        type: 'error',
+        message: response.message
+      })
+      setIsLicenseLoading(false)
+      return
+    }
     setIsLicenseLoading(false)
     setStepData({ ...response.license_data })
   }
@@ -56,19 +65,27 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const handleGetFreeLicenseClick = async () => {
     setIsLicenseLoading(true)
     const response = await apiService.getCommunityLicense()
+    if(response.code > 300){
+      setAlert({
+        type: 'error',
+        message: response.message
+      })
+      setIsLicenseLoading(false)
+      return
+    }
     setIsLicenseLoading(false)
     setStepData({ ...response.license_data })
   }
 
   const handleSubmit = async () => {
     setIsLoading(true)
-    // await apiService.sendStepData(step.path, {})
     handleNextStep(step)
     setIsLoading(false)
   }
 
   return (
     <WindowCard
+      alert={alert}
       dataLoading={isLoading}
       title="License information"
       onNextClick={handleSubmit}
