@@ -43,12 +43,14 @@ class BaseStep implements InstallerStep
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
 
         $domain = $content[Configuration::BASE_DOMAIN];
+        $adServerHost = self::getPrefixedHost($domain, $content[Configuration::BASE_ADSERVER_HOST_PREFIX]);
+        $adPanelHost = self::getPrefixedHost($domain, $content[Configuration::BASE_ADPANEL_HOST_PREFIX]);
+        $adUserHost = self::getPrefixedHost($domain, $content[Configuration::BASE_ADUSER_HOST_PREFIX]);
         $protocol = 'https://';
-        $host = $content[Configuration::BASE_ADSERVER_HOST_PREFIX] . '.' . $domain;
-        $adserverUrl = $protocol . $host;
-        $adpanelUrl = $protocol . $content[Configuration::BASE_ADPANEL_HOST_PREFIX] . '.' . $domain;
-        $aduserUrl = $protocol . $content[Configuration::BASE_ADUSER_HOST_PREFIX] . '.' . $domain;
-        $aduserInternalUrl = 'http://' . $content[Configuration::BASE_ADUSER_HOST_PREFIX] . '.' . $domain;
+        $adserverUrl = $protocol . $adServerHost;
+        $adpanelUrl = $protocol . $adPanelHost;
+        $aduserUrl = $protocol . $adUserHost;
+        $aduserInternalUrl = 'http://' . $adUserHost;
 
         $envEditor->set(
             [
@@ -56,7 +58,7 @@ class BaseStep implements InstallerStep
                 EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL => $content[Configuration::BASE_CONTACT_EMAIL],
                 EnvEditor::ADSERVER_ADUSER_BASE_URL => $aduserUrl,
                 EnvEditor::ADSERVER_ADUSER_INTERNAL_URL => $aduserInternalUrl,
-                EnvEditor::ADSERVER_APP_HOST => $host,
+                EnvEditor::ADSERVER_APP_HOST => $adServerHost,
                 EnvEditor::ADSERVER_APP_NAME => $content[Configuration::BASE_ADSERVER_NAME],
                 EnvEditor::ADSERVER_APP_URL => $adserverUrl,
                 EnvEditor::ADSERVER_MAIL_FROM_ADDRESS => $content[Configuration::BASE_SUPPORT_EMAIL],
@@ -109,6 +111,11 @@ class BaseStep implements InstallerStep
                 );
             }
         }
+    }
+
+    private static function getPrefixedHost(string $domain, string $prefix): string
+    {
+        return ('' === $prefix ? '' : $prefix . '.') . $domain;
     }
 
     private static function extractHost(string $url): string
