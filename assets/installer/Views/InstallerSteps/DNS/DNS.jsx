@@ -21,7 +21,6 @@ const DNS = ({ handleNextStep, handlePrevStep, step }) => {
   const getStepData = async () => {
     setIsLoading(true)
     const response = await apiService.getCurrentStepData(step.path)
-    console.log(response)
     setIsLoading(false)
     setStepData({
       adpanel: response.adpanel,

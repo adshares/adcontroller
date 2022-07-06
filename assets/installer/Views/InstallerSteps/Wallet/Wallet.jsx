@@ -26,6 +26,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   })
   const [editMode, setEditMode] = useState(false)
   const [dataRequired, setDataRequired] = useState(false)
+  const [alert, setAlert] = useState({type: '', message: ''})
 
   useEffect(() => {
     getStepData().catch(error => console.log(error))
@@ -79,13 +80,22 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
       wallet_node_host: nodeHost.wallet_node_host,
       wallet_node_port: Number(nodeHost.wallet_node_port),
     }
-    await apiService.sendStepData(step.path, body)
+    const response = await apiService.sendStepData(step.path, body)
+    if(response.code > 300){
+      setAlert({
+        type: 'error',
+        message: response.message
+      })
+      setIsLoading(false)
+      return
+    }
     handleNextStep(step)
     setIsLoading(false)
   }
 
   return (
     <WindowCard
+      alert={alert}
       dataLoading={isLoading}
       title="Wallet information"
       onNextClick={handleSubmit}
@@ -135,12 +145,6 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
               type="password"
               required
             />
-            {/*<Button*/}
-            {/*  onClick={() => setEditMode(!editMode)}*/}
-            {/*  className={(editMode && !fields.data_required) ? styles.visible : styles.hidden}*/}
-            {/*>*/}
-            {/*  Cancel*/}
-            {/*</Button>*/}
           </Box>
           <Collapse
             className={styles.formBlock}
