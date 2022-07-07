@@ -28,55 +28,61 @@ const Base = ({ handleNextStep, step }) => {
   }, [])
 
   const getStepData = async () => {
-    setIsLoading(true)
-    const response = await apiService.getCurrentStepData(step.path)
-    const {
-      base_adserver_name,
-      base_contact_email,
-      base_domain,
-      base_support_email,
-      base_adpanel_host_prefix,
-      base_adserver_host_prefix,
-      base_aduser_host_prefix,
-      data_required
-    } = response
-    setFields({
-      ...fields,
-      ...{
-        base_adserver_name: base_adserver_name || '',
-        base_contact_email: base_contact_email || '',
-        base_domain: base_domain || '',
-        base_support_email: base_support_email || ''
-      }
-    })
-    setAdvancedFields({ ...advancedFields, ...{ base_adpanel_host_prefix, base_adserver_host_prefix, base_aduser_host_prefix} })
-    setEditMode(data_required)
-    setDataRequired(data_required)
-    setIsLoading(false)
+    try {
+      setIsLoading(true)
+      const response = await apiService.getCurrentStepData(step.path)
+      const {
+        base_adserver_name,
+        base_contact_email,
+        base_domain,
+        base_support_email,
+        base_adpanel_host_prefix,
+        base_adserver_host_prefix,
+        base_aduser_host_prefix,
+        data_required
+      } = response
+      setFields({
+        ...fields,
+        ...{
+          base_adserver_name: base_adserver_name || '',
+          base_contact_email: base_contact_email || '',
+          base_domain: base_domain || '',
+          base_support_email: base_support_email || ''
+        }
+      })
+      setAdvancedFields({ ...advancedFields, ...{ base_adpanel_host_prefix, base_adserver_host_prefix, base_aduser_host_prefix} })
+      setEditMode(data_required)
+      setDataRequired(data_required)
+    } catch (err) {
+      console.log(err)
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleSubmit = async () => {
-    if (!editMode) {
+    try {
       setIsLoading(true)
+      if (!editMode) {
+        handleNextStep(step)
+        return
+      }
+      await apiService.sendStepData(step.path, { ...fields, ...advancedFields })
       handleNextStep(step)
-      setIsLoading(false)
-      return
-    }
-    if (!isFormValid) {
-      return
-    }
-    setIsLoading(true)
-    const response = await apiService.sendStepData(step.path, { ...fields, ...advancedFields })
-    if(response.code > 300){
+    } catch (err) {
       setAlert({
         type: 'error',
-        message: response.message
+        message: err.data.message,
+        title: err.message
       })
+    } finally {
       setIsLoading(false)
-      return
     }
-    handleNextStep(step)
-    setIsLoading(false)
   }
 
   return (

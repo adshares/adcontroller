@@ -6,25 +6,26 @@ import WindowCard from '../../Components/WindowCard/WindowCard'
 export default function Login ({ setToken }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [alert, setAlert] = useState({type: '', message: ''})
+  const [alert, setAlert] = useState({type: '', message: '', title: ''})
 
   const handleSubmit = async e => {
     e.preventDefault()
     await login()
-    // apiService.login({ email, password }).then(response => setToken(response))
   }
 
   const login = async () => {
-    const response = await apiService.login({ email, password })
-    if(response.code === 401){
+    try {
+      const response = await apiService.login({ email, password })
+      setToken(response)
+    } catch (err) {
       setAlert({
         type: 'error',
-        message: response.message
+        message: err.data.message,
+        title: err.message
       })
-      return
     }
-    setToken(response)
   }
+
 
   const handleInputChange = e => {
     const { name, value } = e.target

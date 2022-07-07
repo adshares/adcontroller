@@ -29,40 +29,61 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const [alert, setAlert] = useState({type: '', message: ''})
 
   useEffect(() => {
-    getStepData().catch(error => console.log(error))
+    getStepData()
 
   }, [])
 
   useSkipFirstRenderEffect(() => {
     if (!errorObj.wallet_address) {
-      getWalletNodes().catch(error => console.log(error))
+      getWalletNodes()
     }
   }, [errorObj.wallet_address])
 
   const getStepData = async () => {
-    setIsLoading(true)
-    const response = await apiService.getCurrentStepData(step.path)
-    setFields({ ...fields, ...response })
-    setEditMode(response.data_required)
-    setDataRequired(response.data_required)
-    setIsLoading(false)
+    try {
+      setIsLoading(true)
+      const response = await apiService.getCurrentStepData(step.path)
+      setFields({ ...fields, ...response })
+      setEditMode(response.data_required)
+      setDataRequired(response.data_required)
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    }
+    finally {
+      setIsLoading(false)
+    }
   }
 
   const getWalletNodes = async () => {
-    setIsHostVerification(true)
-    const response = await apiService.getWalletNodeHost({ wallet_address: fields.wallet_address })
-    setIsHostVerification(false)
-    if (response.code) {
+    try {
+      setIsHostVerification(true)
+      const response = await apiService.getWalletNodeHost({ wallet_address: fields.wallet_address })
+      if (response.code) {
+        setNodeHost({
+          ...response,
+          ...{ wallet_node_host: '', wallet_node_port: '' }
+        })
+        return
+      }
       setNodeHost({
         ...response,
-        ...{ wallet_node_host: '', wallet_node_port: '' }
+        ...{ message: '', code: null }
       })
-      return
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
     }
-    setNodeHost({
-      ...response,
-      ...{ message: '', code: null }
-    })
+    finally {
+      setIsHostVerification(false)
+    }
+
   }
   const handleSubmit = async () => {
     if (!editMode) {

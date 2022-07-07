@@ -13,20 +13,31 @@ const DNS = ({ handleNextStep, handlePrevStep, step }) => {
     adserver: { module: null, url: null, code: null },
     aduser: { module: null, url: null, code: null },
   })
+  const [alert, setAlert] = useState({type: '', message: '', title: ''})
 
   useEffect(() => {
-    getStepData().catch(error => console.log(error))
+    getStepData()
   }, [])
 
   const getStepData = async () => {
-    setIsLoading(true)
-    const response = await apiService.getCurrentStepData(step.path)
-    setIsLoading(false)
-    setStepData({
-      adpanel: response.adpanel,
-      adserver: response.adserver,
-      aduser: response.aduser
-    })
+    try {
+      setIsLoading(true)
+      const response = await apiService.getCurrentStepData(step.path)
+      setStepData({
+        adpanel: response.adpanel,
+        adserver: response.adserver,
+        aduser: response.aduser
+      })
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setIsLoading(false)
+    }
+
   }
 
   const handleSubmit = async (e) => {
@@ -37,6 +48,7 @@ const DNS = ({ handleNextStep, handlePrevStep, step }) => {
 
   return (
     <WindowCard
+      alert={alert}
       dataLoading={isLoading}
       title="DNS information"
       onNextClick={handleSubmit}

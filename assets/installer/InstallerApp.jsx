@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import apiService from './utils/apiService'
 import { CircularProgress } from '@mui/material'
 import Base from './Views/InstallerSteps/Base/Base'
@@ -66,15 +66,23 @@ export default function InstallerApp () {
   }, [token])
 
   const getCurrentStep = async () => {
-    const { installer_step: installerStep } = await apiService.getPrevStep()
-    if (!installerStep) {
-      const firstStep = installerSteps.find(el => el.index === 1)
-      setCurrentStep(firstStep.path)
-      return
+    try {
+      const {installer_step} = await apiService.getPrevStep()
+      if (!installer_step) {
+        const firstStep = installerSteps.find(el => el.index === 1)
+        setCurrentStep(firstStep.path)
+        return
+      }
+      const prevEl = installerSteps.find(el => el.path === installer_step)
+      const currentEl = installerSteps.find(el => el.index === prevEl.index + 1)
+      setCurrentStep(currentEl.path)
+    } catch (err) {
+      if(err.data.code === 401) {
+        setToken(localStorage.getItem('authToken'))
+      }
     }
-    const prevEl = installerSteps.find(el => el.path === installerStep)
-    const currentEl = installerSteps.find(el => el.index === prevEl.index + 1)
-    setCurrentStep(currentEl.path)
+
+
   }
 
   return (

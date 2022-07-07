@@ -18,7 +18,7 @@ import Spinner from '../Spiner/Spinner'
 import useSkipFirstRenderEffect from '../../hooks/hooks'
 
 const WindowCard = ({
-  alert = {type: '', message: ''},
+  alert = {type: '', message: '', title: ''},
   dataLoading = false,
   children,
   title,
@@ -62,7 +62,7 @@ const WindowCard = ({
               }
             >
               <Typography variant='body2'>
-                {alert.message}
+                {alert.title}: {alert.message}
               </Typography>
             </Alert>
           )}
