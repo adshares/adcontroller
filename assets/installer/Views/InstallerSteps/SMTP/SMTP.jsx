@@ -26,7 +26,6 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ smtp_password: '' })
   const [alert, setAlert] = useState({type: '', message: ''})
   const [isFormWasTouched, setFormTouched] = useState(false)
-
   useEffect(() => {
     getStepData()
   }, [])
@@ -124,7 +123,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 error={!!errorObj.smtp_port}
                 helperText={errorObj.smtp_port}
                 name="smtp_port"
-                value={fields.smtp_port || '587'}
+                value={fields.smtp_port}
                 label="SMTP port"
                 size="small"
                 type="text"
@@ -156,12 +155,18 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
             <Box
               className={styles.formBlock}
               component="form"
-              onChange={onPasswordChange}
-              onClick={() => setFormTouched(true)}
+              onChange={e => {
+                onPasswordChange(e)
+                if(e.target.value.includes('↹')){
+                  return
+                }
+                setFormTouched(true)
+              }}
             >
               <TextField
                 className={styles.textField}
-                value={newPassword.smtp_password}
+                value={editMode && isDataRequired ? newPassword.smtp_password : undefined}
+                defaultValue={editMode && !isDataRequired ? '↹↹↹↹↹↹↹↹' : undefined}
                 name="smtp_password"
                 size="small"
                 label="New password"
