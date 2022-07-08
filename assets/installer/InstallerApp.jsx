@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import apiService from './utils/apiService'
-import { CircularProgress } from '@mui/material'
+import { Alert } from '@mui/material'
 import Base from './Views/InstallerSteps/Base/Base'
 import Login from './Views/Login/Login'
 import MenuAppBar from './Components/AppBar/AppBar'
@@ -16,6 +16,8 @@ import License from './Views/InstallerSteps/License/License'
 import Classifier from './Views/InstallerSteps/Classifier/Classifier'
 import SMTP from './Views/InstallerSteps/SMTP/SMTP'
 import Status from './Views/InstallerSteps/Status/Status'
+import WindowCard from './Components/WindowCard/WindowCard'
+import Spinner from './Components/Spiner/Spinner'
 
 const installerSteps = [
   {
@@ -58,6 +60,7 @@ const installerSteps = [
 export default function InstallerApp () {
   const [token, setToken] = useState(localStorage.getItem('authToken'))
   const [currentStep, setCurrentStep] = useState(null)
+  const [alert, setAlert] = useState({type: 'error', message: '', title: ''})
 
   useEffect(() => {
     if (token) {
@@ -77,9 +80,12 @@ export default function InstallerApp () {
       const currentEl = installerSteps.find(el => el.index === prevEl.index + 1)
       setCurrentStep(currentEl.path)
     } catch (err) {
-      if(err.data.code === 401) {
-        setToken(localStorage.getItem('authToken'))
-      }
+      setToken(localStorage.getItem('authToken'))
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
     }
   }
 
@@ -105,7 +111,16 @@ export default function InstallerApp () {
                     currentStep={currentStep}
                     steps={installerSteps}
                   /> :
-                  <CircularProgress/>
+                  alert.message ? (
+                    <WindowCard
+                      disabledNext
+                      isFirstCard
+                      isLastCard
+                    >
+                      <Alert severity={alert.type}>{alert.title}: {alert.message}</Alert>
+                    </WindowCard>
+                  ) :
+                    <Spinner />
                 }
               </PrivateRoute>
             }

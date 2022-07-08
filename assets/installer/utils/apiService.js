@@ -16,12 +16,16 @@ const request = async (url, method, withAuthorization = true, _body) => {
     }
     return await result.json()
   } catch (err) {
-    if (err.data.code === 401) {
-      logout()
-      throw new HttpError('Authorization error', err.data)
-    }
-    if (err.data.code === 422) {
-      throw new HttpError('Data error', err.data)
+    switch (err.data.code){
+      case 401:
+        logout()
+        throw new HttpError('Authorization error', err.data)
+
+      case 422:
+        throw new HttpError('Data error', err.data)
+
+      default:
+        throw new HttpError('Error', err.data)
     }
   }
 }

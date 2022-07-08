@@ -21,7 +21,7 @@ const Base = ({ handleNextStep, step }) => {
   })
   const [editMode, setEditMode] = useState(false)
   const [dataRequired, setDataRequired] = useState(false)
-  const [alert, setAlert] = useState({type: '', message: ''})
+  const [alert, setAlert] = useState({type: '', message: '', title: ''})
 
   useEffect(() => {
     getStepData().catch(error => console.log(error))

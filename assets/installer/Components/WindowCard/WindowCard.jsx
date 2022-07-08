@@ -32,7 +32,7 @@ const WindowCard = ({
 
   useSkipFirstRenderEffect(() => {
     setOpenAlert(true)
-    setTimeout(() => setOpenAlert(false), 3000)
+    setTimeout(() => setOpenAlert(false), 7000)
   }, [alert])
 
   return (
