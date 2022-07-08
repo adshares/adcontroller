@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import apiService from './utils/apiService'
 import { CircularProgress } from '@mui/material'
 import Base from './Views/InstallerSteps/Base/Base'
@@ -81,8 +81,6 @@ export default function InstallerApp () {
         setToken(localStorage.getItem('authToken'))
       }
     }
-
-
   }
 
   return (

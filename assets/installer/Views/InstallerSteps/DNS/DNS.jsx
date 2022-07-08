@@ -41,9 +41,20 @@ const DNS = ({ handleNextStep, handlePrevStep, step }) => {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    await apiService.sendStepData(step.path, {})
-    handleNextStep(step)
+    try {
+      setIsLoading(true)
+      e.preventDefault()
+      await apiService.sendStepData(step.path, {})
+      handleNextStep(step)
+    } catch(err){
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (

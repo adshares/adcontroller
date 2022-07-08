@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useForm } from '../../../hooks/hooks'
+import { useForm } from '../../../hooks'
 import apiService from '../../../utils/apiService'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
 import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField, } from '@mui/material'

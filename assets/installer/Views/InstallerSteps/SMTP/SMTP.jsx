@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import styles from './styles.scss'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
-import { useForm } from '../../../hooks/hooks'
+import { useForm } from '../../../hooks'
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -30,42 +30,63 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
     validate: passwordValidate,
     errorObj: passwordErrObj
   } = useForm({ smtp_password: '' })
+  const [alert, setAlert] = useState({type: '', message: ''})
+
   useEffect(() => {
-    getStepData().catch(error => console.log(error))
+    getStepData()
   }, [])
 
   const getStepData = async () => {
-    setIsLoading(true)
-    const response = await apiService.getCurrentStepData(step.path)
-    setIsDataRequired(response.data_required)
-    setEditMode(response.data_required)
-    setFields({
-      smtp_host: response.smtp_host,
-      smtp_port: response.smtp_port,
-      smtp_sender: response.smtp_sender,
-      smtp_username: response.smtp_username,
-    })
-    setIsLoading(false)
+    try {
+      setIsLoading(true)
+      const response = await apiService.getCurrentStepData(step.path)
+      setIsDataRequired(response.data_required)
+      setEditMode(response.data_required)
+      setFields({
+        smtp_host: response.smtp_host,
+        smtp_port: response.smtp_port,
+        smtp_sender: response.smtp_sender,
+        smtp_username: response.smtp_username,
+      })
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleSubmit = async () => {
-    if (!editMode) {
+    try {
+      setIsLoading(true)
+      if (!editMode) {
+        handleNextStep(step)
+        return
+      }
+      if (!isFormValid) {
+        return
+      }
+      const {smtp_password} = newPassword
+      await apiService.sendStepData(step.path, { ...fields, ...(!!smtp_password ? newPassword : {}) })
       handleNextStep(step)
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
       setIsLoading(false)
-      return
     }
-    if (!isFormValid) {
-      return
-    }
-    setIsLoading(true)
-    const {smtp_password} = newPassword
-    await apiService.sendStepData(step.path, { ...fields, ...(!!smtp_password ? newPassword : {}) })
-    handleNextStep(step)
-    setIsLoading(false)
+
   }
 
   return (
     <WindowCard
+      alert={alert}
       dataLoading={isLoading}
       title="SMTP information"
       onNextClick={handleSubmit}

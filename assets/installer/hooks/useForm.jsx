@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-export const useForm = (defFields) => {
+export default function useForm (defFields) {
   const [fields, setFields] = useState(defFields)
   const [errorObj, setErrorOnj] = useState({})
   const [isFormValid, setIsFormValid] = useState(false)
@@ -67,14 +67,3 @@ export const useForm = (defFields) => {
     validate
   }
 }
-
-export const useSkipFirstRenderEffect = (func, deps) => {
-  const didMount = useRef(false)
-
-  useEffect(() => {
-    if (didMount.current) func()
-    else didMount.current = true
-  }, deps)
-}
-
-export default useSkipFirstRenderEffect

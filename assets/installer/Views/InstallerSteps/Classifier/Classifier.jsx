@@ -11,30 +11,39 @@ const Classifier = ({ handleNextStep, handlePrevStep, step }) => {
   const [alert, setAlert] = useState({type: '', message: ''})
 
   useEffect(() => {
-    getStepData().catch(error => console.log(error))
+    getStepData()
   }, [])
 
   const getStepData = async () => {
-    setIsLoading(true)
-    const response = await apiService.getCurrentStepData(step.path)
-    setIsLoading(false)
-    setStepData({ ...stepData, ...response })
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setRegistrationInProgress(true)
-    const response = await apiService.sendStepData(step.path, {})
-    if(response.code > 300){
+    try {
+      setIsLoading(true)
+      const response = await apiService.getCurrentStepData(step.path)
+      setStepData({ ...stepData, ...response })
+    } catch (err) {
       setAlert({
         type: 'error',
-        message: response.message
+        message: err.data.message,
+        title: err.message
       })
-      setRegistrationInProgress(false)
-      return
+    } finally {
+      setIsLoading(false)
     }
-    setRegistrationInProgress(false)
-    handleNextStep(step)
+  }
+
+  const handleSubmit = async () => {
+    try {
+      setRegistrationInProgress(true)
+      await apiService.sendStepData(step.path, {})
+      handleNextStep(step)
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setRegistrationInProgress(false)
+    }
   }
 
   return (

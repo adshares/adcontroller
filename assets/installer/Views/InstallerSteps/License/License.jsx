@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import styles from './styles.scss'
 import Spinner from '../../../Components/Spiner/Spinner'
-import { useForm } from '../../../hooks/hooks'
+import { useForm } from '../../../hooks'
 
 const License = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -35,46 +35,58 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const [alert, setAlert] = useState({type: '', message: ''})
 
   useEffect(() => {
-    getStepData().catch(error => console.log(error))
+    getStepData()
   }, [])
 
   const getStepData = async () => {
-    setIsLoading(true)
-    const response = await apiService.getCurrentStepData(step.path)
-    setStepData({ ...stepData, ...response.license_data })
-    setEditMode(response.data_required)
-    setIsLoading(false)
-    setIsLicenseLoading(false)
+    try {
+      setIsLoading(true)
+      const response = await apiService.getCurrentStepData(step.path)
+      setStepData({ ...stepData, ...response.license_data })
+      setEditMode(response.data_required)
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setIsLoading(false)
+      setIsLicenseLoading(false)
+    }
   }
 
   const handleGetLicenseClick = async () => {
-    setIsLicenseLoading(true)
-    const response = await apiService.getLicenseByKey({ license_key: fields.licenseKey })
-    if(response.code > 300){
+    try {
+      setIsLicenseLoading(true)
+      const response = await apiService.getLicenseByKey({ license_key: fields.licenseKey })
+      setIsLicenseLoading(false)
+      setStepData({ ...response.license_data })
+    } catch (err) {
       setAlert({
         type: 'error',
-        message: response.message
+        message: err.data.message,
+        title: err.message
       })
+    } finally {
       setIsLicenseLoading(false)
-      return
     }
-    setIsLicenseLoading(false)
-    setStepData({ ...response.license_data })
   }
 
   const handleGetFreeLicenseClick = async () => {
-    setIsLicenseLoading(true)
-    const response = await apiService.getCommunityLicense()
-    if(response.code > 300){
+    try {
+      setIsLicenseLoading(true)
+      const response = await apiService.getCommunityLicense()
+      setStepData({ ...response.license_data })
+    } catch (err) {
       setAlert({
         type: 'error',
-        message: response.message
+        message: err.data.message,
+        title: err.message
       })
+    } finally {
       setIsLicenseLoading(false)
-      return
     }
-    setIsLicenseLoading(false)
-    setStepData({ ...response.license_data })
   }
 
   const handleSubmit = async () => {

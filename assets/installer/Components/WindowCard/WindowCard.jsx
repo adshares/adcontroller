@@ -15,7 +15,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 
 import Spinner from '../Spiner/Spinner'
-import useSkipFirstRenderEffect from '../../hooks/hooks'
+import { useSkipFirstRenderEffect } from '../../hooks'
 
 const WindowCard = ({
   alert = {type: '', message: '', title: ''},

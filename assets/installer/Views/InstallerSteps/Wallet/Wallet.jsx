@@ -3,7 +3,7 @@ import apiService from '../../../utils/apiService'
 import { Box, Button, Collapse, TextField, Typography, } from '@mui/material'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
 import styles from './styles.scss'
-import { useForm, useSkipFirstRenderEffect } from '../../../hooks/hooks'
+import { useForm, useSkipFirstRenderEffect } from '../../../hooks/'
 
 const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -21,8 +21,6 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   } = useForm({
     wallet_node_host: '',
     wallet_node_port: '',
-    message: '',
-    code: null,
   })
   const [editMode, setEditMode] = useState(false)
   const [dataRequired, setDataRequired] = useState(false)
@@ -30,7 +28,6 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
 
   useEffect(() => {
     getStepData()
-
   }, [])
 
   useSkipFirstRenderEffect(() => {
@@ -46,6 +43,12 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
       setFields({ ...fields, ...response })
       setEditMode(response.data_required)
       setDataRequired(response.data_required)
+      if(response.wallet_node_host) {
+        setNodeHost({
+          wallet_node_host: response.wallet_node_host,
+          wallet_node_port: response.wallet_node_port,
+        })
+      }
     } catch (err) {
       setAlert({
         type: 'error',
@@ -62,18 +65,9 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
     try {
       setIsHostVerification(true)
       const response = await apiService.getWalletNodeHost({ wallet_address: fields.wallet_address })
-      if (response.code) {
-        setNodeHost({
-          ...response,
-          ...{ wallet_node_host: '', wallet_node_port: '' }
-        })
-        return
-      }
-      setNodeHost({
-        ...response,
-        ...{ message: '', code: null }
-      })
+      setNodeHost({ ...response })
     } catch (err) {
+      setNodeHost({ wallet_node_host: '', wallet_node_port: '' })
       setAlert({
         type: 'error',
         message: err.data.message,
@@ -86,32 +80,29 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
 
   }
   const handleSubmit = async () => {
-    if (!editMode) {
+    try {
+      setIsLoading(true)
+      if (!editMode) {
+        handleNextStep(step)
+        return
+      }
+      const body = {
+        wallet_address: fields.wallet_address,
+        wallet_secret_key: fields.wallet_secret_key,
+        wallet_node_host: nodeHost.wallet_node_host,
+        wallet_node_port: Number(nodeHost.wallet_node_port),
+      }
+      await apiService.sendStepData(step.path, body)
       handleNextStep(step)
-      setIsLoading(false)
-      return
-    }
-    if (!isFormValid) {
-      return
-    }
-    setIsLoading(true)
-    const body = {
-      wallet_address: fields.wallet_address,
-      wallet_secret_key: fields.wallet_secret_key,
-      wallet_node_host: nodeHost.wallet_node_host,
-      wallet_node_port: Number(nodeHost.wallet_node_port),
-    }
-    const response = await apiService.sendStepData(step.path, body)
-    if(response.code > 300){
+    } catch(err) {
       setAlert({
         type: 'error',
-        message: response.message
+        message: err.data.message,
+        title: err.message
       })
+    } finally {
       setIsLoading(false)
-      return
     }
-    handleNextStep(step)
-    setIsLoading(false)
   }
 
   return (
@@ -210,12 +201,6 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
             <Typography variant="body1">
               Your wallet address: {fields.wallet_address}
             </Typography>
-            {/*<Button*/}
-            {/*  onClick={() => setEditMode(!editMode)}*/}
-            {/*  className={(editMode ? styles.hidden : styles.visible)}*/}
-            {/*>*/}
-            {/*  Edit*/}
-            {/*</Button>*/}
           </Box>
         </Box>
       )}
