@@ -22,6 +22,7 @@ const Base = ({ handleNextStep, step }) => {
   const [editMode, setEditMode] = useState(false)
   const [dataRequired, setDataRequired] = useState(false)
   const [alert, setAlert] = useState({type: '', message: '', title: ''})
+  const [isFormWasTouched, setFormTouched] = useState(false)
 
   useEffect(() => {
     getStepData().catch(error => console.log(error))
@@ -72,7 +73,9 @@ const Base = ({ handleNextStep, step }) => {
         handleNextStep(step)
         return
       }
-      await apiService.sendStepData(step.path, { ...fields, ...advancedFields })
+      if(isFormWasTouched) {
+        await apiService.sendStepData(step.path, { ...fields, ...advancedFields })
+      }
       handleNextStep(step)
     } catch (err) {
       setAlert({
@@ -111,6 +114,7 @@ const Base = ({ handleNextStep, step }) => {
             component="form"
             onChange={onFormChange}
             onBlur={(e) => validate(e.target)}
+            onClick={() => setFormTouched(true)}
           >
             <Box className={styles.formBlock}>
               <TextField
@@ -170,6 +174,7 @@ const Base = ({ handleNextStep, step }) => {
             className={styles.formAdvanced}
             component="form"
             onChange={onAdvancedFieldsChange}
+            onClick={() => setFormTouched(true)}
           >
             <Collapse in={showAdvancedOptions} timeout="auto" unmountOnExit>
               <Box sx={{ marginTop: '8px' }} className={styles.formBlock}>

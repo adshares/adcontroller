@@ -23,14 +23,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   })
   const [isDataRequired, setIsDataRequired] = useState(true)
   const [editMode, setEditMode] = useState(isDataRequired)
-  const {
-    fields: newPassword,
-    onFormChange: onPasswordChange,
-    isFormValid: isPasswordFormValid,
-    validate: passwordValidate,
-    errorObj: passwordErrObj
-  } = useForm({ smtp_password: '' })
+  const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ smtp_password: '' })
   const [alert, setAlert] = useState({type: '', message: ''})
+  const [isFormWasTouched, setFormTouched] = useState(false)
 
   useEffect(() => {
     getStepData()
@@ -69,8 +64,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       if (!isFormValid) {
         return
       }
-      const {smtp_password} = newPassword
-      await apiService.sendStepData(step.path, { ...fields, ...(!!smtp_password ? newPassword : {}) })
+      if(isFormWasTouched){
+        await apiService.sendStepData(step.path, { ...fields, ...newPassword })
+      }
       handleNextStep(step)
     } catch (err) {
       setAlert({
@@ -90,7 +86,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       dataLoading={isLoading}
       title="SMTP information"
       onNextClick={handleSubmit}
-      disabledNext={isDataRequired ? !isFormValid || !isPasswordFormValid : !isFormValid}
+      disabledNext={!isFormValid}
       onBackClick={() => handlePrevStep(step)}
     >
       {editMode && (
@@ -110,6 +106,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               component="form"
               onChange={onFormChange}
               onBlur={(e) => validate(e.target)}
+              onClick={() => setFormTouched(true)}
             >
               <TextField
                 className={styles.textField}
@@ -127,7 +124,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 error={!!errorObj.smtp_port}
                 helperText={errorObj.smtp_port}
                 name="smtp_port"
-                value={fields.smtp_port}
+                value={fields.smtp_port || '587'}
                 label="SMTP port"
                 size="small"
                 type="text"
@@ -160,12 +157,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               className={styles.formBlock}
               component="form"
               onChange={onPasswordChange}
-              onBlur={(e) => passwordValidate(e.target)}
-
+              onClick={() => setFormTouched(true)}
             >
               <TextField
-                error={isDataRequired && !!passwordErrObj.smtp_password}
-                helperText={isDataRequired && passwordErrObj.smtp_password}
                 className={styles.textField}
                 value={newPassword.smtp_password}
                 name="smtp_password"
@@ -217,7 +211,7 @@ const InfoTable = ({ stepData }) => {
         </TableRow>
         <TableRow>
           <TableCell align="left">SMTP username</TableCell>
-          <TableCell align="left">{stepData.smtp_username} ADS</TableCell>
+          <TableCell align="left">{stepData.smtp_username}</TableCell>
         </TableRow>
       </TableBody>
     </Table>
