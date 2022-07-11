@@ -64,7 +64,7 @@ export default function InstallerApp () {
 
   useEffect(() => {
     if (token) {
-      getCurrentStep().catch(error => console.log(error))
+      getCurrentStep()
     }
   }, [token])
 

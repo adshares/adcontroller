@@ -25,7 +25,7 @@ const Base = ({ handleNextStep, step }) => {
   const [isFormWasTouched, setFormTouched] = useState(false)
 
   useEffect(() => {
-    getStepData().catch(error => console.log(error))
+    getStepData()
   }, [])
 
   const getStepData = async () => {
@@ -55,7 +55,6 @@ const Base = ({ handleNextStep, step }) => {
       setEditMode(data_required)
       setDataRequired(data_required)
     } catch (err) {
-      console.log(err)
       setAlert({
         type: 'error',
         message: err.data.message,

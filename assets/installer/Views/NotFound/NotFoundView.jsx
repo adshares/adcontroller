@@ -6,7 +6,6 @@ export default function NotFoundView () {
   const navigate = useNavigate()
   const onButtonClick = () => {
     navigate('/login')
-    console.log('click')
   }
   return (
     <>

@@ -24,7 +24,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ smtp_password: '' })
   const [isDataRequired, setIsDataRequired] = useState(true)
   const [editMode, setEditMode] = useState(isDataRequired)
-  const [alert, setAlert] = useState({type: '', message: ''})
+  const [alert, setAlert] = useState({type: 'error', message: '', title: ''})
   const [isFormWasTouched, setFormTouched] = useState(false)
   const [isEmptyPassword, setIsEmptyPassword] = useState(false)
   const [isPasswordWasTouched, setPasswordTouched] = useState(false)
@@ -73,7 +73,6 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       }
       handleNextStep(step)
     } catch (err) {
-      console.log(err)
       setAlert({
         type: 'error',
         message: err.data.message,

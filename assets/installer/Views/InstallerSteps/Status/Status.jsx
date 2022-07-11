@@ -24,27 +24,38 @@ const Status = ({ handlePrevStep, step }) => {
     aduser: { module: null, version: null, url: null, code: null },
     data_required: false
   })
+  const [alert, setAlert] = useState({type: 'error', message: '', title: ''})
 
   useEffect(() => {
     getStepData().catch(error => console.log(error))
   }, [])
 
   const getStepData = async () => {
-    setIsLoading(true)
-    const response = await apiService.getCurrentStepData(step.path)
-    setIsLoading(false)
-    setStepData({
-      adclassify: response.adclassify,
-      adpanel: response.adpanel,
-      adpay: response.adpay,
-      adselect: response.adselect,
-      adserver: response.adserver,
-      aduser: response.aduser,
-    })
+    try {
+      setIsLoading(true)
+      const response = await apiService.getCurrentStepData(step.path)
+      setStepData({
+        adclassify: response.adclassify,
+        adpanel: response.adpanel,
+        adpay: response.adpay,
+        adselect: response.adselect,
+        adserver: response.adserver,
+        aduser: response.aduser,
+      })
+    } catch (err){
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <WindowCard
+      alert={alert}
       title="Status"
       disabledNext
       onBackClick={() => handlePrevStep(step)}

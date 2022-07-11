@@ -32,7 +32,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   })
   const [editMode, setEditMode] = useState(false)
   const { fields, errorObj, isFormValid, onFormChange, validate } = useForm({ licenseKey: '' })
-  const [alert, setAlert] = useState({type: '', message: ''})
+  const [alert, setAlert] = useState({type: 'error', message: '', title: ''})
 
   useEffect(() => {
     getStepData()
