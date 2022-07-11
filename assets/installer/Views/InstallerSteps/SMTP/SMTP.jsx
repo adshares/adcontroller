@@ -21,11 +21,13 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
     smtp_sender: '',
     smtp_username: '',
   })
+  const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ smtp_password: '' })
   const [isDataRequired, setIsDataRequired] = useState(true)
   const [editMode, setEditMode] = useState(isDataRequired)
-  const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ smtp_password: '' })
   const [alert, setAlert] = useState({type: '', message: ''})
   const [isFormWasTouched, setFormTouched] = useState(false)
+  const [isEmptyPassword, setIsEmptyPassword] = useState(false)
+  const [isPasswordWasTouched, setPasswordTouched] = useState(false)
   useEffect(() => {
     getStepData()
   }, [])
@@ -42,6 +44,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
         smtp_sender: response.smtp_sender,
         smtp_username: response.smtp_username,
       })
+      setIsEmptyPassword(!response.smtp_password.length)
     } catch (err) {
       setAlert({
         type: 'error',
@@ -63,11 +66,14 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       if (!isFormValid) {
         return
       }
-      if(isFormWasTouched){
-        await apiService.sendStepData(step.path, { ...fields, ...newPassword })
+      if(isFormWasTouched || isPasswordWasTouched) {
+        isPasswordWasTouched ?
+          await apiService.sendStepData(step.path, { ...fields, ...newPassword }) :
+          await apiService.sendStepData(step.path, { ...fields })
       }
       handleNextStep(step)
     } catch (err) {
+      console.log(err)
       setAlert({
         type: 'error',
         message: err.data.message,
@@ -157,16 +163,15 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               component="form"
               onChange={e => {
                 onPasswordChange(e)
-                if(e.target.value.includes('↹')){
-                  return
+                if(!e.target.value.includes('↹')){
+                  setPasswordTouched(true)
                 }
-                setFormTouched(true)
               }}
             >
               <TextField
                 className={styles.textField}
                 value={editMode && isDataRequired ? newPassword.smtp_password : undefined}
-                defaultValue={editMode && !isDataRequired ? '↹↹↹↹↹↹↹↹' : undefined}
+                defaultValue={editMode && !isDataRequired && !isEmptyPassword ? '↹↹↹↹↹↹↹↹' : undefined}
                 name="smtp_password"
                 size="small"
                 label="New password"
