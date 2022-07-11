@@ -2,6 +2,7 @@ import configuration from '../../controllerConfig/configuration'
 import { HttpError } from './errors'
 
 const request = async (url, method, withAuthorization = true, _body) => {
+  try {
     const result =  await fetch(url, {
       method: method,
       headers: {
@@ -11,20 +12,22 @@ const request = async (url, method, withAuthorization = true, _body) => {
       ...(method === 'POST' ? { body: JSON.stringify(_body) } : {})
     })
     if(!result.ok){
-      switch (result.code){
-        case 401:
-          logout()
-          throw new HttpError('Authorization error', await result.json())
-
-        case 422:
-          throw new HttpError('Data error', await result.json())
-
-        default:
-          throw new HttpError('Error', await result.json())
-      }
+      throw new HttpError('Error', await result.json())
     }
     return await result.json()
+  } catch (err) {
+    switch (err.data.code){
+      case 401:
+        logout()
+        throw new HttpError('Authorization error', err.data)
 
+      case 422:
+        throw new HttpError('Data error', err.data)
+
+      default:
+        throw new HttpError('Error', err.data)
+    }
+  }
 }
 
 const login = async (body) => {
