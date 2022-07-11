@@ -188,7 +188,7 @@ const InfoTable = ({ stepData }) => {
         </TableRow>
         <TableRow>
           <TableCell align="left">License will expire</TableCell>
-          <TableCell align="left">{stepData.date_end}</TableCell>
+          <TableCell align="left">{stepData.date_end.replace('T', ' ').slice(0, stepData.date_end.length - 6)}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell align="left">Fixed fee</TableCell>
