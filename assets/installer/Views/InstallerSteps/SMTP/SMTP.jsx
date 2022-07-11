@@ -69,7 +69,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       if(isFormWasTouched || isPasswordWasTouched) {
         isPasswordWasTouched ?
           await apiService.sendStepData(step.path, { ...fields, ...newPassword }) :
-          await apiService.sendStepData(step.path, { ...fields })
+          await apiService.sendStepData(step.path, { ...fields, ...(isDataRequired ? newPassword : {}) })
       }
       handleNextStep(step)
     } catch (err) {
