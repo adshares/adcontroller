@@ -4,6 +4,7 @@ import { Box, Button, Collapse, TextField, Typography, } from '@mui/material'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
 import styles from './styles.scss'
 import { useForm, useSkipFirstRenderEffect } from '../../../hooks/'
+import Spinner from '../../../Components/Spiner/Spinner'
 
 const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -185,31 +186,32 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
             unmountOnExit
             onChange={onNodeHostChange}
           >
-            <TextField
-              error={!!nodeHostError.wallet_node_host}
-              helperText={nodeHostError.wallet_node_host}
-              value={nodeHost.wallet_node_host}
-              disabled={!!nodeHost.code}
-              margin="normal"
-              size="small"
-              name="wallet_node_host"
-              label="Wallet node host"
-              fullWidth
-            />
-            <TextField
-              error={!!nodeHostError.wallet_node_port}
-              helperText={nodeHostError.wallet_node_port}
-              value={nodeHost.wallet_node_port}
-              disabled={!!nodeHost.code}
-              margin="normal"
-              size="small"
-              name="wallet_node_port"
-              label="Wallet node port"
-              fullWidth
-            />
-            <Typography variant="body2" color="error">
-              {nodeHost.message}
-            </Typography>
+            {isHostVerification ? <Spinner/> : (
+            <>
+              <TextField
+                error={!!nodeHostError.wallet_node_host}
+                helperText={nodeHostError.wallet_node_host}
+                value={nodeHost.wallet_node_host}
+                disabled={!!nodeHost.code}
+                margin="normal"
+                size="small"
+                name="wallet_node_host"
+                label="Wallet node host"
+                fullWidth
+              />
+              <TextField
+                error={!!nodeHostError.wallet_node_port}
+                helperText={nodeHostError.wallet_node_port}
+                value={nodeHost.wallet_node_port}
+                disabled={!!nodeHost.code}
+                margin="normal"
+                size="small"
+                name="wallet_node_port"
+                label="Wallet node port"
+                fullWidth
+              />
+            </>
+            )}
           </Collapse>
         </Box>
       )}
