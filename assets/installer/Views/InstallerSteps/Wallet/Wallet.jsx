@@ -25,6 +25,8 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const [editMode, setEditMode] = useState(false)
   const [dataRequired, setDataRequired] = useState(false)
   const [alert, setAlert] = useState({type: '', message: '', title: ''})
+  const [isKnownNode, setKnownNode] = useState(false)
+
 
   useEffect(() => {
     getStepData()
@@ -35,6 +37,10 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
       getWalletNodes()
     }
   }, [errorObj.wallet_address])
+
+  useEffect(() => {
+    checkIsKnownNode(fields.wallet_address)
+  }, [fields.wallet_address])
 
   const getStepData = async () => {
     try {
@@ -77,8 +83,22 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
     finally {
       setIsHostVerification(false)
     }
+  }
+
+  const checkIsKnownNode = (walletAddress) => {
+    const walletAddressRegEx = /^[0-9A-F]{4}-[0-9A-F]{8}-([0-9A-F]{4})$/g
+    if (!walletAddressRegEx.test(walletAddress)) {
+      return
+    }
+    const expression = walletAddress.slice(0, 4)
+    if(parseInt(expression, 16) > 0 && parseInt(expression, 16) <= 34 ){
+      setKnownNode(true)
+      return
+    }
+    setKnownNode(false)
 
   }
+
   const handleSubmit = async () => {
     try {
       setIsLoading(true)
@@ -161,7 +181,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
           <Collapse
             className={styles.formBlock}
             component="form"
-            in={Object.values(nodeHost).some(el => !!el)}
+            in={Object.values(nodeHost).some(el => !!el) && !isKnownNode}
             timeout="auto"
             unmountOnExit
             onChange={onNodeHostChange}
