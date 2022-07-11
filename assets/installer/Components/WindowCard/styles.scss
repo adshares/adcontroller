@@ -26,6 +26,12 @@
   width: 100%;
 }
 
+.alertContent {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .errMessageBox {
   display: flex;
   align-items: center;

@@ -61,7 +61,7 @@ const WindowCard = ({
                 </IconButton>
               }
             >
-              <Typography variant='body2'>
+              <Typography variant='body2' className={styles.alertContent}>
                 {alert.title}: {alert.message}
               </Typography>
             </Alert>
