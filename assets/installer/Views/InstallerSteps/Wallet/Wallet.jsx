@@ -27,7 +27,6 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const [alert, setAlert] = useState({type: '', message: '', title: ''})
   const [isKnownNode, setKnownNode] = useState(false)
 
-
   useEffect(() => {
     getStepData()
   }, [])
@@ -36,7 +35,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
     if (!errorObj.wallet_address) {
       getWalletNodes()
     }
-  }, [errorObj.wallet_address])
+  }, [errorObj.wallet_address, fields.wallet_address])
 
   useEffect(() => {
     checkIsKnownNode(fields.wallet_address)
