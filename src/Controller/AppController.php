@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AppController extends AbstractController
 {
-    #[Route('/{match_all}', name: 'app', requirements: ['match_all' => '.*'], priority: -1)]
+    #[Route('/{match_all}', name: 'app', requirements: ['match_all' => '^(?!api).*$'], priority: -1)]
     public function index(
         AdserverAdminList $accountList,
         ConfigurationRepository $repository,
