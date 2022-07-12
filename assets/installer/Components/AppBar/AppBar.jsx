@@ -24,7 +24,7 @@ export default function MenuAppBar ({ showIcon, setToken }) {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Installer
+          AdShares - AdController
         </Typography>
         {showIcon && (
           <div>
