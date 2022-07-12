@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import apiService from '../../../utils/apiService'
+import apiService from '../../../../utils/apiService'
 import { Box, Button, Collapse, TextField, Typography, } from '@mui/material'
-import WindowCard from '../../../Components/WindowCard/WindowCard'
+import WindowCard from '../../../../Components/WindowCard/WindowCard'
 import styles from './styles.scss'
-import { useForm, useSkipFirstRenderEffect } from '../../../hooks/'
-import Spinner from '../../../Components/Spiner/Spinner'
+import { useForm, useSkipFirstRenderEffect } from '../../../../hooks/'
+import Spinner from '../../../../Components/Spiner/Spinner'
 
 const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import apiService from '../../../utils/apiService'
-import WindowCard from '../../../Components/WindowCard/WindowCard'
+import apiService from '../../../../utils/apiService'
+import WindowCard from '../../../../Components/WindowCard/WindowCard'
 import { Box, LinearProgress, Typography } from '@mui/material'
 import styles from './styles.scss'
 

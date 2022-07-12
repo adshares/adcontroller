@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import apiService from '../../utils/apiService'
+import apiService from '../../../utils/apiService'
 import {
   Alert,
   Box,
@@ -67,6 +67,7 @@ export default function Login ({ setToken }) {
           src={logo}
           height='70px'
           width='70px'
+          sx={{marginLeft: 'auto', marginRight: 'auto'}}
         />
       </CardContent>
       <CardHeader
@@ -123,7 +124,7 @@ export default function Login ({ setToken }) {
       </CardContent>
       <Collapse in={!!alert.title}>
           <Alert
-            severity={alert.type}
+            severity={alert.type || 'error'}
             action={
               <IconButton
                 aria-label="close"

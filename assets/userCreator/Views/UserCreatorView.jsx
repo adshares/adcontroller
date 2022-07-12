@@ -1,69 +1,46 @@
 import React, { useState } from 'react'
-import configuration from '../../controllerConfig/configuration'
-import { Alert, Button, Container, Grid, TextField, Typography } from '@mui/material'
-import { makeStyles } from '@mui/styles'
-
-const useStyles = makeStyles(() => ({
-  paper: {
-    marginTop: '25vh',
-    textAlign: 'center'
-  },
-}))
-
-const createUser = async (userData) => {
-
-  const response = await fetch (`${configuration.baseUrl}/api/accounts`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(userData)
-  })
-  const body = await response.json()
-  return {
-    status: response.status,
-    message: body.message
-  }
-}
+import apiService from '../../utils/apiService'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Collapse,
+  IconButton,
+  TextField,
+  Typography
+} from '@mui/material'
+import logo from '../../img/logo.png'
+import CloseIcon from '@mui/icons-material/Close'
+import MenuAppBar from '../../Components/AppBar/AppBar'
+import AppWindow from '../../Components/AppWindow/AppWindow'
+import styles from './styles.scss'
 
 export const UserCreatorView = () => {
-  const classes = useStyles()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isFormDisabled, setFormStatus] = useState(false)
-  const [alert, setAlert] = useState({
-    show: false,
-    type: '',
-    message:'',
-  })
+  const [alert, setAlert] = useState({type: '', message: '', title: ''})
 
   const handleSubmit = async e => {
     e.preventDefault()
-    const userData = {
-      email,
-      password
+    try {
+      await apiService.createUser({ email, password })
+      window.location.reload()
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
     }
-    const response = await createUser(userData)
-      if (response.status !== 201) {
-        setAlert({
-          show: true,
-          type: 'error',
-          message: response.message
-        })
-        return
-      }
-
-    setAlert({
-      show: true,
-      type: 'success',
-      message: response.message
-    })
-    setFormStatus(!isFormDisabled)
-    window.location.reload()
   }
 
   const handleInputChange = e => {
     const { name, value } = e.target
+
+    setAlert({type: '', message: '', title: ''})
 
     switch (name) {
       case 'email':
@@ -79,57 +56,85 @@ export const UserCreatorView = () => {
     }
   }
   return (
-    <Container component="main" maxWidth="sm" className={classes.paper}>
-      <Typography component="h1" variant="h5" color={isFormDisabled ? 'grey.500' : 'primary'}>
-          Create user
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
+  <>
+    <MenuAppBar/>
+
+    <AppWindow>
+      <Card className={styles.container}>
+        <CardContent>
+          <Box
+            component='img'
+            src={logo}
+            height='70px'
+            width='70px'
+            sx={{marginLeft: 'auto', marginRight: 'auto'}}
+          />
+        </CardContent>
+        <CardHeader
+          title='Create account'
+          titleTypographyProps={{align: 'center'}}
+        />
+
+        <CardContent>
+          <Box
+            onSubmit={handleSubmit}
+            component='form'
+          >
             <TextField
-              disabled={isFormDisabled}
               variant="standard"
+              margin="normal"
               required
               fullWidth
-              id="email"
+              type="email"
               label="Email Address"
               name="email"
               autoComplete="email"
-              type='email'
               onChange={handleInputChange}
             />
-          </Grid>
-          <Grid item xs={12}>
             <TextField
-              disabled={isFormDisabled}
               variant="standard"
+              margin="normal"
               required
               fullWidth
-              name="password"
-              label="Password"
               type="password"
-              id="password"
+              label="Password"
+              name="password"
               onChange={handleInputChange}
             />
-          </Grid>
-          <Grid item />
-        </Grid>
-        <Button
-          disabled={isFormDisabled}
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-        >
-          Create
-        </Button>
-      </form>
-      {alert.show && (
-        <Alert severity={alert.type} sx={{marginTop: '8px'}}>
-          {alert.message}
-        </Alert>
-      )}
-    </Container>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+            >
+              Create
+            </Button>
+          </Box>
+        </CardContent>
+        <Collapse in={!!alert.title}>
+          <Alert
+            severity={alert.type || 'error'}
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setAlert({type: '', message: '', title: ''});
+                }}
+              >
+                <CloseIcon fontSize="inherit"/>
+              </IconButton>
+            }
+          >
+            <Typography variant='body2'>
+              {alert.title}: {alert.message}
+            </Typography>
+          </Alert>
+        </Collapse>
+      </Card>
+    </AppWindow>
+  </>
   )
 }
 

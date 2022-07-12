@@ -1,12 +1,18 @@
 {% extends 'base.html.twig' %}
 
-        {% block stylesheets %}
-            {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
-                {# installation #}
-                {{ encore_entry_link_tags('js/installer') }}
-            {% endif %}
+{% block stylesheets %}
+    {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
+        {# installation #}
+        {{ encore_entry_link_tags('js/installer') }}
+    {% elseif state is constant('App\\Entity\\Configuration::APP_STATE_INSTALLATION_COMPLETED') %}
+        {# installation #}
+        {{ encore_entry_link_tags('js/app') }}
+    {% else %}
+        {# installation #}
+        {{ encore_entry_link_tags('js/accountCreator') }}
+    {% endif %}
 
-        {% endblock %}
+{% endblock %}
 
 {% block javascripts %}
     {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}

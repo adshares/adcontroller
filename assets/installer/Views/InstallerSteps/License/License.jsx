@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import apiService from '../../../utils/apiService'
-import WindowCard from '../../../Components/WindowCard/WindowCard'
+import apiService from '../../../../utils/apiService'
+import WindowCard from '../../../../Components/WindowCard/WindowCard'
 import {
   Box,
   Button,
@@ -11,8 +11,8 @@ import {
   TextField,
 } from '@mui/material'
 import styles from './styles.scss'
-import Spinner from '../../../Components/Spiner/Spinner'
-import { useForm } from '../../../hooks'
+import Spinner from '../../../../Components/Spiner/Spinner'
+import { useForm } from '../../../../hooks'
 
 const License = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
