@@ -53,12 +53,30 @@ const Status = ({ handlePrevStep, step }) => {
     }
   }
 
+  const handleSubmit = async () => {
+    try{
+      setIsLoading(true)
+      await apiService.sendStepData(step.path, {})
+      window.location.reload()
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <WindowCard
       alert={alert}
       title="Status"
-      disabledNext
+      disabledNext={isLoading}
       onBackClick={() => handlePrevStep(step)}
+      onNextClick={handleSubmit}
+      isLastCard
     >
       {isLoading ?
         <Spinner/> :

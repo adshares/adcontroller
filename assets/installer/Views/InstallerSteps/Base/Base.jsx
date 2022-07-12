@@ -94,7 +94,7 @@ const Base = ({ handleNextStep, step }) => {
       title="Base information"
       onNextClick={handleSubmit}
       disabledNext={!isFormValid}
-      isFirstCard
+      hideBackButton
     >
       <Box className={styles.editButtonThumb}>
         <Button

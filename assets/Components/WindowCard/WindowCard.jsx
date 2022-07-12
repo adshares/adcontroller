@@ -25,8 +25,9 @@ const WindowCard = ({
   onNextClick,
   onBackClick,
   disabledNext = false,
-  isFirstCard = false,
-  isLastCard = false,
+  hideBackButton = false,
+  hideNextButton = false,
+  isLastCard = false
 }) => {
   const [openAlert, setOpenAlert] = useState(false)
 
@@ -69,7 +70,7 @@ const WindowCard = ({
         </Collapse>
 
         <CardActions className={styles.controls}>
-          {!isFirstCard &&
+          {!hideBackButton &&
             <Button
               onClick={onBackClick}
               type="button"
@@ -78,14 +79,14 @@ const WindowCard = ({
               Back
             </Button>
           }
-          {!isLastCard &&
+          {!hideNextButton &&
             <Button
               disabled={disabledNext || dataLoading}
               onClick={onNextClick}
               type="button"
               variant="contained"
             >
-              Next
+              {isLastCard ? 'Finish' : 'Next'}
             </Button>
           }
         </CardActions>

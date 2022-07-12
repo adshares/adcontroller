@@ -78,7 +78,7 @@ export default function InstallerApp () {
       }
       const prevEl = installerSteps.find(el => el.path === installer_step)
       const currentEl = installerSteps.find(el => el.index === prevEl.index + 1)
-      setCurrentStep(currentEl.path)
+      setCurrentStep(currentEl?.path || prevEl.path)
     } catch (err) {
       setToken(localStorage.getItem('authToken'))
       setAlert({
@@ -114,8 +114,8 @@ export default function InstallerApp () {
                   alert.message ? (
                     <WindowCard
                       disabledNext
-                      isFirstCard
-                      isLastCard
+                      hideBackButton
+                      hideNextButton
                     >
                       <Alert severity={alert.type}>{alert.title}: {alert.message}</Alert>
                     </WindowCard>
