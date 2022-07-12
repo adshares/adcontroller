@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import apiService from '../../../../utils/apiService'
-import { Box, Button, Collapse, TextField, Typography, } from '@mui/material'
+import {
+  Box,
+  Button,
+  Collapse,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  TextField,
+} from '@mui/material'
 import WindowCard from '../../../../Components/WindowCard/WindowCard'
 import styles from './styles.scss'
 import { useForm, useSkipFirstRenderEffect } from '../../../../hooks/'
@@ -213,13 +222,14 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
       )}
 
       {!editMode && (
-        <Box className={styles.container}>
-          <Box className={styles.content}>
-            <Typography variant="body1">
-              Your wallet address: {fields.wallet_address}
-            </Typography>
-          </Box>
-        </Box>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell align="center">Your wallet address</TableCell>
+              <TableCell align="center">{fields.wallet_address}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       )}
 
 
