@@ -13,13 +13,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
     wallet_address: '',
     wallet_secret_key: '',
   })
-  const {
-    fields: nodeHost,
-    setFields: setNodeHost,
-    errorObj: nodeHostError,
-    isFormValid: isNodeHostValid,
-    onFormChange: onNodeHostChange
-  } = useForm({
+  const { fields: nodeHost, setFields: setNodeHost, errorObj: nodeHostError, isFormValid: isNodeHostValid, onFormChange: onNodeHostChange } = useForm({
     wallet_node_host: '',
     wallet_node_port: '',
   })
@@ -153,6 +147,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
             className={styles.formBlock}
             onChange={onFormChange}
             onBlur={(e) => validate(e.target)}
+            onSubmit={e => e.preventDefault()}
           >
             <TextField
               className={styles.textField}
@@ -185,6 +180,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
             timeout="auto"
             unmountOnExit
             onChange={onNodeHostChange}
+            onSubmit={e => e.preventDefault()}
           >
             {isHostVerification ? <Spinner/> : (
             <>

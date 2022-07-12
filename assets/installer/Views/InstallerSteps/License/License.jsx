@@ -111,6 +111,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
             component="form"
             onChange={onFormChange}
             onBlur={(e) => validate(e.target)}
+            onSubmit={e => e.preventDefault()}
           >
             <Box className={styles.field}>
               <TextField

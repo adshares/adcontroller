@@ -111,6 +111,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               onChange={onFormChange}
               onBlur={(e) => validate(e.target)}
               onClick={() => setFormTouched(true)}
+              onSubmit={e => e.preventDefault()}
             >
               <TextField
                 className={styles.textField}
@@ -166,6 +167,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                   setPasswordTouched(true)
                 }
               }}
+              onSubmit={e => e.preventDefault()}
             >
               <TextField
                 className={styles.textField}
