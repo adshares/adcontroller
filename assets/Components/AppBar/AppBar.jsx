@@ -3,10 +3,10 @@ import { AppBar, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/ma
 import { AccountCircle } from '@mui/icons-material'
 import MenuIcon from '@mui/icons-material/Menu';
 import apiService from '../../utils/apiService'
+
 export default function MenuAppBar ({
-  showIcon,
+  showProtectedOptions,
   setToken,
-  enableSideMenu = false,
   showSideMenu,
   toggleSideMenu
 }) {
@@ -29,7 +29,7 @@ export default function MenuAppBar ({
   return (
     <AppBar position="sticky" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
       <Toolbar>
-        {enableSideMenu && showIcon && (
+        {showProtectedOptions && (
           <IconButton
             size="large"
             color="inherit"
@@ -41,8 +41,8 @@ export default function MenuAppBar ({
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           AdShares - AdController
         </Typography>
-        {showIcon && (
-          <div>
+        {showProtectedOptions && (
+          <>
             <IconButton
               size="large"
               onClick={handleMenu}
@@ -65,7 +65,7 @@ export default function MenuAppBar ({
             >
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
-          </div>
+          </>
         )}
       </Toolbar>
     </AppBar>

@@ -51,9 +51,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
   }),
 );
-const SideMenu = ({showSideMenu, toggleSideMenu}) => {
+const SideMenu = ({showSideMenu, toggleSideMenu, enableSideMenu}) => {
 
-  return (
+  return ( enableSideMenu &&
     <Drawer
       open={showSideMenu}
       onClose={() => toggleSideMenu(false)}

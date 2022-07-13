@@ -11,19 +11,22 @@ import { Box } from '@mui/material'
 
 export default function AppController () {
   const [token, setToken] = useState(localStorage.getItem('authToken'))
-  const [showSideMenu, toggleSideMenu] = useState(false)
+  const [showSideMenu, toggleSideMenu] = useState(true)
 
   return(
     <>
       <MenuAppBar
-        showIcon={!!token}
+        showProtectedOptions={!!token}
         setToken={setToken}
-        enableSideMenu
         showSideMenu={showSideMenu}
         toggleSideMenu={toggleSideMenu}
       />
-      <Box sx={{display: 'flex'}}>
-        <SideMenu showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu}/>
+      <Box sx={{display: 'flex', justifyContent: 'center' }}>
+        <SideMenu
+          enableSideMenu={!!token}
+          showSideMenu={showSideMenu}
+          toggleSideMenu={toggleSideMenu}
+        />
         <AppWindow>
           <Routes>
             <Route
