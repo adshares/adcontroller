@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import apiService from '../../../utils/apiService'
+import apiService from '../../utils/apiService'
 import {
   Alert,
   Box,
@@ -13,7 +13,7 @@ import {
   Typography
 } from '@mui/material'
 import styles from './styles.scss'
-import logo from '../../../img/logo.png'
+import logo from '../../img/logo.png'
 import CloseIcon from '@mui/icons-material/Close'
 
 export default function Login ({ setToken }) {
