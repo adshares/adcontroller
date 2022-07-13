@@ -4,12 +4,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import InstallerApp from './installer/InstallerApp'
 import { BrowserRouter } from 'react-router-dom'
-// import { UserCreatorView } from './userCreator/Views/UserCreatorView'
+import { ThemeProvider } from '@mui/material'
+import theme from './utils/theme'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
-    <InstallerApp />
+    <ThemeProvider theme={theme}>
+      <InstallerApp />
+    </ThemeProvider>
   </BrowserRouter>
 );
-// root.render(<UserCreatorView />);
