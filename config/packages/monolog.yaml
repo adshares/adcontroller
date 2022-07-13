@@ -10,7 +10,7 @@ when@dev:
         handlers:
             main:
                 type: stream
-                path: "%env(LOG_FILE_PATH)%"
+                path: "%env(resolve:LOG_FILE_PATH)%"
                 level: debug
                 channels: ["!event"]
             # uncomment to get logging in your browser
@@ -37,7 +37,7 @@ when@test:
                 channels: ["!event"]
             nested:
                 type: stream
-                path: "%env(LOG_FILE_PATH)%"
+                path: "%env(resolve:LOG_FILE_PATH)%"
                 level: debug
 
 when@prod:
@@ -51,7 +51,7 @@ when@prod:
                 buffer_size: 50 # How many messages should be saved? Prevent memory leaks
             nested:
                 type: stream
-                path: "%env(LOG_FILE_PATH)%"
+                path: "%env(resolve:LOG_FILE_PATH)%"
                 level: debug
                 formatter: monolog.formatter.json
             console:
@@ -61,4 +61,4 @@ when@prod:
             deprecation:
                 type: stream
                 channels: [deprecation]
-                path: "%env(LOG_FILE_PATH)%"
+                path: "%env(resolve:LOG_FILE_PATH)%"
