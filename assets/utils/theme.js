@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
+// eslint-disable-next-line object-curly-newline
 const theme = createTheme({
   // palette: {
   //   primary: {
@@ -11,4 +12,4 @@ const theme = createTheme({
   // }
 });
 
-export default theme
+export default theme;

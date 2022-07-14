@@ -1,5 +1,5 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -36,63 +36,53 @@ const closedMixin = (theme) => ({
   },
 });
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
+  boxSizing: 'border-box',
+  ...(open && {
+    ...openedMixin(theme),
+    '& .MuiDrawer-paper': openedMixin(theme),
   }),
-);
+  ...(!open && {
+    ...closedMixin(theme),
+    '& .MuiDrawer-paper': closedMixin(theme),
+  }),
+}));
 
-const SideMenu = ({showSideMenu, toggleSideMenu, enableSideMenu}) => {
-  const navigate = useNavigate()
+const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu }) => {
+  const navigate = useNavigate();
 
-  return ( enableSideMenu &&
-    <Drawer
-      open={showSideMenu}
-      onClose={() => toggleSideMenu(false)}
-      variant='permanent'
-    >
-      <Toolbar/>
-      <Box>
-        <List>
-          <ListItem
-            disablePadding
-            onClick={() => navigate('/')}
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <DashboardIcon/>
-              </ListItemIcon>
-              <ListItemText primary='Dashboard' />
-            </ListItemButton>
-          </ListItem>
+  return (
+    enableSideMenu && (
+      <Drawer open={showSideMenu} onClose={() => toggleSideMenu(false)} variant="permanent">
+        <Toolbar />
+        <Box>
+          <List>
+            <ListItem disablePadding onClick={() => navigate('/')}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItemButton>
+            </ListItem>
 
-          <ListItem
-            disablePadding
-            onClick={() => navigate('/adpay')}
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <PaymentIcon/>
-              </ListItemIcon>
-              <ListItemText primary='AdPay' />
-            </ListItemButton>
-          </ListItem>
-        </List>
-        <Divider />
-      </Box>
-    </Drawer>
-  )
-}
+            <ListItem disablePadding onClick={() => navigate('/adpay')}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <PaymentIcon />
+                </ListItemIcon>
+                <ListItemText primary="AdPay" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+          <Divider />
+        </Box>
+      </Drawer>
+    )
+  );
+};
 
-export default SideMenu
+export default SideMenu;

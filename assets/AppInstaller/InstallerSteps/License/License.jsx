@@ -1,22 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import apiService from '../../../utils/apiService'
-import WindowCard from '../../../Components/WindowCard/WindowCard'
-import {
-  Box,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  TextField,
-} from '@mui/material'
-import styles from './styles.scss'
-import Spinner from '../../../Components/Spinner/Spinner'
-import { useForm } from '../../../hooks'
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import apiService from '../../../utils/apiService';
+import WindowCard from '../../../Components/WindowCard/WindowCard';
+import styles from './styles.scss';
+import Spinner from '../../../Components/Spinner/Spinner';
+import { useForm } from '../../../hooks';
 
 const License = ({ handleNextStep, handlePrevStep, step }) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isLicenseLoading, setIsLicenseLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLicenseLoading, setIsLicenseLoading] = useState(true);
   const [stepData, setStepData] = useState({
     demand_fee: 0.01,
     fixed_fee: 0,
@@ -29,71 +21,71 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
     payment_message: '',
     private_label: false,
     status: 1,
-  })
-  const [editMode, setEditMode] = useState(false)
-  const { fields, errorObj, isFormValid, onFormChange, validate } = useForm({ licenseKey: '' })
-  const [alert, setAlert] = useState({type: 'error', message: '', title: ''})
+  });
+  const [editMode, setEditMode] = useState(false);
+  const { fields, errorObj, isFormValid, onFormChange, validate } = useForm({ licenseKey: '' });
+  const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
 
   useEffect(() => {
-    getStepData()
-  }, [])
+    getStepData();
+  }, []);
 
   const getStepData = async () => {
     try {
-      setIsLoading(true)
-      const response = await apiService.getCurrentStepData(step.path)
-      setStepData({ ...stepData, ...response.license_data })
-      setEditMode(response.data_required)
+      setIsLoading(true);
+      const response = await apiService.getCurrentStepData(step.path);
+      setStepData({ ...stepData, ...response.license_data });
+      setEditMode(response.data_required);
     } catch (err) {
       setAlert({
         type: 'error',
         message: err.data.message,
-        title: err.message
-      })
+        title: err.message,
+      });
     } finally {
-      setIsLoading(false)
-      setIsLicenseLoading(false)
+      setIsLoading(false);
+      setIsLicenseLoading(false);
     }
-  }
+  };
 
   const handleGetLicenseClick = async () => {
     try {
-      setIsLicenseLoading(true)
-      const response = await apiService.getLicenseByKey({ license_key: fields.licenseKey })
-      setIsLicenseLoading(false)
-      setStepData({ ...response.license_data })
+      setIsLicenseLoading(true);
+      const response = await apiService.getLicenseByKey({ license_key: fields.licenseKey });
+      setIsLicenseLoading(false);
+      setStepData({ ...response.license_data });
     } catch (err) {
       setAlert({
         type: 'error',
         message: err.data.message,
-        title: err.message
-      })
+        title: err.message,
+      });
     } finally {
-      setIsLicenseLoading(false)
+      setIsLicenseLoading(false);
     }
-  }
+  };
 
   const handleGetFreeLicenseClick = async () => {
     try {
-      setIsLicenseLoading(true)
-      const response = await apiService.getCommunityLicense()
-      setStepData({ ...response.license_data })
+      setIsLicenseLoading(true);
+      const response = await apiService.getCommunityLicense();
+      setStepData({ ...response.license_data });
     } catch (err) {
       setAlert({
         type: 'error',
         message: err.data.message,
-        title: err.message
-      })
+        title: err.message,
+      });
     } finally {
-      setIsLicenseLoading(false)
+      setIsLicenseLoading(false);
     }
-  }
+  };
 
   const handleSubmit = async () => {
-    setIsLoading(true)
-    handleNextStep(step)
-    setIsLoading(false)
-  }
+    setIsLoading(true);
+    handleNextStep(step);
+    setIsLoading(false);
+  };
 
   return (
     <WindowCard
@@ -111,7 +103,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
             component="form"
             onChange={onFormChange}
             onBlur={(e) => validate(e.target)}
-            onSubmit={e => e.preventDefault()}
+            onSubmit={(e) => e.preventDefault()}
           >
             <Box className={styles.field}>
               <TextField
@@ -126,32 +118,19 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
                 fullWidth
               />
             </Box>
-            <Button
-              disabled={!isFormValid}
-              type="button"
-              variant="contained"
-              onClick={handleGetLicenseClick}
-            >
+            <Button disabled={!isFormValid} type="button" variant="contained" onClick={handleGetLicenseClick}>
               Get license
             </Button>
           </Box>
 
-          {editMode && (
-            isLicenseLoading ?
-              <Spinner/> :
-              (stepData.owner) && <InfoTable stepData={stepData}/>
-          )}
+          {editMode && (isLicenseLoading ? <Spinner /> : stepData.owner && <InfoTable stepData={stepData} />)}
 
           <Box className={styles.freeLicense}>
-            {!stepData.owner &&
-              <Button
-                onClick={handleGetFreeLicenseClick}
-                type="button"
-                variant="text"
-              >
+            {!stepData.owner && (
+              <Button onClick={handleGetFreeLicenseClick} type="button" variant="text">
                 Get free license
               </Button>
-            }
+            )}
           </Box>
         </Box>
       )}
@@ -159,48 +138,44 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       {!editMode && (
         <>
           <Box className={styles.editButtonThumb}>
-            <Button
-              onClick={() => (setEditMode(true))}
-              type="button"
-            >
+            <Button onClick={() => setEditMode(true)} type="button">
               Edit
             </Button>
           </Box>
-          <InfoTable stepData={stepData}/>
+          <InfoTable stepData={stepData} />
         </>
       )}
     </WindowCard>
-  )
-}
+  );
+};
 
-export default License
+export default License;
 
-const InfoTable = ({ stepData }) => {
-  return (
-    <Table>
-      <TableBody>
-        <TableRow>
-          <TableCell align="left">License owner</TableCell>
-          <TableCell align="left">{stepData.owner}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">License type</TableCell>
-          <TableCell align="left">{stepData.type}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">License will expire</TableCell>
-          <TableCell align="left">{stepData.date_end.replace('T', ' ').slice(0, stepData.date_end.length - 6)}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">Fixed fee</TableCell>
-          <TableCell align="left">{stepData.fixed_fee} ADS</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">Supply fee / Demand fee</TableCell>
-          <TableCell align="left">{stepData.supply_fee * 100}% / {stepData.demand_fee * 100}%</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  )
-}
-
+const InfoTable = ({ stepData }) => (
+  <Table>
+    <TableBody>
+      <TableRow>
+        <TableCell align="left">License owner</TableCell>
+        <TableCell align="left">{stepData.owner}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">License type</TableCell>
+        <TableCell align="left">{stepData.type}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">License will expire</TableCell>
+        <TableCell align="left">{stepData.date_end.replace('T', ' ').slice(0, stepData.date_end.length - 6)}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">Fixed fee</TableCell>
+        <TableCell align="left">{stepData.fixed_fee} ADS</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">Supply fee / Demand fee</TableCell>
+        <TableCell align="left">
+          {stepData.supply_fee * 100}% / {stepData.demand_fee * 100}%
+        </TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+);

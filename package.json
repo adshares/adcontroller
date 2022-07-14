@@ -4,6 +4,15 @@
         "@hotwired/stimulus": "^3.0.0",
         "@symfony/webpack-encore": "^2.0.0",
         "core-js": "^3.0.0",
+        "eslint": "^7.32.0 || ^8.2.0",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-import": "^2.25.3",
+        "eslint-plugin-jsx-a11y": "^6.5.1",
+        "eslint-plugin-prettier": "^4.2.1",
+        "eslint-plugin-react": "^7.28.0",
+        "eslint-plugin-react-hooks": "^4.3.0",
+        "prettier": "^2.7.1",
         "regenerator-runtime": "^0.13.2",
         "sass": "^1.52.3",
         "sass-loader": "^12.0.0",
@@ -15,7 +24,15 @@
         "dev-server": "encore dev-server",
         "dev": "encore dev",
         "watch": "encore dev --watch",
-        "build": "encore production --progress"
+        "build": "encore production --progress",
+        "eslint": "eslint assets/**/*.js",
+        "eslint-fix": "eslint assets/**/*.js --fix"
+    },
+    "eslintConfig": {
+        "extends": [
+            "eslint:recommended",
+            "plugin:react/recommended"
+        ]
     },
     "dependencies": {
         "@emotion/react": "^11.9.3",

@@ -1,37 +1,45 @@
-import React, { useEffect, useState } from 'react'
-import { useForm } from '../../../hooks'
-import apiService from '../../../utils/apiService'
-import WindowCard from '../../../Components/WindowCard/WindowCard'
-import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField, } from '@mui/material'
-import styles from './styles.scss'
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import { useForm } from '../../../hooks';
+import apiService from '../../../utils/apiService';
+import WindowCard from '../../../Components/WindowCard/WindowCard';
+import styles from './styles.scss';
 
-const Base = ({ handleNextStep, step }) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false)
+function Base({ handleNextStep, step }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
     base_adserver_name: '',
     base_contact_email: '',
     base_domain: '',
     base_support_email: '',
-  })
-  const { fields: advancedFields, setFields: setAdvancedFields, onFormChange: onAdvancedFieldsChange } = useForm({
+  });
+  const {
+    fields: advancedFields,
+    setFields: setAdvancedFields,
+    onFormChange: onAdvancedFieldsChange,
+  } = useForm({
     base_adpanel_host_prefix: '',
     base_adserver_host_prefix: '',
     base_aduser_host_prefix: '',
-  })
-  const [editMode, setEditMode] = useState(false)
-  const [dataRequired, setDataRequired] = useState(false)
-  const [alert, setAlert] = useState({type: '', message: '', title: ''})
-  const [isFormWasTouched, setFormTouched] = useState(false)
+  });
+  const [editMode, setEditMode] = useState(false);
+  const [dataRequired, setDataRequired] = useState(false);
+  const [alert, setAlert] = useState({
+    type: '',
+    message: '',
+    title: '',
+  });
+  const [isFormWasTouched, setFormTouched] = useState(false);
 
   useEffect(() => {
-    getStepData()
-  }, [])
+    getStepData();
+  }, []);
 
   const getStepData = async () => {
     try {
-      setIsLoading(true)
-      const response = await apiService.getCurrentStepData(step.path)
+      setIsLoading(true);
+      const response = await apiService.getCurrentStepData(step.path);
       const {
         base_adserver_name,
         base_contact_email,
@@ -40,52 +48,62 @@ const Base = ({ handleNextStep, step }) => {
         base_adpanel_host_prefix,
         base_adserver_host_prefix,
         base_aduser_host_prefix,
-        data_required
-      } = response
+        data_required,
+      } = response;
       setFields({
         ...fields,
         ...{
           base_adserver_name: base_adserver_name || '',
           base_contact_email: base_contact_email || '',
           base_domain: base_domain || '',
-          base_support_email: base_support_email || ''
-        }
-      })
-      setAdvancedFields({ ...advancedFields, ...{ base_adpanel_host_prefix, base_adserver_host_prefix, base_aduser_host_prefix} })
-      setEditMode(data_required)
-      setDataRequired(data_required)
+          base_support_email: base_support_email || '',
+        },
+      });
+      setAdvancedFields({
+        ...advancedFields,
+        ...{
+          base_adpanel_host_prefix,
+          base_adserver_host_prefix,
+          base_aduser_host_prefix,
+        },
+      });
+      setEditMode(data_required);
+      setDataRequired(data_required);
     } catch (err) {
       setAlert({
         type: 'error',
         message: err.data.message,
-        title: err.message
-      })
+        title: err.message,
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSubmit = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       if (!editMode) {
-        handleNextStep(step)
-        return
+        handleNextStep(step);
+        return;
       }
-      if(isFormWasTouched) {
-        await apiService.sendStepData(step.path, { ...fields, ...advancedFields })
+      if (isFormWasTouched) {
+        await apiService.sendStepData(step.path, {
+          ...fields,
+          ...advancedFields,
+        });
       }
-      handleNextStep(step)
+      handleNextStep(step);
     } catch (err) {
       setAlert({
         type: 'error',
         message: err.data.message,
-        title: err.message
-      })
+        title: err.message,
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <WindowCard
@@ -97,11 +115,7 @@ const Base = ({ handleNextStep, step }) => {
       hideBackButton
     >
       <Box className={styles.editButtonThumb}>
-        <Button
-          className={(dataRequired ? styles.hidden : styles.visible)}
-          onClick={() => (setEditMode(!editMode))}
-          type="button"
-        >
+        <Button className={dataRequired ? styles.hidden : styles.visible} onClick={() => setEditMode(!editMode)} type="button">
           {editMode ? 'Cancel' : 'Edit'}
         </Button>
       </Box>
@@ -114,7 +128,7 @@ const Base = ({ handleNextStep, step }) => {
             onChange={onFormChange}
             onBlur={(e) => validate(e.target)}
             onClick={() => setFormTouched(true)}
-            onSubmit={e => e.preventDefault()}
+            onSubmit={(e) => e.preventDefault()}
           >
             <Box className={styles.formBlock}>
               <TextField
@@ -168,17 +182,24 @@ const Base = ({ handleNextStep, step }) => {
             </Box>
           </Box>
 
-          <Button type="button" onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>Advanced options</Button>
+          <Button type="button" onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>
+            Advanced options
+          </Button>
 
           <Box
             className={styles.formAdvanced}
             component="form"
             onChange={onAdvancedFieldsChange}
             onClick={() => setFormTouched(true)}
-            onSubmit={e => e.preventDefault()}
+            onSubmit={(e) => e.preventDefault()}
           >
             <Collapse in={showAdvancedOptions} timeout="auto" unmountOnExit>
-              <Box sx={{ marginTop: '8px' }} className={styles.formBlock}>
+              <Box
+                sx={{
+                  marginTop: '8px',
+                }}
+                className={styles.formBlock}
+              >
                 <TextField
                   className={styles.textField}
                   size="small"
@@ -210,16 +231,20 @@ const Base = ({ handleNextStep, step }) => {
       )}
 
       {!editMode && (
-        <InfoTable stepData={{ ...fields, ...advancedFields }}/>
+        <InfoTable
+          stepData={{
+            ...fields,
+            ...advancedFields,
+          }}
+        />
       )}
-
     </WindowCard>
-  )
+  );
 }
 
-export default Base
+export default Base;
 
-const InfoTable = ({ stepData }) => {
+function InfoTable({ stepData }) {
   return (
     <Table>
       <TableBody>
@@ -253,5 +278,5 @@ const InfoTable = ({ stepData }) => {
         </TableRow>
       </TableBody>
     </Table>
-  )
+  );
 }

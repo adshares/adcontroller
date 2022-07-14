@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
-const AdPay = () => {
-  return(
-    <h1>AdPay</h1>
-  )
+function AdPay() {
+  return <h1>AdPay</h1>;
 }
 
-export default AdPay
+export default AdPay;
