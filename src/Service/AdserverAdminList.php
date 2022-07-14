@@ -17,7 +17,7 @@ class AdserverAdminList
     public function isAdministratorAccountPresent(): bool
     {
         $process = new Process(
-            ['php7.4', 'artisan', 'ops:admin:list'],
+            ['php', 'artisan', 'ops:admin:list'],
             $this->adserverHomeDirectory,
         );
         $process->setTimeout(3);
