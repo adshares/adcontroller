@@ -1,3 +1,3 @@
 export default {
-  baseUrl: 'http://localhost:8030'
+  baseUrl: process.env.REACT_APP_BASE_URL || ''
 }
