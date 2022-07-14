@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import apiService from '../../../../utils/apiService'
+import apiService from '../../../utils/apiService'
 import {
   Box,
   Button,
@@ -10,8 +10,8 @@ import {
   TextField
 } from '@mui/material'
 import styles from './styles.scss'
-import WindowCard from '../../../../Components/WindowCard/WindowCard'
-import { useForm } from '../../../../hooks'
+import WindowCard from '../../../Components/WindowCard/WindowCard'
+import { useForm } from '../../../hooks'
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)

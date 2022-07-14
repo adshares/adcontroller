@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import apiService from '../../../../utils/apiService'
-import WindowCard from '../../../../Components/WindowCard/WindowCard'
+import apiService from '../../../utils/apiService'
+import WindowCard from '../../../Components/WindowCard/WindowCard'
 import { Box, Icon, Table, TableBody, TableCell, TableRow, Tooltip } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'

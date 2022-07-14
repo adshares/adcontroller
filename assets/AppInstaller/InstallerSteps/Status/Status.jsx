@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import apiService from '../../../../utils/apiService'
+import apiService from '../../../utils/apiService'
 import {
   Icon,
   Table,
@@ -8,8 +8,8 @@ import {
   TableRow,
   Tooltip,
 } from '@mui/material'
-import WindowCard from '../../../../Components/WindowCard/WindowCard'
-import Spinner from '../../../../Components/Spinner/Spinner'
+import WindowCard from '../../../Components/WindowCard/WindowCard'
+import Spinner from '../../../Components/Spinner/Spinner'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 
