@@ -8,7 +8,7 @@
         "sass-loader": "^13.0.0",
         "webpack-notifier": "^1.15.0"
     },
-    "license": "UNLICENSED",
+    "license": "GPL-3.0-only",
     "private": true,
     "scripts": {
         "dev-server": "encore dev-server",
