@@ -1,4 +1,7 @@
 lexik_jwt_authentication:
+    encoder:
+        service: lexik_jwt_authentication.encoder.lcobucci
+        signature_algorithm: RS512
     secret_key: '%env(resolve:JWT_SECRET_KEY)%'
     public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
     pass_phrase: '%env(JWT_PASSPHRASE)%'

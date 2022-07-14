@@ -2,9 +2,16 @@
 import './styles/app.scss';
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { InstallerView } from './installer/Views/InstallerView'
-// import { UserCreatorView } from './userCreator/Views/UserCreatorView'
+import AppInstaller from './AppInstaller/AppInstaller'
+import { BrowserRouter } from 'react-router-dom'
+import { ThemeProvider } from '@mui/material'
+import theme from './utils/theme'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<InstallerView />);
-// root.render(<UserCreatorView />);
+root.render(
+  <BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <AppInstaller />
+    </ThemeProvider>
+  </BrowserRouter>
+);

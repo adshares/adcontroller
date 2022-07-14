@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.formBase {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.formAdvanced {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.formBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.textField {
+  min-height: 4rem;
+}
+
+.editButtonThumb {
+  display: flex;
+  justify-content: end;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}

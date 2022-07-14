@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px;
+  width: 700px;
+  height: 600px;
+}
+
+.controls {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.content {
+  height: 100%;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert {
+  width: 100%;
+}
+
+.alertContent {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.errMessageBox {
+  display: flex;
+  align-items: center;
+}
