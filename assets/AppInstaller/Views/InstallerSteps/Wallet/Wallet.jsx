@@ -13,7 +13,7 @@ import {
 import WindowCard from '../../../../Components/WindowCard/WindowCard'
 import styles from './styles.scss'
 import { useForm, useSkipFirstRenderEffect } from '../../../../hooks/'
-import Spinner from '../../../../Components/Spiner/Spinner'
+import Spinner from '../../../../Components/Spinner/Spinner'
 
 const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)

@@ -8,7 +8,8 @@ export default function MenuAppBar ({
   showProtectedOptions,
   setToken,
   showSideMenu,
-  toggleSideMenu
+  toggleSideMenu,
+  showSideMenuIcon = false
 }) {
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -29,7 +30,7 @@ export default function MenuAppBar ({
   return (
     <AppBar position="sticky" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
       <Toolbar>
-        {showProtectedOptions && (
+        {showProtectedOptions && showSideMenuIcon && (
           <IconButton
             size="large"
             color="inherit"

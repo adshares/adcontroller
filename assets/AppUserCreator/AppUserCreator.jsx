@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import apiService from '../../utils/apiService'
+import apiService from '../utils/apiService'
 import {
   Alert,
   Box,
@@ -12,13 +12,13 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import logo from '../../img/logo.png'
+import logo from '../img/logo.png'
 import CloseIcon from '@mui/icons-material/Close'
-import MenuAppBar from '../../Components/AppBar/AppBar'
-import AppWindow from '../../Components/AppWindow/AppWindow'
+import MenuAppBar from '../Components/MenuAppBar/MenuAppBar'
+import AppWindow from '../Components/AppWindow/AppWindow'
 import styles from './styles.scss'
 
-export const UserCreatorView = () => {
+export const AppUserCreator = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [alert, setAlert] = useState({type: '', message: '', title: ''})

@@ -11,7 +11,7 @@ import {
   TextField,
 } from '@mui/material'
 import styles from './styles.scss'
-import Spinner from '../../../../Components/Spiner/Spinner'
+import Spinner from '../../../../Components/Spinner/Spinner'
 import { useForm } from '../../../../hooks'
 
 const License = ({ handleNextStep, handlePrevStep, step }) => {

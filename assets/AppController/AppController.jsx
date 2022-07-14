@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import PublicRoute from '../Components/Routes/PublicRoute'
 import PrivateRoute from '../Components/Routes/PrivateRoute'
-import MenuAppBar from '../Components/AppBar/AppBar'
+import MenuAppBar from '../Components/MenuAppBar/MenuAppBar'
 import AppWindow from '../Components/AppWindow/AppWindow'
 import Login from '../Components/Login/Login'
-import NotFoundView from '../installer/Views/NotFound/NotFoundView'
+import NotFoundView from '../Components/NotFound/NotFoundView'
 import SideMenu from '../Components/SideMenu/SideMenu'
 import { Box } from '@mui/material'
 
@@ -20,6 +20,7 @@ export default function AppController () {
         setToken={setToken}
         showSideMenu={showSideMenu}
         toggleSideMenu={toggleSideMenu}
+        showSideMenuIcon
       />
       <Box sx={{display: 'flex', justifyContent: 'center' }}>
         <SideMenu

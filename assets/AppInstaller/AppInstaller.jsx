@@ -4,10 +4,10 @@ import apiService from '../utils/apiService'
 import { Alert } from '@mui/material'
 import Base from './Views/InstallerSteps/Base/Base'
 import Login from '../Components/Login/Login'
-import MenuAppBar from '../Components/AppBar/AppBar'
+import MenuAppBar from '../Components/MenuAppBar/MenuAppBar'
 import PublicRoute from '../Components/Routes/PublicRoute'
 import PrivateRoute from '../Components/Routes/PrivateRoute'
-import NotFoundView from './Views/NotFound/NotFoundView'
+import NotFoundView from '../Components/NotFound/NotFoundView'
 import AppWindow from '../Components/AppWindow/AppWindow'
 import DNS from './Views/InstallerSteps/DNS/DNS'
 import Wallet from './Views/InstallerSteps/Wallet/Wallet'
@@ -17,7 +17,7 @@ import Classifier from './Views/InstallerSteps/Classifier/Classifier'
 import SMTP from './Views/InstallerSteps/SMTP/SMTP'
 import Status from './Views/InstallerSteps/Status/Status'
 import WindowCard from '../Components/WindowCard/WindowCard'
-import Spinner from '../Components/Spiner/Spinner'
+import Spinner from '../Components/Spinner/Spinner'
 
 const installerSteps = [
   {
@@ -57,7 +57,7 @@ const installerSteps = [
   },
 ]
 
-export default function InstallerApp () {
+export default function AppInstaller () {
   const [token, setToken] = useState(localStorage.getItem('authToken'))
   const [currentStep, setCurrentStep] = useState(null)
   const [alert, setAlert] = useState({type: 'error', message: '', title: ''})
@@ -91,7 +91,7 @@ export default function InstallerApp () {
 
   return (
     <>
-      <MenuAppBar showIcon={!!token} setToken={setToken}/>
+      <MenuAppBar showProtectedOptions={!!token} showIcon={!!token} setToken={setToken}/>
       <AppWindow>
         <Routes>
           <Route

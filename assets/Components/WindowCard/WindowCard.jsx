@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 
-import Spinner from '../Spiner/Spinner'
+import Spinner from '../Spinner/Spinner'
 import { useSkipFirstRenderEffect } from '../../hooks'
 
 const WindowCard = ({
