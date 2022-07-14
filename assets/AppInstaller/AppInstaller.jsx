@@ -70,15 +70,12 @@ export default function AppInstaller() {
 
   const getCurrentStep = async () => {
     try {
-      // eslint-disable-next-line camelcase
       const { installer_step } = await apiService.getPrevStep();
-      // eslint-disable-next-line camelcase
       if (!installer_step) {
         const firstStep = installerSteps.find((el) => el.index === 1);
         setCurrentStep(firstStep.path);
         return;
       }
-      // eslint-disable-next-line camelcase
       const prevEl = installerSteps.find((el) => el.path === installer_step);
       const currentEl = installerSteps.find((el) => el.index === prevEl.index + 1);
       setCurrentStep(currentEl?.path || prevEl.path);
@@ -109,7 +106,6 @@ export default function AppInstaller() {
             path="steps/*"
             element={
               <PrivateRoute isLoggedIn={!!token}>
-                {/* eslint-disable-next-line no-nested-ternary */}
                 {currentStep ? (
                   <MultiStep currentStep={currentStep} steps={installerSteps} />
                 ) : alert.message ? (
