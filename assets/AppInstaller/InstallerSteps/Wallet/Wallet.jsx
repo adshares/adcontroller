@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import apiService from '../../../utils/apiService'
-import { Box, Button, Collapse, TextField, Typography, } from '@mui/material'
+import {
+  Box,
+  Button,
+  Collapse,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  TextField,
+} from '@mui/material'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
 import styles from './styles.scss'
-import { useForm, useSkipFirstRenderEffect } from '../../../hooks/'
-import Spinner from '../../../Components/Spiner/Spinner'
+import { useForm, useSkipFirstRenderEffect } from '../../../hooks'
+import Spinner from '../../../Components/Spinner/Spinner'
 
 const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -13,13 +22,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
     wallet_address: '',
     wallet_secret_key: '',
   })
-  const {
-    fields: nodeHost,
-    setFields: setNodeHost,
-    errorObj: nodeHostError,
-    isFormValid: isNodeHostValid,
-    onFormChange: onNodeHostChange
-  } = useForm({
+  const { fields: nodeHost, setFields: setNodeHost, errorObj: nodeHostError, isFormValid: isNodeHostValid, onFormChange: onNodeHostChange } = useForm({
     wallet_node_host: '',
     wallet_node_port: '',
   })
@@ -153,6 +156,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
             className={styles.formBlock}
             onChange={onFormChange}
             onBlur={(e) => validate(e.target)}
+            onSubmit={e => e.preventDefault()}
           >
             <TextField
               className={styles.textField}
@@ -185,6 +189,7 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
             timeout="auto"
             unmountOnExit
             onChange={onNodeHostChange}
+            onSubmit={e => e.preventDefault()}
           >
             {isHostVerification ? <Spinner/> : (
             <>
@@ -217,13 +222,14 @@ const Wallet = ({ handleNextStep, handlePrevStep, step }) => {
       )}
 
       {!editMode && (
-        <Box className={styles.container}>
-          <Box className={styles.content}>
-            <Typography variant="body1">
-              Your wallet address: {fields.wallet_address}
-            </Typography>
-          </Box>
-        </Box>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell align="center">Your wallet address</TableCell>
+              <TableCell align="center">{fields.wallet_address}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       )}
 
 

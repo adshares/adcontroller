@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
-import BreadCrumbs from '../../Components/BreadCrumbs/BreadCrumbs'
+import BreadCrumbs from '../BreadCrumbs/BreadCrumbs'
 
 const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
   const [currentInstallerStep, setCurrentInstallerStep] = useState(steps.find(el => el.path === lastCompletedStep))

@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from '@mui/material'
 import WindowCard from '../../../Components/WindowCard/WindowCard'
-import Spinner from '../../../Components/Spiner/Spinner'
+import Spinner from '../../../Components/Spinner/Spinner'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 
@@ -53,12 +53,30 @@ const Status = ({ handlePrevStep, step }) => {
     }
   }
 
+  const handleSubmit = async () => {
+    try{
+      setIsLoading(true)
+      await apiService.sendStepData(step.path, {})
+      window.location.reload()
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err.data.message,
+        title: err.message
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <WindowCard
       alert={alert}
       title="Status"
-      disabledNext
+      disabledNext={isLoading}
       onBackClick={() => handlePrevStep(step)}
+      onNextClick={handleSubmit}
+      isLastCard
     >
       {isLoading ?
         <Spinner/> :

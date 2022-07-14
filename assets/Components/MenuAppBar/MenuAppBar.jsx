@@ -1,9 +1,16 @@
 import React, { useState } from 'react'
 import { AppBar, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
+import MenuIcon from '@mui/icons-material/Menu';
 import apiService from '../../utils/apiService'
 
-export default function MenuAppBar ({ showIcon, setToken }) {
+export default function MenuAppBar ({
+  showProtectedOptions,
+  setToken,
+  showSideMenu,
+  toggleSideMenu,
+  showSideMenuIcon = false
+}) {
   const [anchorEl, setAnchorEl] = useState(null)
 
   const handleMenu = (event) => {
@@ -21,13 +28,22 @@ export default function MenuAppBar ({ showIcon, setToken }) {
   }
 
   return (
-    <AppBar position="static">
+    <AppBar position="sticky" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
       <Toolbar>
+        {showProtectedOptions && showSideMenuIcon && (
+          <IconButton
+            size="large"
+            color="inherit"
+            onClick={() => toggleSideMenu(!showSideMenu)}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Installer
+          AdShares - AdController
         </Typography>
-        {showIcon && (
-          <div>
+        {showProtectedOptions && (
+          <>
             <IconButton
               size="large"
               onClick={handleMenu}
@@ -50,7 +66,7 @@ export default function MenuAppBar ({ showIcon, setToken }) {
             >
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
-          </div>
+          </>
         )}
       </Toolbar>
     </AppBar>

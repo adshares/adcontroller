@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import apiService from './utils/apiService'
+import apiService from '../utils/apiService'
 import { Alert } from '@mui/material'
-import Base from './Views/InstallerSteps/Base/Base'
-import Login from './Views/Login/Login'
-import MenuAppBar from './Components/AppBar/AppBar'
-import PublicRoute from './Components/Routes/PublicRoute'
-import PrivateRoute from './Components/Routes/PrivateRoute'
-import NotFoundView from './Views/NotFound/NotFoundView'
-import AppWindow from './Components/AppWindow/AppWindow'
-import DNS from './Views/InstallerSteps/DNS/DNS'
-import Wallet from './Views/InstallerSteps/Wallet/Wallet'
-import MultiStep from './Views/MultiStep/MultiStep'
-import License from './Views/InstallerSteps/License/License'
-import Classifier from './Views/InstallerSteps/Classifier/Classifier'
-import SMTP from './Views/InstallerSteps/SMTP/SMTP'
-import Status from './Views/InstallerSteps/Status/Status'
-import WindowCard from './Components/WindowCard/WindowCard'
-import Spinner from './Components/Spiner/Spinner'
+import Base from './InstallerSteps/Base/Base'
+import Login from '../Components/Login/Login'
+import MenuAppBar from '../Components/MenuAppBar/MenuAppBar'
+import PublicRoute from '../Components/Routes/PublicRoute'
+import PrivateRoute from '../Components/Routes/PrivateRoute'
+import NotFoundView from '../Components/NotFound/NotFoundView'
+import AppWindow from '../Components/AppWindow/AppWindow'
+import DNS from './InstallerSteps/DNS/DNS'
+import Wallet from './InstallerSteps/Wallet/Wallet'
+import MultiStep from '../Components/MultiStep/MultiStep'
+import License from './InstallerSteps/License/License'
+import Classifier from './InstallerSteps/Classifier/Classifier'
+import SMTP from './InstallerSteps/SMTP/SMTP'
+import Status from './InstallerSteps/Status/Status'
+import WindowCard from '../Components/WindowCard/WindowCard'
+import Spinner from '../Components/Spinner/Spinner'
 
 const installerSteps = [
   {
@@ -57,7 +57,7 @@ const installerSteps = [
   },
 ]
 
-export default function InstallerApp () {
+export default function AppInstaller () {
   const [token, setToken] = useState(localStorage.getItem('authToken'))
   const [currentStep, setCurrentStep] = useState(null)
   const [alert, setAlert] = useState({type: 'error', message: '', title: ''})
@@ -78,7 +78,7 @@ export default function InstallerApp () {
       }
       const prevEl = installerSteps.find(el => el.path === installer_step)
       const currentEl = installerSteps.find(el => el.index === prevEl.index + 1)
-      setCurrentStep(currentEl.path)
+      setCurrentStep(currentEl?.path || prevEl.path)
     } catch (err) {
       setToken(localStorage.getItem('authToken'))
       setAlert({
@@ -91,7 +91,7 @@ export default function InstallerApp () {
 
   return (
     <>
-      <MenuAppBar showIcon={!!token} setToken={setToken}/>
+      <MenuAppBar showProtectedOptions={!!token} showIcon={!!token} setToken={setToken}/>
       <AppWindow>
         <Routes>
           <Route
@@ -114,8 +114,8 @@ export default function InstallerApp () {
                   alert.message ? (
                     <WindowCard
                       disabledNext
-                      isFirstCard
-                      isLastCard
+                      hideBackButton
+                      hideNextButton
                     >
                       <Alert severity={alert.type}>{alert.title}: {alert.message}</Alert>
                     </WindowCard>

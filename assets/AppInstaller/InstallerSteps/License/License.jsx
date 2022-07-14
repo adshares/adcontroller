@@ -11,7 +11,7 @@ import {
   TextField,
 } from '@mui/material'
 import styles from './styles.scss'
-import Spinner from '../../../Components/Spiner/Spinner'
+import Spinner from '../../../Components/Spinner/Spinner'
 import { useForm } from '../../../hooks'
 
 const License = ({ handleNextStep, handlePrevStep, step }) => {
@@ -111,6 +111,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
             component="form"
             onChange={onFormChange}
             onBlur={(e) => validate(e.target)}
+            onSubmit={e => e.preventDefault()}
           >
             <Box className={styles.field}>
               <TextField

@@ -94,7 +94,7 @@ const Base = ({ handleNextStep, step }) => {
       title="Base information"
       onNextClick={handleSubmit}
       disabledNext={!isFormValid}
-      isFirstCard
+      hideBackButton
     >
       <Box className={styles.editButtonThumb}>
         <Button
@@ -114,6 +114,7 @@ const Base = ({ handleNextStep, step }) => {
             onChange={onFormChange}
             onBlur={(e) => validate(e.target)}
             onClick={() => setFormTouched(true)}
+            onSubmit={e => e.preventDefault()}
           >
             <Box className={styles.formBlock}>
               <TextField
@@ -174,6 +175,7 @@ const Base = ({ handleNextStep, step }) => {
             component="form"
             onChange={onAdvancedFieldsChange}
             onClick={() => setFormTouched(true)}
+            onSubmit={e => e.preventDefault()}
           >
             <Collapse in={showAdvancedOptions} timeout="auto" unmountOnExit>
               <Box sx={{ marginTop: '8px' }} className={styles.formBlock}>

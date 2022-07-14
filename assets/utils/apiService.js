@@ -1,4 +1,4 @@
-import configuration from '../../controllerConfig/configuration'
+import configuration from '../controllerConfig/configuration'
 import { HttpError } from './errors'
 
 const request = async (url, method, withAuthorization = true, _body) => {
@@ -28,6 +28,27 @@ const request = async (url, method, withAuthorization = true, _body) => {
         throw new HttpError('Error', err.data)
     }
   }
+}
+
+const createUser = async (body) => {
+  try {
+    await request(`${configuration.baseUrl}/api/accounts`, 'POST', false, body)
+  } catch (err) {
+    throw new HttpError(err.message, err.data)
+  }
+
+  // const response = await fetch (`${configuration.baseUrl}/api/accounts`, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //   },
+  //   body: JSON.stringify(userData)
+  // })
+  // const body = await response.json()
+  // return {
+  //   status: response.status,
+  //   message: body.message
+  // }
 }
 
 const login = async (body) => {
@@ -100,6 +121,7 @@ const getWalletNodeHost = async (body) => {
 }
 
 export default {
+  createUser,
   login,
   logout,
   sendStepData,
