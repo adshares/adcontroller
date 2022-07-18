@@ -9,11 +9,90 @@ import Login from '../Components/Login/Login';
 import NotFoundView from '../Components/NotFound/NotFoundView';
 import SideMenu from '../Components/SideMenu/SideMenu';
 import Dashboard from './Dashboard/Dashboard';
-import AdPay from './AdPay/AdPay';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PaymentIcon from '@mui/icons-material/Payment';
+
+const appModules = [
+  {
+    name: 'Dashboard',
+    path: '/',
+    component: Dashboard,
+    icon: DashboardIcon,
+  },
+  {
+    name: 'Finance settings',
+    path: '/adpay',
+    // component: AdPay,
+    icon: PaymentIcon,
+    children: [
+      {
+        name: '11',
+        path: '/',
+        component: Dashboard,
+        icon: DashboardIcon,
+      },
+      {
+        name: '12',
+        path: '/',
+        component: Dashboard,
+        icon: DashboardIcon,
+      },
+      {
+        name: '13',
+        path: '/asasas',
+        component: Dashboard,
+        icon: DashboardIcon,
+        children: [
+          {
+            name: 'adpanel',
+            path: '/',
+            component: Dashboard,
+            icon: DashboardIcon,
+          },
+          {
+            name: 'adserver',
+            path: '/',
+            component: Dashboard,
+            icon: DashboardIcon,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'adpay',
+    path: '/',
+    component: Dashboard,
+    icon: DashboardIcon,
+  },
+];
+
+const getAppPages = (appModules, isAuthenticate) => {
+  const parseAppModules = (modules) => {
+    const pages = [];
+    for (let page of modules) {
+      if (page.component) {
+        pages.push(
+          <Route
+            key={page.name}
+            path={page.path}
+            element={<PrivateRoute isLoggedIn={isAuthenticate}>{React.createElement(page.component)}</PrivateRoute>}
+          />,
+        );
+      }
+      if (page.children) {
+        pages.push(...parseAppModules(page.children));
+      }
+    }
+    return pages;
+  };
+  return parseAppModules(appModules);
+};
 
 export default function AppController() {
   const [token, setToken] = useState(localStorage.getItem('authToken'));
-  const [showSideMenu, toggleSideMenu] = useState(false);
+  const [showSideMenu, toggleSideMenu] = useState(true);
+  const pages = getAppPages(appModules, !!token);
 
   return (
     <>
@@ -30,7 +109,7 @@ export default function AppController() {
           justifyContent: 'center',
         }}
       >
-        <SideMenu enableSideMenu={!!token} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} />
+        <SideMenu enableSideMenu={!!token} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
         <AppWindow>
           <Routes>
             <Route
@@ -41,22 +120,9 @@ export default function AppController() {
                 </PublicRoute>
               }
             />
-            <Route
-              path="/"
-              element={
-                <PrivateRoute isLoggedIn={!!token}>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/adpay"
-              element={
-                <PrivateRoute isLoggedIn={!!token}>
-                  <AdPay />
-                </PrivateRoute>
-              }
-            />
+
+            {pages}
+
             <Route path="*" element={<NotFoundView />} />
             <Route path="/steps/*" element={<Navigate to="/" />} />
           </Routes>

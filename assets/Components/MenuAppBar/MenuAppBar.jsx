@@ -30,7 +30,7 @@ export default function MenuAppBar({ showProtectedOptions, setToken, showSideMen
           </IconButton>
         )}
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          AdShares - AdController
+          Adshares - AdController
         </Typography>
         {showProtectedOptions && (
           <>
