@@ -5,7 +5,7 @@ namespace App\Service;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-class AdserverAdminList
+class AdServerAdminList
 {
     private string $adserverHomeDirectory;
 

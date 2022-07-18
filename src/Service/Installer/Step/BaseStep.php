@@ -4,6 +4,7 @@ namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
 use App\Repository\ConfigurationRepository;
+use App\Service\AdServerConfigurationClient;
 use App\Service\EnvEditor;
 use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
@@ -22,11 +23,16 @@ class BaseStep implements InstallerStep
         Configuration::BASE_SUPPORT_EMAIL,
     ];
 
+    private AdServerConfigurationClient $adServerConfigurationClient;
     private ConfigurationRepository $repository;
     private ServicePresenceChecker $servicePresenceChecker;
 
-    public function __construct(ConfigurationRepository $repository, ServicePresenceChecker $servicePresenceChecker)
-    {
+    public function __construct(
+        AdServerConfigurationClient $adServerConfigurationClient,
+        ConfigurationRepository $repository,
+        ServicePresenceChecker $servicePresenceChecker
+    ) {
+        $this->adServerConfigurationClient = $adServerConfigurationClient;
         $this->repository = $repository;
         $this->servicePresenceChecker = $servicePresenceChecker;
     }
@@ -51,6 +57,14 @@ class BaseStep implements InstallerStep
         $adpanelUrl = $protocol . $adPanelHost;
         $aduserUrl = $protocol . $adUserHost;
         $aduserInternalUrl = 'http://' . $adUserHost;
+
+        $this->adServerConfigurationClient->store(
+            AdServerConfigurationClient::RESOURCE_MAIL,
+            [
+                Configuration::BASE_SUPPORT_EMAIL => $content[Configuration::BASE_SUPPORT_EMAIL],
+                Configuration::BASE_CONTACT_EMAIL => $content[Configuration::BASE_CONTACT_EMAIL],
+            ]
+        );
 
         $envEditor->set(
             [
