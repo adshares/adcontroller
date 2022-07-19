@@ -11,11 +11,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AdServerConfigurationClient
 {
-    public const RESOURCE_MAIL = 'mail';
-    private const ALLOWED_API_RESOURCES = [
-        self::RESOURCE_MAIL,
-    ];
-    private const MAP = [
+    private const KEY_MAP = [
         Configuration::BASE_CONTACT_EMAIL => self::TECHNICAL_EMAIL,
         Configuration::BASE_SUPPORT_EMAIL => self::SUPPORT_EMAIL,
     ];
@@ -33,12 +29,17 @@ class AdServerConfigurationClient
         $this->adserverBaseUri = $adserverBaseUri;
     }
 
-    public function fetch(string $apiResource): array
+    public function fetch(): array
     {
-        $this->validateApiResource($apiResource);
-        $uri = $this->buildUriByApiResource($apiResource);
-
-        $response = $this->httpClient->request('GET', $uri);
+        $response = $this->httpClient->request(
+            'GET',
+            $this->buildUri(),
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->getToken(),
+                ],
+            ]
+        );
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
             throw new UnexpectedResponseException(
@@ -48,33 +49,22 @@ class AdServerConfigurationClient
 
         $body = json_decode($response->getContent(), true);
 
-        switch ($apiResource) {
-            case self::RESOURCE_MAIL:
-                if (!isset($body[self::SUPPORT_EMAIL]) || !isset($body[self::TECHNICAL_EMAIL])) {
-                    throw new UnexpectedResponseException('AdServer response cannot be processed');
-                }
-
-                return [
-                    Configuration::BASE_SUPPORT_EMAIL => $body[self::SUPPORT_EMAIL],
-                    Configuration::BASE_CONTACT_EMAIL => $body[self::TECHNICAL_EMAIL],
-                ];
-            default:
-                return [];
+        $data = [];
+        foreach (self::KEY_MAP as $localKey => $remoteKey) {
+            $data[$localKey] = $body[$remoteKey] ?? null;
         }
+
+        return $data;
     }
 
-    public function store(string $apiResource, array $data): void
+    public function store(array $data): void
     {
-        $this->validateApiResource($apiResource);
-        $uri = $this->buildUriByApiResource($apiResource);
-        $token = $this->tokenStorage->getToken()->getCredentials();
-
         $response = $this->httpClient->request(
             'PATCH',
-            $uri,
+            $this->buildUri(),
             [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
+                    'Authorization' => 'Bearer ' . $this->getToken(),
                 ],
                 'json' => $this->mapData($data)
             ]
@@ -87,24 +77,22 @@ class AdServerConfigurationClient
         }
     }
 
-    private function validateApiResource(string $apiResource): void
+    private function buildUri(): string
     {
-        if (!in_array($apiResource, self::ALLOWED_API_RESOURCES)) {
-            throw new InvalidArgumentException(sprintf('Value `%s` is not a valid API resource', $apiResource));
-        }
+        return sprintf('%s/api/config', $this->adserverBaseUri);
     }
 
-    private function buildUriByApiResource(string $apiResource): string
+    private function getToken(): string
     {
-        return sprintf('%s/api/config/%s', $this->adserverBaseUri, $apiResource);
+        return $this->tokenStorage->getToken()->getCredentials();
     }
 
     private function mapData(array $data): array
     {
         $mappedData = [];
         foreach ($data as $key => $value) {
-            if (isset(self::MAP[$key])) {
-                $mappedData[self::MAP[$key]] = $value;
+            if (isset(self::KEY_MAP[$key])) {
+                $mappedData[self::KEY_MAP[$key]] = $value;
             }
         }
 

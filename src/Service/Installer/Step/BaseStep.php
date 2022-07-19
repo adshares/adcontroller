@@ -59,7 +59,6 @@ class BaseStep implements InstallerStep
         $aduserInternalUrl = 'http://' . $adUserHost;
 
         $this->adServerConfigurationClient->store(
-            AdServerConfigurationClient::RESOURCE_MAIL,
             [
                 Configuration::BASE_SUPPORT_EMAIL => $content[Configuration::BASE_SUPPORT_EMAIL],
                 Configuration::BASE_CONTACT_EMAIL => $content[Configuration::BASE_CONTACT_EMAIL],
