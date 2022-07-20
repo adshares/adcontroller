@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
 import { useForm } from '../../../hooks';
 import apiService from '../../../utils/apiService';
-import WindowCard from '../../../Components/WindowCard/WindowCard';
+import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
 
 function Base({ handleNextStep, step }) {
@@ -106,7 +106,7 @@ function Base({ handleNextStep, step }) {
   };
 
   return (
-    <WindowCard
+    <InstallerStepWrapper
       alert={alert}
       dataLoading={isLoading}
       title="Base information"
@@ -238,7 +238,7 @@ function Base({ handleNextStep, step }) {
           }}
         />
       )}
-    </WindowCard>
+    </InstallerStepWrapper>
   );
 }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, LinearProgress, Typography } from '@mui/material';
 import apiService from '../../../utils/apiService';
-import WindowCard from '../../../Components/WindowCard/WindowCard';
+import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
 
 function Classifier({ handleNextStep, handlePrevStep, step }) {
@@ -47,7 +47,7 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
   };
 
   return (
-    <WindowCard
+    <InstallerStepWrapper
       alert={alert}
       dataLoading={isLoading}
       title="Classifier information"
@@ -63,7 +63,7 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
           </Box>
         )}
       </Box>
-    </WindowCard>
+    </InstallerStepWrapper>
   );
 }
 

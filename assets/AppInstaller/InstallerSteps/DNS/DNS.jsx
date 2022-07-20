@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Icon, Table, TableBody, TableCell, TableRow, Tooltip } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import WindowCard from '../../../Components/WindowCard/WindowCard';
+import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import apiService from '../../../utils/apiService';
 import styles from './styles.scss';
 
@@ -57,7 +57,7 @@ function DNS({ handleNextStep, handlePrevStep, step }) {
   };
 
   return (
-    <WindowCard
+    <InstallerStepWrapper
       alert={alert}
       dataLoading={isLoading}
       title="DNS information"
@@ -66,7 +66,7 @@ function DNS({ handleNextStep, handlePrevStep, step }) {
       disabledNext={isLoading}
     >
       <TableInfo stepData={stepData} />
-    </WindowCard>
+    </InstallerStepWrapper>
   );
 }
 

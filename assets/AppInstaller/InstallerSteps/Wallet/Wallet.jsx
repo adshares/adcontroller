@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
 import apiService from '../../../utils/apiService';
-import WindowCard from '../../../Components/WindowCard/WindowCard';
+import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
 import { useForm, useSkipFirstRenderEffect } from '../../../hooks';
 import Spinner from '../../../Components/Spinner/Spinner';
@@ -130,7 +130,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   };
 
   return (
-    <WindowCard
+    <InstallerStepWrapper
       alert={alert}
       dataLoading={isLoading}
       title="Wallet information"
@@ -227,7 +227,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
           </TableBody>
         </Table>
       )}
-    </WindowCard>
+    </InstallerStepWrapper>
   );
 }
 

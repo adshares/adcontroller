@@ -3,7 +3,7 @@ import { Icon, Table, TableBody, TableCell, TableRow, Tooltip } from '@mui/mater
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import apiService from '../../../utils/apiService';
-import WindowCard from '../../../Components/WindowCard/WindowCard';
+import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import Spinner from '../../../Components/Spinner/Spinner';
 
 function Status({ handlePrevStep, step }) {
@@ -93,7 +93,7 @@ function Status({ handlePrevStep, step }) {
   };
 
   return (
-    <WindowCard
+    <InstallerStepWrapper
       alert={alert}
       title="Status"
       disabledNext={isLoading}
@@ -169,7 +169,7 @@ function Status({ handlePrevStep, step }) {
           </TableBody>
         </Table>
       )}
-    </WindowCard>
+    </InstallerStepWrapper>
   );
 }
 

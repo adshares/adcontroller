@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Spinner from '../Spinner/Spinner';
 import { useSkipFirstRenderEffect } from '../../hooks';
 
-const WindowCard = ({
+const InstallerStepWrapper = ({
   alert = {
     type: '',
     message: '',
@@ -77,4 +77,4 @@ const WindowCard = ({
   );
 };
 
-export default WindowCard;
+export default InstallerStepWrapper;

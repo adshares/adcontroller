@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
 import apiService from '../../../utils/apiService';
 import styles from './styles.scss';
-import WindowCard from '../../../Components/WindowCard/WindowCard';
+import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import { useForm } from '../../../hooks';
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
@@ -76,7 +76,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   };
 
   return (
-    <WindowCard
+    <InstallerStepWrapper
       alert={alert}
       dataLoading={isLoading}
       title="SMTP information"
@@ -183,7 +183,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
           <InfoTable stepData={fields} />
         </>
       )}
-    </WindowCard>
+    </InstallerStepWrapper>
   );
 };
 

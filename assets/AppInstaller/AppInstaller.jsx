@@ -16,7 +16,7 @@ import License from './InstallerSteps/License/License';
 import Classifier from './InstallerSteps/Classifier/Classifier';
 import SMTP from './InstallerSteps/SMTP/SMTP';
 import Status from './InstallerSteps/Status/Status';
-import WindowCard from '../Components/WindowCard/WindowCard';
+import InstallerStepWrapper from '../Components/InstallerStepWrapper/InstallerStepWrapper';
 import Spinner from '../Components/Spinner/Spinner';
 
 const installerSteps = [
@@ -109,9 +109,9 @@ export default function AppInstaller() {
                 {currentStep ? (
                   <MultiStep currentStep={currentStep} steps={installerSteps} />
                 ) : alert.message ? (
-                  <WindowCard disabledNext hideBackButton hideNextButton>
+                  <InstallerStepWrapper disabledNext hideBackButton hideNextButton>
                     <Alert severity={alert.type}>{`${alert.title}: ${alert.message}`}</Alert>
-                  </WindowCard>
+                  </InstallerStepWrapper>
                 ) : (
                   <Spinner />
                 )}

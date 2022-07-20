@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
 import apiService from '../../../utils/apiService';
-import WindowCard from '../../../Components/WindowCard/WindowCard';
+import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
 import Spinner from '../../../Components/Spinner/Spinner';
 import { useForm } from '../../../hooks';
@@ -88,7 +88,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   };
 
   return (
-    <WindowCard
+    <InstallerStepWrapper
       alert={alert}
       dataLoading={isLoading}
       title="License information"
@@ -145,7 +145,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
           <InfoTable stepData={stepData} />
         </>
       )}
-    </WindowCard>
+    </InstallerStepWrapper>
   );
 };
 
