@@ -11,6 +11,8 @@ import SideMenu from '../Components/SideMenu/SideMenu';
 import Dashboard from './Dashboard/Dashboard';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PaymentIcon from '@mui/icons-material/Payment';
+import AdPay from './AdPay/AdPay';
+import Wallet from './FinanceSettingsSubMenu/Wallet/Wallet';
 
 const appModules = [
   {
@@ -21,48 +23,20 @@ const appModules = [
   },
   {
     name: 'Finance settings',
-    path: '/adpay',
-    // component: AdPay,
     icon: PaymentIcon,
     children: [
       {
-        name: '11',
-        path: '/',
-        component: Dashboard,
-        icon: DashboardIcon,
-      },
-      {
-        name: '12',
-        path: '/',
-        component: Dashboard,
-        icon: DashboardIcon,
-      },
-      {
-        name: '13',
-        path: '/asasas',
-        component: Dashboard,
-        icon: DashboardIcon,
-        children: [
-          {
-            name: 'adpanel',
-            path: '/',
-            component: Dashboard,
-            icon: DashboardIcon,
-          },
-          {
-            name: 'adserver',
-            path: '/',
-            component: Dashboard,
-            icon: DashboardIcon,
-          },
-        ],
+        name: 'Wallet',
+        path: '/wallet',
+        component: Wallet,
+        icon: PaymentIcon,
       },
     ],
   },
   {
-    name: 'adpay',
-    path: '/',
-    component: Dashboard,
+    name: 'AdPay',
+    path: '/adpay',
+    component: AdPay,
     icon: DashboardIcon,
   },
 ];
@@ -76,7 +50,11 @@ const getAppPages = (appModules, isAuthenticate) => {
           <Route
             key={page.name}
             path={page.path}
-            element={<PrivateRoute isLoggedIn={isAuthenticate}>{React.createElement(page.component)}</PrivateRoute>}
+            element={
+              <PrivateRoute isLoggedIn={isAuthenticate}>
+                <page.component />
+              </PrivateRoute>
+            }
           />,
         );
       }

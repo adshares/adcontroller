@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -32,9 +32,9 @@ const closedMixin = (theme) => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`,
+  width: `calc(${theme.spacing(7)} + 8px)`,
   [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
+    width: `calc(${theme.spacing(8)} + 8px)`,
   },
 });
 
@@ -55,20 +55,16 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const Accordion = styled(MuiAccordion, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme }) => ({
   '&': {
-    borderRadius: 0,
     boxShadow: 'none',
-  },
-  '&:last-of-type': {
-    borderRadius: 0,
   },
   '& .MuiAccordion-region:before': {
     content: '""',
     display: 'block',
-    height: ' calc(100% - 64px)',
+    height: 'calc(100% - 48px)',
     width: '2px',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
     position: 'absolute',
-    left: '8px',
+    left: '16px',
     borderRadius: '2px',
   },
   flexShrink: 0,
@@ -84,27 +80,58 @@ const Accordion = styled(MuiAccordion, { shouldForwardProp: (prop) => prop !== '
   }),
 }));
 
-const AccordionSummary = styled(MuiAccordionSummary)(({}) => ({
+const AccordionSummary = styled(MuiAccordionSummary)(() => ({
   '&:hover': {
     backgroundColor: 'rgba(0, 0, 0, 0.04)',
   },
 }));
 
-const getMappedMenuItems = (items, nav) => {
+const getMappedMenuItems = (items) => {
+  const [expanded, setExpanded] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    items.forEach((parentItem) => {
+      if (parentItem.children) {
+        parentItem.children.forEach((childItem) => {
+          if (childItem.path === location.pathname) {
+            setExpanded((prevState) => [...prevState, parentItem.name]);
+          }
+        });
+      }
+    });
+  }, []);
+
+  const handleChange = (itemName) => (event, isExpanded) => {
+    if (isExpanded) {
+      setExpanded((prev) => [...prev, itemName]);
+    } else if (!isExpanded) {
+      setExpanded((prev) => prev.filter((e) => e !== itemName));
+    }
+  };
+
   return items.map((item) => {
     if (item.children) {
       return (
-        <Accordion sx={{ border: 0 }} key={item.name}>
+        <Accordion
+          key={item.name}
+          id={item.name}
+          expanded={expanded.includes(item.name)}
+          onChange={handleChange(item.name)}
+          disableGutters
+          square
+        >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <ListItemIcon>{<item.icon />}</ListItemIcon>
             <Typography>{item.name}</Typography>
           </AccordionSummary>
-          <AccordionDetails>{getMappedMenuItems(item.children, nav)}</AccordionDetails>
+          <AccordionDetails>{getMappedMenuItems(item.children, navigate)}</AccordionDetails>
         </Accordion>
       );
     }
     return (
-      <ListItem key={item.name} disablePadding onClick={() => nav(item.path)}>
+      <ListItem key={item.name} disablePadding onClick={() => navigate(item.path)}>
         <ListItemButton>
           <ListItemIcon>{<item.icon />}</ListItemIcon>
           <ListItemText primary={item.name} />
@@ -115,9 +142,7 @@ const getMappedMenuItems = (items, nav) => {
 };
 
 const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) => {
-  console.log(showSideMenu);
-  const navigate = useNavigate();
-  const items = getMappedMenuItems(menuItems, navigate);
+  const items = getMappedMenuItems(menuItems);
 
   return (
     enableSideMenu && (
