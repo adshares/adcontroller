@@ -1,0 +1,36 @@
+.card {
+  width: 100%;
+
+  &:not(:first-child) {
+    margin-top: 8px;
+  }
+}
+
+.flex {
+  display: flex;
+
+  &.column {
+    flex-direction: column;
+  }
+
+  &.alignCenter {
+    align-items: center;
+  }
+
+  &.spaceBetween {
+    justify-content: space-between;
+  }
+
+  &.spaceAround {
+    justify-content: space-around;
+  }
+
+  &.flexEnd {
+    justify-content: flex-end;
+  }
+
+  &.spaceEvenly {
+    justify-content: space-evenly
+  }
+}
+
