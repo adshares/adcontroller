@@ -13,6 +13,7 @@ module.exports = {
   },
   plugins: ['prettier', 'react'],
   rules: {
+    'react/no-unescaped-entities': 0,
     'react/prop-types': 0,
     'react/jsx-wrap-multilines': 'off',
     'prettier/prettier': [

@@ -13,6 +13,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PaymentIcon from '@mui/icons-material/Payment';
 import AdPay from './AdPay/AdPay';
 import Wallet from './FinanceSettingsSubMenu/Wallet/Wallet';
+import Commissions from './FinanceSettingsSubMenu/Commissions/Commissions';
 
 const appModules = [
   {
@@ -29,6 +30,12 @@ const appModules = [
         name: 'Wallet',
         path: '/wallet',
         component: Wallet,
+        icon: PaymentIcon,
+      },
+      {
+        name: 'Commissions',
+        path: '/commissions',
+        component: Commissions,
         icon: PaymentIcon,
       },
     ],

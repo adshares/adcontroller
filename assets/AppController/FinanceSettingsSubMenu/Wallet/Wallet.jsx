@@ -32,7 +32,7 @@ const WalletSettingsCard = () => {
       </Box>
       <CardContent>
         <>
-          <Collapse in={!editMode}>
+          <Collapse in={!editMode} timeout="auto">
             <Box className={`${styles.flex}`}>
               <Typography variant="h6">You wallet address:</Typography>
               <Typography variant="h6" sx={{ ml: 1 }}>
@@ -40,7 +40,7 @@ const WalletSettingsCard = () => {
               </Typography>
             </Box>
           </Collapse>
-          <Collapse in={editMode}>
+          <Collapse in={editMode} timeout="auto">
             <Box className={`${styles.card} ${styles.flex} ${styles.spaceEvenly}`}>
               <TextField
                 sx={{ width: '40%' }}
@@ -115,10 +115,8 @@ const WalletStatusCard = () => {
           </Typography>
         </Box>
         <Typography variant="body2">
-          {
-            // eslint-disable-next-line max-len
-            "It is the total balance of all users accounts. It is an amount that should be at least equal to the sum funds stored on hot andcold ADS wallets. The amount exceeding this value is operator's profit"
-          }
+          It is the total balance of all users accounts. It is an amount that should be at least equal to the sum funds stored on hot
+          andcold ADS wallets. The amount exceeding this value is operator's profit
         </Typography>
       </CardContent>
       <CardContent>
@@ -129,8 +127,8 @@ const WalletStatusCard = () => {
           </Typography>
         </Box>
         <Typography variant="body2">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci doloremque dolorum eligendi harum ipsa molestias quis
-          recusandae. Commodi, debitis dignissimos, dolores enim nisi porro, quos rem repellendus rerum unde veniam.
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
+          It is the total amount of all bonuses that were added to users' accounts but have not been used so far.
         </Typography>
       </CardContent>
     </Card>
@@ -144,12 +142,10 @@ const ColdWalletSettingsCard = () => {
   const [coldWalletAddress, setColdWalletAddress] = useState('');
   return (
     <Card className={styles.card}>
-      <CardContent>
-        <Box className={`${styles.flex} ${styles.spaceBetween}`}>
-          <Typography variant="h5">Cold wallet settings</Typography>
-          <FormControlLabel label="Enable cold wallet" control={<Checkbox checked={isEnabled} onChange={() => setEnabled(!isEnabled)} />} />
-        </Box>
-      </CardContent>
+      <Box className={`${styles.flex} ${styles.spaceBetween}`}>
+        <CardHeader title="Cold wallet settings" />
+        <FormControlLabel label="Enable cold wallet" control={<Checkbox checked={isEnabled} onChange={() => setEnabled(!isEnabled)} />} />
+      </Box>
 
       <Collapse in={isEnabled} timeout="auto">
         <CardContent>
