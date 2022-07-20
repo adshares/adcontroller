@@ -21,61 +21,78 @@ const WalletSettingsCard = () => {
   const [secretKey, setSecretKey] = useState('');
   const [nodeHost, setNodeHost] = useState('');
   const [nodePort, setNodePort] = useState('');
+  const [editMode, setEditMode] = useState(false);
   return (
     <Card className={styles.card}>
-      <CardHeader title="Wallet settings" />
+      <Box className={`${styles.flex} ${styles.spaceBetween}`}>
+        <CardHeader title="Wallet settings" />
+        <Button variant="text" type="button" onClick={() => setEditMode(!editMode)}>
+          {editMode ? 'Cancel' : 'Edit'}
+        </Button>
+      </Box>
       <CardContent>
-        <Box className={`${styles.card} ${styles.flex} ${styles.spaceEvenly}`}>
-          <TextField
-            sx={{ width: '40%' }}
-            // error={!!errorObj.base_adserver_name}
-            // helperText={errorObj.base_adserver_name}
-            size="small"
-            name="walletAddress"
-            label="Wallet address"
-            value={walletAddress}
-            onChange={(e) => setWalletAddress(e.target.value)}
-            type="text"
-          />
+        <>
+          <Collapse in={!editMode}>
+            <Box className={`${styles.flex}`}>
+              <Typography variant="h6">You wallet address:</Typography>
+              <Typography variant="h6" sx={{ ml: 1 }}>
+                0002-0000064A-3695
+              </Typography>
+            </Box>
+          </Collapse>
+          <Collapse in={editMode}>
+            <Box className={`${styles.card} ${styles.flex} ${styles.spaceEvenly}`}>
+              <TextField
+                sx={{ width: '40%' }}
+                // error={!!errorObj.base_adserver_name}
+                // helperText={errorObj.base_adserver_name}
+                size="small"
+                name="walletAddress"
+                label="Wallet address"
+                value={walletAddress}
+                onChange={(e) => setWalletAddress(e.target.value)}
+                type="text"
+              />
 
-          <TextField
-            sx={{ width: '40%' }}
-            // error={!!errorObj.base_adserver_name}
-            // helperText={errorObj.base_adserver_name}
-            size="small"
-            name="secretKey"
-            label="Secret key"
-            value={secretKey}
-            onChange={(e) => setSecretKey(e.target.value)}
-            type="text"
-          />
-        </Box>
-        <Box className={`${styles.flex} ${styles.column} ${styles.alignCenter}`}>
-          <TextField
-            margin="normal"
-            sx={{ width: '40%' }}
-            // error={!!errorObj.base_adserver_name}
-            // helperText={errorObj.base_adserver_name}
-            size="small"
-            name="nodeHost"
-            label="Node host"
-            value={nodeHost}
-            onChange={(e) => setNodeHost(e.target.value)}
-            type="text"
-          />
+              <TextField
+                sx={{ width: '40%' }}
+                // error={!!errorObj.base_adserver_name}
+                // helperText={errorObj.base_adserver_name}
+                size="small"
+                name="secretKey"
+                label="Secret key"
+                value={secretKey}
+                onChange={(e) => setSecretKey(e.target.value)}
+                type="text"
+              />
+            </Box>
+            <Box className={`${styles.card} ${styles.flex} ${styles.spaceEvenly}`}>
+              <TextField
+                sx={{ width: '40%' }}
+                // error={!!errorObj.base_adserver_name}
+                // helperText={errorObj.base_adserver_name}
+                size="small"
+                name="nodeHost"
+                label="Node host"
+                value={nodeHost}
+                onChange={(e) => setNodeHost(e.target.value)}
+                type="text"
+              />
 
-          <TextField
-            sx={{ width: '40%' }}
-            // error={!!errorObj.base_adserver_name}
-            // helperText={errorObj.base_adserver_name}
-            size="small"
-            name="nodePort"
-            label="Node port"
-            value={nodePort}
-            onChange={(e) => setNodePort(e.target.value)}
-            type="text"
-          />
-        </Box>
+              <TextField
+                sx={{ width: '40%' }}
+                // error={!!errorObj.base_adserver_name}
+                // helperText={errorObj.base_adserver_name}
+                size="small"
+                name="nodePort"
+                label="Node port"
+                value={nodePort}
+                onChange={(e) => setNodePort(e.target.value)}
+                type="text"
+              />
+            </Box>
+          </Collapse>
+        </>
       </CardContent>
     </Card>
   );

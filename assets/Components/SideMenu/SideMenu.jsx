@@ -40,7 +40,7 @@ const closedMixin = (theme) => ({
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
   width: drawerWidth,
-  flexShrink: 0,
+  // flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
   ...(open && {
@@ -115,7 +115,7 @@ const getMappedMenuItems = (items) => {
     if (item.children) {
       return (
         <ListItem key={item.name} disablePadding>
-          <Accordion id={item.name} expanded={expanded.includes(item.name)} onChange={handleChange(item.name)} disableGutters square>
+          <Accordion expanded={expanded.includes(item.name)} onChange={handleChange(item.name)} disableGutters square>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <ListItemIcon>{<item.icon />}</ListItemIcon>
               <Typography>{item.name}</Typography>
