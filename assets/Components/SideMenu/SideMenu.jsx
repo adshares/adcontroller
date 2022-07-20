@@ -64,7 +64,7 @@ const Accordion = styled(MuiAccordion, { shouldForwardProp: (prop) => prop !== '
     width: '2px',
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     position: 'absolute',
-    left: '16px',
+    left: '14px',
     borderRadius: '2px',
   },
   flexShrink: 0,
@@ -114,27 +114,24 @@ const getMappedMenuItems = (items) => {
   return items.map((item) => {
     if (item.children) {
       return (
-        <Accordion
-          key={item.name}
-          id={item.name}
-          expanded={expanded.includes(item.name)}
-          onChange={handleChange(item.name)}
-          disableGutters
-          square
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <ListItemIcon>{<item.icon />}</ListItemIcon>
-            <Typography>{item.name}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>{getMappedMenuItems(item.children, navigate)}</AccordionDetails>
-        </Accordion>
+        <ListItem key={item.name} disablePadding>
+          <Accordion id={item.name} expanded={expanded.includes(item.name)} onChange={handleChange(item.name)} disableGutters square>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <ListItemIcon>{<item.icon />}</ListItemIcon>
+              <Typography>{item.name}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <List>{getMappedMenuItems(item.children, navigate)}</List>
+            </AccordionDetails>
+          </Accordion>
+        </ListItem>
       );
     }
     return (
       <ListItem key={item.name} disablePadding onClick={() => navigate(item.path)}>
-        <ListItemButton>
+        <ListItemButton selected={item.path === location.pathname}>
           <ListItemIcon>{<item.icon />}</ListItemIcon>
-          <ListItemText primary={item.name} />
+          <ListItemText primary={item.name} primaryTypographyProps={{ sx: { fontWeight: item.path === location.pathname ? 600 : 400 } }} />
         </ListItemButton>
       </ListItem>
     );
