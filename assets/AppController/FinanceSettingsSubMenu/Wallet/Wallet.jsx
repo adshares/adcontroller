@@ -91,6 +91,11 @@ const WalletSettingsCard = () => {
                 type="text"
               />
             </Box>
+            <Box className={`${styles.card} ${styles.flex} ${styles.flexEnd}`}>
+              <Button variant="contained" type="button">
+                Save
+              </Button>
+            </Box>
           </Collapse>
         </>
       </CardContent>
@@ -209,6 +214,11 @@ const ColdWalletSettingsCard = () => {
               />
             </Box>
           </Box>
+          <Box className={`${styles.card} ${styles.flex} ${styles.flexEnd}`}>
+            <Button variant="contained" type="button">
+              Save
+            </Button>
+          </Box>
         </CardContent>
       </Collapse>
     </Card>
@@ -221,11 +231,6 @@ const Wallet = () => {
       <WalletSettingsCard />
       <WalletStatusCard />
       <ColdWalletSettingsCard />
-      <Box className={`${styles.card} ${styles.flex} ${styles.flexEnd}`}>
-        <Button variant="contained" type="button">
-          Save changes
-        </Button>
-      </Box>
     </>
   );
 };
