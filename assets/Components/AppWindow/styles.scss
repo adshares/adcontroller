@@ -2,10 +2,14 @@
   display: flex;
   justify-content: center;
   padding: 32px 32px 16px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 1140px;
 }
 
 .container {
   display: flex;
   align-items: center;
   flex-direction: column;
+  width: 100%;
 }
