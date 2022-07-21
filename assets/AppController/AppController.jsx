@@ -9,11 +9,16 @@ import Login from '../Components/Login/Login';
 import NotFoundView from '../Components/NotFound/NotFoundView';
 import SideMenu from '../Components/SideMenu/SideMenu';
 import Dashboard from './Dashboard/Dashboard';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PaymentIcon from '@mui/icons-material/Payment';
 import AdPay from './AdPay/AdPay';
 import Wallet from './FinanceSettingsSubMenu/Wallet/Wallet';
 import Commissions from './FinanceSettingsSubMenu/Commissions/Commissions';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PaymentIcon from '@mui/icons-material/Payment';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import PercentIcon from '@mui/icons-material/Percent';
+import SettingsIcon from '@mui/icons-material/Settings';
+import commonStyles from './commonStyles.scss';
+import Base from './GeneralSettingsSubMenu/Base/Base';
 
 const appModules = [
   {
@@ -23,8 +28,21 @@ const appModules = [
     icon: DashboardIcon,
   },
   {
+    name: 'General settings',
+    icon: SettingsIcon,
+    children: [
+      {
+        name: 'Base',
+        path: '/base',
+        component: Base,
+        icon: PaymentIcon,
+      },
+    ],
+  },
+
+  {
     name: 'Finance settings',
-    icon: PaymentIcon,
+    icon: AccountBalanceIcon,
     children: [
       {
         name: 'Wallet',
@@ -36,7 +54,7 @@ const appModules = [
         name: 'Commissions',
         path: '/commissions',
         component: Commissions,
-        icon: PaymentIcon,
+        icon: PercentIcon,
       },
     ],
   },
@@ -88,12 +106,7 @@ export default function AppController() {
         toggleSideMenu={toggleSideMenu}
         showSideMenuIcon
       />
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
+      <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <SideMenu enableSideMenu={!!token} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
         <AppWindow>
           <Routes>
