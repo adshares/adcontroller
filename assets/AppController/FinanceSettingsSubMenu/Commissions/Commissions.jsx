@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   Alert,
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -12,7 +13,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import styles from '../Wallet/styles.scss';
+import commonStyles from '../../commonStyles.scss';
 
 const Commissions = () => {
   const [publisherCommission, setPublisherCommission] = useState(10);
@@ -22,14 +23,14 @@ const Commissions = () => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        <Card sx={{ width: 'calc(50% - 8px)' }}>
+      <Box className={`${commonStyles.flex} ${commonStyles.spaceBetween}`}>
+        <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.column} ${commonStyles.spaceBetween}`}>
           <CardHeader title="Advertiser commission" titleTypographyProps={{ align: 'center' }} />
           <CardContent>
             <Typography variant="body1" align="center">
               Set a commission that will be subtracted from event payments. It will be a part of your income.
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.justifyCenter}`}>
               <Slider
                 step={0.01}
                 valueLabelDisplay="auto"
@@ -37,7 +38,7 @@ const Commissions = () => {
                 value={Number(advertiserCommission) || 0}
                 onChange={(e) => setAdvertiserCommission(e.target.value)}
               />
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
                 <TextField
                   variant="standard"
                   sx={{ width: '5em' }}
@@ -56,14 +57,14 @@ const Commissions = () => {
           </CardContent>
         </Card>
 
-        <Card sx={{ width: 'calc(50% - 8px)' }}>
+        <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.column} ${commonStyles.spaceBetween}`}>
           <CardHeader title="Publisher commission" titleTypographyProps={{ align: 'center' }} />
           <CardContent>
             <Typography variant="body1" align="center">
               Set a commission that will be subtracted from publishers’ revenue from ads that were displayed. It will be a part of your
               income
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.justifyCenter}`}>
               <Slider
                 step={0.01}
                 valueLabelDisplay="auto"
@@ -71,7 +72,7 @@ const Commissions = () => {
                 value={Number(publisherCommission) || 0}
                 onChange={(e) => setPublisherCommission(e.target.value)}
               />
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
                 <TextField
                   variant="standard"
                   sx={{ width: '5em' }}
@@ -90,23 +91,23 @@ const Commissions = () => {
           </CardContent>
         </Card>
       </Box>
-      <Card sx={{ mt: 1, width: '100%' }}>
-        <Box className={`${styles.flex} ${styles.spaceBetween}`}>
+
+      <Card className={`${commonStyles.card}`}>
+        <Box className={`${commonStyles.flex} ${commonStyles.spaceBetween}`}>
           <CardHeader title="Referral settings" />
           <FormControlLabel
             label="Enable refund referral"
             control={<Checkbox checked={isRefundReferralEnabled} onChange={() => setIsRefundReferralEnabled(!isRefundReferralEnabled)} />}
           />
         </Box>
-
         <Collapse in={isRefundReferralEnabled} timeout="auto">
           <CardContent>
-            <Card raised sx={{ width: 'calc(50% - 8px)' }}>
+            <Card raised className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.column} ${commonStyles.spaceBetween}`}>
               <CardContent>
                 <Typography variant="body1" align="center">
                   Set a commission that will refund to the referral program members
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.justifyCenter}`}>
                   <Slider
                     step={0.01}
                     valueLabelDisplay="auto"
@@ -114,7 +115,7 @@ const Commissions = () => {
                     value={Number(refundReferral) || 0}
                     onChange={(e) => setRefundReferral(e.target.value)}
                   />
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
                     <TextField
                       variant="standard"
                       sx={{ width: '5em' }}
@@ -130,14 +131,20 @@ const Commissions = () => {
                     </Typography>
                   </Box>
                 </Box>
-                {publisherCommission < refundReferral && (
+                <Collapse in={publisherCommission < refundReferral} timeout="auto">
                   <Alert severity="warning">Referral refund should not be greater than a publisher commission</Alert>
-                )}
+                </Collapse>
               </CardContent>
             </Card>
           </CardContent>
         </Collapse>
       </Card>
+
+      <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexEnd}`}>
+        <Button variant="contained" type="button">
+          Save
+        </Button>
+      </Box>
     </>
   );
 };

@@ -6,8 +6,16 @@
   }
 }
 
+.halfCard {
+  width: calc(50% - 4px);
+}
+
 .flex {
   display: flex;
+
+  &.flexWrap {
+    flex-wrap: wrap;
+  }
 
   &.column {
     flex-direction: column;
@@ -15,6 +23,10 @@
 
   &.alignCenter {
     align-items: center;
+  }
+
+  &.justifyCenter {
+    justify-content: center;
   }
 
   &.spaceBetween {
