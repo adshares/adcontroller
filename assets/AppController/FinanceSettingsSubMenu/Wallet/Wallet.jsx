@@ -9,11 +9,14 @@ import {
   Collapse,
   FormControlLabel,
   Icon,
+  IconButton,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 import HelpIcon from '@mui/icons-material/Help';
+import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../commonStyles.scss';
 
 function WalletSettingsCard() {
@@ -24,11 +27,11 @@ function WalletSettingsCard() {
   const [editMode, setEditMode] = useState(false);
   return (
     <Card className={commonStyles.card}>
-      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
+      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="Wallet settings" />
-        <Button variant="text" type="button" onClick={() => setEditMode(!editMode)}>
-          {editMode ? 'Cancel' : 'Edit'}
-        </Button>
+        <IconButton type="button" onClick={() => setEditMode(!editMode)}>
+          {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
+        </IconButton>
       </Box>
       <CardContent>
         <>
