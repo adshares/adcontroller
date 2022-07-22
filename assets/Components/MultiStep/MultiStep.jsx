@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-import BreadCrumbs from '../BreadCrumbs/BreadCrumbs';
+import NavStepper from '../NavStepper/NavStepper';
+import { Box } from '@mui/material';
 
 const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
   const [currentInstallerStep, setCurrentInstallerStep] = useState(steps.find((el) => el.path === lastCompletedStep));
@@ -26,8 +27,8 @@ const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
   };
 
   return (
-    <>
-      <BreadCrumbs steps={steps} unlockedSteps={unlockedSteps.length} handleCurrentStep={handleCurrentStep} />
+    <Box>
+      <NavStepper steps={steps} unlockedSteps={unlockedSteps} handleCurrentStep={handleCurrentStep} />
       <Routes>
         {unlockedSteps.map((step) => (
           <Route
@@ -38,7 +39,7 @@ const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
         ))}
         <Route path="*" element={<Navigate to={lastCompletedStep} />} />
       </Routes>
-    </>
+    </Box>
   );
 };
 export default MultiStep;
