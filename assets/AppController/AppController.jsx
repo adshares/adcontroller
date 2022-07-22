@@ -13,12 +13,15 @@ import AdPay from './AdPay/AdPay';
 import Wallet from './FinanceSettingsSubMenu/Wallet/Wallet';
 import Commissions from './FinanceSettingsSubMenu/Commissions/Commissions';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import PaymentIcon from '@mui/icons-material/Payment';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import PercentIcon from '@mui/icons-material/Percent';
 import SettingsIcon from '@mui/icons-material/Settings';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import commonStyles from './commonStyles.scss';
 import Base from './GeneralSettingsSubMenu/Base/Base';
+import License from './GeneralSettingsSubMenu/License/License';
 
 const appModules = [
   {
@@ -35,11 +38,16 @@ const appModules = [
         name: 'Base',
         path: '/base',
         component: Base,
-        icon: PaymentIcon,
+        icon: AlternateEmailIcon,
+      },
+      {
+        name: 'License',
+        path: '/license',
+        component: License,
+        icon: VpnKeyIcon,
       },
     ],
   },
-
   {
     name: 'Finance settings',
     icon: AccountBalanceIcon,
@@ -48,7 +56,7 @@ const appModules = [
         name: 'Wallet',
         path: '/wallet',
         component: Wallet,
-        icon: PaymentIcon,
+        icon: AccountBalanceWalletIcon,
       },
       {
         name: 'Commissions',
@@ -92,7 +100,7 @@ const getAppPages = (appModules, isAuthenticate) => {
   return parseAppModules(appModules);
 };
 
-export default function AppController() {
+function AppController() {
   const [token, setToken] = useState(localStorage.getItem('authToken'));
   const [showSideMenu, toggleSideMenu] = useState(true);
   const pages = getAppPages(appModules, !!token);
@@ -129,3 +137,5 @@ export default function AppController() {
     </>
   );
 }
+
+export default AppController;
