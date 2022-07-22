@@ -17,32 +17,36 @@
     flex-wrap: wrap;
   }
 
-  &.column {
+  &.flexColumn {
     flex-direction: column;
-  }
-
-  &.alignCenter {
-    align-items: center;
   }
 
   &.justifyCenter {
     justify-content: center;
   }
 
-  &.spaceBetween {
+  &.justifySpaceBetween {
     justify-content: space-between;
   }
 
-  &.spaceAround {
+  &.justifySpaceAround {
     justify-content: space-around;
   }
 
-  &.flexEnd {
+  &.justifyFlexEnd {
     justify-content: flex-end;
   }
 
-  &.spaceEvenly {
+  &.justifySpaceEvenly {
     justify-content: space-evenly
+  }
+
+  &.alignCenter {
+    align-items: center;
+  }
+
+  &.alignStart {
+    align-items: flex-start;
   }
 }
 

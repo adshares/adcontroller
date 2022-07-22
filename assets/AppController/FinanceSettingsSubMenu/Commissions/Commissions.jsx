@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import commonStyles from '../../commonStyles.scss';
 
-const Commissions = () => {
+function Commissions() {
   const [publisherCommission, setPublisherCommission] = useState(10);
   const [advertiserCommission, setAdvertiserCommission] = useState(50);
   const [isRefundReferralEnabled, setIsRefundReferralEnabled] = useState(true);
@@ -23,8 +23,8 @@ const Commissions = () => {
 
   return (
     <>
-      <Box className={`${commonStyles.flex} ${commonStyles.spaceBetween}`}>
-        <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.column} ${commonStyles.spaceBetween}`}>
+      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
+        <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
           <CardHeader title="Advertiser commission" titleTypographyProps={{ align: 'center' }} />
           <CardContent>
             <Typography variant="body1" align="center">
@@ -57,7 +57,7 @@ const Commissions = () => {
           </CardContent>
         </Card>
 
-        <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.column} ${commonStyles.spaceBetween}`}>
+        <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
           <CardHeader title="Publisher commission" titleTypographyProps={{ align: 'center' }} />
           <CardContent>
             <Typography variant="body1" align="center">
@@ -93,7 +93,7 @@ const Commissions = () => {
       </Box>
 
       <Card className={`${commonStyles.card}`}>
-        <Box className={`${commonStyles.flex} ${commonStyles.spaceBetween}`}>
+        <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
           <CardHeader title="Referral settings" />
           <FormControlLabel
             label="Enable refund referral"
@@ -102,7 +102,10 @@ const Commissions = () => {
         </Box>
         <Collapse in={isRefundReferralEnabled} timeout="auto">
           <CardContent>
-            <Card raised className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.column} ${commonStyles.spaceBetween}`}>
+            <Card
+              raised
+              className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}
+            >
               <CardContent>
                 <Typography variant="body1" align="center">
                   Set a commission that will refund to the referral program members
@@ -140,13 +143,13 @@ const Commissions = () => {
         </Collapse>
       </Card>
 
-      <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexEnd}`}>
+      <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
         <Button variant="contained" type="button">
           Save
         </Button>
       </Box>
     </>
   );
-};
+}
 
 export default Commissions;

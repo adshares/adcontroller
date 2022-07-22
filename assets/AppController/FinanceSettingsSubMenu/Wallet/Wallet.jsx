@@ -16,7 +16,7 @@ import {
 import HelpIcon from '@mui/icons-material/Help';
 import commonStyles from '../../commonStyles.scss';
 
-const WalletSettingsCard = () => {
+function WalletSettingsCard() {
   const [walletAddress, setWalletAddress] = useState('');
   const [secretKey, setSecretKey] = useState('');
   const [nodeHost, setNodeHost] = useState('');
@@ -24,7 +24,7 @@ const WalletSettingsCard = () => {
   const [editMode, setEditMode] = useState(false);
   return (
     <Card className={commonStyles.card}>
-      <Box className={`${commonStyles.flex} ${commonStyles.spaceBetween}`}>
+      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
         <CardHeader title="Wallet settings" />
         <Button variant="text" type="button" onClick={() => setEditMode(!editMode)}>
           {editMode ? 'Cancel' : 'Edit'}
@@ -41,7 +41,7 @@ const WalletSettingsCard = () => {
             </Box>
           </Collapse>
           <Collapse in={editMode} timeout="auto">
-            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.spaceEvenly}`}>
+            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifySpaceEvenly}`}>
               <TextField
                 sx={{ width: '40%' }}
                 // error={!!errorObj.base_adserver_name}
@@ -66,7 +66,7 @@ const WalletSettingsCard = () => {
                 type="text"
               />
             </Box>
-            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.spaceEvenly}`}>
+            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifySpaceEvenly}`}>
               <TextField
                 sx={{ width: '40%' }}
                 // error={!!errorObj.base_adserver_name}
@@ -91,7 +91,7 @@ const WalletSettingsCard = () => {
                 type="text"
               />
             </Box>
-            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexEnd}`}>
+            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
               <Button variant="contained" type="button">
                 Save
               </Button>
@@ -101,7 +101,7 @@ const WalletSettingsCard = () => {
       </CardContent>
     </Card>
   );
-};
+}
 
 const WalletStatusCard = () => {
   return (
@@ -115,8 +115,8 @@ const WalletStatusCard = () => {
           </Typography>
         </Box>
         <Typography variant="body2">
-          It is the total balance of all users accounts. It is an amount that should be at least equal to the sum funds stored on hot
-          andcold ADS wallets. The amount exceeding this value is operator's profit
+          It is the total balance of all users accounts. It is an amount that should be at least equal to the sum funds stored on hot and
+          cold ADS wallets. The amount exceeding this value is operator's profit
         </Typography>
       </CardContent>
       <CardContent>
@@ -127,7 +127,6 @@ const WalletStatusCard = () => {
           </Typography>
         </Box>
         <Typography variant="body2">
-          {/* eslint-disable-next-line react/no-unescaped-entities */}
           It is the total amount of all bonuses that were added to users' accounts but have not been used so far.
         </Typography>
       </CardContent>
@@ -142,14 +141,14 @@ const ColdWalletSettingsCard = () => {
   const [coldWalletAddress, setColdWalletAddress] = useState('');
   return (
     <Card className={commonStyles.card}>
-      <Box className={`${commonStyles.flex} ${commonStyles.spaceBetween}`}>
+      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
         <CardHeader title="Cold wallet settings" />
         <FormControlLabel label="Enable cold wallet" control={<Checkbox checked={isEnabled} onChange={() => setEnabled(!isEnabled)} />} />
       </Box>
 
       <Collapse in={isEnabled} timeout="auto">
         <CardContent>
-          <Box className={`${commonStyles.flex} ${commonStyles.spaceAround}`}>
+          <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceAround}`}>
             <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
               <Tooltip title={'lorem ipsum'}>
                 <Icon>
@@ -210,7 +209,7 @@ const ColdWalletSettingsCard = () => {
               />
             </Box>
           </Box>
-          <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexEnd}`}>
+          <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
             <Button variant="contained" type="button">
               Save
             </Button>
