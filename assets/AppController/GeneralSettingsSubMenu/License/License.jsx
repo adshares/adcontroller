@@ -1,7 +1,23 @@
 import React, { useState } from 'react';
 import commonStyles from '../../commonStyles.scss';
-import { Box, Button, Card, CardContent, CardHeader, Collapse, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Collapse,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useForm } from '../../../hooks';
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
 
 function License() {
   const [editMode, setEditMode] = useState(false);
@@ -21,10 +37,44 @@ function License() {
           subheaderTypographyProps={{ color: 'error' }}
           subheader={!editMode && 'No license. Configure an open-source license'}
         />
-        <Button variant="text" type="button" onClick={() => setEditMode(!editMode)}>
-          {editMode ? 'Cancel' : 'Edit'}
-        </Button>
+        <IconButton type="button" onClick={() => setEditMode(!editMode)}>
+          {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
+        </IconButton>
       </Box>
+
+      <Collapse in={!editMode} timeout="auto">
+        <CardContent sx={{ width: '50%', marginLeft: 'auto', marginRight: 'auto' }}>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell align="left">License owner</TableCell>
+                <TableCell align="left">Owner</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell align="left">License type</TableCell>
+                <TableCell align="left">COM</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell align="left">License will expire</TableCell>
+                <TableCell align="left">
+                  <Typography variant="body2" color="warning.light">
+                    dd-mm-yyyy
+                  </Typography>{' '}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell align="left">Fixed fee</TableCell>
+                <TableCell align="left">0 ADS</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell align="left">Supply fee / Demand fee</TableCell>
+                <TableCell align="left">1% / 1%</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Collapse>
+
       <Collapse in={editMode} timeout="auto">
         <CardContent>
           <Box
@@ -56,35 +106,6 @@ function License() {
               Save
             </Button>
           </Box>
-        </CardContent>
-      </Collapse>
-
-      <Collapse in={!editMode} timeout="auto">
-        <CardContent sx={{ width: '50%', marginLeft: 'auto', marginRight: 'auto' }}>
-          <Table>
-            <TableBody>
-              <TableRow>
-                <TableCell align="left">License owner</TableCell>
-                <TableCell align="left">Owner</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="left">License type</TableCell>
-                <TableCell align="left">COM</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="left">License will expire</TableCell>
-                <TableCell align="left">dd-mm-yyyy</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="left">Fixed fee</TableCell>
-                <TableCell align="left">0 ADS</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="left">Supply fee / Demand fee</TableCell>
-                <TableCell align="left">1% / 1%</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
         </CardContent>
       </Collapse>
     </Card>
