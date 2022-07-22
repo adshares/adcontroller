@@ -48,5 +48,9 @@
   &.alignStart {
     align-items: flex-start;
   }
+
+  &.alignBaseline {
+    align-items: baseline;
+  }
 }
 
