@@ -1,91 +1,82 @@
-import React, { useEffect, useState } from 'react'
-import apiService from '../../../utils/apiService'
-import {
-  Box,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  TextField
-} from '@mui/material'
-import styles from './styles.scss'
-import WindowCard from '../../../Components/WindowCard/WindowCard'
-import { useForm } from '../../../hooks'
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import apiService from '../../../utils/apiService';
+import styles from './styles.scss';
+import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
+import { useForm } from '../../../hooks';
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
   const { fields, isFormValid, errorObj, onFormChange, setFields, validate } = useForm({
     smtp_host: '',
     smtp_port: '',
     smtp_sender: '',
     smtp_username: '',
-  })
-  const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ smtp_password: '' })
-  const [isDataRequired, setIsDataRequired] = useState(true)
-  const [editMode, setEditMode] = useState(isDataRequired)
-  const [alert, setAlert] = useState({type: 'error', message: '', title: ''})
-  const [isFormWasTouched, setFormTouched] = useState(false)
-  const [isEmptyPassword, setIsEmptyPassword] = useState(false)
-  const [isPasswordWasTouched, setPasswordTouched] = useState(false)
+  });
+  const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ smtp_password: '' });
+  const [isDataRequired, setIsDataRequired] = useState(true);
+  const [editMode, setEditMode] = useState(isDataRequired);
+  const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
+  const [isFormWasTouched, setFormTouched] = useState(false);
+  const [isEmptyPassword, setIsEmptyPassword] = useState(false);
+  const [isPasswordWasTouched, setPasswordTouched] = useState(false);
   useEffect(() => {
-    getStepData()
-  }, [])
+    getStepData();
+  }, []);
 
   const getStepData = async () => {
     try {
-      setIsLoading(true)
-      const response = await apiService.getCurrentStepData(step.path)
-      setIsDataRequired(response.data_required)
-      setEditMode(response.data_required)
+      setIsLoading(true);
+      const response = await apiService.getCurrentStepData(step.path);
+      setIsDataRequired(response.data_required);
+      setEditMode(response.data_required);
       setFields({
         smtp_host: response.smtp_host,
         smtp_port: response.smtp_port,
         smtp_sender: response.smtp_sender,
         smtp_username: response.smtp_username,
-      })
-      setIsEmptyPassword(!response.smtp_password.length)
+      });
+      setIsEmptyPassword(!response.smtp_password.length);
     } catch (err) {
       setAlert({
         type: 'error',
         message: err.data.message,
-        title: err.message
-      })
+        title: err.message,
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSubmit = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       if (!editMode) {
-        handleNextStep(step)
-        return
+        handleNextStep(step);
+        return;
       }
       if (!isFormValid) {
-        return
+        return;
       }
-      if(isFormWasTouched || isPasswordWasTouched) {
-        isPasswordWasTouched ?
-          await apiService.sendStepData(step.path, { ...fields, ...newPassword }) :
-          await apiService.sendStepData(step.path, { ...fields, ...(isDataRequired ? newPassword : {}) })
+      if (isFormWasTouched || isPasswordWasTouched) {
+        isPasswordWasTouched
+          ? await apiService.sendStepData(step.path, { ...fields, ...newPassword })
+          : await apiService.sendStepData(step.path, { ...fields, ...(isDataRequired ? newPassword : {}) });
       }
-      handleNextStep(step)
+      handleNextStep(step);
     } catch (err) {
       setAlert({
         type: 'error',
         message: err.data.message,
-        title: err.message
-      })
+        title: err.message,
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-
-  }
+  };
 
   return (
-    <WindowCard
+    <InstallerStepWrapper
       alert={alert}
       dataLoading={isLoading}
       title="SMTP information"
@@ -95,15 +86,13 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
     >
       {editMode && (
         <>
-          {!isDataRequired &&
+          {!isDataRequired && (
             <Box className={styles.editButtonThumb}>
-              <Button
-                onClick={() => (setEditMode(false))}
-                type="button"
-              >
+              <Button onClick={() => setEditMode(false)} type="button">
                 Cancel
               </Button>
-            </Box>}
+            </Box>
+          )}
           <Box className={styles.container}>
             <Box
               className={styles.formBlock}
@@ -111,7 +100,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               onChange={onFormChange}
               onBlur={(e) => validate(e.target)}
               onClick={() => setFormTouched(true)}
-              onSubmit={e => e.preventDefault()}
+              onSubmit={(e) => e.preventDefault()}
             >
               <TextField
                 className={styles.textField}
@@ -123,6 +112,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 size="small"
                 type="text"
                 fullWidth
+                inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
@@ -134,6 +124,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 size="small"
                 type="text"
                 fullWidth
+                inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
@@ -145,6 +136,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 size="small"
                 type="text"
                 fullWidth
+                inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
@@ -156,18 +148,19 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 size="small"
                 type="text"
                 fullWidth
+                inputProps={{ autoComplete: 'off' }}
               />
             </Box>
             <Box
               className={styles.formBlock}
               component="form"
-              onChange={e => {
-                onPasswordChange(e)
-                if(!e.target.value.includes('↹')){
-                  setPasswordTouched(true)
+              onChange={(e) => {
+                onPasswordChange(e);
+                if (!e.target.value.includes('↹')) {
+                  setPasswordTouched(true);
                 }
               }}
-              onSubmit={e => e.preventDefault()}
+              onSubmit={(e) => e.preventDefault()}
             >
               <TextField
                 className={styles.textField}
@@ -178,6 +171,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 label="New password"
                 type="password"
                 fullWidth
+                inputProps={{ autoComplete: 'off' }}
               />
             </Box>
           </Box>
@@ -187,44 +181,38 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       {!editMode && (
         <>
           <Box className={styles.editButtonThumb}>
-            <Button
-              onClick={() => (setEditMode(true))}
-              type="button"
-            >
+            <Button onClick={() => setEditMode(true)} type="button">
               Edit
             </Button>
           </Box>
-          <InfoTable stepData={fields}/>
+          <InfoTable stepData={fields} />
         </>
       )}
+    </InstallerStepWrapper>
+  );
+};
 
-    </WindowCard>
-  )
-}
+export default SMTP;
 
-export default SMTP
-
-const InfoTable = ({ stepData }) => {
-  return (
-    <Table>
-      <TableBody>
-        <TableRow>
-          <TableCell align="left">SMTP host</TableCell>
-          <TableCell align="left">{stepData.smtp_host}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">SMTP port</TableCell>
-          <TableCell align="left">{stepData.smtp_port}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">SMTP sender</TableCell>
-          <TableCell align="left">{stepData.smtp_sender}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">SMTP username</TableCell>
-          <TableCell align="left">{stepData.smtp_username}</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  )
-}
+const InfoTable = ({ stepData }) => (
+  <Table>
+    <TableBody>
+      <TableRow>
+        <TableCell align="left">SMTP host</TableCell>
+        <TableCell align="left">{stepData.smtp_host}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">SMTP port</TableCell>
+        <TableCell align="left">{stepData.smtp_port}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">SMTP sender</TableCell>
+        <TableCell align="left">{stepData.smtp_sender}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">SMTP username</TableCell>
+        <TableCell align="left">{stepData.smtp_username}</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+);
