@@ -1,6 +1,5 @@
 export function HttpError(message, data) {
-  // eslint-disable-next-line no-proto
-  this.constructor.prototype.__proto__ = Error.prototype;
+  Object.setPrototypeOf(this.constructor.prototype, Error.prototype);
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this, this.constructor);
   }
