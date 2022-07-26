@@ -5,7 +5,7 @@ namespace App\Service;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-class AdserverAdminList
+class AdServerAdminCreator
 {
     private string $adserverHomeDirectory;
 
@@ -14,21 +14,20 @@ class AdserverAdminList
         $this->adserverHomeDirectory = $adserverHomeDirectory;
     }
 
-    public function isAdministratorAccountPresent(): bool
+    public function create(string $email, string $password): void
     {
         $process = new Process(
-            ['php', 'artisan', 'ops:admin:list'],
+            ['php', 'artisan', 'ops:admin:create', '--password', $password],
             $this->adserverHomeDirectory,
+            null,
+            $email,
+            5
         );
-        $process->setTimeout(3);
         $process->run();
         $process->wait();
 
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-
-        $output = trim($process->getOutput());
-        return 'No administrators' !== $output;
     }
 }

@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Configuration;
 use App\Exception\ServiceNotPresent;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdserverAdminList;
+use App\Service\AdServerAdminList;
 use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
 use Psr\Log\LoggerInterface;
@@ -17,7 +17,7 @@ class AppController extends AbstractController
 {
     #[Route('/{match_all}', name: 'app', requirements: ['match_all' => '^(?!api).*$'], priority: -1)]
     public function index(
-        AdserverAdminList $accountList,
+        AdServerAdminList $accountList,
         ConfigurationRepository $repository,
         LoggerInterface $logger,
         ServicePresenceChecker $servicePresenceChecker
