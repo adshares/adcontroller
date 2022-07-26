@@ -1,7 +1,6 @@
 import configuration from '../controllerConfig/configuration';
 import { HttpError } from './errors';
 
-// eslint-disable-next-line default-param-last
 const request = async (url, method, withAuthorization = true, _body) => {
   try {
     const result = await fetch(url, {
@@ -45,22 +44,8 @@ const createUser = async (body) => {
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }
-
-  // const response = await fetch (`${configuration.baseUrl}/api/accounts`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify(userData)
-  // })
-  // const body = await response.json()
-  // return {
-  //   status: response.status,
-  //   message: body.message
-  // }
 };
 
-// eslint-disable-next-line consistent-return
 const login = async (body) => {
   try {
     const response = await request(`${configuration.baseUrl}/api/login`, 'POST', false, body);
@@ -77,7 +62,6 @@ const logout = () => {
   const token = localStorage.getItem('authToken');
   if (token) {
     localStorage.removeItem('authToken');
-    // eslint-disable-next-line no-restricted-globals
     location.reload();
   }
 };

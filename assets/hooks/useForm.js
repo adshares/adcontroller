@@ -58,7 +58,6 @@ export default function useForm(defFields) {
       if (el === 'data_required' || el === 'message' || el === 'code') {
         return;
       }
-      // eslint-disable-next-line consistent-return
       return !fields[el];
     });
     const isFormErrors = Object.keys(errorObj).some((el) => !!errorObj[el]);

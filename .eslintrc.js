@@ -13,9 +13,13 @@ module.exports = {
   },
   plugins: ['prettier', 'react'],
   rules: {
+    'react/jsx-uses-vars': 2,
     'react/no-unescaped-entities': 0,
     'react/prop-types': 0,
-    'react/jsx-wrap-multilines': 'off',
+    'react/jsx-wrap-multilines': 0,
+    'no-use-before-define': [2, { variables: false }],
+    'no-unused-vars': [1, { ignoreRestSiblings: false }],
+    'max-len': [2, { code: 140 }],
     'prettier/prettier': [
       2,
       {
@@ -28,8 +32,5 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
-    'no-use-before-define': [2, { variables: false }],
-    'no-unused-vars': [1, { ignoreRestSiblings: false }],
-    'max-len': [2, { code: 140 }],
   },
 };
