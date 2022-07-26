@@ -44,7 +44,7 @@ function Commissions() {
                   sx={{ width: '5em' }}
                   size="small"
                   name="publisherCommission"
-                  inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01 }}
+                  inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01, autocomplete: 'off' }}
                   value={Number(advertiserCommission).toString()}
                   onChange={(e) => setAdvertiserCommission(Number(e.target.value).toFixed(2))}
                   type="number"
@@ -78,7 +78,7 @@ function Commissions() {
                   sx={{ width: '5em' }}
                   size="small"
                   name="publisherCommission"
-                  inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01 }}
+                  inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01, autocomplete: 'off' }}
                   value={Number(publisherCommission).toString()}
                   onChange={(e) => setPublisherCommission(Number(e.target.value).toFixed(2))}
                   type="number"
@@ -124,7 +124,7 @@ function Commissions() {
                       sx={{ width: '5em' }}
                       size="small"
                       name="publisherCommission"
-                      inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01 }}
+                      inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01, autocomplete: 'off' }}
                       value={Number(refundReferral).toString()}
                       onChange={(e) => setRefundReferral(Number(e.target.value).toFixed(2))}
                       type="number"

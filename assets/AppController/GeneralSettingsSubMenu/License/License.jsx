@@ -95,6 +95,7 @@ function License() {
                 value={fields.licenseKey}
                 type="text"
                 fullWidth
+                inputProps={{ autocomplete: 'off' }}
               />
             </Box>
             <Button disabled={!isFormValid} type="button" variant="contained" onClick={handleGetLicenseClick}>

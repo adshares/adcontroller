@@ -116,6 +116,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
                 value={fields.licenseKey}
                 type="text"
                 fullWidth
+                inputProps={{ autocomplete: 'off' }}
               />
             </Box>
             <Button disabled={!isFormValid} type="button" variant="contained" onClick={handleGetLicenseClick}>

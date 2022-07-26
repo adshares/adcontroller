@@ -20,7 +20,7 @@ export default function useForm(defFields) {
 
   const validate = (target) => {
     const { name, value } = target;
-    const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    const emailRegEx = /^[a-z\d_.-]+@[a-z\d_.-]+\.[a-z\d_.-]+[a-z\d]+$/gi;
     const walletAddressRegEx = /^[0-9A-F]{4}-[0-9A-F]{8}-([0-9A-F]{4})$/g;
     const walletSecretRegEx = /^[0-9A-F]{64}$/g;
     const licenseKeyRegEx = /^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/gi;

@@ -63,6 +63,7 @@ function Base() {
                     value={fields.adserverName}
                     type="text"
                     variant="standard"
+                    inputProps={{ autocomplete: 'off' }}
                   />
                 ) : (
                   fields.adserverName
@@ -97,6 +98,7 @@ function Base() {
                     placeholder="contact@domain.xyz"
                     type="email"
                     variant="standard"
+                    inputProps={{ autocomplete: 'off' }}
                   />
                 ) : (
                   fields.contactEmail
@@ -131,6 +133,7 @@ function Base() {
                     placeholder="support@domain.xyz"
                     type="email"
                     variant="standard"
+                    inputProps={{ autocomplete: 'off' }}
                   />
                 ) : (
                   fields.supportEmail

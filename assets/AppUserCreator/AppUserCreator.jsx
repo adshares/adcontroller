@@ -87,6 +87,7 @@ export const AppUserCreator = () => {
                 name="email"
                 autoComplete="email"
                 onChange={handleInputChange}
+                inputProps={{ autocomplete: 'off' }}
               />
               <TextField
                 variant="standard"
@@ -97,6 +98,7 @@ export const AppUserCreator = () => {
                 label="Password"
                 name="password"
                 onChange={handleInputChange}
+                inputProps={{ autocomplete: 'off' }}
               />
               <Button type="submit" fullWidth variant="contained" color="primary">
                 Create

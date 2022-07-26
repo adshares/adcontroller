@@ -55,6 +55,7 @@ function WalletSettingsCard() {
                 value={walletAddress}
                 onChange={(e) => setWalletAddress(e.target.value)}
                 type="text"
+                inputProps={{ autocomplete: 'off' }}
               />
 
               <TextField
@@ -67,6 +68,7 @@ function WalletSettingsCard() {
                 value={secretKey}
                 onChange={(e) => setSecretKey(e.target.value)}
                 type="text"
+                inputProps={{ autocomplete: 'off' }}
               />
             </Box>
             <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifySpaceEvenly}`}>
@@ -80,6 +82,7 @@ function WalletSettingsCard() {
                 value={nodeHost}
                 onChange={(e) => setNodeHost(e.target.value)}
                 type="text"
+                inputProps={{ autocomplete: 'off' }}
               />
 
               <TextField
@@ -92,6 +95,7 @@ function WalletSettingsCard() {
                 value={nodePort}
                 onChange={(e) => setNodePort(e.target.value)}
                 type="text"
+                inputProps={{ autocomplete: 'off' }}
               />
             </Box>
             <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
@@ -167,6 +171,7 @@ const ColdWalletSettingsCard = () => {
                 value={minThresholdValue}
                 onChange={(e) => setMinThresholdValue(e.target.value)}
                 type="text"
+                inputProps={{ autocomplete: 'off' }}
               />
               <Typography sx={{ ml: 1 }} variant="body1">
                 ADS
@@ -188,6 +193,7 @@ const ColdWalletSettingsCard = () => {
                 value={maxThresholdValue}
                 onChange={(e) => setMaxThresholdValue(e.target.value)}
                 type="text"
+                inputProps={{ autocomplete: 'off' }}
               />
               <Typography sx={{ ml: 1 }} variant="body1">
                 ADS
@@ -209,6 +215,7 @@ const ColdWalletSettingsCard = () => {
                 value={coldWalletAddress}
                 onChange={(e) => setColdWalletAddress(e.target.value)}
                 type="text"
+                inputProps={{ autocomplete: 'off' }}
               />
             </Box>
           </Box>
