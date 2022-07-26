@@ -39,7 +39,7 @@ function WalletSettingsCard() {
             <Box className={`${commonStyles.flex}`}>
               <Typography variant="h6">You wallet address:</Typography>
               <Typography variant="h6" sx={{ ml: 1 }}>
-                {/*TODO: Add service for read wallet address*/}
+                {/*TODO: Add service to read wallet address*/}
                 0002-0000064A-3695
               </Typography>
             </Box>

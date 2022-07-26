@@ -33,7 +33,7 @@ function License() {
     licenseKey: '',
   });
 
-  //TODO: Add service for get license info
+  //TODO: Add service to get license info
   useEffect(() => {
     setLicenseInfo({
       owner: 'Owner',
@@ -45,7 +45,7 @@ function License() {
     });
   }, []);
 
-  //TODO: Add service for get license
+  //TODO: Add service to get license
   const handleGetLicenseClick = () => {
     console.log('handleGetLicenseClick');
   };

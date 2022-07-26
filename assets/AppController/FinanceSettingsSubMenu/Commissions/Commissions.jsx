@@ -21,7 +21,7 @@ function Commissions() {
   const [isRefundReferralEnabled, setIsRefundReferralEnabled] = useState(true);
   const [refundReferral, setRefundReferral] = useState(0);
 
-  //TODO: Add service for read write and change commissions values
+  //TODO: Add service to read write and change commissions values
   useEffect(() => {
     setPublisherCommission(10);
     setAdvertiserCommission(20);

@@ -23,7 +23,7 @@ function Base() {
     ...fields,
   });
 
-  //TODO: Add service for read write and change base values
+  //TODO: Add service to read write and change base values
   useEffect(() => {
     setFields({
       adserverName: 'AdServer',
