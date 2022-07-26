@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Configuration;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdserverAdminCreator;
+use App\Service\AdServerAdminCreator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +21,7 @@ class AccountController extends AbstractController
     #[Route('/api/accounts', name: 'api_accounts_create', methods: ['POST'])]
     public function createAccount(
         Request $request,
-        AdserverAdminCreator $accountCreator,
+        AdServerAdminCreator $accountCreator,
         ConfigurationRepository $repository,
         ValidatorInterface $validator
     ): JsonResponse {

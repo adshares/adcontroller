@@ -26,8 +26,10 @@ class Configuration
     public const DEFAULT_ADUSER_HOST_PREFIX = 'au';
 
     public const BASE_ADPANEL_HOST_PREFIX = 'base_adpanel_host_prefix';
+    public const BASE_ADPANEL_URL = 'base_adpanel_url';
     public const BASE_ADSERVER_HOST_PREFIX = 'base_adserver_host_prefix';
     public const BASE_ADUSER_HOST_PREFIX = 'base_aduser_host_prefix';
+    public const BASE_ADUSER_URL = 'base_aduser_url';
     public const BASE_ADSERVER_NAME = 'base_adserver_name';
     public const BASE_CONTACT_EMAIL = 'base_contact_email';
     public const BASE_DOMAIN = 'base_domain';
