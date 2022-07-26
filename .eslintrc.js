@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['prettier', 'plugin:react/recommended'],
+  extends: ['prettier', 'plugin:react/jsx-runtime'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
