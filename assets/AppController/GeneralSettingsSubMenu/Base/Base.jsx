@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, IconButton, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
 import { useForm } from '../../../hooks';
 import EditIcon from '@mui/icons-material/Edit';
@@ -8,9 +8,9 @@ import commonStyles from '../../commonStyles.scss';
 
 function Base() {
   const { fields, errorObj, onFormChange, setFields } = useForm({
-    adserverName: 'AdServer',
-    contactEmail: 'contact@domain.xyz',
-    supportEmail: 'support@domain.xyz',
+    adserverName: '',
+    contactEmail: '',
+    supportEmail: '',
   });
 
   const [editableField, setEditableField] = useState({
@@ -22,6 +22,20 @@ function Base() {
   const [defFields, setDefFields] = useState({
     ...fields,
   });
+
+  //TODO: Add service for read write and change base values
+  useEffect(() => {
+    setFields({
+      adserverName: 'AdServer',
+      contactEmail: 'contact@domain.xyz',
+      supportEmail: 'support@domain.xyz',
+    });
+    setDefFields({
+      adserverName: 'AdServer',
+      contactEmail: 'contact@domain.xyz',
+      supportEmail: 'support@domain.xyz',
+    });
+  }, []);
 
   const toggleEditableField = (field) => {
     setEditableField((prevState) => ({ ...prevState, [field]: !prevState[field] }));

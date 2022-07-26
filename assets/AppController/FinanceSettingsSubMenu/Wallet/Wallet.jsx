@@ -39,6 +39,7 @@ function WalletSettingsCard() {
             <Box className={`${commonStyles.flex}`}>
               <Typography variant="h6">You wallet address:</Typography>
               <Typography variant="h6" sx={{ ml: 1 }}>
+                {/*TODO: Add service for read wallet address*/}
                 0002-0000064A-3695
               </Typography>
             </Box>
@@ -47,8 +48,6 @@ function WalletSettingsCard() {
             <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifySpaceEvenly}`}>
               <TextField
                 sx={{ width: '40%' }}
-                // error={!!errorObj.base_adserver_name}
-                // helperText={errorObj.base_adserver_name}
                 size="small"
                 name="walletAddress"
                 label="Wallet address"
@@ -60,8 +59,6 @@ function WalletSettingsCard() {
 
               <TextField
                 sx={{ width: '40%' }}
-                // error={!!errorObj.base_adserver_name}
-                // helperText={errorObj.base_adserver_name}
                 size="small"
                 name="secretKey"
                 label="Secret key"
@@ -74,8 +71,6 @@ function WalletSettingsCard() {
             <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifySpaceEvenly}`}>
               <TextField
                 sx={{ width: '40%' }}
-                // error={!!errorObj.base_adserver_name}
-                // helperText={errorObj.base_adserver_name}
                 size="small"
                 name="nodeHost"
                 label="Node host"
@@ -87,8 +82,6 @@ function WalletSettingsCard() {
 
               <TextField
                 sx={{ width: '40%' }}
-                // error={!!errorObj.base_adserver_name}
-                // helperText={errorObj.base_adserver_name}
                 size="small"
                 name="nodePort"
                 label="Node port"
@@ -118,6 +111,7 @@ const WalletStatusCard = () => {
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Total balance:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
+            {/*TODO: Add service for read wallet balance*/}
             999,999 ADS
           </Typography>
         </Box>
@@ -130,6 +124,7 @@ const WalletStatusCard = () => {
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Unused bonuses:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
+            {/*TODO: Add service for read wallet balance*/}
             1,000 ADS
           </Typography>
         </Box>
@@ -157,14 +152,17 @@ const ColdWalletSettingsCard = () => {
         <CardContent>
           <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceAround}`}>
             <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              <Tooltip title={'lorem ipsum'}>
+              <Tooltip
+                title={
+                  // eslint-disable-next-line max-len
+                  'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail'
+                }
+              >
                 <Icon>
                   <HelpIcon color="primary" />
                 </Icon>
               </Tooltip>
               <TextField
-                // error={!!errorObj.base_adserver_name}
-                // helperText={errorObj.base_adserver_name}
                 size="small"
                 name="minThresholdValue"
                 label="Min threshold value"
@@ -179,14 +177,17 @@ const ColdWalletSettingsCard = () => {
             </Box>
 
             <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              <Tooltip title={'lorem ipsum'}>
+              <Tooltip
+                title={
+                  // eslint-disable-next-line max-len
+                  'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
+                }
+              >
                 <Icon>
                   <HelpIcon color="primary" />
                 </Icon>
               </Tooltip>
               <TextField
-                // error={!!errorObj.base_adserver_name}
-                // helperText={errorObj.base_adserver_name}
                 size="small"
                 name="maxThresholdValue"
                 label="Max threshold value"
@@ -201,14 +202,12 @@ const ColdWalletSettingsCard = () => {
             </Box>
 
             <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              <Tooltip title={'lorem ipsum'}>
+              <Tooltip title="Enter your ADS account address">
                 <Icon>
                   <HelpIcon color="primary" />
                 </Icon>
               </Tooltip>
               <TextField
-                // error={!!errorObj.base_adserver_name}
-                // helperText={errorObj.base_adserver_name}
                 size="small"
                 name="coldWalletAddress"
                 label="Cold wallet address"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Box,
@@ -16,10 +16,17 @@ import {
 import commonStyles from '../../commonStyles.scss';
 
 function Commissions() {
-  const [publisherCommission, setPublisherCommission] = useState(10);
-  const [advertiserCommission, setAdvertiserCommission] = useState(50);
+  const [publisherCommission, setPublisherCommission] = useState(0);
+  const [advertiserCommission, setAdvertiserCommission] = useState(0);
   const [isRefundReferralEnabled, setIsRefundReferralEnabled] = useState(true);
-  const [refundReferral, setRefundReferral] = useState(27.83);
+  const [refundReferral, setRefundReferral] = useState(0);
+
+  //TODO: Add service for read write and change commissions values
+  useEffect(() => {
+    setPublisherCommission(10);
+    setAdvertiserCommission(20);
+    setRefundReferral(10.53);
+  }, []);
 
   return (
     <>

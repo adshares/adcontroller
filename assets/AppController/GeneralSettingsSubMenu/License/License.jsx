@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import commonStyles from '../../commonStyles.scss';
 import {
   Box,
@@ -20,11 +20,32 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 
 function License() {
+  const [licenseInfo, setLicenseInfo] = useState({
+    owner: '',
+    type: '',
+    endDate: '',
+    fixedFee: '',
+    supplyFee: '',
+    demandFee: '',
+  });
   const [editMode, setEditMode] = useState(false);
   const { onFormChange, validate, fields, errorObj, isFormValid } = useForm({
     licenseKey: '',
   });
 
+  //TODO: Add service for get license info
+  useEffect(() => {
+    setLicenseInfo({
+      owner: 'Owner',
+      type: 'COM',
+      endDate: 'dd-mm-yyyy',
+      fixedFee: 0,
+      supplyFee: 1,
+      demandFee: 1,
+    });
+  }, []);
+
+  //TODO: Add service for get license
   const handleGetLicenseClick = () => {
     console.log('handleGetLicenseClick');
   };
@@ -35,6 +56,7 @@ function License() {
         <CardHeader
           title="License"
           subheaderTypographyProps={{ color: 'error' }}
+          //TODO: Add condition to display license error communicate
           subheader={!editMode && 'No license. Configure an open-source license'}
         />
         <IconButton type="button" onClick={() => setEditMode(!editMode)}>
@@ -48,27 +70,32 @@ function License() {
             <TableBody>
               <TableRow>
                 <TableCell align="left">License owner</TableCell>
-                <TableCell align="left">Owner</TableCell>
+
+                <TableCell align="left">{licenseInfo.owner}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell align="left">License type</TableCell>
-                <TableCell align="left">COM</TableCell>
+                <TableCell align="left">{licenseInfo.type}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell align="left">License will expire</TableCell>
                 <TableCell align="left">
+                  {/*TODO: Add condition to change warning color*/}
                   <Typography variant="body2" color="warning.light">
-                    dd-mm-yyyy
-                  </Typography>{' '}
+                    {licenseInfo.endDate}
+                  </Typography>
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell align="left">Fixed fee</TableCell>
-                <TableCell align="left">0 ADS</TableCell>
+                <TableCell align="left">{licenseInfo.fixedFee} ADS</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell align="left">Supply fee / Demand fee</TableCell>
-                <TableCell align="left">1% / 1%</TableCell>
+
+                <TableCell align="left">
+                  {licenseInfo.supplyFee}% / {licenseInfo.demandFee}%
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
