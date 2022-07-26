@@ -141,7 +141,7 @@ function Base({ handleNextStep, step }) {
                 value={fields.base_adserver_name}
                 type="text"
                 required
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
@@ -153,7 +153,7 @@ function Base({ handleNextStep, step }) {
                 value={fields.base_domain}
                 type="text"
                 required
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
             </Box>
             <Box className={styles.formBlock}>
@@ -168,7 +168,7 @@ function Base({ handleNextStep, step }) {
                 type="email"
                 placeholder="support@domain.xyz"
                 required
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
@@ -181,7 +181,7 @@ function Base({ handleNextStep, step }) {
                 type="email"
                 placeholder="tech@domain.xyz"
                 required
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
             </Box>
           </Box>
@@ -211,7 +211,7 @@ function Base({ handleNextStep, step }) {
                   label="AdPanel host prefix"
                   value={advancedFields.base_adpanel_host_prefix}
                   type="text"
-                  inputProps={{ autocomplete: 'off' }}
+                  inputProps={{ autoComplete: 'off' }}
                 />
                 <TextField
                   className={styles.textField}
@@ -220,7 +220,7 @@ function Base({ handleNextStep, step }) {
                   label="AdUser host prefix"
                   value={advancedFields.base_aduser_host_prefix}
                   type="text"
-                  inputProps={{ autocomplete: 'off' }}
+                  inputProps={{ autoComplete: 'off' }}
                 />
                 <TextField
                   className={styles.textField}
@@ -229,7 +229,7 @@ function Base({ handleNextStep, step }) {
                   label="AdServer host prefix"
                   value={advancedFields.base_adserver_host_prefix}
                   type="text"
-                  inputProps={{ autocomplete: 'off' }}
+                  inputProps={{ autoComplete: 'off' }}
                 />
               </Box>
             </Collapse>

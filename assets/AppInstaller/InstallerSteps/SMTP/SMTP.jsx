@@ -112,7 +112,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 size="small"
                 type="text"
                 fullWidth
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
@@ -124,7 +124,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 size="small"
                 type="text"
                 fullWidth
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
@@ -136,7 +136,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 size="small"
                 type="text"
                 fullWidth
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
@@ -148,7 +148,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 size="small"
                 type="text"
                 fullWidth
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
             </Box>
             <Box
@@ -171,7 +171,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
                 label="New password"
                 type="password"
                 fullWidth
-                inputProps={{ autocomplete: 'off' }}
+                inputProps={{ autoComplete: 'off' }}
               />
             </Box>
           </Box>

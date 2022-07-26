@@ -162,7 +162,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
               name="wallet_address"
               label="Wallet address"
               type="text"
-              inputProps={{ autocomplete: 'off' }}
+              inputProps={{ autoComplete: 'off' }}
               required
             />
             <TextField
@@ -174,7 +174,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
               name="wallet_secret_key"
               label="Wallet private key"
               type="password"
-              inputProps={{ autocomplete: 'off' }}
+              inputProps={{ autoComplete: 'off' }}
               required
             />
           </Box>
@@ -201,7 +201,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
                   name="wallet_node_host"
                   label="Wallet node host"
                   fullWidth
-                  inputProps={{ autocomplete: 'off' }}
+                  inputProps={{ autoComplete: 'off' }}
                 />
                 <TextField
                   error={!!nodeHostError.wallet_node_port}
@@ -213,7 +213,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
                   name="wallet_node_port"
                   label="Wallet node port"
                   fullWidth
-                  inputProps={{ autocomplete: 'off' }}
+                  inputProps={{ autoComplete: 'off' }}
                 />
               </>
             )}

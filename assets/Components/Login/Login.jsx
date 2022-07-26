@@ -84,9 +84,8 @@ export default function Login({ setToken }) {
             type="email"
             label="Email Address"
             name="email"
-            autoComplete="email"
             onChange={handleInputChange}
-            inputProps={{ autocomplete: 'off' }}
+            inputProps={{ autoComplete: 'off' }}
           />
           <TextField
             variant="standard"
@@ -97,7 +96,7 @@ export default function Login({ setToken }) {
             label="Password"
             name="password"
             onChange={handleInputChange}
-            inputProps={{ autocomplete: 'off' }}
+            inputProps={{ autoComplete: 'off' }}
           />
           <Button type="submit" fullWidth variant="contained" color="primary">
             Login
