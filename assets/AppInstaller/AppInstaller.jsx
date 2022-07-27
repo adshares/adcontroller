@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Alert } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import apiService from '../utils/apiService';
 import Base from './InstallerSteps/Base/Base';
 import Login from '../Components/Login/Login';
@@ -18,6 +18,7 @@ import SMTP from './InstallerSteps/SMTP/SMTP';
 import Status from './InstallerSteps/Status/Status';
 import InstallerStepWrapper from '../Components/InstallerStepWrapper/InstallerStepWrapper';
 import Spinner from '../Components/Spinner/Spinner';
+import commonStyles from '../AppController/commonStyles.scss';
 
 const installerSteps = [
   {
@@ -92,36 +93,38 @@ export default function AppInstaller() {
   return (
     <>
       <MenuAppBar showProtectedOptions={!!token} showIcon={!!token} setToken={setToken} />
-      <AppWindow>
-        <Routes>
-          <Route
-            path="login"
-            element={
-              <PublicRoute restricted isLoggedIn={!!token} redirectTo="/steps">
-                <Login setToken={setToken} />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="steps/*"
-            element={
-              <PrivateRoute isLoggedIn={!!token}>
-                {currentStep ? (
-                  <MultiStep currentStep={currentStep} steps={installerSteps} />
-                ) : alert.message ? (
-                  <InstallerStepWrapper disabledNext hideBackButton hideNextButton>
-                    <Alert severity={alert.type}>{`${alert.title}: ${alert.message}`}</Alert>
-                  </InstallerStepWrapper>
-                ) : (
-                  <Spinner />
-                )}
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<NotFoundView />} />
-          <Route path="/" element={<Navigate to="steps" />} />
-        </Routes>
-      </AppWindow>
+      <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <AppWindow>
+          <Routes>
+            <Route
+              path="login"
+              element={
+                <PublicRoute restricted isLoggedIn={!!token} redirectTo="/steps">
+                  <Login setToken={setToken} />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="steps/*"
+              element={
+                <PrivateRoute isLoggedIn={!!token}>
+                  {currentStep ? (
+                    <MultiStep currentStep={currentStep} steps={installerSteps} />
+                  ) : alert.message ? (
+                    <InstallerStepWrapper disabledNext hideBackButton hideNextButton>
+                      <Alert severity={alert.type}>{`${alert.title}: ${alert.message}`}</Alert>
+                    </InstallerStepWrapper>
+                  ) : (
+                    <Spinner />
+                  )}
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<NotFoundView />} />
+            <Route path="/" element={<Navigate to="steps" />} />
+          </Routes>
+        </AppWindow>
+      </Box>
     </>
   );
 }
