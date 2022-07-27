@@ -10,7 +10,7 @@ function Base({ handleNextStep, step }) {
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
     base_adserver_name: '',
-    base_contact_email: '',
+    base_technical_email: '',
     base_domain: '',
     base_support_email: '',
   });
@@ -42,7 +42,7 @@ function Base({ handleNextStep, step }) {
       const response = await apiService.getCurrentStepData(step.path);
       const {
         base_adserver_name,
-        base_contact_email,
+        base_technical_email,
         base_domain,
         base_support_email,
         base_adpanel_host_prefix,
@@ -54,7 +54,7 @@ function Base({ handleNextStep, step }) {
         ...fields,
         ...{
           base_adserver_name: base_adserver_name || '',
-          base_contact_email: base_contact_email || '',
+          base_technical_email: base_technical_email || '',
           base_domain: base_domain || '',
           base_support_email: base_support_email || '',
         },
@@ -172,12 +172,12 @@ function Base({ handleNextStep, step }) {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_contact_email}
-                helperText={errorObj.base_contact_email}
+                error={!!errorObj.base_technical_email}
+                helperText={errorObj.base_technical_email}
                 size="small"
-                name="base_contact_email"
-                label="Email to contact"
-                value={fields.base_contact_email}
+                name="base_technical_email"
+                label="AdServer's operator email"
+                value={fields.base_technical_email}
                 type="email"
                 placeholder="tech@domain.xyz"
                 required
@@ -268,8 +268,8 @@ function InfoTable({ stepData }) {
           <TableCell align="left">{stepData.base_support_email}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Email to contact</TableCell>
-          <TableCell align="left">{stepData.base_contact_email}</TableCell>
+          <TableCell align="left">AdServer's operator email</TableCell>
+          <TableCell align="left">{stepData.base_technical_email}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell align="left">AdPanel host prefix</TableCell>
