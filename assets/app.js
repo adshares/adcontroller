@@ -1,17 +1,16 @@
 import './styles/app.scss';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import AppController from './AppController/AppController';
-import { BrowserRouter } from 'react-router-dom';
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import { Alert, CssBaseline, ThemeProvider } from '@mui/material';
 import theme from './utils/theme';
+import AppWindow from './Components/AppWindow/AppWindow';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <BrowserRouter basename={process.env.PUBLIC_URL}>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppController />
-    </ThemeProvider>
-  </BrowserRouter>,
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <AppWindow>
+      <Alert severity="success">Account was successfully created</Alert>
+    </AppWindow>
+  </ThemeProvider>,
 );
