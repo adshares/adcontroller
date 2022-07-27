@@ -60,7 +60,7 @@ export default function Login({ setToken }) {
 
   return (
     <Card className={styles.container}>
-      <CardContent className={styles.logo}>
+      <CardContent>
         <Box
           component="img"
           src={logo}
