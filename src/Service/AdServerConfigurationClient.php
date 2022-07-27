@@ -8,6 +8,7 @@ use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -17,7 +18,9 @@ class AdServerConfigurationClient
 {
     private const KEY_MAP = [
         Configuration::BASE_ADPANEL_URL => self::ADPANEL_URL,
+        Configuration::BASE_ADSERVER_URL => self::URL,
         Configuration::BASE_ADUSER_URL => self::ADUSER_BASE_URL,
+        Configuration::BASE_ADUSER_INTERNAL_URL => self::ADUSER_INTERNAL_URL,
         Configuration::BASE_ADSERVER_NAME => self::ADSERVER_NAME,
         Configuration::BASE_SUPPORT_EMAIL => self::SUPPORT_EMAIL,
         Configuration::BASE_TECHNICAL_EMAIL => self::TECHNICAL_EMAIL,
@@ -150,6 +153,7 @@ class AdServerConfigurationClient
     private const UPLOAD_LIMIT_MODEL = 'upload-limit-model';
     private const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
     private const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
+    private const URL = 'url';
 
     private const SECRETS = [
         self::ADSHARES_LICENSE_KEY,
@@ -252,6 +256,10 @@ class AdServerConfigurationClient
         }
 
         if (Response::HTTP_OK !== $statusCode) {
+            if (Response::HTTP_UNPROCESSABLE_ENTITY === $statusCode) {
+                $message = json_decode($response->getContent(false))->message;
+                throw new UnprocessableEntityHttpException($message);
+            }
             throw new UnexpectedResponseException(
                 sprintf('AdServer responded with an invalid code (%d)', $statusCode)
             );

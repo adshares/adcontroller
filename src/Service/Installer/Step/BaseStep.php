@@ -13,7 +13,8 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class BaseStep implements InstallerStep
 {
-    private const DEFAULT_ENV_ADSHARES_APP_NAME = 'Adshares AdServer';
+    private const DEFAULT_ADSERVER_NAME = 'AdServer';
+    private const DEFAULT_MAIL_ENDING = '@example.com';
     private const FIELDS = [
         Configuration::BASE_ADPANEL_HOST_PREFIX,
         Configuration::BASE_ADSERVER_HOST_PREFIX,
@@ -46,7 +47,6 @@ class BaseStep implements InstallerStep
         }
 
         $this->validate($content);
-
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
 
         $domain = $content[Configuration::BASE_DOMAIN];
@@ -62,6 +62,9 @@ class BaseStep implements InstallerStep
         $this->adServerConfigurationClient->store(
             [
                 Configuration::BASE_ADPANEL_URL => $adPanelUrl,
+                Configuration::BASE_ADSERVER_NAME => $content[Configuration::BASE_ADSERVER_NAME],
+                Configuration::BASE_ADSERVER_URL => $adServerUrl,
+                Configuration::BASE_ADUSER_INTERNAL_URL => $adUserInternalUrl,
                 Configuration::BASE_ADUSER_URL => $adUserUrl,
                 Configuration::BASE_SUPPORT_EMAIL => $content[Configuration::BASE_SUPPORT_EMAIL],
                 Configuration::BASE_TECHNICAL_EMAIL => $content[Configuration::BASE_TECHNICAL_EMAIL],
@@ -70,16 +73,9 @@ class BaseStep implements InstallerStep
 
         $envEditor->set(
             [
-                EnvEditor::ADSERVER_ADPANEL_URL => $adPanelUrl,
-                EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL => $content[Configuration::BASE_TECHNICAL_EMAIL],
-                EnvEditor::ADSERVER_ADUSER_BASE_URL => $adUserUrl,
-                EnvEditor::ADSERVER_ADUSER_INTERNAL_URL => $adUserInternalUrl,
                 EnvEditor::ADSERVER_APP_HOST => $adServerHost,
                 EnvEditor::ADSERVER_APP_NAME => $content[Configuration::BASE_ADSERVER_NAME],
                 EnvEditor::ADSERVER_APP_URL => $adServerUrl,
-                EnvEditor::ADSERVER_MAIL_FROM_ADDRESS => $content[Configuration::BASE_SUPPORT_EMAIL],
-                EnvEditor::ADSERVER_MAIN_JS_BASE_URL => $adServerUrl,
-                EnvEditor::ADSERVER_SERVE_BASE_URL => $adServerUrl,
             ]
         );
 
@@ -88,6 +84,7 @@ class BaseStep implements InstallerStep
             $data[$field] = $content[$field];
         }
         $data[Configuration::BASE_ADPANEL_URL] = $adPanelUrl;
+        $data[Configuration::BASE_ADUSER_INTERNAL_URL] = $adUserInternalUrl;
         $data[Configuration::BASE_ADUSER_URL] = $adUserUrl;
         $data[Configuration::INSTALLER_STEP] = $this->getName();
         $this->repository->insertOrUpdate($data);
@@ -143,20 +140,9 @@ class BaseStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+        $configuration = $this->adServerConfigurationClient->fetch();
 
-        $values = $envEditor->get(
-            [
-                EnvEditor::ADSERVER_ADPANEL_URL,
-                EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL,
-                EnvEditor::ADSERVER_ADUSER_BASE_URL,
-                EnvEditor::ADSERVER_APP_NAME,
-                EnvEditor::ADSERVER_APP_URL,
-                EnvEditor::ADSERVER_MAIL_FROM_ADDRESS,
-            ]
-        );
-
-        $adServerUrl = $values[EnvEditor::ADSERVER_APP_URL] ?? 'https://app.localhost';
+        $adServerUrl = $configuration[Configuration::BASE_ADSERVER_URL] ?? 'https://app.localhost';
 
         $data = [
             Configuration::BASE_ADPANEL_HOST_PREFIX => Configuration::DEFAULT_ADPANEL_HOST_PREFIX,
@@ -165,8 +151,8 @@ class BaseStep implements InstallerStep
         ];
 
         if (!str_ends_with($adServerUrl, 'localhost')) {
-            $adPanelUrl = $values[EnvEditor::ADSERVER_ADPANEL_URL] ?? 'https://panel.localhost';
-            $adUserUrl = $values[EnvEditor::ADSERVER_ADUSER_BASE_URL] ?? 'https://au.localhost';
+            $adPanelUrl = $configuration[Configuration::BASE_ADPANEL_URL] ?? 'https://panel.localhost';
+            $adUserUrl = $configuration[Configuration::BASE_ADUSER_URL] ?? 'https://au.localhost';
             $parsed = ServiceUrlParser::parseUrls($adPanelUrl, $adServerUrl, $adUserUrl);
             if (null !== $parsed) {
                 $data = $parsed;
@@ -174,24 +160,24 @@ class BaseStep implements InstallerStep
         }
 
         if (
-            isset($values[EnvEditor::ADSERVER_APP_NAME])
-            && self::DEFAULT_ENV_ADSHARES_APP_NAME !== $values[EnvEditor::ADSERVER_APP_NAME]
+            isset($configuration[Configuration::BASE_ADSERVER_NAME])
+            && self::DEFAULT_ADSERVER_NAME !== $configuration[Configuration::BASE_ADSERVER_NAME]
         ) {
-            $data[Configuration::BASE_ADSERVER_NAME] = $values[EnvEditor::ADSERVER_APP_NAME];
+            $data[Configuration::BASE_ADSERVER_NAME] = $configuration[Configuration::BASE_ADSERVER_NAME];
         }
 
         if (
-            isset($values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL])
-            && !str_ends_with($values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL], '@localhost')
+            isset($configuration[Configuration::BASE_TECHNICAL_EMAIL])
+            && !str_ends_with($configuration[Configuration::BASE_TECHNICAL_EMAIL], self::DEFAULT_MAIL_ENDING)
         ) {
-            $data[Configuration::BASE_TECHNICAL_EMAIL] = $values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL];
+            $data[Configuration::BASE_TECHNICAL_EMAIL] = $configuration[Configuration::BASE_TECHNICAL_EMAIL];
         }
 
         if (
-            isset($values[EnvEditor::ADSERVER_MAIL_FROM_ADDRESS])
-            && !str_ends_with($values[EnvEditor::ADSERVER_MAIL_FROM_ADDRESS], '@localhost')
+            isset($configuration[Configuration::BASE_SUPPORT_EMAIL])
+            && !str_ends_with($configuration[Configuration::BASE_SUPPORT_EMAIL], self::DEFAULT_MAIL_ENDING)
         ) {
-            $data[Configuration::BASE_SUPPORT_EMAIL] = $values[EnvEditor::ADSERVER_MAIL_FROM_ADDRESS];
+            $data[Configuration::BASE_SUPPORT_EMAIL] = $configuration[Configuration::BASE_SUPPORT_EMAIL];
         }
 
         $data[Configuration::COMMON_DATA_REQUIRED] = $this->isDataRequired();
@@ -201,28 +187,25 @@ class BaseStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+        $values = $this->adServerConfigurationClient->fetch();
+        $requiredKeys = [
+            Configuration::BASE_ADPANEL_URL,
+            Configuration::BASE_ADSERVER_NAME,
+            Configuration::BASE_ADSERVER_URL,
+            Configuration::BASE_ADUSER_URL,
+            Configuration::BASE_SUPPORT_EMAIL,
+            Configuration::BASE_TECHNICAL_EMAIL,
+        ];
 
-        $values = $envEditor->get(
-            [
-                EnvEditor::ADSERVER_ADPANEL_URL,
-                EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL,
-                EnvEditor::ADSERVER_ADUSER_BASE_URL,
-                EnvEditor::ADSERVER_APP_NAME,
-                EnvEditor::ADSERVER_APP_URL,
-                EnvEditor::ADSERVER_MAIL_FROM_ADDRESS,
-            ]
-        );
-
-        foreach ($values as $value) {
-            if (!$value) {
+        foreach ($requiredKeys as $requiredKey) {
+            if (!isset($values[$requiredKey])) {
                 return true;
             }
         }
 
-        return self::DEFAULT_ENV_ADSHARES_APP_NAME === $values[EnvEditor::ADSERVER_APP_NAME]
-            || str_ends_with($values[EnvEditor::ADSERVER_APP_URL], 'localhost')
-            || str_ends_with($values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL], '@localhost')
-            || str_ends_with($values[EnvEditor::ADSERVER_MAIL_FROM_ADDRESS], '@localhost');
+        return self::DEFAULT_ADSERVER_NAME === $values[Configuration::BASE_ADSERVER_NAME]
+            || str_ends_with($values[Configuration::BASE_ADSERVER_URL], 'localhost')
+            || str_ends_with($values[Configuration::BASE_TECHNICAL_EMAIL], self::DEFAULT_MAIL_ENDING)
+            || str_ends_with($values[Configuration::BASE_SUPPORT_EMAIL], self::DEFAULT_MAIL_ENDING);
     }
 }

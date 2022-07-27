@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Configuration;
+use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\Installer\Step\BaseStep;
 use App\Service\Installer\Step\ClassifierStep;
@@ -18,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -70,7 +72,11 @@ class InstallerController extends AbstractController
             throw new UnprocessableEntityHttpException(sprintf('Unsupported step (%s)', $step));
         }
 
-        $service->process($content);
+        try {
+            $service->process($content);
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $exception->getMessage());
+        }
 
         return $this->json(['message' => 'Data saved successfully']);
     }
