@@ -5,12 +5,10 @@ namespace App\Service\Installer\Step;
 use App\Entity\Configuration;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
-use App\Service\EnvEditor;
+use App\Service\AdServerConfigurationClient;
 use App\Service\LicenseDecoder;
 use App\Service\LicenseServerClient;
-use App\Service\ServicePresenceChecker;
 use App\ValueObject\License;
-use App\ValueObject\Module;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -20,21 +18,21 @@ class LicenseStep implements InstallerStep
 {
     private const LICENSE_KEY_PATTERN = '/^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/i';
 
+    private AdServerConfigurationClient $adServerConfigurationClient;
     private ConfigurationRepository $repository;
     private LicenseServerClient $licenseServerClient;
     private LoggerInterface $logger;
-    private ServicePresenceChecker $servicePresenceChecker;
 
     public function __construct(
+        AdServerConfigurationClient $adServerConfigurationClient,
         ConfigurationRepository $repository,
         LicenseServerClient $licenseServerClient,
-        LoggerInterface $logger,
-        ServicePresenceChecker $servicePresenceChecker
+        LoggerInterface $logger
     ) {
+        $this->adServerConfigurationClient = $adServerConfigurationClient;
         $this->repository = $repository;
         $this->licenseServerClient = $licenseServerClient;
         $this->logger = $logger;
-        $this->servicePresenceChecker = $servicePresenceChecker;
     }
 
     public function process(array $content): void
@@ -51,8 +49,9 @@ class LicenseStep implements InstallerStep
         $this->validate($content);
 
         $licenseKey = $content[Configuration::LICENSE_KEY];
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $envEditor->setOne(EnvEditor::ADSERVER_ADSHARES_LICENSE_KEY, $licenseKey);
+        $this->adServerConfigurationClient->store([
+            Configuration::LICENSE_KEY => $licenseKey,
+        ]);
 
         $this->repository->insertOrUpdate(
             [
@@ -86,8 +85,7 @@ class LicenseStep implements InstallerStep
             Configuration::COMMON_DATA_REQUIRED => true,
         ];
 
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $licenseKey = $envEditor->getOne(EnvEditor::ADSERVER_ADSHARES_LICENSE_KEY);
+        $licenseKey = $this->repository->fetchValueByName(Configuration::LICENSE_KEY);
 
         if (null !== ($license = $this->getLicenseByKey($licenseKey))) {
             $data[Configuration::COMMON_DATA_REQUIRED] = false;
@@ -99,8 +97,7 @@ class LicenseStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $licenseKey = $envEditor->getOne(EnvEditor::ADSERVER_ADSHARES_LICENSE_KEY);
+        $licenseKey = $this->repository->fetchValueByName(Configuration::LICENSE_KEY);
 
         return null === $this->getLicenseByKey($licenseKey);
     }
@@ -130,6 +127,7 @@ class LicenseStep implements InstallerStep
         }
 
         if (!$license->isValid()) {
+            $this->logger->debug('License is not valid');
             return null;
         }
 
@@ -166,8 +164,11 @@ class LicenseStep implements InstallerStep
             throw new UnprocessableEntityHttpException('License server is not accessible');
         }
 
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $envEditor->setOne(EnvEditor::ADSERVER_ADSHARES_LICENSE_KEY, $licenseKey);
+        $this->adServerConfigurationClient->store(
+            [
+                Configuration::LICENSE_KEY => $licenseKey,
+            ]
+        );
 
         $this->repository->insertOrUpdate(
             [
