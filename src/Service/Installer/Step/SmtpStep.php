@@ -43,8 +43,8 @@ class SmtpStep implements InstallerStep
             return;
         }
 
-        if (null === ($sender = $this->repository->fetchValueByName(Configuration::BASE_CONTACT_EMAIL))) {
-            throw new UnprocessableEntityHttpException('Contact e-mail must be set');
+        if (null === ($sender = $this->repository->fetchValueByName(Configuration::BASE_TECHNICAL_EMAIL))) {
+            throw new UnprocessableEntityHttpException('Technical e-mail must be set');
         }
         if (null === ($receiver = $this->repository->fetchValueByName(Configuration::BASE_SUPPORT_EMAIL))) {
             throw new UnprocessableEntityHttpException('Support e-mail must be set');
@@ -141,14 +141,14 @@ class SmtpStep implements InstallerStep
     {
         $localData = $this->repository->fetchValuesByNames([
             Configuration::BASE_ADSERVER_NAME,
-            Configuration::BASE_CONTACT_EMAIL,
             Configuration::BASE_SUPPORT_EMAIL,
+            Configuration::BASE_TECHNICAL_EMAIL,
         ]);
 
         if (
             !isset($localData[Configuration::BASE_ADSERVER_NAME])
-            || !isset($localData[Configuration::BASE_CONTACT_EMAIL])
             || !isset($localData[Configuration::BASE_SUPPORT_EMAIL])
+            || !isset($localData[Configuration::BASE_TECHNICAL_EMAIL])
         ) {
             throw new UnprocessableEntityHttpException('Base step must be completed');
         }
