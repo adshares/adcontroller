@@ -20,7 +20,7 @@ final class Version20220714125437 extends AbstractMigration
 CREATE TABLE configuration (
   id INT AUTO_INCREMENT NOT NULL,
   name VARCHAR(255),
-  value VARCHAR(255),
+  value TEXT,
   created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_NAME (name),
