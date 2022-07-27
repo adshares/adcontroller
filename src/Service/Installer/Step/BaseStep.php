@@ -4,8 +4,10 @@ namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
 use App\Repository\ConfigurationRepository;
+use App\Service\AdServerConfigurationClient;
 use App\Service\EnvEditor;
 use App\Service\ServicePresenceChecker;
+use App\Service\ServiceUrlParser;
 use App\ValueObject\Module;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
@@ -17,16 +19,21 @@ class BaseStep implements InstallerStep
         Configuration::BASE_ADSERVER_HOST_PREFIX,
         Configuration::BASE_ADSERVER_NAME,
         Configuration::BASE_ADUSER_HOST_PREFIX,
-        Configuration::BASE_CONTACT_EMAIL,
         Configuration::BASE_DOMAIN,
         Configuration::BASE_SUPPORT_EMAIL,
+        Configuration::BASE_TECHNICAL_EMAIL,
     ];
 
+    private AdServerConfigurationClient $adServerConfigurationClient;
     private ConfigurationRepository $repository;
     private ServicePresenceChecker $servicePresenceChecker;
 
-    public function __construct(ConfigurationRepository $repository, ServicePresenceChecker $servicePresenceChecker)
-    {
+    public function __construct(
+        AdServerConfigurationClient $adServerConfigurationClient,
+        ConfigurationRepository $repository,
+        ServicePresenceChecker $servicePresenceChecker
+    ) {
+        $this->adServerConfigurationClient = $adServerConfigurationClient;
         $this->repository = $repository;
         $this->servicePresenceChecker = $servicePresenceChecker;
     }
@@ -47,23 +54,32 @@ class BaseStep implements InstallerStep
         $adPanelHost = self::getPrefixedHost($domain, $content[Configuration::BASE_ADPANEL_HOST_PREFIX]);
         $adUserHost = self::getPrefixedHost($domain, $content[Configuration::BASE_ADUSER_HOST_PREFIX]);
         $protocol = 'https://';
-        $adserverUrl = $protocol . $adServerHost;
-        $adpanelUrl = $protocol . $adPanelHost;
-        $aduserUrl = $protocol . $adUserHost;
-        $aduserInternalUrl = 'http://' . $adUserHost;
+        $adServerUrl = $protocol . $adServerHost;
+        $adPanelUrl = $protocol . $adPanelHost;
+        $adUserUrl = $protocol . $adUserHost;
+        $adUserInternalUrl = 'http://' . $adUserHost;
+
+        $this->adServerConfigurationClient->store(
+            [
+                Configuration::BASE_ADPANEL_URL => $adPanelUrl,
+                Configuration::BASE_ADUSER_URL => $adUserUrl,
+                Configuration::BASE_SUPPORT_EMAIL => $content[Configuration::BASE_SUPPORT_EMAIL],
+                Configuration::BASE_TECHNICAL_EMAIL => $content[Configuration::BASE_TECHNICAL_EMAIL],
+            ]
+        );
 
         $envEditor->set(
             [
-                EnvEditor::ADSERVER_ADPANEL_URL => $adpanelUrl,
-                EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL => $content[Configuration::BASE_CONTACT_EMAIL],
-                EnvEditor::ADSERVER_ADUSER_BASE_URL => $aduserUrl,
-                EnvEditor::ADSERVER_ADUSER_INTERNAL_URL => $aduserInternalUrl,
+                EnvEditor::ADSERVER_ADPANEL_URL => $adPanelUrl,
+                EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL => $content[Configuration::BASE_TECHNICAL_EMAIL],
+                EnvEditor::ADSERVER_ADUSER_BASE_URL => $adUserUrl,
+                EnvEditor::ADSERVER_ADUSER_INTERNAL_URL => $adUserInternalUrl,
                 EnvEditor::ADSERVER_APP_HOST => $adServerHost,
                 EnvEditor::ADSERVER_APP_NAME => $content[Configuration::BASE_ADSERVER_NAME],
-                EnvEditor::ADSERVER_APP_URL => $adserverUrl,
+                EnvEditor::ADSERVER_APP_URL => $adServerUrl,
                 EnvEditor::ADSERVER_MAIL_FROM_ADDRESS => $content[Configuration::BASE_SUPPORT_EMAIL],
-                EnvEditor::ADSERVER_MAIN_JS_BASE_URL => $adserverUrl,
-                EnvEditor::ADSERVER_SERVE_BASE_URL => $adserverUrl,
+                EnvEditor::ADSERVER_MAIN_JS_BASE_URL => $adServerUrl,
+                EnvEditor::ADSERVER_SERVE_BASE_URL => $adServerUrl,
             ]
         );
 
@@ -71,6 +87,8 @@ class BaseStep implements InstallerStep
         foreach (self::FIELDS as $field) {
             $data[$field] = $content[$field];
         }
+        $data[Configuration::BASE_ADPANEL_URL] = $adPanelUrl;
+        $data[Configuration::BASE_ADUSER_URL] = $adUserUrl;
         $data[Configuration::INSTALLER_STEP] = $this->getName();
         $this->repository->insertOrUpdate($data);
     }
@@ -83,9 +101,9 @@ class BaseStep implements InstallerStep
             }
         }
 
-        if (!filter_var($content[Configuration::BASE_CONTACT_EMAIL], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($content[Configuration::BASE_TECHNICAL_EMAIL], FILTER_VALIDATE_EMAIL)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be an email', Configuration::BASE_CONTACT_EMAIL)
+                sprintf('Field `%s` must be an email', Configuration::BASE_TECHNICAL_EMAIL)
             );
         }
         if (!filter_var($content[Configuration::BASE_SUPPORT_EMAIL], FILTER_VALIDATE_EMAIL)) {
@@ -118,15 +136,6 @@ class BaseStep implements InstallerStep
         return ('' === $prefix ? '' : $prefix . '.') . $domain;
     }
 
-    private static function extractHost(string $url): string
-    {
-        if (!str_contains($url, '//')) {
-            return $url;
-        }
-
-        return explode('//', $url)[1];
-    }
-
     public function getName(): string
     {
         return Configuration::INSTALLER_STEP_BASE;
@@ -147,9 +156,7 @@ class BaseStep implements InstallerStep
             ]
         );
 
-        $adpanelHost = self::extractHost($values[EnvEditor::ADSERVER_ADPANEL_URL] ?? 'https://panel.localhost');
-        $adserverHost = self::extractHost($values[EnvEditor::ADSERVER_APP_URL] ?? 'https://app.localhost');
-        $aduserHost = self::extractHost($values[EnvEditor::ADSERVER_ADUSER_BASE_URL] ?? 'https://au.localhost');
+        $adServerUrl = $values[EnvEditor::ADSERVER_APP_URL] ?? 'https://app.localhost';
 
         $data = [
             Configuration::BASE_ADPANEL_HOST_PREFIX => Configuration::DEFAULT_ADPANEL_HOST_PREFIX,
@@ -157,42 +164,12 @@ class BaseStep implements InstallerStep
             Configuration::BASE_ADUSER_HOST_PREFIX => Configuration::DEFAULT_ADUSER_HOST_PREFIX,
         ];
 
-        if (!str_ends_with($adserverHost, 'localhost')) {
-            $invertedDomains = array_map(
-                fn($arr) => array_reverse(explode('.', $arr)),
-                ['panel' => $adpanelHost, 'app' => $adserverHost, 'au' => $aduserHost]
-            );
-
-            $commonDomainParts = [];
-            $i = 0;
-            while (
-                isset($invertedDomains['panel'][$i])
-                && isset($invertedDomains['app'][$i])
-                && isset($invertedDomains['au'][$i])
-            ) {
-                if (
-                    $invertedDomains['panel'][$i] !== $invertedDomains['app'][$i]
-                    || $invertedDomains['panel'][$i] !== $invertedDomains['au'][$i]
-                ) {
-                    break;
-                }
-                $commonDomainParts[] = $invertedDomains['panel'][$i];
-                ++$i;
-            }
-
-            $offset = count($commonDomainParts);
-            if ($offset > 0) {
-                $prefixes = array_map(
-                    fn($domains) => implode('.', array_reverse(array_slice($domains, $offset))),
-                    $invertedDomains
-                );
-
-                $data = [
-                    Configuration::BASE_ADPANEL_HOST_PREFIX => $prefixes['panel'],
-                    Configuration::BASE_ADSERVER_HOST_PREFIX => $prefixes['app'],
-                    Configuration::BASE_ADUSER_HOST_PREFIX => $prefixes['au'],
-                    Configuration::BASE_DOMAIN => implode('.', array_reverse($commonDomainParts)),
-                ];
+        if (!str_ends_with($adServerUrl, 'localhost')) {
+            $adPanelUrl = $values[EnvEditor::ADSERVER_ADPANEL_URL] ?? 'https://panel.localhost';
+            $adUserUrl = $values[EnvEditor::ADSERVER_ADUSER_BASE_URL] ?? 'https://au.localhost';
+            $parsed = ServiceUrlParser::parseUrls($adPanelUrl, $adServerUrl, $adUserUrl);
+            if (null !== $parsed) {
+                $data = $parsed;
             }
         }
 
@@ -207,7 +184,7 @@ class BaseStep implements InstallerStep
             isset($values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL])
             && !str_ends_with($values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL], '@localhost')
         ) {
-            $data[Configuration::BASE_CONTACT_EMAIL] = $values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL];
+            $data[Configuration::BASE_TECHNICAL_EMAIL] = $values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL];
         }
 
         if (
