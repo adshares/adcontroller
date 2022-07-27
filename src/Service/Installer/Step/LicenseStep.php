@@ -145,17 +145,17 @@ class LicenseStep implements InstallerStep
     {
         $localData = $this->repository->fetchValuesByNames([
             Configuration::BASE_ADSERVER_NAME,
-            Configuration::BASE_CONTACT_EMAIL,
+            Configuration::BASE_TECHNICAL_EMAIL,
         ]);
 
         if (
             !isset($localData[Configuration::BASE_ADSERVER_NAME])
-            || !isset($localData[Configuration::BASE_CONTACT_EMAIL])
+            || !isset($localData[Configuration::BASE_TECHNICAL_EMAIL])
         ) {
             throw new UnprocessableEntityHttpException('Base step must be completed');
         }
 
-        $email = $localData[Configuration::BASE_CONTACT_EMAIL];
+        $email = $localData[Configuration::BASE_TECHNICAL_EMAIL];
         $name = $localData[Configuration::BASE_ADSERVER_NAME];
         try {
             $licenseKey = $this->licenseServerClient->createCommunityLicense($email, $name);

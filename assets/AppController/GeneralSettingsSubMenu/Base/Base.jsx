@@ -9,13 +9,13 @@ import commonStyles from '../../commonStyles.scss';
 function Base() {
   const { fields, errorObj, onFormChange, setFields } = useForm({
     adserverName: '',
-    contactEmail: '',
+    technicalEmail: '',
     supportEmail: '',
   });
 
   const [editableField, setEditableField] = useState({
     adserverName: false,
-    contactEmail: false,
+    technicalEmail: false,
     supportEmail: false,
   });
 
@@ -27,12 +27,12 @@ function Base() {
   useEffect(() => {
     setFields({
       adserverName: 'AdServer',
-      contactEmail: 'contact@domain.xyz',
+      technicalEmail: 'tech@domain.xyz',
       supportEmail: 'support@domain.xyz',
     });
     setDefFields({
       adserverName: 'AdServer',
-      contactEmail: 'contact@domain.xyz',
+      technicalEmail: 'tech@domain.xyz',
       supportEmail: 'support@domain.xyz',
     });
   }, []);
@@ -97,33 +97,33 @@ function Base() {
 
             <TableRow>
               <TableCell width="40%" align="left">
-                Email to contact
+                AdServer's operator email
               </TableCell>
               <TableCell width="40%" align="left">
-                {editableField.contactEmail ? (
+                {editableField.technicalEmail ? (
                   <TextField
                     autoFocus
                     onChange={onFormChange}
-                    error={!!errorObj.contactEmail}
-                    helperText={errorObj.contactEmail}
+                    error={!!errorObj.technicalEmail}
+                    helperText={errorObj.technicalEmail}
                     size="small"
-                    name="contactEmail"
-                    value={fields.contactEmail}
-                    placeholder="contact@domain.xyz"
+                    name="technicalEmail"
+                    value={fields.technicalEmail}
+                    placeholder="tech@domain.xyz"
                     type="email"
                     variant="standard"
                     inputProps={{ autoComplete: 'off' }}
                   />
                 ) : (
-                  fields.contactEmail
+                  fields.technicalEmail
                 )}
               </TableCell>
               <TableCell width="20%" align="center">
-                <IconButton type="button" onClick={() => toggleEditableField('contactEmail')}>
-                  {editableField.contactEmail ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
+                <IconButton type="button" onClick={() => toggleEditableField('technicalEmail')}>
+                  {editableField.technicalEmail ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
                 </IconButton>
-                {editableField.contactEmail && (
-                  <IconButton onClick={() => onSaveClick('contactEmail', fields.contactEmail)} type="button">
+                {editableField.technicalEmail && (
+                  <IconButton onClick={() => onSaveClick('technicalEmail', fields.technicalEmail)} type="button">
                     <CheckIcon color="success" />
                   </IconButton>
                 )}

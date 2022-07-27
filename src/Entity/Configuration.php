@@ -31,9 +31,9 @@ class Configuration
     public const BASE_ADUSER_HOST_PREFIX = 'base_aduser_host_prefix';
     public const BASE_ADUSER_URL = 'base_aduser_url';
     public const BASE_ADSERVER_NAME = 'base_adserver_name';
-    public const BASE_CONTACT_EMAIL = 'base_contact_email';
     public const BASE_DOMAIN = 'base_domain';
     public const BASE_SUPPORT_EMAIL = 'base_support_email';
+    public const BASE_TECHNICAL_EMAIL = 'base_technical_email';
     public const CLASSIFIER_API_KEY_NAME = 'classifier_ext_api_key_name';
     public const CLASSIFIER_API_KEY_SECRET = 'classifier_ext_api_key_secret';
     public const COMMON_DATA_REQUIRED = 'data_required';

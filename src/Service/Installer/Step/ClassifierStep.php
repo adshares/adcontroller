@@ -42,8 +42,8 @@ class ClassifierStep implements InstallerStep
         if (null === ($name = $this->repository->fetchValueByName(Configuration::BASE_ADSERVER_NAME))) {
             throw new UnprocessableEntityHttpException('AdServer\'s name must be set');
         }
-        if (null === ($email = $this->repository->fetchValueByName(Configuration::BASE_CONTACT_EMAIL))) {
-            throw new UnprocessableEntityHttpException('Contact e-mail must be set');
+        if (null === ($email = $this->repository->fetchValueByName(Configuration::BASE_TECHNICAL_EMAIL))) {
+            throw new UnprocessableEntityHttpException('Technical e-mail must be set');
         }
 
         try {
@@ -85,12 +85,12 @@ class ClassifierStep implements InstallerStep
         if ($isDataRequired) {
             $localData = $this->repository->fetchValuesByNames([
                 Configuration::BASE_ADSERVER_NAME,
-                Configuration::BASE_CONTACT_EMAIL,
+                Configuration::BASE_TECHNICAL_EMAIL,
             ]);
 
             if (
                 !isset($localData[Configuration::BASE_ADSERVER_NAME])
-                || !isset($localData[Configuration::BASE_CONTACT_EMAIL])
+                || !isset($localData[Configuration::BASE_TECHNICAL_EMAIL])
             ) {
                 throw new UnprocessableEntityHttpException('Base step must be completed');
             }
