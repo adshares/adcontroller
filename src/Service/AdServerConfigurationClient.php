@@ -8,7 +8,6 @@ use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -235,7 +234,10 @@ class AdServerConfigurationClient
         $mappedData = [];
         foreach ($data as $key => $value) {
             if (isset(self::KEY_MAP[$key])) {
-                $mappedData[self::KEY_MAP[$key]] = $value;
+                if (is_bool($value)) {
+                    $value = $value ? '1' : '0';
+                }
+                $mappedData[self::KEY_MAP[$key]] = (string)$value;
             }
         }
 
@@ -258,7 +260,7 @@ class AdServerConfigurationClient
         if (Response::HTTP_OK !== $statusCode) {
             if (Response::HTTP_UNPROCESSABLE_ENTITY === $statusCode) {
                 $message = json_decode($response->getContent(false))->message;
-                throw new UnprocessableEntityHttpException($message);
+                throw new UnexpectedResponseException($message);
             }
             throw new UnexpectedResponseException(
                 sprintf('AdServer responded with an invalid code (%d)', $statusCode)

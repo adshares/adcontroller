@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Configuration;
+use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\Installer\Step\BaseStep;
@@ -47,7 +48,11 @@ class InstallerController extends AbstractController
             throw new UnprocessableEntityHttpException(sprintf('Unsupported step (%s)', $step));
         }
 
-        $data = $service->fetchData();
+        try {
+            $data = $service->fetchData();
+        } catch (UnexpectedResponseException|ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $exception->getMessage());
+        }
 
         return new JsonResponse(
             json_encode($data, JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_FORCE_OBJECT),

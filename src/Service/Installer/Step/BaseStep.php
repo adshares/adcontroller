@@ -187,7 +187,7 @@ class BaseStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $values = $this->adServerConfigurationClient->fetch();
+        $configuration = $this->adServerConfigurationClient->fetch();
         $requiredKeys = [
             Configuration::BASE_ADPANEL_URL,
             Configuration::BASE_ADSERVER_NAME,
@@ -198,14 +198,14 @@ class BaseStep implements InstallerStep
         ];
 
         foreach ($requiredKeys as $requiredKey) {
-            if (!isset($values[$requiredKey])) {
+            if (!isset($configuration[$requiredKey])) {
                 return true;
             }
         }
 
-        return self::DEFAULT_ADSERVER_NAME === $values[Configuration::BASE_ADSERVER_NAME]
-            || str_ends_with($values[Configuration::BASE_ADSERVER_URL], 'localhost')
-            || str_ends_with($values[Configuration::BASE_TECHNICAL_EMAIL], self::DEFAULT_MAIL_ENDING)
-            || str_ends_with($values[Configuration::BASE_SUPPORT_EMAIL], self::DEFAULT_MAIL_ENDING);
+        return self::DEFAULT_ADSERVER_NAME === $configuration[Configuration::BASE_ADSERVER_NAME]
+            || str_ends_with($configuration[Configuration::BASE_ADSERVER_URL], 'localhost')
+            || str_ends_with($configuration[Configuration::BASE_TECHNICAL_EMAIL], self::DEFAULT_MAIL_ENDING)
+            || str_ends_with($configuration[Configuration::BASE_SUPPORT_EMAIL], self::DEFAULT_MAIL_ENDING);
     }
 }
