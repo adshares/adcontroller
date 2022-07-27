@@ -17,7 +17,7 @@ class AdServerAdminCreator
     public function create(string $email, string $password): void
     {
         $process = new Process(
-            ['php7.4', 'artisan', 'ops:admin:create', '--password', $password],
+            ['php', 'artisan', 'ops:admin:create', '--password', $password],
             $this->adserverHomeDirectory,
             null,
             $email,

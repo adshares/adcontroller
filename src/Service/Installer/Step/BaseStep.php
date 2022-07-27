@@ -19,9 +19,9 @@ class BaseStep implements InstallerStep
         Configuration::BASE_ADSERVER_HOST_PREFIX,
         Configuration::BASE_ADSERVER_NAME,
         Configuration::BASE_ADUSER_HOST_PREFIX,
-        Configuration::BASE_CONTACT_EMAIL,
         Configuration::BASE_DOMAIN,
         Configuration::BASE_SUPPORT_EMAIL,
+        Configuration::BASE_TECHNICAL_EMAIL,
     ];
 
     private AdServerConfigurationClient $adServerConfigurationClient;
@@ -64,14 +64,14 @@ class BaseStep implements InstallerStep
                 Configuration::BASE_ADPANEL_URL => $adPanelUrl,
                 Configuration::BASE_ADUSER_URL => $adUserUrl,
                 Configuration::BASE_SUPPORT_EMAIL => $content[Configuration::BASE_SUPPORT_EMAIL],
-                Configuration::BASE_CONTACT_EMAIL => $content[Configuration::BASE_CONTACT_EMAIL],
+                Configuration::BASE_TECHNICAL_EMAIL => $content[Configuration::BASE_TECHNICAL_EMAIL],
             ]
         );
 
         $envEditor->set(
             [
                 EnvEditor::ADSERVER_ADPANEL_URL => $adPanelUrl,
-                EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL => $content[Configuration::BASE_CONTACT_EMAIL],
+                EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL => $content[Configuration::BASE_TECHNICAL_EMAIL],
                 EnvEditor::ADSERVER_ADUSER_BASE_URL => $adUserUrl,
                 EnvEditor::ADSERVER_ADUSER_INTERNAL_URL => $adUserInternalUrl,
                 EnvEditor::ADSERVER_APP_HOST => $adServerHost,
@@ -101,9 +101,9 @@ class BaseStep implements InstallerStep
             }
         }
 
-        if (!filter_var($content[Configuration::BASE_CONTACT_EMAIL], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($content[Configuration::BASE_TECHNICAL_EMAIL], FILTER_VALIDATE_EMAIL)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be an email', Configuration::BASE_CONTACT_EMAIL)
+                sprintf('Field `%s` must be an email', Configuration::BASE_TECHNICAL_EMAIL)
             );
         }
         if (!filter_var($content[Configuration::BASE_SUPPORT_EMAIL], FILTER_VALIDATE_EMAIL)) {
@@ -184,7 +184,7 @@ class BaseStep implements InstallerStep
             isset($values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL])
             && !str_ends_with($values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL], '@localhost')
         ) {
-            $data[Configuration::BASE_CONTACT_EMAIL] = $values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL];
+            $data[Configuration::BASE_TECHNICAL_EMAIL] = $values[EnvEditor::ADSERVER_ADSHARES_OPERATOR_EMAIL];
         }
 
         if (
