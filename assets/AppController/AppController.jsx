@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAppLogin, setAppLogout } from '../redux/auth/authSlice';
+import authSelectors from '../redux/auth/authSelectors';
 import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
 import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
@@ -12,6 +15,8 @@ import Dashboard from './Dashboard/Dashboard';
 import AdPay from './AdPay/AdPay';
 import Wallet from './FinanceSettingsSubMenu/Wallet/Wallet';
 import Commissions from './FinanceSettingsSubMenu/Commissions/Commissions';
+import Base from './GeneralSettingsSubMenu/Base/Base';
+import License from './GeneralSettingsSubMenu/License/License';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -20,8 +25,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import commonStyles from './commonStyles.scss';
-import Base from './GeneralSettingsSubMenu/Base/Base';
-import License from './GeneralSettingsSubMenu/License/License';
 
 const appModules = [
   {
@@ -101,40 +104,55 @@ const getAppPages = (appModules, isAuthenticate) => {
 };
 
 function AppController() {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
+  const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('authToken'));
   const [showSideMenu, toggleSideMenu] = useState(true);
-  const pages = getAppPages(appModules, !!token);
+  const pages = getAppPages(appModules, isLoggedIn);
+
+  useEffect(() => {
+    if (!token) {
+      dispatch(setAppLogout());
+      setIsLoading(false);
+      return;
+    }
+    dispatch(setAppLogin(token));
+    setIsLoading(false);
+  }, [token]);
 
   return (
-    <>
-      <MenuAppBar
-        showProtectedOptions={!!token}
-        setToken={setToken}
-        showSideMenu={showSideMenu}
-        toggleSideMenu={toggleSideMenu}
-        showSideMenuIcon
-      />
-      <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <SideMenu enableSideMenu={!!token} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
-        <AppWindow>
-          <Routes>
-            <Route
-              path="login"
-              element={
-                <PublicRoute restricted isLoggedIn={!!token} redirectTo="/">
-                  <Login setToken={setToken} />
-                </PublicRoute>
-              }
-            />
+    !isLoading && (
+      <>
+        <MenuAppBar
+          showProtectedOptions={isLoggedIn}
+          setToken={setToken}
+          showSideMenu={showSideMenu}
+          toggleSideMenu={toggleSideMenu}
+          showSideMenuIcon
+        />
+        <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+          <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
+          <AppWindow>
+            <Routes>
+              <Route
+                path="login"
+                element={
+                  <PublicRoute restricted isLoggedIn={isLoggedIn} redirectTo="/">
+                    <Login setToken={setToken} />
+                  </PublicRoute>
+                }
+              />
 
-            {pages}
+              {pages}
 
-            <Route path="*" element={<NotFoundView />} />
-            <Route path="/steps/*" element={<Navigate to="/" />} />
-          </Routes>
-        </AppWindow>
-      </Box>
-    </>
+              <Route path="*" element={<NotFoundView />} />
+              <Route path="/steps/*" element={<Navigate to="/" />} />
+            </Routes>
+          </AppWindow>
+        </Box>
+      </>
+    )
   );
 }
 
