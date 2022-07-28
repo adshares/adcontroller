@@ -16,8 +16,13 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class AdServerConfigurationClient
 {
     private const KEY_MAP = [
+        Configuration::ADCLASSIFY_URL => self::CLASSIFIER_EXTERNAL_BASE_URL,
+        Configuration::ADPAY_URL => self::ADPAY_URL,
+        Configuration::ADSELECT_URL => self::ADSELECT_URL,
         Configuration::BASE_ADPANEL_URL => self::ADPANEL_URL,
+        Configuration::BASE_ADSERVER_URL => self::URL,
         Configuration::BASE_ADUSER_URL => self::ADUSER_BASE_URL,
+        Configuration::BASE_ADUSER_INTERNAL_URL => self::ADUSER_INTERNAL_URL,
         Configuration::BASE_ADSERVER_NAME => self::ADSERVER_NAME,
         Configuration::BASE_SUPPORT_EMAIL => self::SUPPORT_EMAIL,
         Configuration::BASE_TECHNICAL_EMAIL => self::TECHNICAL_EMAIL,
@@ -150,15 +155,7 @@ class AdServerConfigurationClient
     private const UPLOAD_LIMIT_MODEL = 'upload-limit-model';
     private const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
     private const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
-
-    private const SECRETS = [
-        self::ADSHARES_LICENSE_KEY,
-        self::ADSHARES_SECRET,
-        self::CLASSIFIER_EXTERNAL_API_KEY_SECRET,
-        self::EXCHANGE_API_SECRET,
-        self::NOW_PAYMENTS_IPN_SECRET,
-        self::SKYNET_API_KEY,
-    ];
+    private const URL = 'url';
 
     private HttpClientInterface $httpClient;
     private LoggerInterface $logger;
@@ -190,9 +187,6 @@ class AdServerConfigurationClient
         $body = json_decode($response->getContent(), true);
 
         $data = [];
-        foreach (self::SECRETS as $secretKey) {
-            unset($body[$secretKey]);
-        }
         foreach (self::KEY_MAP as $localKey => $remoteKey) {
             $data[$localKey] = $body[$remoteKey] ?? null;
         }
@@ -231,7 +225,10 @@ class AdServerConfigurationClient
         $mappedData = [];
         foreach ($data as $key => $value) {
             if (isset(self::KEY_MAP[$key])) {
-                $mappedData[self::KEY_MAP[$key]] = $value;
+                if (is_bool($value)) {
+                    $value = $value ? '1' : '0';
+                }
+                $mappedData[self::KEY_MAP[$key]] = (string)$value;
             }
         }
 
@@ -252,6 +249,10 @@ class AdServerConfigurationClient
         }
 
         if (Response::HTTP_OK !== $statusCode) {
+            if (Response::HTTP_UNPROCESSABLE_ENTITY === $statusCode) {
+                $message = json_decode($response->getContent(false))->message;
+                throw new UnexpectedResponseException($message);
+            }
             throw new UnexpectedResponseException(
                 sprintf('AdServer responded with an invalid code (%d)', $statusCode)
             );

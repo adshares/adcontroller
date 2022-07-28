@@ -4,7 +4,7 @@ namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
 use App\Repository\ConfigurationRepository;
-use App\Service\EnvEditor;
+use App\Service\AdServerConfigurationClient;
 use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,18 +16,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DnsStep implements InstallerStep
 {
+    private AdServerConfigurationClient $adServerConfigurationClient;
     private ConfigurationRepository $repository;
     private HttpClientInterface $httpClient;
-    private ServicePresenceChecker $servicePresenceChecker;
 
     public function __construct(
+        AdServerConfigurationClient $adServerConfigurationClient,
         ConfigurationRepository $repository,
-        HttpClientInterface $httpClient,
-        ServicePresenceChecker $servicePresenceChecker
+        HttpClientInterface $httpClient
     ) {
+        $this->adServerConfigurationClient = $adServerConfigurationClient;
         $this->repository = $repository;
         $this->httpClient = $httpClient;
-        $this->servicePresenceChecker = $servicePresenceChecker;
     }
 
     public function process(array $content): void
@@ -42,15 +42,13 @@ class DnsStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+        $values = $this->adServerConfigurationClient->fetch();
 
         $config = [
-            Module::ADPANEL => EnvEditor::ADSERVER_ADPANEL_URL,
-            Module::ADSERVER => EnvEditor::ADSERVER_APP_URL,
-            Module::ADUSER => EnvEditor::ADSERVER_ADUSER_BASE_URL,
+            Module::ADPANEL => Configuration::BASE_ADPANEL_URL,
+            Module::ADSERVER => Configuration::BASE_ADSERVER_URL,
+            Module::ADUSER => Configuration::BASE_ADUSER_URL,
         ];
-
-        $values = $envEditor->get(array_values($config));
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),

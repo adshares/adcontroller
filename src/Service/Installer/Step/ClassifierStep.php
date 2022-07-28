@@ -6,9 +6,7 @@ use App\Entity\Configuration;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdClassifyClient;
-use App\Service\EnvEditor;
-use App\Service\ServicePresenceChecker;
-use App\ValueObject\Module;
+use App\Service\AdServerConfigurationClient;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -16,20 +14,20 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class ClassifierStep implements InstallerStep
 {
     private AdClassifyClient $adClassifyClient;
+    private AdServerConfigurationClient $adServerConfigurationClient;
     private ConfigurationRepository $repository;
     private LoggerInterface $logger;
-    private ServicePresenceChecker $servicePresenceChecker;
 
     public function __construct(
         AdClassifyClient $adClassifyClient,
+        AdServerConfigurationClient $adServerConfigurationClient,
         ConfigurationRepository $repository,
-        LoggerInterface $logger,
-        ServicePresenceChecker $servicePresenceChecker
+        LoggerInterface $logger
     ) {
         $this->adClassifyClient = $adClassifyClient;
+        $this->adServerConfigurationClient = $adServerConfigurationClient;
         $this->repository = $repository;
         $this->logger = $logger;
-        $this->servicePresenceChecker = $servicePresenceChecker;
     }
 
     public function process(array $content): void
@@ -55,22 +53,14 @@ class ClassifierStep implements InstallerStep
             throw new UnprocessableEntityHttpException('AdClassify is not accessible');
         }
 
-        $apiKeyName = $apiKey['name'];
-        $apiKeySecret = $apiKey['secret'];
+        $data = [
+            Configuration::CLASSIFIER_API_KEY_NAME => $apiKey['name'],
+            Configuration::CLASSIFIER_API_KEY_SECRET => $apiKey['secret'],
+        ];
+        $this->adServerConfigurationClient->store($data);
 
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $envEditor->set([
-            EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_API_KEY_NAME => $apiKeyName,
-            EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_API_KEY_SECRET => $apiKeySecret,
-        ]);
-
-        $this->repository->insertOrUpdate(
-            [
-                Configuration::INSTALLER_STEP => $this->getName(),
-                Configuration::CLASSIFIER_API_KEY_NAME => $apiKeyName,
-                Configuration::CLASSIFIER_API_KEY_SECRET => $apiKeySecret,
-            ]
-        );
+        $data[Configuration::INSTALLER_STEP] = $this->getName();
+        $this->repository->insertOrUpdate($data);
     }
 
     public function getName(): string
@@ -103,18 +93,27 @@ class ClassifierStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $values = $envEditor->get(
-            [
-                EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_API_KEY_NAME,
-                EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_API_KEY_SECRET,
-            ]
-        );
+        $requiredKeys = [
+            Configuration::CLASSIFIER_API_KEY_NAME,
+            Configuration::CLASSIFIER_API_KEY_SECRET,
+        ];
+        $localConfiguration = $this->repository->fetchValuesByNames($requiredKeys);
 
-        foreach ($values as $value) {
-            if (!$value) {
+        foreach ($requiredKeys as $requiredKey) {
+            if (!isset($localConfiguration[$requiredKey])) {
                 return true;
             }
+        }
+
+        $remoteConfiguration = $this->adServerConfigurationClient->fetch();
+        if (
+            !isset($remoteConfiguration[Configuration::CLASSIFIER_API_KEY_NAME])
+            || (
+                $remoteConfiguration[Configuration::CLASSIFIER_API_KEY_NAME]
+                !== $localConfiguration[Configuration::CLASSIFIER_API_KEY_NAME]
+            )
+        ) {
+            return true;
         }
 
         return false;

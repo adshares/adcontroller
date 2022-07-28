@@ -4,8 +4,7 @@ namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
 use App\Repository\ConfigurationRepository;
-use App\Service\EnvEditor;
-use App\Service\ServicePresenceChecker;
+use App\Service\AdServerConfigurationClient;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -16,18 +15,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class StatusStep implements InstallerStep
 {
+    private AdServerConfigurationClient $adServerConfigurationClient;
     private ConfigurationRepository $repository;
     private HttpClientInterface $httpClient;
-    private ServicePresenceChecker $servicePresenceChecker;
 
     public function __construct(
+        AdServerConfigurationClient $adServerConfigurationClient,
         ConfigurationRepository $repository,
-        HttpClientInterface $httpClient,
-        ServicePresenceChecker $servicePresenceChecker
+        HttpClientInterface $httpClient
     ) {
+        $this->adServerConfigurationClient = $adServerConfigurationClient;
         $this->repository = $repository;
         $this->httpClient = $httpClient;
-        $this->servicePresenceChecker = $servicePresenceChecker;
     }
 
     public function process(array $content): void
@@ -47,23 +46,22 @@ class StatusStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+        $configuration = $this->adServerConfigurationClient->fetch();
 
         $config = [
-            Module::ADCLASSIFY => EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_BASE_URL,
-            Module::ADPANEL => EnvEditor::ADSERVER_ADPANEL_URL,
-            Module::ADPAY => EnvEditor::ADSERVER_ADPAY_ENDPOINT,
-            Module::ADSELECT => EnvEditor::ADSERVER_ADSELECT_ENDPOINT,
-            Module::ADSERVER => EnvEditor::ADSERVER_APP_URL,
-            Module::ADUSER => EnvEditor::ADSERVER_ADUSER_BASE_URL,
+            Module::ADCLASSIFY => Configuration::ADCLASSIFY_URL,
+            Module::ADPANEL => Configuration::BASE_ADPANEL_URL,
+            Module::ADPAY => Configuration::ADPAY_URL,
+            Module::ADSELECT => Configuration::ADSELECT_URL,
+            Module::ADSERVER => Configuration::BASE_ADSERVER_URL,
+            Module::ADUSER => Configuration::BASE_ADUSER_URL,
         ];
-        $values = $envEditor->get(array_values($config));
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
         foreach ($config as $moduleName => $key) {
-            $url = $values[$key] ?? null;
+            $url = $configuration[$key] ?? null;
             $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
         }
 

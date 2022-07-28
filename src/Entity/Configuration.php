@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ConfigurationRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
@@ -25,12 +26,17 @@ class Configuration
     public const DEFAULT_ADSERVER_HOST_PREFIX = 'app';
     public const DEFAULT_ADUSER_HOST_PREFIX = 'au';
 
+    public const ADCLASSIFY_URL = 'adclassify_url';
+    public const ADPAY_URL = 'adpay_url';
+    public const ADSELECT_URL = 'adselect_url';
     public const BASE_ADPANEL_HOST_PREFIX = 'base_adpanel_host_prefix';
     public const BASE_ADPANEL_URL = 'base_adpanel_url';
     public const BASE_ADSERVER_HOST_PREFIX = 'base_adserver_host_prefix';
     public const BASE_ADUSER_HOST_PREFIX = 'base_aduser_host_prefix';
     public const BASE_ADUSER_URL = 'base_aduser_url';
+    public const BASE_ADUSER_INTERNAL_URL = 'base_aduser_internal_url';
     public const BASE_ADSERVER_NAME = 'base_adserver_name';
+    public const BASE_ADSERVER_URL = 'base_adserver_url';
     public const BASE_DOMAIN = 'base_domain';
     public const BASE_SUPPORT_EMAIL = 'base_support_email';
     public const BASE_TECHNICAL_EMAIL = 'base_technical_email';
@@ -96,24 +102,24 @@ class Configuration
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setCreatedAt(DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(DateTimeImmutable $updated_at): self
     {
         $this->updated_at = $updated_at;
 
