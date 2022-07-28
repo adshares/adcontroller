@@ -157,15 +157,6 @@ class AdServerConfigurationClient
     private const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
     private const URL = 'url';
 
-    private const SECRETS = [
-        self::ADSHARES_LICENSE_KEY,
-        self::ADSHARES_SECRET,
-        self::CLASSIFIER_EXTERNAL_API_KEY_SECRET,
-        self::EXCHANGE_API_SECRET,
-        self::NOW_PAYMENTS_IPN_SECRET,
-        self::SKYNET_API_KEY,
-    ];
-
     private HttpClientInterface $httpClient;
     private LoggerInterface $logger;
     private TokenStorageInterface $tokenStorage;
@@ -196,9 +187,6 @@ class AdServerConfigurationClient
         $body = json_decode($response->getContent(), true);
 
         $data = [];
-        foreach (self::SECRETS as $secretKey) {
-            unset($body[$secretKey]);
-        }
         foreach (self::KEY_MAP as $localKey => $remoteKey) {
             $data[$localKey] = $body[$remoteKey] ?? null;
         }

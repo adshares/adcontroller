@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Configuration;
+use App\Service\Crypt;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,9 +18,18 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ConfigurationRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private const SECRETS = [
+        Configuration::CLASSIFIER_API_KEY_SECRET,
+        Configuration::LICENSE_KEY,
+        Configuration::WALLET_SECRET_KEY,
+    ];
+
+    private Crypt $crypt;
+
+    public function __construct(Crypt $crypt, ManagerRegistry $registry)
     {
         parent::__construct($registry, Configuration::class);
+        $this->crypt = $crypt;
     }
 
     public function insertOrUpdateOne(string $name, string $value, bool $flush = true): void
@@ -30,6 +40,9 @@ class ConfigurationRepository extends ServiceEntityRepository
             $entity = new Configuration();
             $entity->setName($name);
             $entity->setCreatedAt($now);
+        }
+        if (in_array($name, self::SECRETS)) {
+            $value = $this->crypt->encrypt($value);
         }
         $entity->setValue($value);
         $entity->setUpdatedAt($now);
@@ -55,6 +68,9 @@ class ConfigurationRepository extends ServiceEntityRepository
                 $entity->setCreatedAt($now);
             } else {
                 $entity = $entities[$name];
+            }
+            if (in_array($name, self::SECRETS)) {
+                $value = $this->crypt->encrypt($value);
             }
             $entity->setValue($value);
             $entity->setUpdatedAt($now);
@@ -84,7 +100,13 @@ class ConfigurationRepository extends ServiceEntityRepository
         if (null === ($configuration = $this->findOneBy(['name' => $name]))) {
             return null;
         }
-        return $configuration->getValue();
+
+        $value = $configuration->getValue();
+        if (in_array($name, self::SECRETS)) {
+            $value = $this->crypt->decrypt($value);
+        }
+
+        return $value;
     }
 
     /**
@@ -96,7 +118,11 @@ class ConfigurationRepository extends ServiceEntityRepository
         $entities = $this->findByNames($names);
         $data = [];
         foreach ($entities as $entity) {
-            $data[$entity->getName()] = $entity->getValue();
+            $value = $entity->getValue();
+            if (in_array($entity->getName(), self::SECRETS)) {
+                $value = $this->crypt->decrypt($value);
+            }
+            $data[$entity->getName()] = $value;
         }
         return $data;
     }
