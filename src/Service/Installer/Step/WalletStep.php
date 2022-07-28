@@ -163,26 +163,42 @@ class WalletStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $configuration = $this->adServerConfigurationClient->fetch();
         $requiredKeys = [
             Configuration::WALLET_ADDRESS,
             Configuration::WALLET_SECRET_KEY,
             Configuration::WALLET_NODE_HOST,
             Configuration::WALLET_NODE_PORT,
         ];
+        $localConfiguration = $this->repository->fetchValuesByNames($requiredKeys);
 
         foreach ($requiredKeys as $requiredKey) {
-            if (!isset($configuration[$requiredKey])) {
+            if (!isset($localConfiguration[$requiredKey])) {
+                return true;
+            }
+        }
+
+        $remoteConfiguration = $this->adServerConfigurationClient->fetch();
+        $requiredKeys = [
+            Configuration::WALLET_ADDRESS,
+            Configuration::WALLET_NODE_HOST,
+            Configuration::WALLET_NODE_PORT,
+        ];
+
+        foreach ($requiredKeys as $requiredKey) {
+            if (
+                !isset($remoteConfiguration[$requiredKey])
+                || $remoteConfiguration[$requiredKey] !== $localConfiguration[$requiredKey]
+            ) {
                 return true;
             }
         }
 
         try {
             $this->adsCredentialsChecker->check(
-                $configuration[Configuration::WALLET_ADDRESS],
-                $configuration[Configuration::WALLET_SECRET_KEY],
-                $configuration[Configuration::WALLET_NODE_HOST],
-                $configuration[Configuration::WALLET_NODE_PORT]
+                $localConfiguration[Configuration::WALLET_ADDRESS],
+                $localConfiguration[Configuration::WALLET_SECRET_KEY],
+                $localConfiguration[Configuration::WALLET_NODE_HOST],
+                $localConfiguration[Configuration::WALLET_NODE_PORT]
             );
         } catch (UnexpectedResponseException) {
             return true;
