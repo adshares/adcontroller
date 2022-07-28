@@ -84,7 +84,6 @@ export default function Login() {
             label="Email Address"
             name="email"
             onChange={handleInputChange}
-            inputProps={{ autoComplete: 'off' }}
           />
           <TextField
             variant="standard"
@@ -95,7 +94,6 @@ export default function Login() {
             label="Password"
             name="password"
             onChange={handleInputChange}
-            inputProps={{ autoComplete: 'off' }}
           />
           <Button type="submit" fullWidth variant="contained" color="primary" disabled={isLoading}>
             Login
