@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import apiService from '../../utils/apiService';
+import { useLoginUserMutation } from '../../redux/auth/authApi';
+import { useDispatch } from 'react-redux';
+import { setAppLogin } from '../../redux/auth/authSlice';
 import { Alert, Box, Button, Card, CardContent, CardHeader, Collapse, IconButton, Link, TextField, Typography } from '@mui/material';
 import styles from './styles.scss';
 import logo from '../../img/logo.png';
 import CloseIcon from '@mui/icons-material/Close';
 
-export default function Login({ setToken }) {
+export default function Login() {
+  const dispatch = useDispatch();
+  const [loginUser] = useLoginUserMutation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [alert, setAlert] = useState({
@@ -16,21 +20,16 @@ export default function Login({ setToken }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login();
-  };
-
-  const login = async () => {
     try {
-      const response = await apiService.login({
-        email,
-        password,
-      });
-      setToken(response);
+      const response = await loginUser({ email, password }).unwrap();
+      if (response.token) {
+        dispatch(setAppLogin(response.token));
+      }
     } catch (err) {
       setAlert({
         type: 'error',
         message: err.data.message,
-        title: err.message,
+        title: 'Authorization error',
       });
     }
   };
@@ -60,7 +59,7 @@ export default function Login({ setToken }) {
 
   return (
     <Card className={styles.container}>
-      <CardContent className={styles.logo}>
+      <CardContent>
         <Box
           component="img"
           src={logo}
@@ -108,7 +107,7 @@ export default function Login({ setToken }) {
           </Link>
         </Box>
       </CardContent>
-      <Collapse in={!!alert.title}>
+      <Collapse in={!!alert.message}>
         <Alert
           severity={alert.type || 'error'}
           action={

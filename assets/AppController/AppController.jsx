@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAppLogin, setAppLogout } from '../redux/auth/authSlice';
+import { checkAppAuth } from '../redux/auth/authSlice';
 import authSelectors from '../redux/auth/authSelectors';
 import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
@@ -104,33 +104,22 @@ const getAppPages = (appModules, isAuthenticate) => {
 };
 
 function AppController() {
+  const token = useSelector(authSelectors.getToken);
   const dispatch = useDispatch();
   const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
   const [isLoading, setIsLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('authToken'));
   const [showSideMenu, toggleSideMenu] = useState(true);
   const pages = getAppPages(appModules, isLoggedIn);
 
   useEffect(() => {
-    if (!token) {
-      dispatch(setAppLogout());
-      setIsLoading(false);
-      return;
-    }
-    dispatch(setAppLogin(token));
+    dispatch(checkAppAuth());
     setIsLoading(false);
   }, [token]);
 
   return (
     !isLoading && (
       <>
-        <MenuAppBar
-          showProtectedOptions={isLoggedIn}
-          setToken={setToken}
-          showSideMenu={showSideMenu}
-          toggleSideMenu={toggleSideMenu}
-          showSideMenuIcon
-        />
+        <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
         <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
           <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
           <AppWindow>
@@ -139,7 +128,7 @@ function AppController() {
                 path="login"
                 element={
                   <PublicRoute restricted isLoggedIn={isLoggedIn} redirectTo="/">
-                    <Login setToken={setToken} />
+                    <Login />
                   </PublicRoute>
                 }
               />

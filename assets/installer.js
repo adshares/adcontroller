@@ -6,13 +6,17 @@ import AppInstaller from './AppInstaller/AppInstaller';
 import { BrowserRouter } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import theme from './utils/theme';
+import { store } from './redux/store';
+import { Provider } from 'react-redux';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <BrowserRouter>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppInstaller />
-    </ThemeProvider>
-  </BrowserRouter>,
+  <Provider store={store}>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppInstaller />
+      </ThemeProvider>
+    </BrowserRouter>
+  </Provider>,
 );
