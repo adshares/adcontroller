@@ -50,7 +50,7 @@ class InstallerController extends AbstractController
 
         try {
             $data = $service->fetchData();
-        } catch (UnexpectedResponseException|ServiceNotPresent $exception) {
+        } catch (UnexpectedResponseException | ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $exception->getMessage());
         }
 

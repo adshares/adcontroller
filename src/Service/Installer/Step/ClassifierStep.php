@@ -13,21 +13,12 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ClassifierStep implements InstallerStep
 {
-    private AdClassifyClient $adClassifyClient;
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private LoggerInterface $logger;
-
     public function __construct(
-        AdClassifyClient $adClassifyClient,
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        LoggerInterface $logger
+        private readonly AdClassifyClient $adClassifyClient,
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository,
+        private readonly LoggerInterface $logger
     ) {
-        $this->adClassifyClient = $adClassifyClient;
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->logger = $logger;
     }
 
     public function process(array $content): void

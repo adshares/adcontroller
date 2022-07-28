@@ -14,11 +14,8 @@ class LicenseDecoder
 {
     private const METHOD = 'AES-128-CBC';
 
-    private string $licenseKey;
-
-    public function __construct(string $licenseKey)
+    public function __construct(private readonly string $licenseKey)
     {
-        $this->licenseKey = $licenseKey;
     }
 
     public function decode(string $encodedLicense): License

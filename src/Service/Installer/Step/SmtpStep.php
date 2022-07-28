@@ -24,15 +24,10 @@ class SmtpStep implements InstallerStep
     ];
     private const SUCCESS = 'OK';
 
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-
     public function __construct(
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository
     ) {
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
     }
 
     public function process(array $content): void

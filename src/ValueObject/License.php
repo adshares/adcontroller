@@ -9,42 +9,19 @@ use DateTimeInterface;
 
 class License
 {
-    private string $type;
-    private int $status;
-    private DateTimeInterface $dateStart;
-    private DateTimeInterface $dateEnd;
-    private string $owner;
-    private AccountId $paymentAddress;
-    private string $paymentMessage;
-    private float $fixedFee;
-    private float $demandFee;
-    private float $supplyFee;
-    private bool $privateLabel;
-
     public function __construct(
-        string $type,
-        int $status,
-        DateTimeInterface $dateStart,
-        DateTimeInterface $dateEnd,
-        string $owner,
-        AccountId $paymentAddress,
-        string $paymentMessage,
-        float $fixedFee,
-        float $demandFee,
-        float $supplyFee,
-        bool $privateLabel
+        private readonly string $type,
+        private readonly int $status,
+        private readonly DateTimeInterface $dateStart,
+        private readonly DateTimeInterface $dateEnd,
+        private readonly string $owner,
+        private readonly AccountId $paymentAddress,
+        private readonly string $paymentMessage,
+        private readonly float $fixedFee,
+        private readonly float $demandFee,
+        private readonly float $supplyFee,
+        private readonly bool $privateLabel
     ) {
-        $this->type = $type;
-        $this->status = $status;
-        $this->dateStart = $dateStart;
-        $this->dateEnd = $dateEnd;
-        $this->owner = $owner;
-        $this->paymentAddress = $paymentAddress;
-        $this->paymentMessage = $paymentMessage;
-        $this->fixedFee = $fixedFee;
-        $this->demandFee = $demandFee;
-        $this->supplyFee = $supplyFee;
-        $this->privateLabel = $privateLabel;
     }
 
     public function isValid(): bool

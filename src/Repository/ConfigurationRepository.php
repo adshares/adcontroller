@@ -24,12 +24,9 @@ class ConfigurationRepository extends ServiceEntityRepository
         Configuration::WALLET_SECRET_KEY,
     ];
 
-    private Crypt $crypt;
-
-    public function __construct(Crypt $crypt, ManagerRegistry $registry)
+    public function __construct(private readonly Crypt $crypt, ManagerRegistry $registry)
     {
         parent::__construct($registry, Configuration::class);
-        $this->crypt = $crypt;
     }
 
     public function insertOrUpdateOne(string $name, string $value, bool $flush = true): void

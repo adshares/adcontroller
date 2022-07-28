@@ -9,11 +9,8 @@ use Symfony\Component\Process\Process;
 
 class ServicePresenceChecker
 {
-    private string $adserverHomeDirectory;
-
-    public function __construct(string $adserverHomeDirectory)
+    public function __construct(private readonly string $adserverHomeDirectory)
     {
-        $this->adserverHomeDirectory = $adserverHomeDirectory;
     }
 
     public function check(Module $module): void

@@ -25,18 +25,11 @@ class BaseStep implements InstallerStep
         Configuration::BASE_TECHNICAL_EMAIL,
     ];
 
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private ServicePresenceChecker $servicePresenceChecker;
-
     public function __construct(
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        ServicePresenceChecker $servicePresenceChecker
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository,
+        private readonly ServicePresenceChecker $servicePresenceChecker
     ) {
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->servicePresenceChecker = $servicePresenceChecker;
     }
 
     public function process(array $content): void

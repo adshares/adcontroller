@@ -32,11 +32,8 @@ class EnvEditor
     public const ADSERVER_MAIN_JS_BASE_URL = 'MAIN_JS_BASE_URL';
     public const ADSERVER_SERVE_BASE_URL = 'SERVE_BASE_URL';
 
-    private string $envFile;
-
-    public function __construct(string $envFile)
+    public function __construct(private readonly string $envFile)
     {
-        $this->envFile = $envFile;
     }
 
     public function getOne(string $key): ?string

@@ -157,17 +157,12 @@ class AdServerConfigurationClient
     private const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
     private const URL = 'url';
 
-    private HttpClientInterface $httpClient;
-    private LoggerInterface $logger;
-    private TokenStorageInterface $tokenStorage;
-    private string $adserverBaseUri;
-
-    public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger, TokenStorageInterface $tokenStorage, string $adserverBaseUri)
-    {
-        $this->httpClient = $httpClient;
-        $this->logger = $logger;
-        $this->tokenStorage = $tokenStorage;
-        $this->adserverBaseUri = $adserverBaseUri;
+    public function __construct(
+        private readonly HttpClientInterface $httpClient,
+        private readonly LoggerInterface $logger,
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly string $adserverBaseUri
+    ) {
     }
 
     public function fetch(): array

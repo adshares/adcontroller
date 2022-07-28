@@ -5,7 +5,6 @@ namespace App\Service\Installer\Step;
 use App\Entity\Configuration;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
-use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -16,18 +15,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DnsStep implements InstallerStep
 {
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private HttpClientInterface $httpClient;
-
     public function __construct(
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        HttpClientInterface $httpClient
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository,
+        private readonly HttpClientInterface $httpClient
     ) {
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->httpClient = $httpClient;
     }
 
     public function process(array $content): void

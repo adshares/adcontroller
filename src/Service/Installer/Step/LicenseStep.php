@@ -18,21 +18,12 @@ class LicenseStep implements InstallerStep
 {
     private const LICENSE_KEY_PATTERN = '/^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/i';
 
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private LicenseServerClient $licenseServerClient;
-    private LoggerInterface $logger;
-
     public function __construct(
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        LicenseServerClient $licenseServerClient,
-        LoggerInterface $logger
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository,
+        private readonly LicenseServerClient $licenseServerClient,
+        private readonly LoggerInterface $logger
     ) {
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->licenseServerClient = $licenseServerClient;
-        $this->logger = $logger;
     }
 
     public function process(array $content): void

@@ -20,21 +20,12 @@ class WalletStep implements InstallerStep
     ];
     private const SECRET_KEY_PATTERN = '/^[0-9A-F]{64}$/i';
 
-    private AdsCredentialsChecker $adsCredentialsChecker;
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private HttpClientInterface $httpClient;
-
     public function __construct(
-        AdsCredentialsChecker $adsCredentialsChecker,
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        HttpClientInterface $httpClient
+        private readonly AdsCredentialsChecker $adsCredentialsChecker,
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository,
+        private readonly HttpClientInterface $httpClient
     ) {
-        $this->adsCredentialsChecker = $adsCredentialsChecker;
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->httpClient = $httpClient;
     }
 
     public function process(array $content): void

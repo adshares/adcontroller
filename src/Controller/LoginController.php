@@ -25,13 +25,8 @@ class LoginController extends AbstractController
     private const ADSERVER_LOG_IN_URI = '/auth/jwt/login';
     private const ADSERVER_LOG_OUT_URI = '/auth/jwt/logout';
 
-    private LoggerInterface $logger;
-    private string $adserverBaseUri;
-
-    public function __construct(LoggerInterface $logger, string $adserverBaseUri)
+    public function __construct(private readonly LoggerInterface $logger, private readonly string $adserverBaseUri)
     {
-        $this->logger = $logger;
-        $this->adserverBaseUri = $adserverBaseUri;
     }
 
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
