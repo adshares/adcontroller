@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdClassify;
+use App\Entity\Enum\AdServer;
 use App\Service\Crypt;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -22,6 +24,12 @@ class ConfigurationRepository extends ServiceEntityRepository
         Configuration::CLASSIFIER_API_KEY_SECRET,
         Configuration::LICENSE_KEY,
         Configuration::WALLET_SECRET_KEY,
+    ];
+
+    private const SECRETS_ENUM = [
+        AdClassify::CLASSIFIER_API_KEY_SECRET,
+        AdServer::LICENSE_KEY,
+        AdServer::WALLET_SECRET_KEY,
     ];
 
     public function __construct(private readonly Crypt $crypt, ManagerRegistry $registry)

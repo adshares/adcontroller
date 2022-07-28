@@ -64,6 +64,9 @@ class Configuration
     #[ORM\Column(type: 'string', length: 255, unique: true)]
     private $name;
 
+    #[ORM\Column(type: 'string', length: 31)]
+    private $module;
+
     #[ORM\Column(type: 'string', length: 255)]
     private $value;
 
@@ -86,6 +89,18 @@ class Configuration
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getModule(): ?string
+    {
+        return $this->module;
+    }
+
+    public function setModule(string $module): self
+    {
+        $this->module = $module;
 
         return $this;
     }
