@@ -48,18 +48,6 @@ const createUser = async (body) => {
   }
 };
 
-const login = async (body) => {
-  try {
-    const response = await request(`${configuration.baseUrl}/api/login`, 'POST', false, body);
-    if (response.token?.length) {
-      localStorage.setItem('authToken', response.token);
-      return response.token;
-    }
-  } catch (err) {
-    throw new HttpError(err.message, err.data);
-  }
-};
-
 const sendStepData = async (stepName, body) => {
   try {
     return await request(`${configuration.baseUrl}/api/step/${stepName}`, 'POST', true, body);
@@ -110,7 +98,6 @@ const getWalletNodeHost = async (body) => {
 
 export default {
   createUser,
-  login,
   sendStepData,
   getPrevStep,
   getCurrentStepData,
