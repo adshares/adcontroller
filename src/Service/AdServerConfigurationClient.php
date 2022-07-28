@@ -16,6 +16,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class AdServerConfigurationClient
 {
     private const KEY_MAP = [
+        Configuration::ADCLASSIFY_URL => self::CLASSIFIER_EXTERNAL_BASE_URL,
+        Configuration::ADPAY_URL => self::ADPAY_URL,
+        Configuration::ADSELECT_URL => self::ADSELECT_URL,
         Configuration::BASE_ADPANEL_URL => self::ADPANEL_URL,
         Configuration::BASE_ADSERVER_URL => self::URL,
         Configuration::BASE_ADUSER_URL => self::ADUSER_BASE_URL,

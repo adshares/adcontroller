@@ -26,6 +26,9 @@ class Configuration
     public const DEFAULT_ADSERVER_HOST_PREFIX = 'app';
     public const DEFAULT_ADUSER_HOST_PREFIX = 'au';
 
+    public const ADCLASSIFY_URL = 'adclassify_url';
+    public const ADPAY_URL = 'adpay_url';
+    public const ADSELECT_URL = 'adselect_url';
     public const BASE_ADPANEL_HOST_PREFIX = 'base_adpanel_host_prefix';
     public const BASE_ADPANEL_URL = 'base_adpanel_url';
     public const BASE_ADSERVER_HOST_PREFIX = 'base_adserver_host_prefix';
