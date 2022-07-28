@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 export default function Login() {
   const dispatch = useDispatch();
-  const [loginUser] = useLoginUserMutation();
+  const [loginUser, { isLoading }] = useLoginUserMutation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [alert, setAlert] = useState({
@@ -97,7 +97,7 @@ export default function Login() {
             onChange={handleInputChange}
             inputProps={{ autoComplete: 'off' }}
           />
-          <Button type="submit" fullWidth variant="contained" color="primary">
+          <Button type="submit" fullWidth variant="contained" color="primary" disabled={isLoading}>
             Login
           </Button>
         </Box>
