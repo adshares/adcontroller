@@ -47,7 +47,7 @@ class DnsStep implements InstallerStep
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
         foreach ($config as $moduleName => $enum) {
-            $url = $this->repository->fetchValueByEnum($enum) ?? null;
+            $url = $this->repository->fetchValueByEnum($enum);
             $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
         }
 

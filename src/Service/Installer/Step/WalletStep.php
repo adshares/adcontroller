@@ -145,56 +145,41 @@ class WalletStep implements InstallerStep
             ];
         }
 
-        $configuration = $this->adServerConfigurationClient->fetch();
+        $configuration = $this->repository->fetchValuesByNames(
+            AdServer::MODULE,
+            [
+                AdServer::WALLET_ADDRESS->value,
+                AdServer::WALLET_NODE_HOST->value,
+                AdServer::WALLET_NODE_PORT->value,
+            ]
+        );
+        $configuration[Configuration::COMMON_DATA_REQUIRED] = false;
 
-        return [
-            Configuration::COMMON_DATA_REQUIRED => false,
-            Configuration::WALLET_ADDRESS => $configuration[Configuration::WALLET_ADDRESS],
-            Configuration::WALLET_NODE_HOST => $configuration[Configuration::WALLET_NODE_HOST],
-            Configuration::WALLET_NODE_PORT => $configuration[Configuration::WALLET_NODE_PORT],
-        ];
+        return $configuration;
     }
 
     public function isDataRequired(): bool
     {
-        $enums = [
-            AdServer::WALLET_ADDRESS,
-            AdServer::WALLET_NODE_HOST,
-            AdServer::WALLET_NODE_PORT,
-            AdServer::WALLET_SECRET_KEY,
-        ];
-        $module = $enums[0]->getModule();
-        $requiredKeys = array_map(fn($enum) => $enum->value, $enums);
-        $localConfiguration = $this->repository->fetchValuesByNames($module, $requiredKeys);
-
-        foreach ($requiredKeys as $requiredKey) {
-            if (!isset($localConfiguration[$requiredKey])) {
-                return true;
-            }
-        }
-
-        $remoteConfiguration = $this->adServerConfigurationClient->fetch();
         $requiredKeys = [
-            Configuration::WALLET_ADDRESS,
-            Configuration::WALLET_NODE_HOST,
-            Configuration::WALLET_NODE_PORT,
+            AdServer::WALLET_ADDRESS->value,
+            AdServer::WALLET_NODE_HOST->value,
+            AdServer::WALLET_NODE_PORT->value,
+            AdServer::WALLET_SECRET_KEY->value,
         ];
+        $configuration = $this->repository->fetchValuesByNames(AdServer::MODULE, $requiredKeys);
 
         foreach ($requiredKeys as $requiredKey) {
-            if (
-                !isset($remoteConfiguration[$requiredKey])
-                || $remoteConfiguration[$requiredKey] !== $localConfiguration[$requiredKey]
-            ) {
+            if (!isset($configuration[$requiredKey])) {
                 return true;
             }
         }
 
         try {
             $this->adsCredentialsChecker->check(
-                $localConfiguration[Configuration::WALLET_ADDRESS],
-                $localConfiguration[Configuration::WALLET_SECRET_KEY],
-                $localConfiguration[Configuration::WALLET_NODE_HOST],
-                $localConfiguration[Configuration::WALLET_NODE_PORT]
+                $configuration[AdServer::WALLET_ADDRESS->value],
+                $configuration[AdServer::WALLET_SECRET_KEY->value],
+                $configuration[AdServer::WALLET_NODE_HOST->value],
+                $configuration[AdServer::WALLET_NODE_PORT->value]
             );
         } catch (UnexpectedResponseException) {
             return true;

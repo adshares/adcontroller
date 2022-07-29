@@ -3,11 +3,16 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdClassify;
+use App\Entity\Enum\AdPanel;
+use App\Entity\Enum\AdPay;
+use App\Entity\Enum\AdSelect;
+use App\Entity\Enum\AdServer;
+use App\Entity\Enum\AdUser;
 use App\Entity\Enum\App;
 use App\Entity\Enum\AppStateEnum;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -19,7 +24,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class StatusStep implements InstallerStep
 {
     public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
         private readonly HttpClientInterface $httpClient
     ) {
@@ -43,22 +47,20 @@ class StatusStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $configuration = $this->adServerConfigurationClient->fetch();
-
         $config = [
-            Module::ADCLASSIFY => Configuration::ADCLASSIFY_URL,
-            Module::ADPANEL => Configuration::BASE_ADPANEL_URL,
-            Module::ADPAY => Configuration::ADPAY_URL,
-            Module::ADSELECT => Configuration::ADSELECT_URL,
-            Module::ADSERVER => Configuration::BASE_ADSERVER_URL,
-            Module::ADUSER => Configuration::BASE_ADUSER_URL,
+            Module::ADCLASSIFY => AdClassify::ADCLASSIFY_URL,
+            Module::ADPANEL => AdPanel::BASE_ADPANEL_URL,
+            Module::ADPAY => AdPay::ADPAY_URL,
+            Module::ADSELECT => AdSelect::ADSELECT_URL,
+            Module::ADSERVER => AdServer::BASE_ADSERVER_URL,
+            Module::ADUSER => AdUser::BASE_ADUSER_URL,
         ];
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
-        foreach ($config as $moduleName => $key) {
-            $url = $configuration[$key] ?? null;
+        foreach ($config as $moduleName => $enum) {
+            $url = $this->repository->fetchValueByEnum($enum);
             $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
         }
 

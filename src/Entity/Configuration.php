@@ -9,30 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
 class Configuration
 {
-    public const ADCLASSIFY_URL = 'adclassify_url';
-    public const ADPAY_URL = 'adpay_url';
-    public const ADSELECT_URL = 'adselect_url';
-    public const BASE_ADPANEL_HOST_PREFIX = 'base_adpanel_host_prefix';
-    public const BASE_ADPANEL_URL = 'base_adpanel_url';
-    public const BASE_ADSERVER_HOST_PREFIX = 'base_adserver_host_prefix';
-    public const BASE_ADUSER_HOST_PREFIX = 'base_aduser_host_prefix';
-    public const BASE_ADUSER_URL = 'base_aduser_url';
-    public const BASE_ADSERVER_URL = 'base_adserver_url';
-    public const BASE_DOMAIN = 'base_domain';
-    public const CLASSIFIER_API_KEY_NAME = 'classifier_ext_api_key_name';
-    public const CLASSIFIER_API_KEY_SECRET = 'classifier_ext_api_key_secret';
     public const COMMON_DATA_REQUIRED = 'data_required';
     public const LICENSE_DATA = 'license_data';
-    public const LICENSE_KEY = 'license_key';
-    public const SMTP_HOST = 'smtp_host';
-    public const SMTP_PASSWORD = 'smtp_password';
-    public const SMTP_PORT = 'smtp_port';
-    public const SMTP_SENDER = 'smtp_sender';
-    public const SMTP_USERNAME = 'smtp_username';
-    public const WALLET_ADDRESS = 'wallet_address';
-    public const WALLET_NODE_HOST = 'wallet_node_host';
-    public const WALLET_NODE_PORT = 'wallet_node_port';
-    public const WALLET_SECRET_KEY = 'wallet_secret_key';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
