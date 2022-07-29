@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Enum\AdServer;
 use App\Entity\Enum\App;
+use App\Entity\Enum\AppStateEnum;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
+use App\Service\Installer\Migrator;
 use App\Service\Installer\Step\BaseStep;
 use App\Service\Installer\Step\ClassifierStep;
 use App\Service\Installer\Step\DnsStep;
@@ -28,6 +30,12 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'api_')]
 class InstallerController extends AbstractController
 {
+    public function __construct(
+        private readonly ConfigurationRepository $repository,
+        private readonly Migrator $migrator,
+    ) {
+    }
+
     #[Route('/step', name: 'previous_step', methods: ['GET'])]
     public function previousStep(ConfigurationRepository $repository): JsonResponse
     {
@@ -39,6 +47,13 @@ class InstallerController extends AbstractController
     #[Route('/step/{step}', name: 'get_step', methods: ['GET'])]
     public function getStep(string $step): JsonResponse
     {
+        if (
+            AppStateEnum::ADSERVER_ACCOUNT_CREATED
+            === AppStateEnum::tryFrom($this->repository->fetchValueByEnum(App::APP_STATE))
+        ) {
+            $this->migrator->migrate();
+            $this->repository->insertOrUpdateOne(App::APP_STATE, AppStateEnum::MIGRATION_COMPLETED->value);
+        }
         if (1 !== preg_match('/^[a-z]+$/', $step)) {
             throw new UnprocessableEntityHttpException(sprintf('Invalid step (%s)', $step));
         }

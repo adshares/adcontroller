@@ -50,6 +50,6 @@ MESSAGE
             }
         }
 
-        return $this->render('index.html.twig', ['state' => $state]);
+        return $this->render('index.html.twig', ['state' => AppStateEnum::tryFrom($state)]);
     }
 }
