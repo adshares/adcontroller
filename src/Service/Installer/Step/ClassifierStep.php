@@ -92,29 +92,16 @@ class ClassifierStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $enums = [
-            AdClassify::CLASSIFIER_API_KEY_NAME,
-            AdClassify::CLASSIFIER_API_KEY_SECRET,
+        $requiredKeys = [
+            AdClassify::CLASSIFIER_API_KEY_NAME->value,
+            AdClassify::CLASSIFIER_API_KEY_SECRET->value,
         ];
-        $module = $enums[0]->getModule();
-        $requiredKeys = array_map(fn($enum) => $enum->value, $enums);
-        $localConfiguration = $this->repository->fetchValuesByNames($module, $requiredKeys);
+        $configuration = $this->repository->fetchValuesByNames(AdClassify::MODULE, $requiredKeys);
 
         foreach ($requiredKeys as $requiredKey) {
-            if (!isset($localConfiguration[$requiredKey])) {
+            if (!isset($configuration[$requiredKey])) {
                 return true;
             }
-        }
-
-        $remoteConfiguration = $this->adServerConfigurationClient->fetch();
-        if (
-            !isset($remoteConfiguration[Configuration::CLASSIFIER_API_KEY_NAME])
-            || (
-                $remoteConfiguration[Configuration::CLASSIFIER_API_KEY_NAME]
-                !== $localConfiguration[Configuration::CLASSIFIER_API_KEY_NAME]
-            )
-        ) {
-            return true;
         }
 
         return false;

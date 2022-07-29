@@ -3,10 +3,12 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdPanel;
+use App\Entity\Enum\AdServer;
+use App\Entity\Enum\AdUser;
 use App\Entity\Enum\App;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -18,7 +20,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class DnsStep implements InstallerStep
 {
     public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
         private readonly HttpClientInterface $httpClient
     ) {
@@ -36,19 +37,17 @@ class DnsStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $values = $this->adServerConfigurationClient->fetch();
-
         $config = [
-            Module::ADPANEL => Configuration::BASE_ADPANEL_URL,
-            Module::ADSERVER => Configuration::BASE_ADSERVER_URL,
-            Module::ADUSER => Configuration::BASE_ADUSER_URL,
+            Module::ADPANEL => AdPanel::BASE_ADPANEL_URL,
+            Module::ADSERVER => AdServer::BASE_ADSERVER_URL,
+            Module::ADUSER => AdUser::BASE_ADUSER_URL,
         ];
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
-        foreach ($config as $moduleName => $key) {
-            $url = $values[$key] ?? null;
+        foreach ($config as $moduleName => $enum) {
+            $url = $this->repository->fetchValueByEnum($enum) ?? null;
             $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
         }
 
