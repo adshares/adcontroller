@@ -3,6 +3,9 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdClassify;
+use App\Entity\Enum\AdServer;
+use App\Entity\Enum\App;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdsCredentialsChecker;
@@ -31,7 +34,7 @@ class WalletStep implements InstallerStep
     public function process(array $content): void
     {
         if (empty($content) && !$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+            $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
             return;
         }
 
@@ -63,8 +66,8 @@ class WalletStep implements InstallerStep
         ];
         $this->adServerConfigurationClient->store($data);
 
-        $data[Configuration::INSTALLER_STEP] = $this->getName();
-        $this->repository->insertOrUpdate($data);
+        $this->repository->insertOrUpdate(AdServer::MODULE, $data);
+        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
     }
 
     private function validate(array $content): void
@@ -154,13 +157,15 @@ class WalletStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $requiredKeys = [
-            Configuration::WALLET_ADDRESS,
-            Configuration::WALLET_SECRET_KEY,
-            Configuration::WALLET_NODE_HOST,
-            Configuration::WALLET_NODE_PORT,
+        $enums = [
+            AdServer::WALLET_ADDRESS,
+            AdServer::WALLET_NODE_HOST,
+            AdServer::WALLET_NODE_PORT,
+            AdServer::WALLET_SECRET_KEY,
         ];
-        $localConfiguration = $this->repository->fetchValuesByNames($requiredKeys);
+        $module = $enums[0]->getModule();
+        $requiredKeys = array_map(fn($enum) => $enum->value, $enums);
+        $localConfiguration = $this->repository->fetchValuesByNames($module, $requiredKeys);
 
         foreach ($requiredKeys as $requiredKey) {
             if (!isset($localConfiguration[$requiredKey])) {

@@ -3,6 +3,7 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\App;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\ValueObject\Module;
@@ -25,6 +26,7 @@ class StatusStep implements InstallerStep
     public function process(array $content): void
     {
         $this->repository->insertOrUpdate(
+            App::MODULE,
             [
                 Configuration::INSTALLER_STEP => $this->getName(),
                 Configuration::APP_STATE => Configuration::APP_STATE_INSTALLATION_COMPLETED,

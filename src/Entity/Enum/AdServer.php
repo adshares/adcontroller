@@ -4,7 +4,7 @@ namespace App\Entity\Enum;
 
 enum AdServer: string implements ConfigurationEnum
 {
-    use GetModule;
+    public const MODULE = 'AdServer';
 
     case BASE_ADSERVER_HOST_PREFIX = 'base_adserver_host_prefix';
     case BASE_ADSERVER_NAME = 'base_adserver_name';
@@ -15,4 +15,9 @@ enum AdServer: string implements ConfigurationEnum
     case WALLET_NODE_HOST = 'wallet_node_host';
     case WALLET_NODE_PORT = 'wallet_node_port';
     case WALLET_SECRET_KEY = 'wallet_secret_key';
+
+    public function getModule(): string
+    {
+        return self::MODULE;
+    }
 }

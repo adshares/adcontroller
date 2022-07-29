@@ -3,6 +3,11 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdPanel;
+use App\Entity\Enum\AdServer;
+use App\Entity\Enum\AdUser;
+use App\Entity\Enum\App;
+use App\Entity\Enum\General;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Service\EnvEditor;
@@ -16,13 +21,13 @@ class BaseStep implements InstallerStep
     private const DEFAULT_ADSERVER_NAME = 'AdServer';
     private const DEFAULT_MAIL_ENDING = '@example.com';
     private const FIELDS = [
-        Configuration::BASE_ADPANEL_HOST_PREFIX,
-        Configuration::BASE_ADSERVER_HOST_PREFIX,
-        Configuration::BASE_ADSERVER_NAME,
-        Configuration::BASE_ADUSER_HOST_PREFIX,
-        Configuration::BASE_DOMAIN,
-        Configuration::BASE_SUPPORT_EMAIL,
-        Configuration::BASE_TECHNICAL_EMAIL,
+        AdPanel::BASE_ADPANEL_HOST_PREFIX,
+        AdServer::BASE_ADSERVER_HOST_PREFIX,
+        AdServer::BASE_ADSERVER_NAME,
+        AdUser::BASE_ADUSER_HOST_PREFIX,
+        General::BASE_DOMAIN,
+        General::BASE_SUPPORT_EMAIL,
+        General::BASE_TECHNICAL_EMAIL,
     ];
 
     public function __construct(
@@ -35,17 +40,17 @@ class BaseStep implements InstallerStep
     public function process(array $content): void
     {
         if (empty($content) && !$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+            $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
             return;
         }
 
         $this->validate($content);
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
 
-        $domain = $content[Configuration::BASE_DOMAIN];
-        $adServerHost = self::getPrefixedHost($domain, $content[Configuration::BASE_ADSERVER_HOST_PREFIX]);
-        $adPanelHost = self::getPrefixedHost($domain, $content[Configuration::BASE_ADPANEL_HOST_PREFIX]);
-        $adUserHost = self::getPrefixedHost($domain, $content[Configuration::BASE_ADUSER_HOST_PREFIX]);
+        $domain = $content[General::BASE_DOMAIN->value];
+        $adServerHost = self::getPrefixedHost($domain, $content[AdServer::BASE_ADSERVER_HOST_PREFIX->value]);
+        $adPanelHost = self::getPrefixedHost($domain, $content[AdPanel::BASE_ADPANEL_HOST_PREFIX->value]);
+        $adUserHost = self::getPrefixedHost($domain, $content[AdUser::BASE_ADUSER_HOST_PREFIX->value]);
         $protocol = 'https://';
         $adServerUrl = $protocol . $adServerHost;
         $adPanelUrl = $protocol . $adPanelHost;
@@ -55,67 +60,95 @@ class BaseStep implements InstallerStep
         $this->adServerConfigurationClient->store(
             [
                 Configuration::BASE_ADPANEL_URL => $adPanelUrl,
-                Configuration::BASE_ADSERVER_NAME => $content[Configuration::BASE_ADSERVER_NAME],
+                Configuration::BASE_ADSERVER_NAME => $content[AdServer::BASE_ADSERVER_NAME->value],
                 Configuration::BASE_ADSERVER_URL => $adServerUrl,
                 Configuration::BASE_ADUSER_INTERNAL_URL => $adUserInternalUrl,
                 Configuration::BASE_ADUSER_URL => $adUserUrl,
-                Configuration::BASE_SUPPORT_EMAIL => $content[Configuration::BASE_SUPPORT_EMAIL],
-                Configuration::BASE_TECHNICAL_EMAIL => $content[Configuration::BASE_TECHNICAL_EMAIL],
+                Configuration::BASE_SUPPORT_EMAIL => $content[General::BASE_SUPPORT_EMAIL->value],
+                Configuration::BASE_TECHNICAL_EMAIL => $content[General::BASE_TECHNICAL_EMAIL->value],
             ]
         );
 
         $envEditor->set(
             [
                 EnvEditor::ADSERVER_APP_HOST => $adServerHost,
-                EnvEditor::ADSERVER_APP_NAME => $content[Configuration::BASE_ADSERVER_NAME],
+                EnvEditor::ADSERVER_APP_NAME => $content[AdServer::BASE_ADSERVER_NAME->value],
                 EnvEditor::ADSERVER_APP_URL => $adServerUrl,
             ]
         );
 
-        $data = [];
-        foreach (self::FIELDS as $field) {
-            $data[$field] = $content[$field];
-        }
-        $data[Configuration::BASE_ADPANEL_URL] = $adPanelUrl;
-        $data[Configuration::BASE_ADUSER_INTERNAL_URL] = $adUserInternalUrl;
-        $data[Configuration::BASE_ADUSER_URL] = $adUserUrl;
-        $data[Configuration::INSTALLER_STEP] = $this->getName();
-        $this->repository->insertOrUpdate($data);
+        $this->repository->insertOrUpdate(
+            AdPanel::MODULE,
+            [
+                AdPanel::BASE_ADPANEL_HOST_PREFIX->value => $content[AdPanel::BASE_ADPANEL_HOST_PREFIX->value],
+                AdPanel::BASE_ADPANEL_URL->value => $adPanelUrl,
+            ]
+        );
+        $this->repository->insertOrUpdate(
+            AdServer::MODULE,
+            [
+                AdServer::BASE_ADSERVER_HOST_PREFIX->value => $content[AdServer::BASE_ADSERVER_HOST_PREFIX->value],
+                AdServer::BASE_ADSERVER_NAME->value => $content[AdServer::BASE_ADSERVER_NAME->value],
+                AdServer::BASE_ADSERVER_URL->value => $adServerUrl,
+            ]
+        );
+        $this->repository->insertOrUpdate(
+            AdUser::MODULE,
+            [
+                AdUser::BASE_ADUSER_HOST_PREFIX->value => $content[AdUser::BASE_ADUSER_HOST_PREFIX->value],
+                AdUser::BASE_ADUSER_INTERNAL_URL->value => $adUserInternalUrl,
+                AdUser::BASE_ADUSER_URL->value => $adUserUrl,
+            ]
+        );
+        $this->repository->insertOrUpdate(
+            General::MODULE,
+            [
+                General::BASE_DOMAIN->value => $content[General::BASE_DOMAIN->value],
+                General::BASE_SUPPORT_EMAIL->value => $content[General::BASE_SUPPORT_EMAIL->value],
+                General::BASE_TECHNICAL_EMAIL->value => $content[General::BASE_TECHNICAL_EMAIL->value],
+            ]
+        );
+        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
     }
 
     private function validate(array $content): void
     {
         foreach (self::FIELDS as $field) {
-            if (!isset($content[$field])) {
+            if (!isset($content[$field->value])) {
                 throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field));
             }
         }
 
-        if (!filter_var($content[Configuration::BASE_TECHNICAL_EMAIL], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($content[General::BASE_TECHNICAL_EMAIL->value], FILTER_VALIDATE_EMAIL)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be an email', Configuration::BASE_TECHNICAL_EMAIL)
+                sprintf('Field `%s` must be an email', General::BASE_TECHNICAL_EMAIL->value)
             );
         }
-        if (!filter_var($content[Configuration::BASE_SUPPORT_EMAIL], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($content[General::BASE_SUPPORT_EMAIL->value], FILTER_VALIDATE_EMAIL)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be an email', Configuration::BASE_SUPPORT_EMAIL)
+                sprintf('Field `%s` must be an email', General::BASE_SUPPORT_EMAIL->value)
             );
         }
-        if (!filter_var($content[Configuration::BASE_DOMAIN], FILTER_VALIDATE_DOMAIN)) {
+        if (!filter_var($content[General::BASE_DOMAIN->value], FILTER_VALIDATE_DOMAIN)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a domain', Configuration::BASE_DOMAIN)
+                sprintf('Field `%s` must be a domain', General::BASE_DOMAIN->value)
             );
         }
 
-        $pairs = [
-            Configuration::BASE_ADPANEL_HOST_PREFIX => Configuration::BASE_ADSERVER_HOST_PREFIX,
-            Configuration::BASE_ADSERVER_HOST_PREFIX => Configuration::BASE_ADUSER_HOST_PREFIX,
-            Configuration::BASE_ADUSER_HOST_PREFIX => Configuration::BASE_ADPANEL_HOST_PREFIX,
+        $enumPrefixes = [
+            AdPanel::BASE_ADPANEL_HOST_PREFIX->value,
+            AdServer::BASE_ADSERVER_HOST_PREFIX->value,
+            AdUser::BASE_ADUSER_HOST_PREFIX->value,
         ];
-        foreach ($pairs as $prefixA => $prefixB) {
-            if ($content[$prefixA] === $content[$prefixB]) {
+        $pairs = [
+            0 => 1,
+            1 => 2,
+            2 => 0,
+        ];
+        foreach ($pairs as $index1 => $index2) {
+            if ($content[$enumPrefixes[$index1]] === $content[$enumPrefixes[$index2]]) {
                 throw new UnprocessableEntityHttpException(
-                    sprintf('Field `%s` must be different than `%s', $prefixA, $prefixB)
+                    sprintf('Field `%s` must be different than `%s', $enumPrefixes[$index1], $enumPrefixes[$index2])
                 );
             }
         }

@@ -3,6 +3,7 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\App;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\ValueObject\Module;
@@ -24,7 +25,7 @@ class DnsStep implements InstallerStep
 
     public function process(array $content): void
     {
-        $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
     }
 
     public function getName(): string

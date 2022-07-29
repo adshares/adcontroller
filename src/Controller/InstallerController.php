@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\App;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
@@ -30,7 +31,7 @@ class InstallerController extends AbstractController
     #[Route('/step', name: 'previous_step', methods: ['GET'])]
     public function previousStep(ConfigurationRepository $repository): JsonResponse
     {
-        $step = $repository->fetchValueByName(Configuration::INSTALLER_STEP);
+        $step = $repository->fetchValueByEnum(App::INSTALLER_STEP);
 
         return $this->json([Configuration::INSTALLER_STEP => $step]);
     }
