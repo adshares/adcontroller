@@ -133,7 +133,7 @@ class LicenseStep implements InstallerStep
     public function claimCommunityLicense(): void
     {
         if (
-            null === ($name = $this->repository->fetchValueByEnum(AdServer::BASE_ADSERVER_NAME))
+            null === ($name = $this->repository->fetchValueByEnum(AdServer::NAME))
             || null === ($email = $this->repository->fetchValueByEnum(General::BASE_TECHNICAL_EMAIL))
         ) {
             throw new UnprocessableEntityHttpException('Base step must be completed');

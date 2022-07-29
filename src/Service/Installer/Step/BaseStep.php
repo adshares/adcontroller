@@ -25,10 +25,10 @@ class BaseStep implements InstallerStep
     private const DEFAULT_ADUSER_HOST_PREFIX = 'au';
     private const DEFAULT_MAIL_ENDING = '@example.com';
     private const FIELDS = [
-        AdPanel::BASE_ADPANEL_HOST_PREFIX,
-        AdServer::BASE_ADSERVER_HOST_PREFIX,
-        AdServer::BASE_ADSERVER_NAME,
-        AdUser::BASE_ADUSER_HOST_PREFIX,
+        AdPanel::HOST_PREFIX,
+        AdServer::HOST_PREFIX,
+        AdServer::NAME,
+        AdUser::HOST_PREFIX,
         General::BASE_DOMAIN,
         General::BASE_SUPPORT_EMAIL,
         General::BASE_TECHNICAL_EMAIL,
@@ -52,9 +52,9 @@ class BaseStep implements InstallerStep
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
 
         $domain = $content[General::BASE_DOMAIN->value];
-        $adServerHost = self::getPrefixedHost($domain, $content[AdServer::BASE_ADSERVER_HOST_PREFIX->value]);
-        $adPanelHost = self::getPrefixedHost($domain, $content[AdPanel::BASE_ADPANEL_HOST_PREFIX->value]);
-        $adUserHost = self::getPrefixedHost($domain, $content[AdUser::BASE_ADUSER_HOST_PREFIX->value]);
+        $adServerHost = self::getPrefixedHost($domain, $content[AdServer::HOST_PREFIX->value]);
+        $adPanelHost = self::getPrefixedHost($domain, $content[AdPanel::HOST_PREFIX->value]);
+        $adUserHost = self::getPrefixedHost($domain, $content[AdUser::HOST_PREFIX->value]);
         $protocol = 'https://';
         $adServerUrl = $protocol . $adServerHost;
         $adPanelUrl = $protocol . $adPanelHost;
@@ -63,8 +63,8 @@ class BaseStep implements InstallerStep
 
         $this->adServerConfigurationClient->store(
             [
-                AdServer::BASE_ADSERVER_NAME->value => $content[AdServer::BASE_ADSERVER_NAME->value],
-                AdServer::BASE_ADSERVER_URL->value => $adServerUrl,
+                AdServer::NAME->value => $content[AdServer::NAME->value],
+                AdServer::URL->value => $adServerUrl,
                 General::BASE_SUPPORT_EMAIL->value => $content[General::BASE_SUPPORT_EMAIL->value],
                 General::BASE_TECHNICAL_EMAIL->value => $content[General::BASE_TECHNICAL_EMAIL->value],
             ]
@@ -75,7 +75,7 @@ class BaseStep implements InstallerStep
         $envEditor->set(
             [
                 EnvEditor::ADSERVER_APP_HOST => $adServerHost,
-                EnvEditor::ADSERVER_APP_NAME => $content[AdServer::BASE_ADSERVER_NAME->value],
+                EnvEditor::ADSERVER_APP_NAME => $content[AdServer::NAME->value],
                 EnvEditor::ADSERVER_APP_URL => $adServerUrl,
             ]
         );
@@ -83,24 +83,24 @@ class BaseStep implements InstallerStep
         $this->repository->insertOrUpdate(
             AdPanel::MODULE,
             [
-                AdPanel::BASE_ADPANEL_HOST_PREFIX->value => $content[AdPanel::BASE_ADPANEL_HOST_PREFIX->value],
-                AdPanel::BASE_ADPANEL_URL->value => $adPanelUrl,
+                AdPanel::HOST_PREFIX->value => $content[AdPanel::HOST_PREFIX->value],
+                AdPanel::URL->value => $adPanelUrl,
             ]
         );
         $this->repository->insertOrUpdate(
             AdServer::MODULE,
             [
-                AdServer::BASE_ADSERVER_HOST_PREFIX->value => $content[AdServer::BASE_ADSERVER_HOST_PREFIX->value],
-                AdServer::BASE_ADSERVER_NAME->value => $content[AdServer::BASE_ADSERVER_NAME->value],
-                AdServer::BASE_ADSERVER_URL->value => $adServerUrl,
+                AdServer::HOST_PREFIX->value => $content[AdServer::HOST_PREFIX->value],
+                AdServer::NAME->value => $content[AdServer::NAME->value],
+                AdServer::URL->value => $adServerUrl,
             ]
         );
         $this->repository->insertOrUpdate(
             AdUser::MODULE,
             [
-                AdUser::BASE_ADUSER_HOST_PREFIX->value => $content[AdUser::BASE_ADUSER_HOST_PREFIX->value],
-                AdUser::BASE_ADUSER_INTERNAL_URL->value => $adUserInternalUrl,
-                AdUser::BASE_ADUSER_URL->value => $adUserUrl,
+                AdUser::HOST_PREFIX->value => $content[AdUser::HOST_PREFIX->value],
+                AdUser::INTERNAL_URL->value => $adUserInternalUrl,
+                AdUser::URL->value => $adUserUrl,
             ]
         );
         $this->repository->insertOrUpdate(
@@ -139,9 +139,9 @@ class BaseStep implements InstallerStep
         }
 
         $enumPrefixes = [
-            AdPanel::BASE_ADPANEL_HOST_PREFIX->value,
-            AdServer::BASE_ADSERVER_HOST_PREFIX->value,
-            AdUser::BASE_ADUSER_HOST_PREFIX->value,
+            AdPanel::HOST_PREFIX->value,
+            AdServer::HOST_PREFIX->value,
+            AdUser::HOST_PREFIX->value,
         ];
         $pairs = [
             0 => 1,
@@ -172,21 +172,21 @@ class BaseStep implements InstallerStep
         $adServerConfig = $this->repository->fetchValuesByNames(
             AdServer::MODULE,
             [
-                AdServer::BASE_ADSERVER_NAME->value,
-                AdServer::BASE_ADSERVER_URL->value,
+                AdServer::NAME->value,
+                AdServer::URL->value,
             ]
         );
-        $adServerUrl = $adServerConfig[AdServer::BASE_ADSERVER_URL->value] ?? 'https://app.localhost';
+        $adServerUrl = $adServerConfig[AdServer::URL->value] ?? 'https://app.localhost';
 
         $data = [
-            AdPanel::BASE_ADPANEL_HOST_PREFIX->value => self::DEFAULT_ADPANEL_HOST_PREFIX,
-            AdServer::BASE_ADSERVER_HOST_PREFIX->value => self::DEFAULT_ADSERVER_HOST_PREFIX,
-            AdUser::BASE_ADUSER_HOST_PREFIX->value => self::DEFAULT_ADUSER_HOST_PREFIX,
+            AdPanel::HOST_PREFIX->value => self::DEFAULT_ADPANEL_HOST_PREFIX,
+            AdServer::HOST_PREFIX->value => self::DEFAULT_ADSERVER_HOST_PREFIX,
+            AdUser::HOST_PREFIX->value => self::DEFAULT_ADUSER_HOST_PREFIX,
         ];
 
         if (!str_ends_with($adServerUrl, 'localhost')) {
-            $adPanelUrl = $this->repository->fetchValueByEnum(AdPanel::BASE_ADPANEL_URL) ?? 'https://panel.localhost';
-            $adUserUrl = $this->repository->fetchValueByEnum(AdUser::BASE_ADUSER_URL) ?? 'https://au.localhost';
+            $adPanelUrl = $this->repository->fetchValueByEnum(AdPanel::URL) ?? 'https://panel.localhost';
+            $adUserUrl = $this->repository->fetchValueByEnum(AdUser::URL) ?? 'https://au.localhost';
             $parsed = ServiceUrlParser::parseUrls($adPanelUrl, $adServerUrl, $adUserUrl);
             if (null !== $parsed) {
                 $data = $parsed;
@@ -194,10 +194,10 @@ class BaseStep implements InstallerStep
         }
 
         if (
-            isset($adServerConfig[AdServer::BASE_ADSERVER_NAME->value])
-            && self::DEFAULT_ADSERVER_NAME !== $adServerConfig[AdServer::BASE_ADSERVER_NAME->value]
+            isset($adServerConfig[AdServer::NAME->value])
+            && self::DEFAULT_ADSERVER_NAME !== $adServerConfig[AdServer::NAME->value]
         ) {
-            $data[AdServer::BASE_ADSERVER_NAME->value] = $adServerConfig[AdServer::BASE_ADSERVER_NAME->value];
+            $data[AdServer::NAME->value] = $adServerConfig[AdServer::NAME->value];
         }
 
         $mailKeys = [
@@ -221,27 +221,27 @@ class BaseStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        if (null === $this->repository->fetchValueByEnum(AdPanel::BASE_ADPANEL_URL)) {
+        if (null === $this->repository->fetchValueByEnum(AdPanel::URL)) {
             return true;
         }
 
         $adServerConfig = $this->repository->fetchValuesByNames(
             AdServer::MODULE,
             [
-                AdServer::BASE_ADSERVER_NAME->value,
-                AdServer::BASE_ADSERVER_URL->value,
+                AdServer::NAME->value,
+                AdServer::URL->value,
             ]
         );
         if (
-            !isset($adServerConfig[AdServer::BASE_ADSERVER_NAME->value])
-            || self::DEFAULT_ADSERVER_NAME === $adServerConfig[AdServer::BASE_ADSERVER_NAME->value]
-            || !isset($adServerConfig[AdServer::BASE_ADSERVER_URL->value])
-            || str_ends_with($adServerConfig[AdServer::BASE_ADSERVER_URL->value], 'localhost')
+            !isset($adServerConfig[AdServer::NAME->value])
+            || self::DEFAULT_ADSERVER_NAME === $adServerConfig[AdServer::NAME->value]
+            || !isset($adServerConfig[AdServer::URL->value])
+            || str_ends_with($adServerConfig[AdServer::URL->value], 'localhost')
         ) {
             return true;
         }
 
-        if (null === $this->repository->fetchValueByEnum(AdUser::BASE_ADUSER_URL)) {
+        if (null === $this->repository->fetchValueByEnum(AdUser::URL)) {
             return true;
         }
 

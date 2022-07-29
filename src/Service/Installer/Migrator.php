@@ -16,26 +16,26 @@ class Migrator
 {
     private const KEY_MAP = [
         // AdClassify
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_BASE_URL => AdClassify::ADCLASSIFY_URL,
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_NAME => AdClassify::CLASSIFIER_API_KEY_NAME,
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_SECRET => AdClassify::CLASSIFIER_API_KEY_SECRET,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_BASE_URL => AdClassify::URL,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_NAME => AdClassify::API_KEY_NAME,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_SECRET => AdClassify::API_KEY_SECRET,
         // AdPanel
-        AdServerConfigurationClient::ADPANEL_URL => AdPanel::BASE_ADPANEL_URL,
+        AdServerConfigurationClient::ADPANEL_URL => AdPanel::URL,
         // AdPay
-        AdServerConfigurationClient::ADPAY_URL => AdPay::ADPAY_URL,
+        AdServerConfigurationClient::ADPAY_URL => AdPay::URL,
         // AdSelect
-        AdServerConfigurationClient::ADSELECT_URL => AdSelect::ADSELECT_URL,
+        AdServerConfigurationClient::ADSELECT_URL => AdSelect::URL,
         // AdServer
-        AdServerConfigurationClient::URL => AdServer::BASE_ADSERVER_URL,
-        AdServerConfigurationClient::ADSERVER_NAME => AdServer::BASE_ADSERVER_NAME,
+        AdServerConfigurationClient::URL => AdServer::URL,
+        AdServerConfigurationClient::ADSERVER_NAME => AdServer::NAME,
         AdServerConfigurationClient::ADSHARES_LICENSE_KEY => AdServer::LICENSE_KEY,
         AdServerConfigurationClient::ADSHARES_ADDRESS => AdServer::WALLET_ADDRESS,
         AdServerConfigurationClient::ADSHARES_NODE_HOST => AdServer::WALLET_NODE_HOST,
         AdServerConfigurationClient::ADSHARES_NODE_PORT => AdServer::WALLET_NODE_PORT,
         AdServerConfigurationClient::ADSHARES_SECRET => AdServer::WALLET_SECRET_KEY,
         // AdUser
-        AdServerConfigurationClient::ADUSER_BASE_URL => AdUser::BASE_ADUSER_URL,
-        AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUser::BASE_ADUSER_INTERNAL_URL,
+        AdServerConfigurationClient::ADUSER_BASE_URL => AdUser::URL,
+        AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUser::INTERNAL_URL,
         // General
         AdServerConfigurationClient::SUPPORT_EMAIL => General::BASE_SUPPORT_EMAIL,
         AdServerConfigurationClient::TECHNICAL_EMAIL => General::BASE_TECHNICAL_EMAIL,

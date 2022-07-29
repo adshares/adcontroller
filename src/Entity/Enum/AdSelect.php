@@ -6,5 +6,5 @@ enum AdSelect: string implements ConfigurationEnum
 {
     use GetModule;
 
-    case ADSELECT_URL = 'adselect_url';
+    case URL = 'adselect_url';
 }

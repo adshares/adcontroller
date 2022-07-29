@@ -24,7 +24,7 @@ use Doctrine\Persistence\ManagerRegistry;
 class ConfigurationRepository extends ServiceEntityRepository
 {
     private const SECRETS_ENUM = [
-        AdClassify::CLASSIFIER_API_KEY_SECRET,
+        AdClassify::API_KEY_SECRET,
         AdServer::LICENSE_KEY,
         AdServer::WALLET_SECRET_KEY,
     ];

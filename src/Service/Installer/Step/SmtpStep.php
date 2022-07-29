@@ -150,7 +150,7 @@ class SmtpStep implements InstallerStep
         );
 
         if (
-            null === ($adServerName = $this->repository->fetchValueByEnum(AdServer::BASE_ADSERVER_NAME))
+            null === ($adServerName = $this->repository->fetchValueByEnum(AdServer::NAME))
             || !isset($generalConfig[General::BASE_SUPPORT_EMAIL->value])
             || !isset($generalConfig[General::BASE_TECHNICAL_EMAIL->value])
         ) {

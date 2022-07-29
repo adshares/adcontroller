@@ -38,9 +38,9 @@ class DnsStep implements InstallerStep
     public function fetchData(): array
     {
         $config = [
-            Module::ADPANEL => AdPanel::BASE_ADPANEL_URL,
-            Module::ADSERVER => AdServer::BASE_ADSERVER_URL,
-            Module::ADUSER => AdUser::BASE_ADUSER_URL,
+            Module::ADPANEL => AdPanel::URL,
+            Module::ADSERVER => AdServer::URL,
+            Module::ADUSER => AdUser::URL,
         ];
 
         $data = [

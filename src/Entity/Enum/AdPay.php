@@ -6,5 +6,5 @@ enum AdPay: string implements ConfigurationEnum
 {
     use GetModule;
 
-    case ADPAY_URL = 'adpay_url';
+    case URL = 'adpay_url';
 }

@@ -48,12 +48,12 @@ class StatusStep implements InstallerStep
     public function fetchData(): array
     {
         $config = [
-            Module::ADCLASSIFY => AdClassify::ADCLASSIFY_URL,
-            Module::ADPANEL => AdPanel::BASE_ADPANEL_URL,
-            Module::ADPAY => AdPay::ADPAY_URL,
-            Module::ADSELECT => AdSelect::ADSELECT_URL,
-            Module::ADSERVER => AdServer::BASE_ADSERVER_URL,
-            Module::ADUSER => AdUser::BASE_ADUSER_URL,
+            Module::ADCLASSIFY => AdClassify::URL,
+            Module::ADPANEL => AdPanel::URL,
+            Module::ADPAY => AdPay::URL,
+            Module::ADSELECT => AdSelect::URL,
+            Module::ADSERVER => AdServer::URL,
+            Module::ADUSER => AdUser::URL,
         ];
 
         $data = [

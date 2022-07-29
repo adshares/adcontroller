@@ -6,11 +6,11 @@ enum AdServer: string implements ConfigurationEnum
 {
     public const MODULE = 'AdServer';
 
-    case BASE_ADSERVER_HOST_PREFIX = 'base_adserver_host_prefix';
-    case BASE_ADSERVER_NAME = 'base_adserver_name';
-    case BASE_ADSERVER_URL = 'base_adserver_url';
+    case HOST_PREFIX = 'base_adserver_host_prefix';
     case LICENSE_DATA = 'license_data';
     case LICENSE_KEY = 'license_key';
+    case NAME = 'base_adserver_name';
+    case URL = 'base_adserver_url';
     case WALLET_ADDRESS = 'wallet_address';
     case WALLET_NODE_HOST = 'wallet_node_host';
     case WALLET_NODE_PORT = 'wallet_node_port';

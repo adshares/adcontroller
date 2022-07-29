@@ -178,9 +178,9 @@ class AdServerConfigurationClient
     private function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
-            AdServer::BASE_ADSERVER_URL->value => self::URL,
-            AdServer::BASE_ADSERVER_NAME->value => self::ADSERVER_NAME,
             AdServer::LICENSE_KEY->value => self::ADSHARES_LICENSE_KEY,
+            AdServer::NAME->value => self::ADSERVER_NAME,
+            AdServer::URL->value => self::URL,
             AdServer::WALLET_ADDRESS->value => self::ADSHARES_ADDRESS,
             AdServer::WALLET_NODE_HOST->value => self::ADSHARES_NODE_HOST,
             AdServer::WALLET_NODE_PORT->value => self::ADSHARES_NODE_PORT,

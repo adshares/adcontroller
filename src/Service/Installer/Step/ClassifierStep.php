@@ -34,7 +34,7 @@ class ClassifierStep implements InstallerStep
             return;
         }
 
-        if (null === ($name = $this->repository->fetchValueByEnum(AdServer::BASE_ADSERVER_NAME))) {
+        if (null === ($name = $this->repository->fetchValueByEnum(AdServer::NAME))) {
             throw new UnprocessableEntityHttpException('AdServer\'s name must be set');
         }
         if (null === ($email = $this->repository->fetchValueByEnum(General::BASE_TECHNICAL_EMAIL))) {
@@ -59,8 +59,8 @@ class ClassifierStep implements InstallerStep
         $this->repository->insertOrUpdate(
             AdClassify::MODULE,
             [
-                AdClassify::CLASSIFIER_API_KEY_NAME->value => $apiKey['name'],
-                AdClassify::CLASSIFIER_API_KEY_SECRET->value => $apiKey['secret'],
+                AdClassify::API_KEY_NAME->value => $apiKey['name'],
+                AdClassify::API_KEY_SECRET->value => $apiKey['secret'],
             ]
         );
         $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
@@ -78,7 +78,7 @@ class ClassifierStep implements InstallerStep
         if (
             $isDataRequired
             && (
-                null === $this->repository->fetchValueByEnum(AdServer::BASE_ADSERVER_NAME)
+                null === $this->repository->fetchValueByEnum(AdServer::NAME)
                 || null === $this->repository->fetchValueByEnum(General::BASE_TECHNICAL_EMAIL)
             )
         ) {
@@ -93,8 +93,8 @@ class ClassifierStep implements InstallerStep
     public function isDataRequired(): bool
     {
         $requiredKeys = [
-            AdClassify::CLASSIFIER_API_KEY_NAME->value,
-            AdClassify::CLASSIFIER_API_KEY_SECRET->value,
+            AdClassify::API_KEY_NAME->value,
+            AdClassify::API_KEY_SECRET->value,
         ];
         $configuration = $this->repository->fetchValuesByNames(AdClassify::MODULE, $requiredKeys);
 

@@ -45,9 +45,9 @@ class ServiceUrlParser
             );
 
             return [
-                AdPanel::BASE_ADPANEL_HOST_PREFIX->value => $prefixes['panel'],
-                AdServer::BASE_ADSERVER_HOST_PREFIX->value => $prefixes['app'],
-                AdUser::BASE_ADUSER_HOST_PREFIX->value => $prefixes['au'],
+                AdPanel::HOST_PREFIX->value => $prefixes['panel'],
+                AdServer::HOST_PREFIX->value => $prefixes['app'],
+                AdUser::HOST_PREFIX->value => $prefixes['au'],
                 General::BASE_DOMAIN->value => implode('.', array_reverse($commonDomainParts)),
             ];
         }
