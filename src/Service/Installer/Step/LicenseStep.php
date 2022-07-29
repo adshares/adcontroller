@@ -49,7 +49,7 @@ class LicenseStep implements InstallerStep
         ]);
 
         $this->repository->insertOrUpdateOne(AdServer::LICENSE_KEY, $licenseKey);
-        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP,  $this->getName());
+        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
     }
 
     private function validate(array $content): void
@@ -155,6 +155,6 @@ class LicenseStep implements InstallerStep
         );
 
         $this->repository->insertOrUpdateOne(AdServer::LICENSE_KEY, $licenseKey);
-        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP,  $this->getName());
+        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
     }
 }
