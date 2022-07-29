@@ -18,6 +18,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class ClassifierStep implements InstallerStep
 {
     public function __construct(
+        private readonly string $adclassifyBaseUri,
         private readonly AdClassifyClient $adClassifyClient,
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
@@ -48,13 +49,19 @@ class ClassifierStep implements InstallerStep
             throw new UnprocessableEntityHttpException('AdClassify is not accessible');
         }
 
-        $data = [
-            Configuration::CLASSIFIER_API_KEY_NAME => $apiKey['name'],
-            Configuration::CLASSIFIER_API_KEY_SECRET => $apiKey['secret'],
-        ];
-        $this->adServerConfigurationClient->store($data);
+        $this->adServerConfigurationClient->setupAdClassify(
+            $this->adclassifyBaseUri,
+            $apiKey['name'],
+            $apiKey['secret']
+        );
 
-        $this->repository->insertOrUpdate(AdClassify::MODULE, $data);
+        $this->repository->insertOrUpdate(
+            AdClassify::MODULE,
+            [
+                Configuration::CLASSIFIER_API_KEY_NAME => $apiKey['name'],
+                Configuration::CLASSIFIER_API_KEY_SECRET => $apiKey['secret'],
+            ]
+        );
         $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
     }
 

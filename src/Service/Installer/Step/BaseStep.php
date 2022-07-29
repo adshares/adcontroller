@@ -59,15 +59,14 @@ class BaseStep implements InstallerStep
 
         $this->adServerConfigurationClient->store(
             [
-                Configuration::BASE_ADPANEL_URL => $adPanelUrl,
-                Configuration::BASE_ADSERVER_NAME => $content[AdServer::BASE_ADSERVER_NAME->value],
-                Configuration::BASE_ADSERVER_URL => $adServerUrl,
-                Configuration::BASE_ADUSER_INTERNAL_URL => $adUserInternalUrl,
-                Configuration::BASE_ADUSER_URL => $adUserUrl,
-                Configuration::BASE_SUPPORT_EMAIL => $content[General::BASE_SUPPORT_EMAIL->value],
-                Configuration::BASE_TECHNICAL_EMAIL => $content[General::BASE_TECHNICAL_EMAIL->value],
+                AdServer::BASE_ADSERVER_NAME->value => $content[AdServer::BASE_ADSERVER_NAME->value],
+                AdServer::BASE_ADSERVER_URL->value => $adServerUrl,
+                General::BASE_SUPPORT_EMAIL->value => $content[General::BASE_SUPPORT_EMAIL->value],
+                General::BASE_TECHNICAL_EMAIL->value => $content[General::BASE_TECHNICAL_EMAIL->value],
             ]
         );
+        $this->adServerConfigurationClient->setupAdPanel($adPanelUrl);
+        $this->adServerConfigurationClient->setupAdUser($adUserUrl, $adUserInternalUrl);
 
         $envEditor->set(
             [

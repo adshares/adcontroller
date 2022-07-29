@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdServer;
+use App\Entity\Enum\General;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
@@ -191,18 +193,8 @@ class AdServerConfigurationClient
 
     public function store(array $data): void
     {
-        $response = $this->httpClient->request(
-            'PATCH',
-            $this->buildUri(),
-            [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getToken(),
-                ],
-                'json' => $this->mapDataToAdServerFormat($data)
-            ]
-        );
-
-        $this->checkStatusCode($response);
+        $mapped = $this->mapDataToAdServerFormat($data);
+        $this->sendData($mapped);
     }
 
     private function buildUri(): string
@@ -217,13 +209,30 @@ class AdServerConfigurationClient
 
     private function mapDataToAdServerFormat(array $data): array
     {
+        $keyMap = [
+            AdServer::BASE_ADSERVER_URL->value => self::URL,
+            AdServer::BASE_ADSERVER_NAME->value => self::ADSERVER_NAME,
+            AdServer::LICENSE_KEY->value => self::ADSHARES_LICENSE_KEY,
+            AdServer::WALLET_ADDRESS->value => self::ADSHARES_ADDRESS,
+            AdServer::WALLET_NODE_HOST->value => self::ADSHARES_NODE_HOST,
+            AdServer::WALLET_NODE_PORT->value => self::ADSHARES_NODE_PORT,
+            AdServer::WALLET_SECRET_KEY->value => self::ADSHARES_SECRET,
+            General::BASE_SUPPORT_EMAIL->value => self::SUPPORT_EMAIL,
+            General::BASE_TECHNICAL_EMAIL->value => self::TECHNICAL_EMAIL,
+            General::SMTP_HOST->value => self::MAIL_SMTP_HOST,
+            General::SMTP_PASSWORD->value => self::MAIL_SMTP_PASSWORD,
+            General::SMTP_PORT->value => self::MAIL_SMTP_PORT,
+            General::SMTP_SENDER->value => self::MAIL_FROM_NAME,
+            General::SMTP_USERNAME->value => self::MAIL_SMTP_USERNAME,
+        ];
+
         $mappedData = [];
         foreach ($data as $key => $value) {
-            if (isset(self::KEY_MAP[$key])) {
+            if (isset($keyMap[$key])) {
                 if (is_bool($value)) {
                     $value = $value ? '1' : '0';
                 }
-                $mappedData[self::KEY_MAP[$key]] = (string)$value;
+                $mappedData[$keyMap[$key]] = (string)$value;
             }
         }
 
@@ -252,5 +261,57 @@ class AdServerConfigurationClient
                 sprintf('AdServer responded with an invalid code (%d)', $statusCode)
             );
         }
+    }
+
+    public function setupAdClassify(string $adClassifyUrl, string $apiKeyName, string $apiKeySecret): void
+    {
+        $this->sendData(
+            [
+                self::CLASSIFIER_EXTERNAL_API_KEY_NAME => $apiKeyName,
+                self::CLASSIFIER_EXTERNAL_API_KEY_SECRET => $apiKeySecret,
+                self::CLASSIFIER_EXTERNAL_BASE_URL => $adClassifyUrl,
+            ]
+        );
+    }
+
+    public function setupAdPanel(string $adPanelUrl): void
+    {
+        $this->sendData([self::ADPANEL_URL => $adPanelUrl]);
+    }
+
+    public function setupAdPay(string $adPayUrl): void
+    {
+        $this->sendData([self::ADPAY_URL => $adPayUrl]);
+    }
+
+    public function setupAdSelect(string $adSelectUrl): void
+    {
+        $this->sendData([self::ADSELECT_URL => $adSelectUrl]);
+    }
+
+    public function setupAdUser(string $adUserUrl, string $adUserInternalUrl): void
+    {
+        $this->sendData(
+            [
+                self::ADUSER_BASE_URL => $adUserUrl,
+                self::ADUSER_INTERNAL_URL => $adUserInternalUrl,
+            ]
+        );
+    }
+
+    private function sendData(array $data): void
+    {
+        $response = $this->httpClient->request(
+            'PATCH',
+            $this->buildUri(),
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->getToken(),
+                ],
+                'json' => $data
+            ]
+        );
+
+        $this->checkStatusCode($response);
     }
 }

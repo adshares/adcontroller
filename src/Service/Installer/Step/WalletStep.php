@@ -59,10 +59,10 @@ class WalletStep implements InstallerStep
         }
 
         $data = [
-            Configuration::WALLET_ADDRESS => $content[Configuration::WALLET_ADDRESS],
-            Configuration::WALLET_NODE_HOST => $content[Configuration::WALLET_NODE_HOST],
-            Configuration::WALLET_NODE_PORT => $content[Configuration::WALLET_NODE_PORT],
-            Configuration::WALLET_SECRET_KEY => $content[Configuration::WALLET_SECRET_KEY],
+            AdServer::WALLET_ADDRESS->value => $content[AdServer::WALLET_ADDRESS->value],
+            AdServer::WALLET_NODE_HOST->value => $content[AdServer::WALLET_NODE_HOST->value],
+            AdServer::WALLET_NODE_PORT->value => $content[AdServer::WALLET_NODE_PORT->value],
+            AdServer::WALLET_SECRET_KEY->value => $content[AdServer::WALLET_SECRET_KEY->value],
         ];
         $this->adServerConfigurationClient->store($data);
 

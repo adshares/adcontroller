@@ -44,7 +44,7 @@ class LicenseStep implements InstallerStep
 
         $licenseKey = $content[Configuration::LICENSE_KEY];
         $this->adServerConfigurationClient->store([
-            Configuration::LICENSE_KEY => $licenseKey,
+            AdServer::LICENSE_KEY->value => $licenseKey,
         ]);
 
         $this->repository->insertOrUpdateOne(AdServer::LICENSE_KEY, $licenseKey);
@@ -149,7 +149,7 @@ class LicenseStep implements InstallerStep
 
         $this->adServerConfigurationClient->store(
             [
-                Configuration::LICENSE_KEY => $licenseKey,
+                AdServer::LICENSE_KEY->value => $licenseKey,
             ]
         );
 

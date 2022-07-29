@@ -65,11 +65,11 @@ class SmtpStep implements InstallerStep
         }
 
         $data = [
-            Configuration::SMTP_HOST => $content[Configuration::SMTP_HOST],
-            Configuration::SMTP_PASSWORD => $content[Configuration::SMTP_PASSWORD],
-            Configuration::SMTP_PORT => $content[Configuration::SMTP_PORT],
-            Configuration::SMTP_SENDER => $content[Configuration::SMTP_SENDER],
-            Configuration::SMTP_USERNAME => $content[Configuration::SMTP_USERNAME],
+            General::SMTP_HOST->value => $content[General::SMTP_HOST->value],
+            General::SMTP_PASSWORD->value => $content[General::SMTP_PASSWORD->value],
+            General::SMTP_PORT->value => $content[General::SMTP_PORT->value],
+            General::SMTP_SENDER->value => $content[General::SMTP_SENDER->value],
+            General::SMTP_USERNAME->value => $content[General::SMTP_USERNAME->value],
         ];
         $this->adServerConfigurationClient->store($data);
 
