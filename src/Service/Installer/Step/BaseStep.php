@@ -8,6 +8,7 @@ use App\Entity\Enum\AdServer;
 use App\Entity\Enum\AdUser;
 use App\Entity\Enum\App;
 use App\Entity\Enum\General;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Service\EnvEditor;
@@ -160,7 +161,7 @@ class BaseStep implements InstallerStep
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_BASE;
+        return InstallerStepEnum::BASE->value;
     }
 
     public function fetchData(): array

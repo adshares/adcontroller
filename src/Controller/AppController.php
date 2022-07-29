@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Configuration;
 use App\Entity\Enum\App;
+use App\Entity\Enum\AppStateEnum;
 use App\Exception\ServiceNotPresent;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerAdminList;
@@ -45,7 +45,7 @@ MESSAGE
 
         if (null === ($state = $repository->fetchValueByEnum(App::APP_STATE))) {
             if ($accountList->isAdministratorAccountPresent()) {
-                $state = Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED;
+                $state = AppStateEnum::ADSERVER_ACCOUNT_CREATED->value;
                 $repository->insertOrUpdateOne(App::APP_STATE, $state);
             }
         }

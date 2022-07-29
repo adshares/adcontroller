@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Configuration;
+use App\Entity\Enum\AdServer;
 use App\Entity\Enum\App;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
@@ -33,7 +33,7 @@ class InstallerController extends AbstractController
     {
         $step = $repository->fetchValueByEnum(App::INSTALLER_STEP);
 
-        return $this->json([Configuration::INSTALLER_STEP => $step]);
+        return $this->json([App::INSTALLER_STEP->value => $step]);
     }
 
     #[Route('/step/{step}', name: 'get_step', methods: ['GET'])]
@@ -92,22 +92,22 @@ class InstallerController extends AbstractController
     {
         $content = json_decode($request->getContent(), true);
         if (
-            !isset($content[Configuration::WALLET_ADDRESS]) ||
-            !is_string($content[Configuration::WALLET_ADDRESS]) ||
-            !AccountId::isValid($content[Configuration::WALLET_ADDRESS])
+            !isset($content[AdServer::WALLET_ADDRESS->value]) ||
+            !is_string($content[AdServer::WALLET_ADDRESS->value]) ||
+            !AccountId::isValid($content[AdServer::WALLET_ADDRESS->value])
         ) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a valid ADS account', Configuration::WALLET_ADDRESS)
+                sprintf('Field `%s` must be a valid ADS account', AdServer::WALLET_ADDRESS->value)
             );
         }
 
-        $accountId = new AccountId($content[Configuration::WALLET_ADDRESS]);
+        $accountId = new AccountId($content[AdServer::WALLET_ADDRESS->value]);
         $nodeHost = $walletStep->getNodeHostByAccountAddress($accountId);
 
         return $this->json(
             [
-                Configuration::WALLET_NODE_HOST => $nodeHost,
-                Configuration::WALLET_NODE_PORT => '6511',
+                AdServer::WALLET_NODE_HOST->value => $nodeHost,
+                AdServer::WALLET_NODE_PORT->value => '6511',
             ]
         );
     }

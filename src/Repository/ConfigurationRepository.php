@@ -23,12 +23,6 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ConfigurationRepository extends ServiceEntityRepository
 {
-    private const SECRETS = [
-        Configuration::CLASSIFIER_API_KEY_SECRET,
-        Configuration::LICENSE_KEY,
-        Configuration::WALLET_SECRET_KEY,
-    ];
-
     private const SECRETS_ENUM = [
         AdClassify::CLASSIFIER_API_KEY_SECRET,
         AdServer::LICENSE_KEY,
@@ -62,7 +56,7 @@ class ConfigurationRepository extends ServiceEntityRepository
             } else {
                 $entity = $entities[$name];
             }
-            if (in_array($name, self::SECRETS)) {
+            if ($this->isSecretEntity($entity)) {
                 $value = $this->crypt->encrypt($value);
             }
             $entity->setValue($value);
@@ -113,12 +107,26 @@ class ConfigurationRepository extends ServiceEntityRepository
         $data = [];
         foreach ($entities as $entity) {
             $value = $entity->getValue();
-            if (in_array($entity->getName(), self::SECRETS)) {
+            if ($this->isSecretEntity($entity)) {
                 $value = $this->crypt->decrypt($value);
             }
             $data[$entity->getName()] = $value;
         }
         return $data;
+    }
+
+    private function isSecretEntity(Configuration $entity): bool
+    {
+        $module = $entity->getModule();
+        $name = $entity->getName();
+
+        foreach (self::SECRETS_ENUM as $enum) {
+            if ($enum->getModule() === $module && $enum->value === $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function findOneByEnum(ConfigurationEnum $enum): ?Configuration

@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Configuration;
 use App\Entity\Enum\App;
+use App\Entity\Enum\AppStateEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerAdminCreator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -62,7 +62,7 @@ class AccountController extends AbstractController
         } catch (ProcessFailedException | ProcessRuntimeException) {
             throw new UnprocessableEntityHttpException('Account cannot be created');
         }
-        $repository->insertOrUpdateOne(App::APP_STATE, Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED);
+        $repository->insertOrUpdateOne(App::APP_STATE, AppStateEnum::ADSERVER_ACCOUNT_CREATED->value);
 
         return $this->json(['message' => sprintf('Account %s created', $email)], Response::HTTP_CREATED);
     }

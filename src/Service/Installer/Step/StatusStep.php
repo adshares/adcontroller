@@ -4,6 +4,8 @@ namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
 use App\Entity\Enum\App;
+use App\Entity\Enum\AppStateEnum;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\ValueObject\Module;
@@ -28,15 +30,15 @@ class StatusStep implements InstallerStep
         $this->repository->insertOrUpdate(
             App::MODULE,
             [
-                Configuration::INSTALLER_STEP => $this->getName(),
-                Configuration::APP_STATE => Configuration::APP_STATE_INSTALLATION_COMPLETED,
+                App::INSTALLER_STEP->value => $this->getName(),
+                App::APP_STATE->value => AppStateEnum::INSTALLATION_COMPLETED->value,
             ]
         );
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_STATUS;
+        return InstallerStepEnum::STATUS->value;
     }
 
     public function fetchData(): array

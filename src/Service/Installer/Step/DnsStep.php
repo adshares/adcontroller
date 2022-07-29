@@ -4,6 +4,7 @@ namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
 use App\Entity\Enum\App;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\ValueObject\Module;
@@ -30,7 +31,7 @@ class DnsStep implements InstallerStep
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_DNS;
+        return InstallerStepEnum::DNS->value;
     }
 
     public function fetchData(): array

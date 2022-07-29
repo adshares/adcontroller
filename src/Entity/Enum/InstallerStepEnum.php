@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-enum InstallerStep: string
+enum InstallerStepEnum: string
 {
     case BASE = 'base';
     case DNS = 'dns';

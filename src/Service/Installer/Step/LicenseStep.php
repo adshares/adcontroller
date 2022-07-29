@@ -6,6 +6,7 @@ use App\Entity\Configuration;
 use App\Entity\Enum\AdServer;
 use App\Entity\Enum\App;
 use App\Entity\Enum\General;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
@@ -42,7 +43,7 @@ class LicenseStep implements InstallerStep
     {
         $this->validate($content);
 
-        $licenseKey = $content[Configuration::LICENSE_KEY];
+        $licenseKey = $content[AdServer::LICENSE_KEY->value];
         $this->adServerConfigurationClient->store([
             AdServer::LICENSE_KEY->value => $licenseKey,
         ]);
@@ -53,20 +54,20 @@ class LicenseStep implements InstallerStep
 
     private function validate(array $content): void
     {
-        if (!isset($content[Configuration::LICENSE_KEY])) {
-            throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', Configuration::LICENSE_KEY));
+        if (!isset($content[AdServer::LICENSE_KEY->value])) {
+            throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', AdServer::LICENSE_KEY->value));
         }
 
-        if (null === $this->getLicenseByKey($content[Configuration::LICENSE_KEY])) {
+        if (null === $this->getLicenseByKey($content[AdServer::LICENSE_KEY->value])) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a valid license key', Configuration::LICENSE_KEY)
+                sprintf('Field `%s` must be a valid license key', AdServer::LICENSE_KEY->value)
             );
         }
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_LICENSE;
+        return InstallerStepEnum::LICENSE->value;
     }
 
     public function fetchData(): array

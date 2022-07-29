@@ -8,6 +8,7 @@ enum App: string implements ConfigurationEnum
 
     case APP_STATE = 'app_state';
     case INSTALLER_STEP = 'installer_step';
+    case EMAIL_SENT = 'email_sent';
 
     public function getModule(): string
     {

@@ -7,6 +7,7 @@ use App\Entity\Enum\AdClassify;
 use App\Entity\Enum\AdServer;
 use App\Entity\Enum\App;
 use App\Entity\Enum\General;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdClassifyClient;
@@ -58,8 +59,8 @@ class ClassifierStep implements InstallerStep
         $this->repository->insertOrUpdate(
             AdClassify::MODULE,
             [
-                Configuration::CLASSIFIER_API_KEY_NAME => $apiKey['name'],
-                Configuration::CLASSIFIER_API_KEY_SECRET => $apiKey['secret'],
+                AdClassify::CLASSIFIER_API_KEY_NAME->value => $apiKey['name'],
+                AdClassify::CLASSIFIER_API_KEY_SECRET->value => $apiKey['secret'],
             ]
         );
         $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
@@ -67,7 +68,7 @@ class ClassifierStep implements InstallerStep
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_CLASSIFIER;
+        return InstallerStepEnum::CLASSIFIER->value;
     }
 
     public function fetchData(): array

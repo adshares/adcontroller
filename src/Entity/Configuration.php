@@ -9,19 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
 class Configuration
 {
-    public const APP_STATE = 'app_state';
-    public const APP_STATE_ADSERVER_ACCOUNT_CREATED = 'adserver_account_created';
-    public const APP_STATE_INSTALLATION_COMPLETED = 'installation_completed';
-
-    public const INSTALLER_STEP = 'installer_step';
-    public const INSTALLER_STEP_BASE = 'base';
-    public const INSTALLER_STEP_DNS = 'dns';
-    public const INSTALLER_STEP_WALLET = 'wallet';
-    public const INSTALLER_STEP_LICENSE = 'license';
-    public const INSTALLER_STEP_CLASSIFIER = 'classifier';
-    public const INSTALLER_STEP_SMTP = 'smtp';
-    public const INSTALLER_STEP_STATUS = 'status';
-
     public const DEFAULT_ADPANEL_HOST_PREFIX = 'panel';
     public const DEFAULT_ADSERVER_HOST_PREFIX = 'app';
     public const DEFAULT_ADUSER_HOST_PREFIX = 'au';
@@ -45,7 +32,6 @@ class Configuration
     public const COMMON_DATA_REQUIRED = 'data_required';
     public const LICENSE_DATA = 'license_data';
     public const LICENSE_KEY = 'license_key';
-    public const SMTP_EMAIL_SENT = 'smtp_email_sent';
     public const SMTP_HOST = 'smtp_host';
     public const SMTP_PASSWORD = 'smtp_password';
     public const SMTP_PORT = 'smtp_port';
