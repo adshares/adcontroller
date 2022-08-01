@@ -44,11 +44,10 @@ class ServiceUrlParser
                 $invertedDomains
             );
 
+            /** @var array{app: string, au: string, panel: string} $prefixes */
             return [
-                AdPanelConfig::HOST_PREFIX->value => $prefixes['panel'],
-                AdServerConfig::HOST_PREFIX->value => $prefixes['app'],
-                AdUserConfig::HOST_PREFIX->value => $prefixes['au'],
                 GeneralConfig::BASE_DOMAIN->value => implode('.', array_reverse($commonDomainParts)),
+                'prefixes' => $prefixes,
             ];
         }
 

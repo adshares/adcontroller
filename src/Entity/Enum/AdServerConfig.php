@@ -6,7 +6,6 @@ enum AdServerConfig: string implements ConfigEnum
 {
     public const MODULE = 'AdServer';
 
-    case HOST_PREFIX = 'base_adserver_host_prefix';
     case LICENSE_DATA = 'license_data';
     case LICENSE_KEY = 'license_key';
     case NAME = 'base_adserver_name';

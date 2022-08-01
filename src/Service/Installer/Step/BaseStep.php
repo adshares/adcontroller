@@ -25,10 +25,7 @@ class BaseStep implements InstallerStep
     private const DEFAULT_ADUSER_HOST_PREFIX = 'au';
     private const DEFAULT_MAIL_ENDING = '@example.com';
     private const FIELDS = [
-        AdPanelConfig::HOST_PREFIX,
-        AdServerConfig::HOST_PREFIX,
         AdServerConfig::NAME,
-        AdUserConfig::HOST_PREFIX,
         GeneralConfig::BASE_DOMAIN,
         GeneralConfig::BASE_SUPPORT_EMAIL,
         GeneralConfig::BASE_TECHNICAL_EMAIL,
@@ -52,9 +49,9 @@ class BaseStep implements InstallerStep
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
 
         $domain = $content[GeneralConfig::BASE_DOMAIN->value];
-        $adServerHost = self::getPrefixedHost($domain, $content[AdServerConfig::HOST_PREFIX->value]);
-        $adPanelHost = self::getPrefixedHost($domain, $content[AdPanelConfig::HOST_PREFIX->value]);
-        $adUserHost = self::getPrefixedHost($domain, $content[AdUserConfig::HOST_PREFIX->value]);
+        $adServerHost = self::getPrefixedHost($domain, self::DEFAULT_ADSERVER_HOST_PREFIX);
+        $adPanelHost = self::getPrefixedHost($domain, self::DEFAULT_ADPANEL_HOST_PREFIX);
+        $adUserHost = self::getPrefixedHost($domain, self::DEFAULT_ADUSER_HOST_PREFIX);
         $protocol = 'https://';
         $adServerUrl = $protocol . $adServerHost;
         $adPanelUrl = $protocol . $adPanelHost;
@@ -80,17 +77,10 @@ class BaseStep implements InstallerStep
             ]
         );
 
-        $this->repository->insertOrUpdate(
-            AdPanelConfig::MODULE,
-            [
-                AdPanelConfig::HOST_PREFIX->value => $content[AdPanelConfig::HOST_PREFIX->value],
-                AdPanelConfig::URL->value => $adPanelUrl,
-            ]
-        );
+        $this->repository->insertOrUpdateOne(AdPanelConfig::URL, $adPanelUrl);
         $this->repository->insertOrUpdate(
             AdServerConfig::MODULE,
             [
-                AdServerConfig::HOST_PREFIX->value => $content[AdServerConfig::HOST_PREFIX->value],
                 AdServerConfig::NAME->value => $content[AdServerConfig::NAME->value],
                 AdServerConfig::URL->value => $adServerUrl,
             ]
@@ -98,7 +88,6 @@ class BaseStep implements InstallerStep
         $this->repository->insertOrUpdate(
             AdUserConfig::MODULE,
             [
-                AdUserConfig::HOST_PREFIX->value => $content[AdUserConfig::HOST_PREFIX->value],
                 AdUserConfig::INTERNAL_URL->value => $adUserInternalUrl,
                 AdUserConfig::URL->value => $adUserUrl,
             ]
@@ -137,24 +126,6 @@ class BaseStep implements InstallerStep
                 sprintf('Field `%s` must be a domain', GeneralConfig::BASE_DOMAIN->value)
             );
         }
-
-        $enumPrefixes = [
-            AdPanelConfig::HOST_PREFIX->value,
-            AdServerConfig::HOST_PREFIX->value,
-            AdUserConfig::HOST_PREFIX->value,
-        ];
-        $pairs = [
-            0 => 1,
-            1 => 2,
-            2 => 0,
-        ];
-        foreach ($pairs as $index1 => $index2) {
-            if ($content[$enumPrefixes[$index1]] === $content[$enumPrefixes[$index2]]) {
-                throw new UnprocessableEntityHttpException(
-                    sprintf('Field `%s` must be different than `%s', $enumPrefixes[$index1], $enumPrefixes[$index2])
-                );
-            }
-        }
     }
 
     private static function getPrefixedHost(string $domain, string $prefix): string
@@ -179,9 +150,6 @@ class BaseStep implements InstallerStep
         $adServerUrl = $adServerConfig[AdServerConfig::URL->value] ?? 'https://app.localhost';
 
         $data = [
-            AdPanelConfig::HOST_PREFIX->value => self::DEFAULT_ADPANEL_HOST_PREFIX,
-            AdServerConfig::HOST_PREFIX->value => self::DEFAULT_ADSERVER_HOST_PREFIX,
-            AdUserConfig::HOST_PREFIX->value => self::DEFAULT_ADUSER_HOST_PREFIX,
         ];
 
         if (!str_ends_with($adServerUrl, 'localhost')) {
@@ -189,7 +157,7 @@ class BaseStep implements InstallerStep
             $adUserUrl = $this->repository->fetchValueByEnum(AdUserConfig::URL) ?? 'https://au.localhost';
             $parsed = ServiceUrlParser::parseUrls($adPanelUrl, $adServerUrl, $adUserUrl);
             if (null !== $parsed) {
-                $data = $parsed;
+                $data[GeneralConfig::BASE_DOMAIN->value] = $parsed[GeneralConfig::BASE_DOMAIN->value];
             }
         }
 

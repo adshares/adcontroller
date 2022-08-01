@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
 import { useForm } from '../../../hooks';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
@@ -7,21 +7,11 @@ import styles from './styles.scss';
 
 function Base({ handleNextStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
     base_adserver_name: '',
     base_technical_email: '',
     base_domain: '',
     base_support_email: '',
-  });
-  const {
-    fields: advancedFields,
-    setFields: setAdvancedFields,
-    onFormChange: onAdvancedFieldsChange,
-  } = useForm({
-    base_adpanel_host_prefix: '',
-    base_adserver_host_prefix: '',
-    base_aduser_host_prefix: '',
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
@@ -45,9 +35,6 @@ function Base({ handleNextStep, step }) {
         base_technical_email,
         base_domain,
         base_support_email,
-        base_adpanel_host_prefix,
-        base_adserver_host_prefix,
-        base_aduser_host_prefix,
         data_required,
       } = response;
       setFields({
@@ -57,14 +44,6 @@ function Base({ handleNextStep, step }) {
           base_technical_email: base_technical_email || '',
           base_domain: base_domain || '',
           base_support_email: base_support_email || '',
-        },
-      });
-      setAdvancedFields({
-        ...advancedFields,
-        ...{
-          base_adpanel_host_prefix,
-          base_adserver_host_prefix,
-          base_aduser_host_prefix,
         },
       });
       setEditMode(data_required);
@@ -90,7 +69,6 @@ function Base({ handleNextStep, step }) {
       if (isFormWasTouched) {
         await apiService.sendStepData(step.path, {
           ...fields,
-          ...advancedFields,
         });
       }
       handleNextStep(step);
@@ -185,55 +163,6 @@ function Base({ handleNextStep, step }) {
               />
             </Box>
           </Box>
-
-          <Button type="button" onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>
-            Advanced options
-          </Button>
-
-          <Box
-            className={styles.formAdvanced}
-            component="form"
-            onChange={onAdvancedFieldsChange}
-            onClick={() => setFormTouched(true)}
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <Collapse in={showAdvancedOptions} timeout="auto" unmountOnExit>
-              <Box
-                sx={{
-                  marginTop: '8px',
-                }}
-                className={styles.formBlock}
-              >
-                <TextField
-                  className={styles.textField}
-                  size="small"
-                  name="base_adpanel_host_prefix"
-                  label="AdPanel host prefix"
-                  value={advancedFields.base_adpanel_host_prefix}
-                  type="text"
-                  inputProps={{ autoComplete: 'off' }}
-                />
-                <TextField
-                  className={styles.textField}
-                  size="small"
-                  name="base_aduser_host_prefix"
-                  label="AdUser host prefix"
-                  value={advancedFields.base_aduser_host_prefix}
-                  type="text"
-                  inputProps={{ autoComplete: 'off' }}
-                />
-                <TextField
-                  className={styles.textField}
-                  size="small"
-                  name="base_adserver_host_prefix"
-                  label="AdServer host prefix"
-                  value={advancedFields.base_adserver_host_prefix}
-                  type="text"
-                  inputProps={{ autoComplete: 'off' }}
-                />
-              </Box>
-            </Collapse>
-          </Box>
         </Box>
       )}
 
@@ -241,7 +170,6 @@ function Base({ handleNextStep, step }) {
         <InfoTable
           stepData={{
             ...fields,
-            ...advancedFields,
           }}
         />
       )}
@@ -270,18 +198,6 @@ function InfoTable({ stepData }) {
         <TableRow>
           <TableCell align="left">AdServer's operator email</TableCell>
           <TableCell align="left">{stepData.base_technical_email}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">AdPanel host prefix</TableCell>
-          <TableCell align="left">{stepData.base_adpanel_host_prefix}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">AdUser host prefix</TableCell>
-          <TableCell align="left">{stepData.base_aduser_host_prefix}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">AdServer host prefix</TableCell>
-          <TableCell align="left">{stepData.base_adserver_host_prefix}</TableCell>
         </TableRow>
       </TableBody>
     </Table>
