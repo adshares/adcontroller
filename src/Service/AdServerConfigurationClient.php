@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\Entity\Enum\AdServer;
-use App\Entity\Enum\General;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\GeneralConfig;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
@@ -178,20 +178,20 @@ class AdServerConfigurationClient
     private function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
-            AdServer::LICENSE_KEY->value => self::ADSHARES_LICENSE_KEY,
-            AdServer::NAME->value => self::ADSERVER_NAME,
-            AdServer::URL->value => self::URL,
-            AdServer::WALLET_ADDRESS->value => self::ADSHARES_ADDRESS,
-            AdServer::WALLET_NODE_HOST->value => self::ADSHARES_NODE_HOST,
-            AdServer::WALLET_NODE_PORT->value => self::ADSHARES_NODE_PORT,
-            AdServer::WALLET_SECRET_KEY->value => self::ADSHARES_SECRET,
-            General::BASE_SUPPORT_EMAIL->value => self::SUPPORT_EMAIL,
-            General::BASE_TECHNICAL_EMAIL->value => self::TECHNICAL_EMAIL,
-            General::SMTP_HOST->value => self::MAIL_SMTP_HOST,
-            General::SMTP_PASSWORD->value => self::MAIL_SMTP_PASSWORD,
-            General::SMTP_PORT->value => self::MAIL_SMTP_PORT,
-            General::SMTP_SENDER->value => self::MAIL_FROM_NAME,
-            General::SMTP_USERNAME->value => self::MAIL_SMTP_USERNAME,
+            AdServerConfig::LICENSE_KEY->value => self::ADSHARES_LICENSE_KEY,
+            AdServerConfig::NAME->value => self::ADSERVER_NAME,
+            AdServerConfig::URL->value => self::URL,
+            AdServerConfig::WALLET_ADDRESS->value => self::ADSHARES_ADDRESS,
+            AdServerConfig::WALLET_NODE_HOST->value => self::ADSHARES_NODE_HOST,
+            AdServerConfig::WALLET_NODE_PORT->value => self::ADSHARES_NODE_PORT,
+            AdServerConfig::WALLET_SECRET_KEY->value => self::ADSHARES_SECRET,
+            GeneralConfig::BASE_SUPPORT_EMAIL->value => self::SUPPORT_EMAIL,
+            GeneralConfig::BASE_TECHNICAL_EMAIL->value => self::TECHNICAL_EMAIL,
+            GeneralConfig::SMTP_HOST->value => self::MAIL_SMTP_HOST,
+            GeneralConfig::SMTP_PASSWORD->value => self::MAIL_SMTP_PASSWORD,
+            GeneralConfig::SMTP_PORT->value => self::MAIL_SMTP_PORT,
+            GeneralConfig::SMTP_SENDER->value => self::MAIL_FROM_NAME,
+            GeneralConfig::SMTP_USERNAME->value => self::MAIL_SMTP_USERNAME,
         ];
 
         $mappedData = [];

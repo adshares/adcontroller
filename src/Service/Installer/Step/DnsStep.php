@@ -3,10 +3,10 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
-use App\Entity\Enum\AdPanel;
-use App\Entity\Enum\AdServer;
-use App\Entity\Enum\AdUser;
-use App\Entity\Enum\App;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
 use App\ValueObject\Module;
@@ -27,20 +27,20 @@ class DnsStep implements InstallerStep
 
     public function process(array $content): void
     {
-        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
     }
 
     public function getName(): string
     {
-        return InstallerStepEnum::DNS->value;
+        return InstallerStepEnum::Dns->name;
     }
 
     public function fetchData(): array
     {
         $config = [
-            Module::ADPANEL => AdPanel::URL,
-            Module::ADSERVER => AdServer::URL,
-            Module::ADUSER => AdUser::URL,
+            Module::ADPANEL => AdPanelConfig::URL,
+            Module::ADSERVER => AdServerConfig::URL,
+            Module::ADUSER => AdUserConfig::URL,
         ];
 
         $data = [

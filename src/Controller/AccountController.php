@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Enum\App;
+use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerAdminCreator;
@@ -26,7 +26,7 @@ class AccountController extends AbstractController
         ConfigurationRepository $repository,
         ValidatorInterface $validator
     ): JsonResponse {
-        if (null !== $repository->fetchValueByEnum(App::APP_STATE)) {
+        if (null !== $repository->fetchValueByEnum(AppConfig::APP_STATE)) {
             throw new UnprocessableEntityHttpException('Account already created');
         }
         $content = json_decode($request->getContent(), true);
@@ -62,7 +62,7 @@ class AccountController extends AbstractController
         } catch (ProcessFailedException | ProcessRuntimeException) {
             throw new UnprocessableEntityHttpException('Account cannot be created');
         }
-        $repository->insertOrUpdateOne(App::APP_STATE, AppStateEnum::ADSERVER_ACCOUNT_CREATED->value);
+        $repository->insertOrUpdateOne(AppConfig::APP_STATE, AppStateEnum::ADSERVER_ACCOUNT_CREATED->value);
 
         return $this->json(['message' => sprintf('Account %s created', $email)], Response::HTTP_CREATED);
     }

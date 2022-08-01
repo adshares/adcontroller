@@ -3,13 +3,13 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
-use App\Entity\Enum\AdClassify;
-use App\Entity\Enum\AdPanel;
-use App\Entity\Enum\AdPay;
-use App\Entity\Enum\AdSelect;
-use App\Entity\Enum\AdServer;
-use App\Entity\Enum\AdUser;
-use App\Entity\Enum\App;
+use App\Entity\Enum\AdClassifyConfig;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdPayConfig;
+use App\Entity\Enum\AdSelectConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
@@ -32,28 +32,28 @@ class StatusStep implements InstallerStep
     public function process(array $content): void
     {
         $this->repository->insertOrUpdate(
-            App::MODULE,
+            AppConfig::MODULE,
             [
-                App::INSTALLER_STEP->value => $this->getName(),
-                App::APP_STATE->value => AppStateEnum::INSTALLATION_COMPLETED->value,
+                AppConfig::INSTALLER_STEP->value => $this->getName(),
+                AppConfig::APP_STATE->value => AppStateEnum::INSTALLATION_COMPLETED->value,
             ]
         );
     }
 
     public function getName(): string
     {
-        return InstallerStepEnum::STATUS->value;
+        return InstallerStepEnum::Status->name;
     }
 
     public function fetchData(): array
     {
         $config = [
-            Module::ADCLASSIFY => AdClassify::URL,
-            Module::ADPANEL => AdPanel::URL,
-            Module::ADPAY => AdPay::URL,
-            Module::ADSELECT => AdSelect::URL,
-            Module::ADSERVER => AdServer::URL,
-            Module::ADUSER => AdUser::URL,
+            Module::ADCLASSIFY => AdClassifyConfig::URL,
+            Module::ADPANEL => AdPanelConfig::URL,
+            Module::ADPAY => AdPayConfig::URL,
+            Module::ADSELECT => AdSelectConfig::URL,
+            Module::ADSERVER => AdServerConfig::URL,
+            Module::ADUSER => AdUserConfig::URL,
         ];
 
         $data = [

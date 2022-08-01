@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-enum App: string implements ConfigurationEnum
+enum AppConfig: string implements ConfigEnum
 {
     public const MODULE = 'App';
 

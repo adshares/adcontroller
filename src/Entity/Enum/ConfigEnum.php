@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-interface ConfigurationEnum
+interface ConfigEnum
 {
     public function getModule(): string;
 }

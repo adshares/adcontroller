@@ -2,13 +2,13 @@
 
 namespace App\Service\Installer;
 
-use App\Entity\Enum\AdClassify;
-use App\Entity\Enum\AdPanel;
-use App\Entity\Enum\AdPay;
-use App\Entity\Enum\AdSelect;
-use App\Entity\Enum\AdServer;
-use App\Entity\Enum\AdUser;
-use App\Entity\Enum\General;
+use App\Entity\Enum\AdClassifyConfig;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdPayConfig;
+use App\Entity\Enum\AdSelectConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\GeneralConfig;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 
@@ -16,34 +16,34 @@ class Migrator
 {
     private const KEY_MAP = [
         // AdClassify
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_BASE_URL => AdClassify::URL,
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_NAME => AdClassify::API_KEY_NAME,
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_SECRET => AdClassify::API_KEY_SECRET,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_BASE_URL => AdClassifyConfig::URL,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_NAME => AdClassifyConfig::API_KEY_NAME,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_SECRET => AdClassifyConfig::API_KEY_SECRET,
         // AdPanel
-        AdServerConfigurationClient::ADPANEL_URL => AdPanel::URL,
+        AdServerConfigurationClient::ADPANEL_URL => AdPanelConfig::URL,
         // AdPay
-        AdServerConfigurationClient::ADPAY_URL => AdPay::URL,
+        AdServerConfigurationClient::ADPAY_URL => AdPayConfig::URL,
         // AdSelect
-        AdServerConfigurationClient::ADSELECT_URL => AdSelect::URL,
+        AdServerConfigurationClient::ADSELECT_URL => AdSelectConfig::URL,
         // AdServer
-        AdServerConfigurationClient::URL => AdServer::URL,
-        AdServerConfigurationClient::ADSERVER_NAME => AdServer::NAME,
-        AdServerConfigurationClient::ADSHARES_LICENSE_KEY => AdServer::LICENSE_KEY,
-        AdServerConfigurationClient::ADSHARES_ADDRESS => AdServer::WALLET_ADDRESS,
-        AdServerConfigurationClient::ADSHARES_NODE_HOST => AdServer::WALLET_NODE_HOST,
-        AdServerConfigurationClient::ADSHARES_NODE_PORT => AdServer::WALLET_NODE_PORT,
-        AdServerConfigurationClient::ADSHARES_SECRET => AdServer::WALLET_SECRET_KEY,
+        AdServerConfigurationClient::URL => AdServerConfig::URL,
+        AdServerConfigurationClient::ADSERVER_NAME => AdServerConfig::NAME,
+        AdServerConfigurationClient::ADSHARES_LICENSE_KEY => AdServerConfig::LICENSE_KEY,
+        AdServerConfigurationClient::ADSHARES_ADDRESS => AdServerConfig::WALLET_ADDRESS,
+        AdServerConfigurationClient::ADSHARES_NODE_HOST => AdServerConfig::WALLET_NODE_HOST,
+        AdServerConfigurationClient::ADSHARES_NODE_PORT => AdServerConfig::WALLET_NODE_PORT,
+        AdServerConfigurationClient::ADSHARES_SECRET => AdServerConfig::WALLET_SECRET_KEY,
         // AdUser
-        AdServerConfigurationClient::ADUSER_BASE_URL => AdUser::URL,
-        AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUser::INTERNAL_URL,
+        AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::URL,
+        AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUserConfig::INTERNAL_URL,
         // General
-        AdServerConfigurationClient::SUPPORT_EMAIL => General::BASE_SUPPORT_EMAIL,
-        AdServerConfigurationClient::TECHNICAL_EMAIL => General::BASE_TECHNICAL_EMAIL,
-        AdServerConfigurationClient::MAIL_SMTP_HOST => General::SMTP_HOST,
-        AdServerConfigurationClient::MAIL_SMTP_PASSWORD => General::SMTP_PASSWORD,
-        AdServerConfigurationClient::MAIL_SMTP_PORT => General::SMTP_PORT,
-        AdServerConfigurationClient::MAIL_FROM_NAME => General::SMTP_SENDER,
-        AdServerConfigurationClient::MAIL_SMTP_USERNAME => General::SMTP_USERNAME,
+        AdServerConfigurationClient::SUPPORT_EMAIL => GeneralConfig::BASE_SUPPORT_EMAIL,
+        AdServerConfigurationClient::TECHNICAL_EMAIL => GeneralConfig::BASE_TECHNICAL_EMAIL,
+        AdServerConfigurationClient::MAIL_SMTP_HOST => GeneralConfig::SMTP_HOST,
+        AdServerConfigurationClient::MAIL_SMTP_PASSWORD => GeneralConfig::SMTP_PASSWORD,
+        AdServerConfigurationClient::MAIL_SMTP_PORT => GeneralConfig::SMTP_PORT,
+        AdServerConfigurationClient::MAIL_FROM_NAME => GeneralConfig::SMTP_SENDER,
+        AdServerConfigurationClient::MAIL_SMTP_USERNAME => GeneralConfig::SMTP_USERNAME,
     ];
 
     public function __construct(

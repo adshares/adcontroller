@@ -3,8 +3,8 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
-use App\Entity\Enum\AdServer;
-use App\Entity\Enum\App;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
@@ -18,8 +18,8 @@ class WalletStep implements InstallerStep
 {
     private const DEFAULT_NODE_PORT = 6511;
     private const FIELDS = [
-        AdServer::WALLET_ADDRESS,
-        AdServer::WALLET_SECRET_KEY,
+        AdServerConfig::WALLET_ADDRESS,
+        AdServerConfig::WALLET_SECRET_KEY,
     ];
     private const SECRET_KEY_PATTERN = '/^[0-9A-F]{64}$/i';
 
@@ -34,40 +34,40 @@ class WalletStep implements InstallerStep
     public function process(array $content): void
     {
         if (empty($content) && !$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
+            $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
             return;
         }
 
         $this->validate($content);
 
-        if (!isset($content[AdServer::WALLET_NODE_HOST->value])) {
-            $accountId = new AccountId($content[AdServer::WALLET_ADDRESS->value]);
-            $content[AdServer::WALLET_NODE_HOST->value] = $this->getNodeHostByAccountAddress($accountId);
+        if (!isset($content[AdServerConfig::WALLET_NODE_HOST->value])) {
+            $accountId = new AccountId($content[AdServerConfig::WALLET_ADDRESS->value]);
+            $content[AdServerConfig::WALLET_NODE_HOST->value] = $this->getNodeHostByAccountAddress($accountId);
         }
-        $content[AdServer::WALLET_NODE_PORT->value] =
-            (int)($content[AdServer::WALLET_NODE_PORT->value] ?? self::DEFAULT_NODE_PORT);
+        $content[AdServerConfig::WALLET_NODE_PORT->value] =
+            (int)($content[AdServerConfig::WALLET_NODE_PORT->value] ?? self::DEFAULT_NODE_PORT);
 
         try {
             $this->adsCredentialsChecker->check(
-                $content[AdServer::WALLET_ADDRESS->value],
-                $content[AdServer::WALLET_SECRET_KEY->value],
-                $content[AdServer::WALLET_NODE_HOST->value],
-                $content[AdServer::WALLET_NODE_PORT->value]
+                $content[AdServerConfig::WALLET_ADDRESS->value],
+                $content[AdServerConfig::WALLET_SECRET_KEY->value],
+                $content[AdServerConfig::WALLET_NODE_HOST->value],
+                $content[AdServerConfig::WALLET_NODE_PORT->value]
             );
         } catch (UnexpectedResponseException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage());
         }
 
         $data = [
-            AdServer::WALLET_ADDRESS->value => $content[AdServer::WALLET_ADDRESS->value],
-            AdServer::WALLET_NODE_HOST->value => $content[AdServer::WALLET_NODE_HOST->value],
-            AdServer::WALLET_NODE_PORT->value => $content[AdServer::WALLET_NODE_PORT->value],
-            AdServer::WALLET_SECRET_KEY->value => $content[AdServer::WALLET_SECRET_KEY->value],
+            AdServerConfig::WALLET_ADDRESS->value => $content[AdServerConfig::WALLET_ADDRESS->value],
+            AdServerConfig::WALLET_NODE_HOST->value => $content[AdServerConfig::WALLET_NODE_HOST->value],
+            AdServerConfig::WALLET_NODE_PORT->value => $content[AdServerConfig::WALLET_NODE_PORT->value],
+            AdServerConfig::WALLET_SECRET_KEY->value => $content[AdServerConfig::WALLET_SECRET_KEY->value],
         ];
         $this->adServerConfigurationClient->store($data);
 
-        $this->repository->insertOrUpdate(AdServer::MODULE, $data);
-        $this->repository->insertOrUpdateOne(App::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $data);
+        $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
     }
 
     private function validate(array $content): void
@@ -77,64 +77,64 @@ class WalletStep implements InstallerStep
                 throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field->value));
             }
         }
-        if (1 !== preg_match(self::SECRET_KEY_PATTERN, $content[AdServer::WALLET_SECRET_KEY->value])) {
+        if (1 !== preg_match(self::SECRET_KEY_PATTERN, $content[AdServerConfig::WALLET_SECRET_KEY->value])) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a hexadecimal string of 64 characters', AdServer::WALLET_SECRET_KEY->value)
+                sprintf('Field `%s` must be a hexadecimal string of 64 characters', AdServerConfig::WALLET_SECRET_KEY->value)
             );
         }
         if (
-            !is_string($content[AdServer::WALLET_ADDRESS->value]) ||
-            !AccountId::isValid($content[AdServer::WALLET_ADDRESS->value])
+            !is_string($content[AdServerConfig::WALLET_ADDRESS->value]) ||
+            !AccountId::isValid($content[AdServerConfig::WALLET_ADDRESS->value])
         ) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a valid ADS account', AdServer::WALLET_ADDRESS->value)
+                sprintf('Field `%s` must be a valid ADS account', AdServerConfig::WALLET_ADDRESS->value)
             );
         }
 
         if (
-            !isset($content[AdServer::WALLET_NODE_HOST->value])
-            && !isset($content[AdServer::WALLET_NODE_PORT->value])
+            !isset($content[AdServerConfig::WALLET_NODE_HOST->value])
+            && !isset($content[AdServerConfig::WALLET_NODE_PORT->value])
         ) {
             return;
         }
 
-        if (!isset($content[AdServer::WALLET_NODE_HOST->value])) {
+        if (!isset($content[AdServerConfig::WALLET_NODE_HOST->value])) {
             throw new UnprocessableEntityHttpException(
                 sprintf(
                     'Field `%s` is required if field `%s` is present',
-                    AdServer::WALLET_NODE_HOST->value,
-                    AdServer::WALLET_NODE_PORT->value
+                    AdServerConfig::WALLET_NODE_HOST->value,
+                    AdServerConfig::WALLET_NODE_PORT->value
                 )
             );
         }
-        if (!isset($content[AdServer::WALLET_NODE_PORT->value])) {
+        if (!isset($content[AdServerConfig::WALLET_NODE_PORT->value])) {
             throw new UnprocessableEntityHttpException(
                 sprintf(
                     'Field `%s` is required if field `%s` is present',
-                    AdServer::WALLET_NODE_PORT->value,
-                    AdServer::WALLET_NODE_HOST->value
+                    AdServerConfig::WALLET_NODE_PORT->value,
+                    AdServerConfig::WALLET_NODE_HOST->value
                 )
             );
         }
 
         if (
-            !filter_var($content[AdServer::WALLET_NODE_HOST->value], FILTER_VALIDATE_DOMAIN)
-            && !filter_var($content[AdServer::WALLET_NODE_HOST->value], FILTER_VALIDATE_IP)
+            !filter_var($content[AdServerConfig::WALLET_NODE_HOST->value], FILTER_VALIDATE_DOMAIN)
+            && !filter_var($content[AdServerConfig::WALLET_NODE_HOST->value], FILTER_VALIDATE_IP)
         ) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a host', AdServer::WALLET_NODE_HOST->value)
+                sprintf('Field `%s` must be a host', AdServerConfig::WALLET_NODE_HOST->value)
             );
         }
-        if (!filter_var($content[AdServer::WALLET_NODE_PORT->value], FILTER_VALIDATE_INT)) {
+        if (!filter_var($content[AdServerConfig::WALLET_NODE_PORT->value], FILTER_VALIDATE_INT)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be an integer', AdServer::WALLET_NODE_PORT->value)
+                sprintf('Field `%s` must be an integer', AdServerConfig::WALLET_NODE_PORT->value)
             );
         }
     }
 
     public function getName(): string
     {
-        return InstallerStepEnum::WALLET->value;
+        return InstallerStepEnum::Wallet->name;
     }
 
     public function fetchData(): array
@@ -146,11 +146,11 @@ class WalletStep implements InstallerStep
         }
 
         $configuration = $this->repository->fetchValuesByNames(
-            AdServer::MODULE,
+            AdServerConfig::MODULE,
             [
-                AdServer::WALLET_ADDRESS->value,
-                AdServer::WALLET_NODE_HOST->value,
-                AdServer::WALLET_NODE_PORT->value,
+                AdServerConfig::WALLET_ADDRESS->value,
+                AdServerConfig::WALLET_NODE_HOST->value,
+                AdServerConfig::WALLET_NODE_PORT->value,
             ]
         );
         $configuration[Configuration::COMMON_DATA_REQUIRED] = false;
@@ -161,12 +161,12 @@ class WalletStep implements InstallerStep
     public function isDataRequired(): bool
     {
         $requiredKeys = [
-            AdServer::WALLET_ADDRESS->value,
-            AdServer::WALLET_NODE_HOST->value,
-            AdServer::WALLET_NODE_PORT->value,
-            AdServer::WALLET_SECRET_KEY->value,
+            AdServerConfig::WALLET_ADDRESS->value,
+            AdServerConfig::WALLET_NODE_HOST->value,
+            AdServerConfig::WALLET_NODE_PORT->value,
+            AdServerConfig::WALLET_SECRET_KEY->value,
         ];
-        $configuration = $this->repository->fetchValuesByNames(AdServer::MODULE, $requiredKeys);
+        $configuration = $this->repository->fetchValuesByNames(AdServerConfig::MODULE, $requiredKeys);
 
         foreach ($requiredKeys as $requiredKey) {
             if (!isset($configuration[$requiredKey])) {
@@ -176,10 +176,10 @@ class WalletStep implements InstallerStep
 
         try {
             $this->adsCredentialsChecker->check(
-                $configuration[AdServer::WALLET_ADDRESS->value],
-                $configuration[AdServer::WALLET_SECRET_KEY->value],
-                $configuration[AdServer::WALLET_NODE_HOST->value],
-                $configuration[AdServer::WALLET_NODE_PORT->value]
+                $configuration[AdServerConfig::WALLET_ADDRESS->value],
+                $configuration[AdServerConfig::WALLET_SECRET_KEY->value],
+                $configuration[AdServerConfig::WALLET_NODE_HOST->value],
+                $configuration[AdServerConfig::WALLET_NODE_PORT->value]
             );
         } catch (UnexpectedResponseException) {
             return true;

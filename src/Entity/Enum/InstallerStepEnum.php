@@ -2,13 +2,13 @@
 
 namespace App\Entity\Enum;
 
-enum InstallerStepEnum: string
+enum InstallerStepEnum
 {
-    case BASE = 'base';
-    case DNS = 'dns';
-    case WALLET = 'wallet';
-    case LICENSE = 'license';
-    case CLASSIFIER = 'classifier';
-    case SMTP = 'smtp';
-    case STATUS = 'status';
+    case Base;
+    case Dns;
+    case Wallet;
+    case License;
+    case Classifier;
+    case Smtp;
+    case Status;
 }

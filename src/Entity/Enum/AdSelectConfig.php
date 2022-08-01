@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-enum AdSelect: string implements ConfigurationEnum
+enum AdSelectConfig: string implements ConfigEnum
 {
     use GetModule;
 

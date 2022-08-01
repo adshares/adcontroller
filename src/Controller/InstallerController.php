@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Enum\AdServer;
-use App\Entity\Enum\App;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
@@ -39,9 +39,9 @@ class InstallerController extends AbstractController
     #[Route('/step', name: 'previous_step', methods: ['GET'])]
     public function previousStep(ConfigurationRepository $repository): JsonResponse
     {
-        $step = $repository->fetchValueByEnum(App::INSTALLER_STEP);
+        $step = $repository->fetchValueByEnum(AppConfig::INSTALLER_STEP);
 
-        return $this->json([App::INSTALLER_STEP->value => $step]);
+        return $this->json([AppConfig::INSTALLER_STEP->value => $step]);
     }
 
     #[Route('/step/{step}', name: 'get_step', methods: ['GET'])]
@@ -49,10 +49,10 @@ class InstallerController extends AbstractController
     {
         if (
             AppStateEnum::ADSERVER_ACCOUNT_CREATED
-            === AppStateEnum::tryFrom($this->repository->fetchValueByEnum(App::APP_STATE))
+            === AppStateEnum::tryFrom($this->repository->fetchValueByEnum(AppConfig::APP_STATE))
         ) {
             $this->migrator->migrate();
-            $this->repository->insertOrUpdateOne(App::APP_STATE, AppStateEnum::MIGRATION_COMPLETED->value);
+            $this->repository->insertOrUpdateOne(AppConfig::APP_STATE, AppStateEnum::MIGRATION_COMPLETED->value);
         }
         if (1 !== preg_match('/^[a-z]+$/', $step)) {
             throw new UnprocessableEntityHttpException(sprintf('Invalid step (%s)', $step));
@@ -107,22 +107,22 @@ class InstallerController extends AbstractController
     {
         $content = json_decode($request->getContent(), true);
         if (
-            !isset($content[AdServer::WALLET_ADDRESS->value]) ||
-            !is_string($content[AdServer::WALLET_ADDRESS->value]) ||
-            !AccountId::isValid($content[AdServer::WALLET_ADDRESS->value])
+            !isset($content[AdServerConfig::WALLET_ADDRESS->value]) ||
+            !is_string($content[AdServerConfig::WALLET_ADDRESS->value]) ||
+            !AccountId::isValid($content[AdServerConfig::WALLET_ADDRESS->value])
         ) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a valid ADS account', AdServer::WALLET_ADDRESS->value)
+                sprintf('Field `%s` must be a valid ADS account', AdServerConfig::WALLET_ADDRESS->value)
             );
         }
 
-        $accountId = new AccountId($content[AdServer::WALLET_ADDRESS->value]);
+        $accountId = new AccountId($content[AdServerConfig::WALLET_ADDRESS->value]);
         $nodeHost = $walletStep->getNodeHostByAccountAddress($accountId);
 
         return $this->json(
             [
-                AdServer::WALLET_NODE_HOST->value => $nodeHost,
-                AdServer::WALLET_NODE_PORT->value => '6511',
+                AdServerConfig::WALLET_NODE_HOST->value => $nodeHost,
+                AdServerConfig::WALLET_NODE_PORT->value => '6511',
             ]
         );
     }

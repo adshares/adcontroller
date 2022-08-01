@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-enum AdPanel: string implements ConfigurationEnum
+enum AdPanelConfig: string implements ConfigEnum
 {
     public const MODULE = 'AdPanel';
 

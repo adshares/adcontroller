@@ -2,10 +2,10 @@
 
 namespace App\Service;
 
-use App\Entity\Enum\AdPanel;
-use App\Entity\Enum\AdServer;
-use App\Entity\Enum\AdUser;
-use App\Entity\Enum\General;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\GeneralConfig;
 
 class ServiceUrlParser
 {
@@ -45,10 +45,10 @@ class ServiceUrlParser
             );
 
             return [
-                AdPanel::HOST_PREFIX->value => $prefixes['panel'],
-                AdServer::HOST_PREFIX->value => $prefixes['app'],
-                AdUser::HOST_PREFIX->value => $prefixes['au'],
-                General::BASE_DOMAIN->value => implode('.', array_reverse($commonDomainParts)),
+                AdPanelConfig::HOST_PREFIX->value => $prefixes['panel'],
+                AdServerConfig::HOST_PREFIX->value => $prefixes['app'],
+                AdUserConfig::HOST_PREFIX->value => $prefixes['au'],
+                GeneralConfig::BASE_DOMAIN->value => implode('.', array_reverse($commonDomainParts)),
             ];
         }
 

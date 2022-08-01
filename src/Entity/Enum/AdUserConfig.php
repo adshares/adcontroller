@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-enum AdUser: string implements ConfigurationEnum
+enum AdUserConfig: string implements ConfigEnum
 {
     public const MODULE = 'AdUser';
 

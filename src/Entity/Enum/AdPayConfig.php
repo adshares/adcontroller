@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-enum AdPay: string implements ConfigurationEnum
+enum AdPayConfig: string implements ConfigEnum
 {
     use GetModule;
 

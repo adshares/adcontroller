@@ -3,9 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Configuration;
-use App\Entity\Enum\AdClassify;
-use App\Entity\Enum\AdServer;
-use App\Entity\Enum\ConfigurationEnum;
+use App\Entity\Enum\AdClassifyConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\ConfigEnum;
 use App\Service\Crypt;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -24,9 +24,9 @@ use Doctrine\Persistence\ManagerRegistry;
 class ConfigurationRepository extends ServiceEntityRepository
 {
     private const SECRETS_ENUM = [
-        AdClassify::API_KEY_SECRET,
-        AdServer::LICENSE_KEY,
-        AdServer::WALLET_SECRET_KEY,
+        AdClassifyConfig::API_KEY_SECRET,
+        AdServerConfig::LICENSE_KEY,
+        AdServerConfig::WALLET_SECRET_KEY,
     ];
 
     public function __construct(private readonly Crypt $crypt, ManagerRegistry $registry)
@@ -34,7 +34,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         parent::__construct($registry, Configuration::class);
     }
 
-    public function insertOrUpdateOne(ConfigurationEnum $enum, string $value, bool $flush = true): void
+    public function insertOrUpdateOne(ConfigEnum $enum, string $value, bool $flush = true): void
     {
         $this->insertOrUpdate($enum->getModule(), [$enum->value => $value], $flush);
     }
@@ -70,7 +70,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(ConfigurationEnum $enum, bool $flush = true): void
+    public function remove(ConfigEnum $enum, bool $flush = true): void
     {
         if (null === ($entity = $this->findOneByEnum($enum))) {
             return;
@@ -82,7 +82,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         }
     }
 
-    public function fetchValueByEnum(ConfigurationEnum $enum): ?string
+    public function fetchValueByEnum(ConfigEnum $enum): ?string
     {
         if (null === ($configuration = $this->findOneByEnum($enum))) {
             return null;
@@ -129,7 +129,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         return false;
     }
 
-    private function findOneByEnum(ConfigurationEnum $enum): ?Configuration
+    private function findOneByEnum(ConfigEnum $enum): ?Configuration
     {
         return $this->findOneBy(['module' => $enum->getModule(), 'name' => $enum->value]);
     }
