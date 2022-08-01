@@ -25,10 +25,10 @@ class BaseStep implements InstallerStep
     private const DEFAULT_ADUSER_HOST_PREFIX = 'au';
     private const DEFAULT_MAIL_ENDING = '@example.com';
     private const FIELDS = [
-        AdServerConfig::NAME,
-        GeneralConfig::BASE_DOMAIN,
-        GeneralConfig::BASE_SUPPORT_EMAIL,
-        GeneralConfig::BASE_TECHNICAL_EMAIL,
+        AdServerConfig::Name,
+        GeneralConfig::Domain,
+        GeneralConfig::SupportEmail,
+        GeneralConfig::TechnicalEmail,
     ];
 
     public function __construct(
@@ -41,14 +41,14 @@ class BaseStep implements InstallerStep
     public function process(array $content): void
     {
         if (empty($content) && !$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
+            $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
             return;
         }
 
         $this->validate($content);
         $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
 
-        $domain = $content[GeneralConfig::BASE_DOMAIN->value];
+        $domain = $content[GeneralConfig::Domain->name];
         $adServerHost = self::getPrefixedHost($domain, self::DEFAULT_ADSERVER_HOST_PREFIX);
         $adPanelHost = self::getPrefixedHost($domain, self::DEFAULT_ADPANEL_HOST_PREFIX);
         $adUserHost = self::getPrefixedHost($domain, self::DEFAULT_ADUSER_HOST_PREFIX);
@@ -60,10 +60,10 @@ class BaseStep implements InstallerStep
 
         $this->adServerConfigurationClient->store(
             [
-                AdServerConfig::NAME->value => $content[AdServerConfig::NAME->value],
-                AdServerConfig::URL->value => $adServerUrl,
-                GeneralConfig::BASE_SUPPORT_EMAIL->value => $content[GeneralConfig::BASE_SUPPORT_EMAIL->value],
-                GeneralConfig::BASE_TECHNICAL_EMAIL->value => $content[GeneralConfig::BASE_TECHNICAL_EMAIL->value],
+                AdServerConfig::Name->name => $content[AdServerConfig::Name->name],
+                AdServerConfig::Url->name => $adServerUrl,
+                GeneralConfig::SupportEmail->name => $content[GeneralConfig::SupportEmail->name],
+                GeneralConfig::TechnicalEmail->name => $content[GeneralConfig::TechnicalEmail->name],
             ]
         );
         $this->adServerConfigurationClient->setupAdPanel($adPanelUrl);
@@ -72,58 +72,58 @@ class BaseStep implements InstallerStep
         $envEditor->set(
             [
                 EnvEditor::ADSERVER_APP_HOST => $adServerHost,
-                EnvEditor::ADSERVER_APP_NAME => $content[AdServerConfig::NAME->value],
+                EnvEditor::ADSERVER_APP_NAME => $content[AdServerConfig::Name->name],
                 EnvEditor::ADSERVER_APP_URL => $adServerUrl,
             ]
         );
 
-        $this->repository->insertOrUpdateOne(AdPanelConfig::URL, $adPanelUrl);
+        $this->repository->insertOrUpdateOne(AdPanelConfig::Url, $adPanelUrl);
         $this->repository->insertOrUpdate(
             AdServerConfig::MODULE,
             [
-                AdServerConfig::NAME->value => $content[AdServerConfig::NAME->value],
-                AdServerConfig::URL->value => $adServerUrl,
+                AdServerConfig::Name->name => $content[AdServerConfig::Name->name],
+                AdServerConfig::Url->name => $adServerUrl,
             ]
         );
         $this->repository->insertOrUpdate(
             AdUserConfig::MODULE,
             [
-                AdUserConfig::INTERNAL_URL->value => $adUserInternalUrl,
-                AdUserConfig::URL->value => $adUserUrl,
+                AdUserConfig::InternalUrl->name => $adUserInternalUrl,
+                AdUserConfig::Url->name => $adUserUrl,
             ]
         );
         $this->repository->insertOrUpdate(
             GeneralConfig::MODULE,
             [
-                GeneralConfig::BASE_DOMAIN->value => $content[GeneralConfig::BASE_DOMAIN->value],
-                GeneralConfig::BASE_SUPPORT_EMAIL->value => $content[GeneralConfig::BASE_SUPPORT_EMAIL->value],
-                GeneralConfig::BASE_TECHNICAL_EMAIL->value => $content[GeneralConfig::BASE_TECHNICAL_EMAIL->value],
+                GeneralConfig::Domain->name => $content[GeneralConfig::Domain->name],
+                GeneralConfig::SupportEmail->name => $content[GeneralConfig::SupportEmail->name],
+                GeneralConfig::TechnicalEmail->name => $content[GeneralConfig::TechnicalEmail->name],
             ]
         );
-        $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     private function validate(array $content): void
     {
         foreach (self::FIELDS as $field) {
-            if (!isset($content[$field->value])) {
-                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field));
+            if (!isset($content[$field->name])) {
+                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field->name));
             }
         }
 
-        if (!filter_var($content[GeneralConfig::BASE_TECHNICAL_EMAIL->value], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($content[GeneralConfig::TechnicalEmail->name], FILTER_VALIDATE_EMAIL)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be an email', GeneralConfig::BASE_TECHNICAL_EMAIL->value)
+                sprintf('Field `%s` must be an email', GeneralConfig::TechnicalEmail->name)
             );
         }
-        if (!filter_var($content[GeneralConfig::BASE_SUPPORT_EMAIL->value], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($content[GeneralConfig::SupportEmail->name], FILTER_VALIDATE_EMAIL)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be an email', GeneralConfig::BASE_SUPPORT_EMAIL->value)
+                sprintf('Field `%s` must be an email', GeneralConfig::SupportEmail->name)
             );
         }
-        if (!filter_var($content[GeneralConfig::BASE_DOMAIN->value], FILTER_VALIDATE_DOMAIN)) {
+        if (!filter_var($content[GeneralConfig::Domain->name], FILTER_VALIDATE_DOMAIN)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a domain', GeneralConfig::BASE_DOMAIN->value)
+                sprintf('Field `%s` must be a domain', GeneralConfig::Domain->name)
             );
         }
     }
@@ -143,34 +143,34 @@ class BaseStep implements InstallerStep
         $adServerConfig = $this->repository->fetchValuesByNames(
             AdServerConfig::MODULE,
             [
-                AdServerConfig::NAME->value,
-                AdServerConfig::URL->value,
+                AdServerConfig::Name->name,
+                AdServerConfig::Url->name,
             ]
         );
-        $adServerUrl = $adServerConfig[AdServerConfig::URL->value] ?? 'https://app.localhost';
+        $adServerUrl = $adServerConfig[AdServerConfig::Url->name] ?? 'https://app.localhost';
 
         $data = [
         ];
 
         if (!str_ends_with($adServerUrl, 'localhost')) {
-            $adPanelUrl = $this->repository->fetchValueByEnum(AdPanelConfig::URL) ?? 'https://panel.localhost';
-            $adUserUrl = $this->repository->fetchValueByEnum(AdUserConfig::URL) ?? 'https://au.localhost';
+            $adPanelUrl = $this->repository->fetchValueByEnum(AdPanelConfig::Url) ?? 'https://panel.localhost';
+            $adUserUrl = $this->repository->fetchValueByEnum(AdUserConfig::Url) ?? 'https://au.localhost';
             $parsed = ServiceUrlParser::parseUrls($adPanelUrl, $adServerUrl, $adUserUrl);
             if (null !== $parsed) {
-                $data[GeneralConfig::BASE_DOMAIN->value] = $parsed[GeneralConfig::BASE_DOMAIN->value];
+                $data[GeneralConfig::Domain->name] = $parsed[GeneralConfig::Domain->name];
             }
         }
 
         if (
-            isset($adServerConfig[AdServerConfig::NAME->value])
-            && self::DEFAULT_ADSERVER_NAME !== $adServerConfig[AdServerConfig::NAME->value]
+            isset($adServerConfig[AdServerConfig::Name->name])
+            && self::DEFAULT_ADSERVER_NAME !== $adServerConfig[AdServerConfig::Name->name]
         ) {
-            $data[AdServerConfig::NAME->value] = $adServerConfig[AdServerConfig::NAME->value];
+            $data[AdServerConfig::Name->name] = $adServerConfig[AdServerConfig::Name->name];
         }
 
         $mailKeys = [
-            GeneralConfig::BASE_SUPPORT_EMAIL->value,
-            GeneralConfig::BASE_TECHNICAL_EMAIL->value,
+            GeneralConfig::SupportEmail->name,
+            GeneralConfig::TechnicalEmail->name,
         ];
         $generalConfig = $this->repository->fetchValuesByNames(GeneralConfig::MODULE, $mailKeys);
         foreach ($mailKeys as $mailKey) {
@@ -189,33 +189,33 @@ class BaseStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        if (null === $this->repository->fetchValueByEnum(AdPanelConfig::URL)) {
+        if (null === $this->repository->fetchValueByEnum(AdPanelConfig::Url)) {
             return true;
         }
 
         $adServerConfig = $this->repository->fetchValuesByNames(
             AdServerConfig::MODULE,
             [
-                AdServerConfig::NAME->value,
-                AdServerConfig::URL->value,
+                AdServerConfig::Name->name,
+                AdServerConfig::Url->name,
             ]
         );
         if (
-            !isset($adServerConfig[AdServerConfig::NAME->value])
-            || self::DEFAULT_ADSERVER_NAME === $adServerConfig[AdServerConfig::NAME->value]
-            || !isset($adServerConfig[AdServerConfig::URL->value])
-            || str_ends_with($adServerConfig[AdServerConfig::URL->value], 'localhost')
+            !isset($adServerConfig[AdServerConfig::Name->name])
+            || self::DEFAULT_ADSERVER_NAME === $adServerConfig[AdServerConfig::Name->name]
+            || !isset($adServerConfig[AdServerConfig::Url->name])
+            || str_ends_with($adServerConfig[AdServerConfig::Url->name], 'localhost')
         ) {
             return true;
         }
 
-        if (null === $this->repository->fetchValueByEnum(AdUserConfig::URL)) {
+        if (null === $this->repository->fetchValueByEnum(AdUserConfig::Url)) {
             return true;
         }
 
         $mailKeys = [
-            GeneralConfig::BASE_SUPPORT_EMAIL->value,
-            GeneralConfig::BASE_TECHNICAL_EMAIL->value,
+            GeneralConfig::SupportEmail->name,
+            GeneralConfig::TechnicalEmail->name,
         ];
         $generalConfig = $this->repository->fetchValuesByNames(GeneralConfig::MODULE, $mailKeys);
         foreach ($mailKeys as $mailKey) {

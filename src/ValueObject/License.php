@@ -32,17 +32,17 @@ class License
     public function toArray(): array
     {
         return [
-            'type' => $this->type,
-            'status' => $this->status,
-            'date_start' => $this->dateStart->format(DateTimeInterface::ATOM),
-            'date_end' => $this->dateEnd->format(DateTimeInterface::ATOM),
-            'owner' => $this->owner,
-            'payment_address' => $this->paymentAddress->toString(),
-            'payment_message' => $this->paymentMessage,
-            'fixed_fee' => $this->fixedFee,
-            'demand_fee' => $this->demandFee,
-            'supply_fee' => $this->supplyFee,
-            'private_label' => $this->privateLabel,
+            'Type' => $this->type,
+            'Status' => $this->status,
+            'DateStart' => $this->dateStart->format(DateTimeInterface::ATOM),
+            'DateEnd' => $this->dateEnd->format(DateTimeInterface::ATOM),
+            'Owner' => $this->owner,
+            'PaymentAddress' => $this->paymentAddress->toString(),
+            'PaymentMessage' => $this->paymentMessage,
+            'FixedFee' => $this->fixedFee,
+            'DemandFee' => $this->demandFee,
+            'SupplyFee' => $this->supplyFee,
+            'PrivateLabel' => $this->privateLabel,
         ];
     }
 }

@@ -2,9 +2,14 @@
 
 namespace App\Entity\Enum;
 
-enum AdPayConfig: string implements ConfigEnum
+enum AdPayConfig implements ConfigEnum
 {
-    use GetModule;
+    public const MODULE = 'AdPay';
 
-    case URL = 'adpay_url';
+    case Url;
+
+    public function getModule(): string
+    {
+        return self::MODULE;
+    }
 }

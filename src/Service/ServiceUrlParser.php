@@ -46,7 +46,7 @@ class ServiceUrlParser
 
             /** @var array{app: string, au: string, panel: string} $prefixes */
             return [
-                GeneralConfig::BASE_DOMAIN->value => implode('.', array_reverse($commonDomainParts)),
+                GeneralConfig::Domain->name => implode('.', array_reverse($commonDomainParts)),
                 'prefixes' => $prefixes,
             ];
         }

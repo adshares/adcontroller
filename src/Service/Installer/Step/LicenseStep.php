@@ -36,31 +36,31 @@ class LicenseStep implements InstallerStep
             throw new UnprocessableEntityHttpException('License key not set');
         }
 
-        $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     public function setLicenseKey(array $content): void
     {
         $this->validate($content);
 
-        $licenseKey = $content[AdServerConfig::LICENSE_KEY->value];
+        $licenseKey = $content[AdServerConfig::LicenseKey->name];
         $this->adServerConfigurationClient->store([
-            AdServerConfig::LICENSE_KEY->value => $licenseKey,
+            AdServerConfig::LicenseKey->name => $licenseKey,
         ]);
 
-        $this->repository->insertOrUpdateOne(AdServerConfig::LICENSE_KEY, $licenseKey);
-        $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AdServerConfig::LicenseKey, $licenseKey);
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     private function validate(array $content): void
     {
-        if (!isset($content[AdServerConfig::LICENSE_KEY->value])) {
-            throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', AdServerConfig::LICENSE_KEY->value));
+        if (!isset($content[AdServerConfig::LicenseKey->name])) {
+            throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', AdServerConfig::LicenseKey->name));
         }
 
-        if (null === $this->getLicenseByKey($content[AdServerConfig::LICENSE_KEY->value])) {
+        if (null === $this->getLicenseByKey($content[AdServerConfig::LicenseKey->name])) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a valid license key', AdServerConfig::LICENSE_KEY->value)
+                sprintf('Field `%s` must be a valid license key', AdServerConfig::LicenseKey->name)
             );
         }
     }
@@ -76,7 +76,7 @@ class LicenseStep implements InstallerStep
             Configuration::COMMON_DATA_REQUIRED => true,
         ];
 
-        $licenseKey = $this->repository->fetchValueByEnum(AdServerConfig::LICENSE_KEY);
+        $licenseKey = $this->repository->fetchValueByEnum(AdServerConfig::LicenseKey);
 
         if (null !== ($license = $this->getLicenseByKey($licenseKey))) {
             $data[Configuration::COMMON_DATA_REQUIRED] = false;
@@ -88,7 +88,7 @@ class LicenseStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $licenseKey = $this->repository->fetchValueByEnum(AdServerConfig::LICENSE_KEY);
+        $licenseKey = $this->repository->fetchValueByEnum(AdServerConfig::LicenseKey);
 
         return null === $this->getLicenseByKey($licenseKey);
     }
@@ -133,8 +133,8 @@ class LicenseStep implements InstallerStep
     public function claimCommunityLicense(): void
     {
         if (
-            null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::NAME))
-            || null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::BASE_TECHNICAL_EMAIL))
+            null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::Name))
+            || null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail))
         ) {
             throw new UnprocessableEntityHttpException('Base step must be completed');
         }
@@ -150,11 +150,11 @@ class LicenseStep implements InstallerStep
 
         $this->adServerConfigurationClient->store(
             [
-                AdServerConfig::LICENSE_KEY->value => $licenseKey,
+                AdServerConfig::LicenseKey->name => $licenseKey,
             ]
         );
 
-        $this->repository->insertOrUpdateOne(AdServerConfig::LICENSE_KEY, $licenseKey);
-        $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AdServerConfig::LicenseKey, $licenseKey);
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 }

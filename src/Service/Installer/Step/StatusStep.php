@@ -34,8 +34,8 @@ class StatusStep implements InstallerStep
         $this->repository->insertOrUpdate(
             AppConfig::MODULE,
             [
-                AppConfig::INSTALLER_STEP->value => $this->getName(),
-                AppConfig::APP_STATE->value => AppStateEnum::INSTALLATION_COMPLETED->value,
+                AppConfig::InstallerStep->name => $this->getName(),
+                AppConfig::AppState->name => AppStateEnum::InstallationCompleted->name,
             ]
         );
     }
@@ -48,12 +48,12 @@ class StatusStep implements InstallerStep
     public function fetchData(): array
     {
         $config = [
-            Module::ADCLASSIFY => AdClassifyConfig::URL,
-            Module::ADPANEL => AdPanelConfig::URL,
-            Module::ADPAY => AdPayConfig::URL,
-            Module::ADSELECT => AdSelectConfig::URL,
-            Module::ADSERVER => AdServerConfig::URL,
-            Module::ADUSER => AdUserConfig::URL,
+            Module::ADCLASSIFY => AdClassifyConfig::Url,
+            Module::ADPANEL => AdPanelConfig::Url,
+            Module::ADPAY => AdPayConfig::Url,
+            Module::ADSELECT => AdSelectConfig::Url,
+            Module::ADSERVER => AdServerConfig::Url,
+            Module::ADUSER => AdUserConfig::Url,
         ];
 
         $data = [

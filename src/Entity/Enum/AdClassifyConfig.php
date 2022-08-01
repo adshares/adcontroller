@@ -2,13 +2,13 @@
 
 namespace App\Entity\Enum;
 
-enum AdClassifyConfig: string implements ConfigEnum
+enum AdClassifyConfig implements ConfigEnum
 {
     public const MODULE = 'AdClassify';
 
-    case API_KEY_NAME = 'classifier_ext_api_key_name';
-    case API_KEY_SECRET = 'classifier_ext_api_key_secret';
-    case URL = 'adclassify_url';
+    case ApiKeyName;
+    case ApiKeySecret;
+    case Url;
 
     public function getModule(): string
     {

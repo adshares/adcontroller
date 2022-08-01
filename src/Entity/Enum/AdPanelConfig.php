@@ -2,11 +2,11 @@
 
 namespace App\Entity\Enum;
 
-enum AdPanelConfig: string implements ConfigEnum
+enum AdPanelConfig implements ConfigEnum
 {
     public const MODULE = 'AdPanel';
 
-    case URL = 'base_adpanel_url';
+    case Url;
 
     public function getModule(): string
     {

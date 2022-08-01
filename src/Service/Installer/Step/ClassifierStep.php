@@ -30,14 +30,14 @@ class ClassifierStep implements InstallerStep
     public function process(array $content): void
     {
         if (!$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
+            $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
             return;
         }
 
-        if (null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::NAME))) {
+        if (null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::Name))) {
             throw new UnprocessableEntityHttpException('AdServer\'s name must be set');
         }
-        if (null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::BASE_TECHNICAL_EMAIL))) {
+        if (null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail))) {
             throw new UnprocessableEntityHttpException('Technical e-mail must be set');
         }
 
@@ -59,11 +59,11 @@ class ClassifierStep implements InstallerStep
         $this->repository->insertOrUpdate(
             AdClassifyConfig::MODULE,
             [
-                AdClassifyConfig::API_KEY_NAME->value => $apiKey['name'],
-                AdClassifyConfig::API_KEY_SECRET->value => $apiKey['secret'],
+                AdClassifyConfig::ApiKeyName->name => $apiKey['name'],
+                AdClassifyConfig::ApiKeySecret->name => $apiKey['secret'],
             ]
         );
-        $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     public function getName(): string
@@ -78,8 +78,8 @@ class ClassifierStep implements InstallerStep
         if (
             $isDataRequired
             && (
-                null === $this->repository->fetchValueByEnum(AdServerConfig::NAME)
-                || null === $this->repository->fetchValueByEnum(GeneralConfig::BASE_TECHNICAL_EMAIL)
+                null === $this->repository->fetchValueByEnum(AdServerConfig::Name)
+                || null === $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail)
             )
         ) {
             throw new UnprocessableEntityHttpException('Base step must be completed');
@@ -93,8 +93,8 @@ class ClassifierStep implements InstallerStep
     public function isDataRequired(): bool
     {
         $requiredKeys = [
-            AdClassifyConfig::API_KEY_NAME->value,
-            AdClassifyConfig::API_KEY_SECRET->value,
+            AdClassifyConfig::ApiKeyName->name,
+            AdClassifyConfig::ApiKeySecret->name,
         ];
         $configuration = $this->repository->fetchValuesByNames(AdClassifyConfig::MODULE, $requiredKeys);
 

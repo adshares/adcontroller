@@ -8,12 +8,12 @@ import { useForm } from '../../../hooks';
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { fields, isFormValid, errorObj, onFormChange, setFields, validate } = useForm({
-    smtp_host: '',
-    smtp_port: '',
-    smtp_sender: '',
-    smtp_username: '',
+    SmtpHost: '',
+    SmtpPort: '',
+    SmtpSender: '',
+    SmtpUsername: '',
   });
-  const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ smtp_password: '' });
+  const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ SmtpPassword: '' });
   const [isDataRequired, setIsDataRequired] = useState(true);
   const [editMode, setEditMode] = useState(isDataRequired);
   const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
@@ -28,15 +28,15 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
     try {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
-      setIsDataRequired(response.data_required);
-      setEditMode(response.data_required);
+      setIsDataRequired(response.DataRequired);
+      setEditMode(response.DataRequired);
       setFields({
-        smtp_host: response.smtp_host,
-        smtp_port: response.smtp_port,
-        smtp_sender: response.smtp_sender,
-        smtp_username: response.smtp_username,
+        SmtpHost: response.SmtpHost,
+        SmtpPort: response.SmtpPort,
+        SmtpSender: response.SmtpSender,
+        SmtpUsername: response.SmtpUsername,
       });
-      setIsEmptyPassword(!response.smtp_password.length);
+      setIsEmptyPassword(!response.SmtpPassword.length);
     } catch (err) {
       setAlert({
         type: 'error',
@@ -104,10 +104,10 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
             >
               <TextField
                 className={styles.textField}
-                error={!!errorObj.smtp_host}
-                helperText={errorObj.smtp_host}
-                name="smtp_host"
-                value={fields.smtp_host}
+                error={!!errorObj.SmtpHost}
+                helperText={errorObj.SmtpHost}
+                name="SmtpHost"
+                value={fields.SmtpHost}
                 label="SMTP host"
                 size="small"
                 type="text"
@@ -116,10 +116,10 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.smtp_port}
-                helperText={errorObj.smtp_port}
-                name="smtp_port"
-                value={fields.smtp_port}
+                error={!!errorObj.SmtpPort}
+                helperText={errorObj.SmtpPort}
+                name="SmtpPort"
+                value={fields.SmtpPort}
                 label="SMTP port"
                 size="small"
                 type="text"
@@ -128,10 +128,10 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.smtp_sender}
-                helperText={errorObj.smtp_sender}
-                name="smtp_sender"
-                value={fields.smtp_sender}
+                error={!!errorObj.SmtpSender}
+                helperText={errorObj.SmtpSender}
+                name="SmtpSender"
+                value={fields.SmtpSender}
                 label="SMTP sender"
                 size="small"
                 type="text"
@@ -140,10 +140,10 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.smtp_username}
-                helperText={errorObj.smtp_username}
-                name="smtp_username"
-                value={fields.smtp_username}
+                error={!!errorObj.SmtpUsername}
+                helperText={errorObj.SmtpUsername}
+                name="SmtpUsername"
+                value={fields.SmtpUsername}
                 label="SMTP username"
                 size="small"
                 type="text"
@@ -164,9 +164,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
             >
               <TextField
                 className={styles.textField}
-                value={editMode && isDataRequired ? newPassword.smtp_password : undefined}
+                value={editMode && isDataRequired ? newPassword.SmtpPassword : undefined}
                 defaultValue={editMode && !isDataRequired && !isEmptyPassword ? '↹↹↹↹↹↹↹↹' : undefined}
-                name="smtp_password"
+                name="SmtpPassword"
                 size="small"
                 label="New password"
                 type="password"
@@ -199,19 +199,19 @@ const InfoTable = ({ stepData }) => (
     <TableBody>
       <TableRow>
         <TableCell align="left">SMTP host</TableCell>
-        <TableCell align="left">{stepData.smtp_host}</TableCell>
+        <TableCell align="left">{stepData.SmtpHost}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">SMTP port</TableCell>
-        <TableCell align="left">{stepData.smtp_port}</TableCell>
+        <TableCell align="left">{stepData.SmtpPort}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">SMTP sender</TableCell>
-        <TableCell align="left">{stepData.smtp_sender}</TableCell>
+        <TableCell align="left">{stepData.SmtpSender}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">SMTP username</TableCell>
-        <TableCell align="left">{stepData.smtp_username}</TableCell>
+        <TableCell align="left">{stepData.SmtpUsername}</TableCell>
       </TableRow>
     </TableBody>
   </Table>

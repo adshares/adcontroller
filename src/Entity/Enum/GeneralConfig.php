@@ -2,18 +2,18 @@
 
 namespace App\Entity\Enum;
 
-enum GeneralConfig: string implements ConfigEnum
+enum GeneralConfig implements ConfigEnum
 {
     public const MODULE = 'General';
 
-    case BASE_DOMAIN = 'base_domain';
-    case BASE_SUPPORT_EMAIL = 'base_support_email';
-    case BASE_TECHNICAL_EMAIL = 'base_technical_email';
-    case SMTP_HOST = 'smtp_host';
-    case SMTP_PASSWORD = 'smtp_password';
-    case SMTP_PORT = 'smtp_port';
-    case SMTP_SENDER = 'smtp_sender';
-    case SMTP_USERNAME = 'smtp_username';
+    case Domain;
+    case SmtpHost;
+    case SmtpPassword;
+    case SmtpPort;
+    case SmtpSender;
+    case SmtpUsername;
+    case SupportEmail;
+    case TechnicalEmail;
 
     public function getModule(): string
     {

@@ -9,8 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
 class Configuration
 {
-    public const COMMON_DATA_REQUIRED = 'data_required';
-    public const LICENSE_DATA = 'license_data';
+    public const COMMON_DATA_REQUIRED = 'DataRequired';
+    public const LICENSE_DATA = 'LicenseData';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

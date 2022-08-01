@@ -27,7 +27,7 @@ class DnsStep implements InstallerStep
 
     public function process(array $content): void
     {
-        $this->repository->insertOrUpdateOne(AppConfig::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     public function getName(): string
@@ -38,9 +38,9 @@ class DnsStep implements InstallerStep
     public function fetchData(): array
     {
         $config = [
-            Module::ADPANEL => AdPanelConfig::URL,
-            Module::ADSERVER => AdServerConfig::URL,
-            Module::ADUSER => AdUserConfig::URL,
+            Module::ADPANEL => AdPanelConfig::Url,
+            Module::ADSERVER => AdServerConfig::Url,
+            Module::ADUSER => AdUserConfig::Url,
         ];
 
         $data = [

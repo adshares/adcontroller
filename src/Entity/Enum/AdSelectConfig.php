@@ -2,9 +2,14 @@
 
 namespace App\Entity\Enum;
 
-enum AdSelectConfig: string implements ConfigEnum
+enum AdSelectConfig implements ConfigEnum
 {
-    use GetModule;
+    public const MODULE = 'AdSelect';
 
-    case URL = 'adselect_url';
+    case Url;
+
+    public function getModule(): string
+    {
+        return self::MODULE;
+    }
 }

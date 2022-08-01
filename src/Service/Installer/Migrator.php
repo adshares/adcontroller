@@ -16,34 +16,34 @@ class Migrator
 {
     private const KEY_MAP = [
         // AdClassify
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_BASE_URL => AdClassifyConfig::URL,
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_NAME => AdClassifyConfig::API_KEY_NAME,
-        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_SECRET => AdClassifyConfig::API_KEY_SECRET,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_BASE_URL => AdClassifyConfig::Url,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_NAME => AdClassifyConfig::ApiKeyName,
+        AdServerConfigurationClient::CLASSIFIER_EXTERNAL_API_KEY_SECRET => AdClassifyConfig::ApiKeySecret,
         // AdPanel
-        AdServerConfigurationClient::ADPANEL_URL => AdPanelConfig::URL,
+        AdServerConfigurationClient::ADPANEL_URL => AdPanelConfig::Url,
         // AdPay
-        AdServerConfigurationClient::ADPAY_URL => AdPayConfig::URL,
+        AdServerConfigurationClient::ADPAY_URL => AdPayConfig::Url,
         // AdSelect
-        AdServerConfigurationClient::ADSELECT_URL => AdSelectConfig::URL,
+        AdServerConfigurationClient::ADSELECT_URL => AdSelectConfig::Url,
         // AdServer
-        AdServerConfigurationClient::URL => AdServerConfig::URL,
-        AdServerConfigurationClient::ADSERVER_NAME => AdServerConfig::NAME,
-        AdServerConfigurationClient::ADSHARES_LICENSE_KEY => AdServerConfig::LICENSE_KEY,
-        AdServerConfigurationClient::ADSHARES_ADDRESS => AdServerConfig::WALLET_ADDRESS,
-        AdServerConfigurationClient::ADSHARES_NODE_HOST => AdServerConfig::WALLET_NODE_HOST,
-        AdServerConfigurationClient::ADSHARES_NODE_PORT => AdServerConfig::WALLET_NODE_PORT,
-        AdServerConfigurationClient::ADSHARES_SECRET => AdServerConfig::WALLET_SECRET_KEY,
+        AdServerConfigurationClient::URL => AdServerConfig::Url,
+        AdServerConfigurationClient::ADSERVER_NAME => AdServerConfig::Name,
+        AdServerConfigurationClient::ADSHARES_LICENSE_KEY => AdServerConfig::LicenseKey,
+        AdServerConfigurationClient::ADSHARES_ADDRESS => AdServerConfig::WalletAddress,
+        AdServerConfigurationClient::ADSHARES_NODE_HOST => AdServerConfig::WalletNodeHost,
+        AdServerConfigurationClient::ADSHARES_NODE_PORT => AdServerConfig::WalletNodePort,
+        AdServerConfigurationClient::ADSHARES_SECRET => AdServerConfig::WalletSecretKey,
         // AdUser
-        AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::URL,
-        AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUserConfig::INTERNAL_URL,
+        AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::Url,
+        AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUserConfig::InternalUrl,
         // General
-        AdServerConfigurationClient::SUPPORT_EMAIL => GeneralConfig::BASE_SUPPORT_EMAIL,
-        AdServerConfigurationClient::TECHNICAL_EMAIL => GeneralConfig::BASE_TECHNICAL_EMAIL,
-        AdServerConfigurationClient::MAIL_SMTP_HOST => GeneralConfig::SMTP_HOST,
-        AdServerConfigurationClient::MAIL_SMTP_PASSWORD => GeneralConfig::SMTP_PASSWORD,
-        AdServerConfigurationClient::MAIL_SMTP_PORT => GeneralConfig::SMTP_PORT,
-        AdServerConfigurationClient::MAIL_FROM_NAME => GeneralConfig::SMTP_SENDER,
-        AdServerConfigurationClient::MAIL_SMTP_USERNAME => GeneralConfig::SMTP_USERNAME,
+        AdServerConfigurationClient::SUPPORT_EMAIL => GeneralConfig::SupportEmail,
+        AdServerConfigurationClient::TECHNICAL_EMAIL => GeneralConfig::TechnicalEmail,
+        AdServerConfigurationClient::MAIL_SMTP_HOST => GeneralConfig::SmtpHost,
+        AdServerConfigurationClient::MAIL_SMTP_PASSWORD => GeneralConfig::SmtpPassword,
+        AdServerConfigurationClient::MAIL_SMTP_PORT => GeneralConfig::SmtpPort,
+        AdServerConfigurationClient::MAIL_FROM_NAME => GeneralConfig::SmtpSender,
+        AdServerConfigurationClient::MAIL_SMTP_USERNAME => GeneralConfig::SmtpUsername,
     ];
 
     public function __construct(
@@ -66,7 +66,7 @@ class Migrator
         $config = [];
         foreach (self::KEY_MAP as $adServerKey => $enum) {
             if (isset($adServerConfig[$adServerKey])) {
-                $config[$enum->getModule()][$enum->value] = $adServerConfig[$adServerKey];
+                $config[$enum->getModule()][$enum->name] = $adServerConfig[$adServerKey];
             }
         }
         return $config;

@@ -43,10 +43,10 @@ MESSAGE
             );
         }
 
-        if (null === ($state = $repository->fetchValueByEnum(AppConfig::APP_STATE))) {
+        if (null === ($state = $repository->fetchValueByEnum(AppConfig::AppState))) {
             if ($accountList->isAdministratorAccountPresent()) {
-                $state = AppStateEnum::ADSERVER_ACCOUNT_CREATED->value;
-                $repository->insertOrUpdateOne(AppConfig::APP_STATE, $state);
+                $state = AppStateEnum::AdserverAccountCreated->name;
+                $repository->insertOrUpdateOne(AppConfig::AppState, $state);
             }
         }
 

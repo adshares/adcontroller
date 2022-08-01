@@ -2,13 +2,13 @@
 
 namespace App\Entity\Enum;
 
-enum AppConfig: string implements ConfigEnum
+enum AppConfig implements ConfigEnum
 {
     public const MODULE = 'App';
 
-    case APP_STATE = 'app_state';
-    case INSTALLER_STEP = 'installer_step';
-    case EMAIL_SENT = 'email_sent';
+    case AppState;
+    case InstallerStep;
+    case EmailSent;
 
     public function getModule(): string
     {

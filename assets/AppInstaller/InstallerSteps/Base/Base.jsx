@@ -8,10 +8,10 @@ import styles from './styles.scss';
 function Base({ handleNextStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
   const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
-    base_adserver_name: '',
-    base_technical_email: '',
-    base_domain: '',
-    base_support_email: '',
+    Domain: '',
+    Name: '',
+    SupportEmail: '',
+    TechnicalEmail: '',
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
@@ -31,23 +31,23 @@ function Base({ handleNextStep, step }) {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
       const {
-        base_adserver_name,
-        base_technical_email,
-        base_domain,
-        base_support_email,
-        data_required,
+        Domain,
+        Name,
+        SupportEmail,
+        TechnicalEmail,
+        DataRequired,
       } = response;
       setFields({
         ...fields,
         ...{
-          base_adserver_name: base_adserver_name || '',
-          base_technical_email: base_technical_email || '',
-          base_domain: base_domain || '',
-          base_support_email: base_support_email || '',
+          Domain: Domain || '',
+          Name: Name || '',
+          SupportEmail: SupportEmail || '',
+          TechnicalEmail: TechnicalEmail || '',
         },
       });
-      setEditMode(data_required);
-      setDataRequired(data_required);
+      setEditMode(DataRequired);
+      setDataRequired(DataRequired);
     } catch (err) {
       setAlert({
         type: 'error',
@@ -111,24 +111,24 @@ function Base({ handleNextStep, step }) {
             <Box className={styles.formBlock}>
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_adserver_name}
-                helperText={errorObj.base_adserver_name}
+                error={!!errorObj.Name}
+                helperText={errorObj.Name}
                 size="small"
-                name="base_adserver_name"
-                label="AdServer name"
-                value={fields.base_adserver_name}
+                name="Name"
+                label="AdServer's name"
+                value={fields.Name}
                 type="text"
                 required
                 inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_domain}
-                helperText={errorObj.base_domain}
+                error={!!errorObj.Domain}
+                helperText={errorObj.Domain}
                 size="small"
-                name="base_domain"
-                label="Domain name"
-                value={fields.base_domain}
+                name="Domain"
+                label="AdServer's domain"
+                value={fields.Domain}
                 type="text"
                 required
                 inputProps={{ autoComplete: 'off' }}
@@ -137,12 +137,12 @@ function Base({ handleNextStep, step }) {
             <Box className={styles.formBlock}>
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_support_email}
-                helperText={errorObj.base_support_email}
+                error={!!errorObj.SupportEmail}
+                helperText={errorObj.SupportEmail}
                 size="small"
-                name="base_support_email"
+                name="SupportEmail"
                 label="Email to support"
-                value={fields.base_support_email}
+                value={fields.SupportEmail}
                 type="email"
                 placeholder="support@domain.xyz"
                 required
@@ -150,12 +150,12 @@ function Base({ handleNextStep, step }) {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_technical_email}
-                helperText={errorObj.base_technical_email}
+                error={!!errorObj.TechnicalEmail}
+                helperText={errorObj.TechnicalEmail}
                 size="small"
-                name="base_technical_email"
+                name="TechnicalEmail"
                 label="AdServer's operator email"
-                value={fields.base_technical_email}
+                value={fields.TechnicalEmail}
                 type="email"
                 placeholder="tech@domain.xyz"
                 required
@@ -185,19 +185,19 @@ function InfoTable({ stepData }) {
       <TableBody>
         <TableRow>
           <TableCell align="left">AdServer name</TableCell>
-          <TableCell align="left">{stepData.base_adserver_name}</TableCell>
+          <TableCell align="left">{stepData.Name}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell align="left">Domain</TableCell>
-          <TableCell align="left">{stepData.base_domain}</TableCell>
+          <TableCell align="left">{stepData.Domain}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell align="left">Email to support</TableCell>
-          <TableCell align="left">{stepData.base_support_email}</TableCell>
+          <TableCell align="left">{stepData.SupportEmail}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell align="left">AdServer's operator email</TableCell>
-          <TableCell align="left">{stepData.base_technical_email}</TableCell>
+          <TableCell align="left">{stepData.TechnicalEmail}</TableCell>
         </TableRow>
       </TableBody>
     </Table>

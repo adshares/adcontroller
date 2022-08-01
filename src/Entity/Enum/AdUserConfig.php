@@ -2,12 +2,12 @@
 
 namespace App\Entity\Enum;
 
-enum AdUserConfig: string implements ConfigEnum
+enum AdUserConfig implements ConfigEnum
 {
     public const MODULE = 'AdUser';
 
-    case INTERNAL_URL = 'base_aduser_internal_url';
-    case URL = 'base_aduser_url';
+    case InternalUrl;
+    case Url;
 
     public function getModule(): string
     {

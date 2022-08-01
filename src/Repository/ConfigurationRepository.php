@@ -24,9 +24,9 @@ use Doctrine\Persistence\ManagerRegistry;
 class ConfigurationRepository extends ServiceEntityRepository
 {
     private const SECRETS_ENUM = [
-        AdClassifyConfig::API_KEY_SECRET,
-        AdServerConfig::LICENSE_KEY,
-        AdServerConfig::WALLET_SECRET_KEY,
+        AdClassifyConfig::ApiKeySecret,
+        AdServerConfig::LicenseKey,
+        AdServerConfig::WalletSecretKey,
     ];
 
     public function __construct(private readonly Crypt $crypt, ManagerRegistry $registry)
@@ -36,7 +36,7 @@ class ConfigurationRepository extends ServiceEntityRepository
 
     public function insertOrUpdateOne(ConfigEnum $enum, string $value, bool $flush = true): void
     {
-        $this->insertOrUpdate($enum->getModule(), [$enum->value => $value], $flush);
+        $this->insertOrUpdate($enum->getModule(), [$enum->name => $value], $flush);
     }
 
     public function insertOrUpdate(string $module, array $data, bool $flush = true): void
@@ -121,7 +121,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         $name = $entity->getName();
 
         foreach (self::SECRETS_ENUM as $enum) {
-            if ($enum->getModule() === $module && $enum->value === $name) {
+            if ($enum->getModule() === $module && $enum->name === $name) {
                 return true;
             }
         }
@@ -131,7 +131,7 @@ class ConfigurationRepository extends ServiceEntityRepository
 
     private function findOneByEnum(ConfigEnum $enum): ?Configuration
     {
-        return $this->findOneBy(['module' => $enum->getModule(), 'name' => $enum->value]);
+        return $this->findOneBy(['module' => $enum->getModule(), 'name' => $enum->name]);
     }
 
     /**

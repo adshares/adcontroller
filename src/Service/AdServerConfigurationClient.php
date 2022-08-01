@@ -178,20 +178,20 @@ class AdServerConfigurationClient
     private function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
-            AdServerConfig::LICENSE_KEY->value => self::ADSHARES_LICENSE_KEY,
-            AdServerConfig::NAME->value => self::ADSERVER_NAME,
-            AdServerConfig::URL->value => self::URL,
-            AdServerConfig::WALLET_ADDRESS->value => self::ADSHARES_ADDRESS,
-            AdServerConfig::WALLET_NODE_HOST->value => self::ADSHARES_NODE_HOST,
-            AdServerConfig::WALLET_NODE_PORT->value => self::ADSHARES_NODE_PORT,
-            AdServerConfig::WALLET_SECRET_KEY->value => self::ADSHARES_SECRET,
-            GeneralConfig::BASE_SUPPORT_EMAIL->value => self::SUPPORT_EMAIL,
-            GeneralConfig::BASE_TECHNICAL_EMAIL->value => self::TECHNICAL_EMAIL,
-            GeneralConfig::SMTP_HOST->value => self::MAIL_SMTP_HOST,
-            GeneralConfig::SMTP_PASSWORD->value => self::MAIL_SMTP_PASSWORD,
-            GeneralConfig::SMTP_PORT->value => self::MAIL_SMTP_PORT,
-            GeneralConfig::SMTP_SENDER->value => self::MAIL_FROM_NAME,
-            GeneralConfig::SMTP_USERNAME->value => self::MAIL_SMTP_USERNAME,
+            AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
+            AdServerConfig::Name->name => self::ADSERVER_NAME,
+            AdServerConfig::Url->name => self::URL,
+            AdServerConfig::WalletAddress->name => self::ADSHARES_ADDRESS,
+            AdServerConfig::WalletNodeHost->name => self::ADSHARES_NODE_HOST,
+            AdServerConfig::WalletNodePort->name => self::ADSHARES_NODE_PORT,
+            AdServerConfig::WalletSecretKey->name => self::ADSHARES_SECRET,
+            GeneralConfig::SupportEmail->name => self::SUPPORT_EMAIL,
+            GeneralConfig::TechnicalEmail->name => self::TECHNICAL_EMAIL,
+            GeneralConfig::SmtpHost->name => self::MAIL_SMTP_HOST,
+            GeneralConfig::SmtpPassword->name => self::MAIL_SMTP_PASSWORD,
+            GeneralConfig::SmtpPort->name => self::MAIL_SMTP_PORT,
+            GeneralConfig::SmtpSender->name => self::MAIL_FROM_NAME,
+            GeneralConfig::SmtpUsername->name => self::MAIL_SMTP_USERNAME,
         ];
 
         $mappedData = [];

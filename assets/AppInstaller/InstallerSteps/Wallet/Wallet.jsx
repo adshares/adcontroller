@@ -10,8 +10,8 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isHostVerification, setIsHostVerification] = useState(false);
   const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
-    wallet_address: '',
-    wallet_secret_key: '',
+    WalletAddress: '',
+    WalletSecretKey: '',
   });
   const {
     fields: nodeHost,
@@ -20,8 +20,8 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
     isFormValid: isNodeHostValid,
     onFormChange: onNodeHostChange,
   } = useForm({
-    wallet_node_host: '',
-    wallet_node_port: '',
+    WalletNodeHost: '',
+    WalletNodePort: '',
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
@@ -37,26 +37,26 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   }, []);
 
   useSkipFirstRenderEffect(() => {
-    if (!errorObj.wallet_address) {
+    if (!errorObj.WalletAddress) {
       getWalletNodes();
     }
-  }, [errorObj.wallet_address, fields.wallet_address]);
+  }, [errorObj.WalletAddress, fields.WalletAddress]);
 
   useEffect(() => {
-    checkIsKnownNode(fields.wallet_address);
-  }, [fields.wallet_address]);
+    checkIsKnownNode(fields.WalletAddress);
+  }, [fields.WalletAddress]);
 
   const getStepData = async () => {
     try {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
       setFields({ ...fields, ...response });
-      setEditMode(response.data_required);
-      setDataRequired(response.data_required);
-      if (response.wallet_node_host) {
+      setEditMode(response.DataRequired);
+      setDataRequired(response.DataRequired);
+      if (response.WalletNodeHost) {
         setNodeHost({
-          wallet_node_host: response.wallet_node_host,
-          wallet_node_port: response.wallet_node_port,
+          WalletNodeHost: response.WalletNodeHost,
+          WalletNodePort: response.WalletNodePort,
         });
       }
     } catch (err) {
@@ -73,12 +73,12 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   const getWalletNodes = async () => {
     try {
       setIsHostVerification(true);
-      const response = await apiService.getWalletNodeHost({ wallet_address: fields.wallet_address });
+      const response = await apiService.getWalletNodeHost({ WalletAddress: fields.WalletAddress });
       setNodeHost({ ...response });
     } catch (err) {
       setNodeHost({
-        wallet_node_host: '',
-        wallet_node_port: '',
+        WalletNodeHost: '',
+        WalletNodePort: '',
       });
       setAlert({
         type: 'error',
@@ -111,10 +111,10 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
         return;
       }
       const body = {
-        wallet_address: fields.wallet_address,
-        wallet_secret_key: fields.wallet_secret_key,
-        wallet_node_host: nodeHost.wallet_node_host,
-        wallet_node_port: Number(nodeHost.wallet_node_port),
+        WalletAddress: fields.WalletAddress,
+        WalletSecretKey: fields.WalletSecretKey,
+        WalletNodeHost: nodeHost.WalletNodeHost,
+        WalletNodePort: Number(nodeHost.WalletNodePort),
       };
       await apiService.sendStepData(step.path, body);
       handleNextStep(step);
@@ -154,24 +154,24 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
           >
             <TextField
               className={styles.textField}
-              error={!!errorObj.wallet_address}
-              helperText={errorObj.wallet_address}
-              value={fields.wallet_address}
+              error={!!errorObj.WalletAddress}
+              helperText={errorObj.WalletAddress}
+              value={fields.WalletAddress}
               margin="normal"
               size="small"
-              name="wallet_address"
+              name="WalletAddress"
               label="Wallet address"
               type="text"
               inputProps={{ autoComplete: 'off' }}
               required
             />
             <TextField
-              error={!!errorObj.wallet_secret_key}
-              helperText={errorObj.wallet_secret_key}
-              value={fields.wallet_secret_key}
+              error={!!errorObj.WalletSecretKey}
+              helperText={errorObj.WalletSecretKey}
+              value={fields.WalletSecretKey}
               margin="normal"
               size="small"
-              name="wallet_secret_key"
+              name="WalletSecretKey"
               label="Wallet private key"
               type="password"
               inputProps={{ autoComplete: 'off' }}
@@ -192,25 +192,25 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
             ) : (
               <>
                 <TextField
-                  error={!!nodeHostError.wallet_node_host}
-                  helperText={nodeHostError.wallet_node_host}
-                  value={nodeHost.wallet_node_host}
+                  error={!!nodeHostError.WalletNodeHost}
+                  helperText={nodeHostError.WalletNodeHost}
+                  value={nodeHost.WalletNodeHost}
                   disabled={!!nodeHost.code}
                   margin="normal"
                   size="small"
-                  name="wallet_node_host"
+                  name="WalletNodeHost"
                   label="Wallet node host"
                   fullWidth
                   inputProps={{ autoComplete: 'off' }}
                 />
                 <TextField
-                  error={!!nodeHostError.wallet_node_port}
-                  helperText={nodeHostError.wallet_node_port}
-                  value={nodeHost.wallet_node_port}
+                  error={!!nodeHostError.WalletNodePort}
+                  helperText={nodeHostError.WalletNodePort}
+                  value={nodeHost.WalletNodePort}
                   disabled={!!nodeHost.code}
                   margin="normal"
                   size="small"
-                  name="wallet_node_port"
+                  name="WalletNodePort"
                   label="Wallet node port"
                   fullWidth
                   inputProps={{ autoComplete: 'off' }}
@@ -226,7 +226,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
           <TableBody>
             <TableRow>
               <TableCell align="center">Your wallet address</TableCell>
-              <TableCell align="center">{fields.wallet_address}</TableCell>
+              <TableCell align="center">{fields.WalletAddress}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
