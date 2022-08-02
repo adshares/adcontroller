@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
   Checkbox,
@@ -218,13 +219,15 @@ const ColdWalletSettingsCard = () => {
               />
             </Box>
           </Box>
-          <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-            <Button variant="contained" type="button">
-              Save
-            </Button>
-          </Box>
         </CardContent>
       </Collapse>
+      <CardActions>
+        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+          <Button variant="contained" type="button">
+            Save
+          </Button>
+        </Box>
+      </CardActions>
     </Card>
   );
 };
