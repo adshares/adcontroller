@@ -17,7 +17,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../commonStyles.scss';
 
-const all = ['0023-00000000-D758', '0023-00000001-C779', '0023-00000002-F71A'];
+const all = [];
 const supply = [];
 const demand = [];
 
