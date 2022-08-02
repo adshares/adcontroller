@@ -55,7 +55,7 @@ export default function Network() {
         />
       </Box>
 
-      <Collapse in={!isPrivateAdserver} timeout="auto">
+      <Collapse in={!isPrivateAdserver} timeout="auto" sx={{ overflow: 'auto' }}>
         <CardActions>
           <FormControlLabel
             control={<Checkbox checked={separateNetworkList} onChange={() => setSeparateNetworkList((prevState) => !prevState)} />}
@@ -115,7 +115,7 @@ export default function Network() {
 
 const CardList = ({ listSubHeader, listTitle, list, setListFn }) => {
   const [addMore, setAddMore] = useState(false);
-  const [textareaList, setTextAreaList] = useState([]);
+  const [textareaValue, setTextareaValue] = useState('');
   const textAreaRef = useRef(null);
 
   const handleChange = (e, idx, list, setListFn) => {
@@ -175,14 +175,13 @@ const CardList = ({ listSubHeader, listTitle, list, setListFn }) => {
   };
 
   const onTextareaChange = (e) => {
-    const newList = e.target.value.split(/[.,:;\[\]'"{}()|/\\\s]/).filter(Boolean);
-    setTextAreaList(newList);
+    setTextareaValue(e.target.value);
   };
 
   const onSaveClick = () => {
-    setListFn((prevState) => [...prevState, ...textareaList]);
-    setTextAreaList([]);
-    textAreaRef.current.value = '';
+    const newList = textareaValue.split(/[.,:;\[\]'"{}()|/\\\s]/).filter(Boolean);
+    setListFn((prevState) => [...prevState, ...newList]);
+    setTextareaValue('');
     setAddMore((prevState) => !prevState);
   };
 
@@ -207,7 +206,7 @@ const CardList = ({ listSubHeader, listTitle, list, setListFn }) => {
         <Collapse in={addMore} timeout="auto">
           <CardContent>
             <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
-              <TextField multiline rows={8} onChange={onTextareaChange} inputRef={textAreaRef} />
+              <TextField value={textareaValue} multiline rows={8} onChange={onTextareaChange} inputRef={textAreaRef} />
               <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
                 <Button type="button" variant="contained" sx={{ mr: 1 }} onClick={onSaveClick}>
                   Save
