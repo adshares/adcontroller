@@ -11,7 +11,8 @@ use App\Entity\Enum\GeneralConfig;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
-use App\Service\EnvEditor;
+use App\Service\Env\AdServerEnvVar;
+use App\Service\Env\EnvEditor;
 use App\Service\ServicePresenceChecker;
 use App\Service\ServiceUrlParser;
 use App\ValueObject\Module;
@@ -71,9 +72,9 @@ class BaseStep implements InstallerStep
 
         $envEditor->set(
             [
-                EnvEditor::ADSERVER_APP_HOST => $adServerHost,
-                EnvEditor::ADSERVER_APP_NAME => $content[AdServerConfig::Name->name],
-                EnvEditor::ADSERVER_APP_URL => $adServerUrl,
+                AdServerEnvVar::AppHost->value => $adServerHost,
+                AdServerEnvVar::AppName->value => $content[AdServerConfig::Name->name],
+                AdServerEnvVar::AppUrl->value => $adServerUrl,
             ]
         );
 
