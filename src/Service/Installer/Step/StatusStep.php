@@ -13,6 +13,9 @@ use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
+use App\Service\Env\AdServerEnvVar;
+use App\Service\Env\EnvEditor;
+use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -25,7 +28,8 @@ class StatusStep implements InstallerStep
 {
     public function __construct(
         private readonly ConfigurationRepository $repository,
-        private readonly HttpClientInterface $httpClient
+        private readonly HttpClientInterface $httpClient,
+        private readonly ServicePresenceChecker $servicePresenceChecker,
     ) {
     }
 
@@ -38,6 +42,8 @@ class StatusStep implements InstallerStep
                 AppConfig::AppState->name => AppStateEnum::InstallationCompleted->name,
             ]
         );
+        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+        $envEditor->setOne(AdServerEnvVar::AppSetup->value, '0');
     }
 
     public function getName(): string
