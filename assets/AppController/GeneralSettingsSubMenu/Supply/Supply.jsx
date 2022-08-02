@@ -27,7 +27,7 @@ export default function Supply() {
     <Card className={`${commonStyles.card}`}>
       <CardHeader title="Site options" subheader="Site banners classifications settings." />
       <CardContent>
-        <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceEvenly}`}>
+        <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceEvenly} ${commonStyles.alignStart}`}>
           <FormControlLabel
             label="Require banner acceptance by default"
             control={<Checkbox checked={acceptBannersManually} onChange={() => setAcceptBannersManually((prevState) => !prevState)} />}
