@@ -25,6 +25,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import commonStyles from './commonStyles.scss';
+import Network from './GeneralSettingsSubMenu/Network/Network';
+import Supply from './GeneralSettingsSubMenu/Supply/Supply';
+import Demand from './GeneralSettingsSubMenu/Demand/Demand';
 
 const appModules = [
   {
@@ -47,6 +50,24 @@ const appModules = [
         name: 'License',
         path: '/license',
         component: License,
+        icon: VpnKeyIcon,
+      },
+      {
+        name: 'Network',
+        path: '/network',
+        component: Network,
+        icon: VpnKeyIcon,
+      },
+      {
+        name: 'Supply',
+        path: '/supply',
+        component: Supply,
+        icon: VpnKeyIcon,
+      },
+      {
+        name: 'Demand',
+        path: '/demand',
+        component: Demand,
         icon: VpnKeyIcon,
       },
     ],
@@ -120,7 +141,7 @@ function AppController() {
     !isLoading && (
       <>
         <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
-        <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ height: 'calc(100vh - 64px)' }}>
           <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
           <AppWindow>
             <Routes>
