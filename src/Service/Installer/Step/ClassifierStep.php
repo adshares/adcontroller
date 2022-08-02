@@ -3,6 +3,11 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdClassifyConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\GeneralConfig;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdClassifyClient;
@@ -13,34 +18,26 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ClassifierStep implements InstallerStep
 {
-    private AdClassifyClient $adClassifyClient;
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private LoggerInterface $logger;
-
     public function __construct(
-        AdClassifyClient $adClassifyClient,
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        LoggerInterface $logger
+        private readonly string $adclassifyBaseUri,
+        private readonly AdClassifyClient $adClassifyClient,
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository,
+        private readonly LoggerInterface $logger
     ) {
-        $this->adClassifyClient = $adClassifyClient;
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->logger = $logger;
     }
 
     public function process(array $content): void
     {
         if (!$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+            $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
             return;
         }
 
-        if (null === ($name = $this->repository->fetchValueByName(Configuration::BASE_ADSERVER_NAME))) {
+        if (null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::Name))) {
             throw new UnprocessableEntityHttpException('AdServer\'s name must be set');
         }
-        if (null === ($email = $this->repository->fetchValueByName(Configuration::BASE_TECHNICAL_EMAIL))) {
+        if (null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail))) {
             throw new UnprocessableEntityHttpException('Technical e-mail must be set');
         }
 
@@ -53,37 +50,39 @@ class ClassifierStep implements InstallerStep
             throw new UnprocessableEntityHttpException('AdClassify is not accessible');
         }
 
-        $data = [
-            Configuration::CLASSIFIER_API_KEY_NAME => $apiKey['name'],
-            Configuration::CLASSIFIER_API_KEY_SECRET => $apiKey['secret'],
-        ];
-        $this->adServerConfigurationClient->store($data);
+        $this->adServerConfigurationClient->setupAdClassify(
+            $this->adclassifyBaseUri,
+            $apiKey['name'],
+            $apiKey['secret']
+        );
 
-        $data[Configuration::INSTALLER_STEP] = $this->getName();
-        $this->repository->insertOrUpdate($data);
+        $this->repository->insertOrUpdate(
+            AdClassifyConfig::MODULE,
+            [
+                AdClassifyConfig::ApiKeyName->name => $apiKey['name'],
+                AdClassifyConfig::ApiKeySecret->name => $apiKey['secret'],
+            ]
+        );
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_CLASSIFIER;
+        return InstallerStepEnum::Classifier->name;
     }
 
     public function fetchData(): array
     {
         $isDataRequired = $this->isDataRequired();
 
-        if ($isDataRequired) {
-            $localData = $this->repository->fetchValuesByNames([
-                Configuration::BASE_ADSERVER_NAME,
-                Configuration::BASE_TECHNICAL_EMAIL,
-            ]);
-
-            if (
-                !isset($localData[Configuration::BASE_ADSERVER_NAME])
-                || !isset($localData[Configuration::BASE_TECHNICAL_EMAIL])
-            ) {
-                throw new UnprocessableEntityHttpException('Base step must be completed');
-            }
+        if (
+            $isDataRequired
+            && (
+                null === $this->repository->fetchValueByEnum(AdServerConfig::Name)
+                || null === $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail)
+            )
+        ) {
+            throw new UnprocessableEntityHttpException('Base step must be completed');
         }
 
         return [
@@ -94,26 +93,15 @@ class ClassifierStep implements InstallerStep
     public function isDataRequired(): bool
     {
         $requiredKeys = [
-            Configuration::CLASSIFIER_API_KEY_NAME,
-            Configuration::CLASSIFIER_API_KEY_SECRET,
+            AdClassifyConfig::ApiKeyName->name,
+            AdClassifyConfig::ApiKeySecret->name,
         ];
-        $localConfiguration = $this->repository->fetchValuesByNames($requiredKeys);
+        $configuration = $this->repository->fetchValuesByNames(AdClassifyConfig::MODULE, $requiredKeys);
 
         foreach ($requiredKeys as $requiredKey) {
-            if (!isset($localConfiguration[$requiredKey])) {
+            if (!isset($configuration[$requiredKey])) {
                 return true;
             }
-        }
-
-        $remoteConfiguration = $this->adServerConfigurationClient->fetch();
-        if (
-            !isset($remoteConfiguration[Configuration::CLASSIFIER_API_KEY_NAME])
-            || (
-                $remoteConfiguration[Configuration::CLASSIFIER_API_KEY_NAME]
-                !== $localConfiguration[Configuration::CLASSIFIER_API_KEY_NAME]
-            )
-        ) {
-            return true;
         }
 
         return false;

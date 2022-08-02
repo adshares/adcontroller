@@ -3,9 +3,12 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
-use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -16,45 +19,35 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DnsStep implements InstallerStep
 {
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private HttpClientInterface $httpClient;
-
     public function __construct(
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        HttpClientInterface $httpClient
+        private readonly ConfigurationRepository $repository,
+        private readonly HttpClientInterface $httpClient
     ) {
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->httpClient = $httpClient;
     }
 
     public function process(array $content): void
     {
-        $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_DNS;
+        return InstallerStepEnum::Dns->name;
     }
 
     public function fetchData(): array
     {
-        $values = $this->adServerConfigurationClient->fetch();
-
         $config = [
-            Module::ADPANEL => Configuration::BASE_ADPANEL_URL,
-            Module::ADSERVER => Configuration::BASE_ADSERVER_URL,
-            Module::ADUSER => Configuration::BASE_ADUSER_URL,
+            Module::ADPANEL => AdPanelConfig::Url,
+            Module::ADSERVER => AdServerConfig::Url,
+            Module::ADUSER => AdUserConfig::Url,
         ];
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
-        foreach ($config as $moduleName => $key) {
-            $url = $values[$key] ?? null;
+        foreach ($config as $moduleName => $enum) {
+            $url = $this->repository->fetchValueByEnum($enum);
             $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
         }
 

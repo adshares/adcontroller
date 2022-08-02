@@ -3,6 +3,10 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\GeneralConfig;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
@@ -18,21 +22,12 @@ class LicenseStep implements InstallerStep
 {
     private const LICENSE_KEY_PATTERN = '/^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/i';
 
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private LicenseServerClient $licenseServerClient;
-    private LoggerInterface $logger;
-
     public function __construct(
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        LicenseServerClient $licenseServerClient,
-        LoggerInterface $logger
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository,
+        private readonly LicenseServerClient $licenseServerClient,
+        private readonly LoggerInterface $logger
     ) {
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->licenseServerClient = $licenseServerClient;
-        $this->logger = $logger;
     }
 
     public function process(array $content): void
@@ -41,42 +36,38 @@ class LicenseStep implements InstallerStep
             throw new UnprocessableEntityHttpException('License key not set');
         }
 
-        $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     public function setLicenseKey(array $content): void
     {
         $this->validate($content);
 
-        $licenseKey = $content[Configuration::LICENSE_KEY];
+        $licenseKey = $content[AdServerConfig::LicenseKey->name];
         $this->adServerConfigurationClient->store([
-            Configuration::LICENSE_KEY => $licenseKey,
+            AdServerConfig::LicenseKey->name => $licenseKey,
         ]);
 
-        $this->repository->insertOrUpdate(
-            [
-                Configuration::INSTALLER_STEP => $this->getName(),
-                Configuration::LICENSE_KEY => $licenseKey,
-            ]
-        );
+        $this->repository->insertOrUpdateOne(AdServerConfig::LicenseKey, $licenseKey);
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     private function validate(array $content): void
     {
-        if (!isset($content[Configuration::LICENSE_KEY])) {
-            throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', Configuration::LICENSE_KEY));
+        if (!isset($content[AdServerConfig::LicenseKey->name])) {
+            throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', AdServerConfig::LicenseKey->name));
         }
 
-        if (null === $this->getLicenseByKey($content[Configuration::LICENSE_KEY])) {
+        if (null === $this->getLicenseByKey($content[AdServerConfig::LicenseKey->name])) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a valid license key', Configuration::LICENSE_KEY)
+                sprintf('Field `%s` must be a valid license key', AdServerConfig::LicenseKey->name)
             );
         }
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_LICENSE;
+        return InstallerStepEnum::License->name;
     }
 
     public function fetchData(): array
@@ -85,7 +76,7 @@ class LicenseStep implements InstallerStep
             Configuration::COMMON_DATA_REQUIRED => true,
         ];
 
-        $licenseKey = $this->repository->fetchValueByName(Configuration::LICENSE_KEY);
+        $licenseKey = $this->repository->fetchValueByEnum(AdServerConfig::LicenseKey);
 
         if (null !== ($license = $this->getLicenseByKey($licenseKey))) {
             $data[Configuration::COMMON_DATA_REQUIRED] = false;
@@ -97,7 +88,7 @@ class LicenseStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $licenseKey = $this->repository->fetchValueByName(Configuration::LICENSE_KEY);
+        $licenseKey = $this->repository->fetchValueByEnum(AdServerConfig::LicenseKey);
 
         return null === $this->getLicenseByKey($licenseKey);
     }
@@ -141,20 +132,13 @@ class LicenseStep implements InstallerStep
 
     public function claimCommunityLicense(): void
     {
-        $localData = $this->repository->fetchValuesByNames([
-            Configuration::BASE_ADSERVER_NAME,
-            Configuration::BASE_TECHNICAL_EMAIL,
-        ]);
-
         if (
-            !isset($localData[Configuration::BASE_ADSERVER_NAME])
-            || !isset($localData[Configuration::BASE_TECHNICAL_EMAIL])
+            null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::Name))
+            || null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail))
         ) {
             throw new UnprocessableEntityHttpException('Base step must be completed');
         }
 
-        $email = $localData[Configuration::BASE_TECHNICAL_EMAIL];
-        $name = $localData[Configuration::BASE_ADSERVER_NAME];
         try {
             $licenseKey = $this->licenseServerClient->createCommunityLicense($email, $name);
         } catch (UnexpectedResponseException) {
@@ -166,15 +150,11 @@ class LicenseStep implements InstallerStep
 
         $this->adServerConfigurationClient->store(
             [
-                Configuration::LICENSE_KEY => $licenseKey,
+                AdServerConfig::LicenseKey->name => $licenseKey,
             ]
         );
 
-        $this->repository->insertOrUpdate(
-            [
-                Configuration::INSTALLER_STEP => $this->getName(),
-                Configuration::LICENSE_KEY => $licenseKey,
-            ]
-        );
+        $this->repository->insertOrUpdateOne(AdServerConfig::LicenseKey, $licenseKey);
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 }

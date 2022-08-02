@@ -11,13 +11,10 @@ class AdClassifyClient
 {
     private const CREATE_URI = '/api/v1/users';
 
-    private HttpClientInterface $httpClient;
-    private string $baseUri;
-
-    public function __construct(HttpClientInterface $httpClient, string $adclassifyBaseUri)
-    {
-        $this->httpClient = $httpClient;
-        $this->baseUri = $adclassifyBaseUri;
+    public function __construct(
+        private readonly HttpClientInterface $httpClient,
+        private readonly string $adclassifyBaseUri
+    ) {
     }
 
     /**
@@ -27,7 +24,7 @@ class AdClassifyClient
     {
         $response = $this->httpClient->request(
             'POST',
-            $this->baseUri . self::CREATE_URI,
+            $this->adclassifyBaseUri . self::CREATE_URI,
             [
                 'json' => ['email' => $email, 'name' => $adserverName]
             ]

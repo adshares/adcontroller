@@ -10,7 +10,7 @@ root.render(
   <ThemeProvider theme={theme}>
     <CssBaseline />
     <AppWindow>
-      <Alert severity="success">Account was successfully created</Alert>
+      <Alert severity="success">AdServer was successfully installed</Alert>
     </AppWindow>
   </ThemeProvider>,
 );

@@ -14,11 +14,8 @@ class ExceptionListener implements EventSubscriberInterface
 {
     private const HEADER_JSON_CONTENT = 'application/json';
 
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private readonly LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
     public function onKernelException(ExceptionEvent $event)

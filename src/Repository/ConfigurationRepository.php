@@ -3,9 +3,14 @@
 namespace App\Repository;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdClassifyConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\ConfigEnum;
 use App\Service\Crypt;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -18,58 +23,40 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ConfigurationRepository extends ServiceEntityRepository
 {
-    private const SECRETS = [
-        Configuration::CLASSIFIER_API_KEY_SECRET,
-        Configuration::LICENSE_KEY,
-        Configuration::WALLET_SECRET_KEY,
+    private const SECRETS_ENUM = [
+        AdClassifyConfig::ApiKeySecret,
+        AdServerConfig::LicenseKey,
+        AdServerConfig::WalletSecretKey,
     ];
 
-    private Crypt $crypt;
-
-    public function __construct(Crypt $crypt, ManagerRegistry $registry)
+    public function __construct(private readonly Crypt $crypt, ManagerRegistry $registry)
     {
         parent::__construct($registry, Configuration::class);
-        $this->crypt = $crypt;
     }
 
-    public function insertOrUpdateOne(string $name, string $value, bool $flush = true): void
+    public function insertOrUpdateOne(ConfigEnum $enum, string $value, bool $flush = true): void
+    {
+        $this->insertOrUpdate($enum->getModule(), [$enum->name => $value], $flush);
+    }
+
+    public function insertOrUpdate(string $module, array $data, bool $flush = true): void
     {
         $now = new DateTimeImmutable();
 
-        if (null === ($entity = $this->findOneByName($name))) {
-            $entity = new Configuration();
-            $entity->setName($name);
-            $entity->setCreatedAt($now);
-        }
-        if (in_array($name, self::SECRETS)) {
-            $value = $this->crypt->encrypt($value);
-        }
-        $entity->setValue($value);
-        $entity->setUpdatedAt($now);
-
-        $this->getEntityManager()->persist($entity);
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function insertOrUpdate(array $data, bool $flush = true): void
-    {
-        $now = new DateTimeImmutable();
-
-        $entities = $this->findByNames(array_keys($data));
+        $entities = $this->findByNames($module, array_keys($data));
         $names = array_map(fn($entity) => $entity->getName(), $entities);
         $entities = array_combine($names, $entities);
 
         foreach ($data as $name => $value) {
             if (!isset($entities[$name])) {
                 $entity = new Configuration();
+                $entity->setModule($module);
                 $entity->setName($name);
                 $entity->setCreatedAt($now);
             } else {
                 $entity = $entities[$name];
             }
-            if (in_array($name, self::SECRETS)) {
+            if ($this->isSecretEntity($entity)) {
                 $value = $this->crypt->encrypt($value);
             }
             $entity->setValue($value);
@@ -83,9 +70,9 @@ class ConfigurationRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(string $key, bool $flush = true): void
+    public function remove(ConfigEnum $enum, bool $flush = true): void
     {
-        if (null === ($entity = $this->findOneByName($key))) {
+        if (null === ($entity = $this->findOneByEnum($enum))) {
             return;
         }
 
@@ -95,14 +82,14 @@ class ConfigurationRepository extends ServiceEntityRepository
         }
     }
 
-    public function fetchValueByName(string $name): ?string
+    public function fetchValueByEnum(ConfigEnum $enum): ?string
     {
-        if (null === ($configuration = $this->findOneBy(['name' => $name]))) {
+        if (null === ($configuration = $this->findOneByEnum($enum))) {
             return null;
         }
 
         $value = $configuration->getValue();
-        if (in_array($name, self::SECRETS)) {
+        if (in_array($enum, self::SECRETS_ENUM)) {
             $value = $this->crypt->decrypt($value);
         }
 
@@ -110,16 +97,17 @@ class ConfigurationRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param string $module
      * @param array $names
      * @return array<string, string>
      */
-    public function fetchValuesByNames(array $names): array
+    public function fetchValuesByNames(string $module, array $names): array
     {
-        $entities = $this->findByNames($names);
+        $entities = $this->findByNames($module, $names);
         $data = [];
         foreach ($entities as $entity) {
             $value = $entity->getValue();
-            if (in_array($entity->getName(), self::SECRETS)) {
+            if ($this->isSecretEntity($entity)) {
                 $value = $this->crypt->decrypt($value);
             }
             $data[$entity->getName()] = $value;
@@ -127,20 +115,41 @@ class ConfigurationRepository extends ServiceEntityRepository
         return $data;
     }
 
-    private function findOneByName(string $key): ?Configuration
+    private function isSecretEntity(Configuration $entity): bool
     {
-        return $this->findOneBy(['name' => $key]);
+        $module = $entity->getModule();
+        $name = $entity->getName();
+
+        foreach (self::SECRETS_ENUM as $enum) {
+            if ($enum->getModule() === $module && $enum->name === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function findOneByEnum(ConfigEnum $enum): ?Configuration
+    {
+        return $this->findOneBy(['module' => $enum->getModule(), 'name' => $enum->name]);
     }
 
     /**
+     * @param string $module
      * @param array $names
      * @return Configuration[]
      */
-    private function findByNames(array $names): array
+    private function findByNames(string $module, array $names): array
     {
         return $this->createQueryBuilder('c')
+            ->andWhere('c.module = :module')
             ->andWhere('c.name IN (:names)')
-            ->setParameter('names', $names)
+            ->setParameters(
+                new ArrayCollection([
+                    new Parameter('module', $module),
+                    new Parameter('names', $names)
+                ])
+            )
             ->getQuery()
             ->getResult();
     }

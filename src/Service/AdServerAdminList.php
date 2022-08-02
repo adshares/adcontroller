@@ -7,11 +7,8 @@ use Symfony\Component\Process\Process;
 
 class AdServerAdminList
 {
-    private string $adserverHomeDirectory;
-
-    public function __construct(string $adserverHomeDirectory)
+    public function __construct(private readonly string $adserverHomeDirectory)
     {
-        $this->adserverHomeDirectory = $adserverHomeDirectory;
     }
 
     public function isAdministratorAccountPresent(): bool

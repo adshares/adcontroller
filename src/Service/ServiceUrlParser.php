@@ -2,7 +2,10 @@
 
 namespace App\Service;
 
-use App\Entity\Configuration;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\GeneralConfig;
 
 class ServiceUrlParser
 {
@@ -41,11 +44,10 @@ class ServiceUrlParser
                 $invertedDomains
             );
 
+            /** @var array{app: string, au: string, panel: string} $prefixes */
             return [
-                Configuration::BASE_ADPANEL_HOST_PREFIX => $prefixes['panel'],
-                Configuration::BASE_ADSERVER_HOST_PREFIX => $prefixes['app'],
-                Configuration::BASE_ADUSER_HOST_PREFIX => $prefixes['au'],
-                Configuration::BASE_DOMAIN => implode('.', array_reverse($commonDomainParts)),
+                GeneralConfig::Domain->name => implode('.', array_reverse($commonDomainParts)),
+                'prefixes' => $prefixes,
             ];
         }
 

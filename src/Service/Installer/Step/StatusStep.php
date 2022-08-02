@@ -3,8 +3,16 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdClassifyConfig;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdPayConfig;
+use App\Entity\Enum\AdSelectConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\AppStateEnum;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -15,53 +23,44 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class StatusStep implements InstallerStep
 {
-    private AdServerConfigurationClient $adServerConfigurationClient;
-    private ConfigurationRepository $repository;
-    private HttpClientInterface $httpClient;
-
     public function __construct(
-        AdServerConfigurationClient $adServerConfigurationClient,
-        ConfigurationRepository $repository,
-        HttpClientInterface $httpClient
+        private readonly ConfigurationRepository $repository,
+        private readonly HttpClientInterface $httpClient
     ) {
-        $this->adServerConfigurationClient = $adServerConfigurationClient;
-        $this->repository = $repository;
-        $this->httpClient = $httpClient;
     }
 
     public function process(array $content): void
     {
         $this->repository->insertOrUpdate(
+            AppConfig::MODULE,
             [
-                Configuration::INSTALLER_STEP => $this->getName(),
-                Configuration::APP_STATE => Configuration::APP_STATE_INSTALLATION_COMPLETED,
+                AppConfig::InstallerStep->name => $this->getName(),
+                AppConfig::AppState->name => AppStateEnum::InstallationCompleted->name,
             ]
         );
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_STATUS;
+        return InstallerStepEnum::Status->name;
     }
 
     public function fetchData(): array
     {
-        $configuration = $this->adServerConfigurationClient->fetch();
-
         $config = [
-            Module::ADCLASSIFY => Configuration::ADCLASSIFY_URL,
-            Module::ADPANEL => Configuration::BASE_ADPANEL_URL,
-            Module::ADPAY => Configuration::ADPAY_URL,
-            Module::ADSELECT => Configuration::ADSELECT_URL,
-            Module::ADSERVER => Configuration::BASE_ADSERVER_URL,
-            Module::ADUSER => Configuration::BASE_ADUSER_URL,
+            Module::ADCLASSIFY => AdClassifyConfig::Url,
+            Module::ADPANEL => AdPanelConfig::Url,
+            Module::ADPAY => AdPayConfig::Url,
+            Module::ADSELECT => AdSelectConfig::Url,
+            Module::ADSERVER => AdServerConfig::Url,
+            Module::ADUSER => AdUserConfig::Url,
         ];
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
-        foreach ($config as $moduleName => $key) {
-            $url = $configuration[$key] ?? null;
+        foreach ($config as $moduleName => $enum) {
+            $url = $this->repository->fetchValueByEnum($enum);
             $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
         }
 

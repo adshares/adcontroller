@@ -10,11 +10,8 @@ use Psr\Log\LoggerInterface;
 
 class AdsCredentialsChecker
 {
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private readonly LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
     public function check(string $address, string $secret, string $host, int $port): void

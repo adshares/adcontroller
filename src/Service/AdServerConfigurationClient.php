@@ -2,7 +2,8 @@
 
 namespace App\Service;
 
-use App\Entity\Configuration;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\GeneralConfig;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
@@ -15,51 +16,27 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AdServerConfigurationClient
 {
-    private const KEY_MAP = [
-        Configuration::ADCLASSIFY_URL => self::CLASSIFIER_EXTERNAL_BASE_URL,
-        Configuration::ADPAY_URL => self::ADPAY_URL,
-        Configuration::ADSELECT_URL => self::ADSELECT_URL,
-        Configuration::BASE_ADPANEL_URL => self::ADPANEL_URL,
-        Configuration::BASE_ADSERVER_URL => self::URL,
-        Configuration::BASE_ADUSER_URL => self::ADUSER_BASE_URL,
-        Configuration::BASE_ADUSER_INTERNAL_URL => self::ADUSER_INTERNAL_URL,
-        Configuration::BASE_ADSERVER_NAME => self::ADSERVER_NAME,
-        Configuration::BASE_SUPPORT_EMAIL => self::SUPPORT_EMAIL,
-        Configuration::BASE_TECHNICAL_EMAIL => self::TECHNICAL_EMAIL,
-        Configuration::CLASSIFIER_API_KEY_NAME => self::CLASSIFIER_EXTERNAL_API_KEY_NAME,
-        Configuration::CLASSIFIER_API_KEY_SECRET => self::CLASSIFIER_EXTERNAL_API_KEY_SECRET,
-        Configuration::LICENSE_KEY => self::ADSHARES_LICENSE_KEY,
-        Configuration::SMTP_HOST => self::MAIL_SMTP_HOST,
-        Configuration::SMTP_PASSWORD => self::MAIL_SMTP_PASSWORD,
-        Configuration::SMTP_PORT => self::MAIL_SMTP_PORT,
-        Configuration::SMTP_SENDER => self::MAIL_FROM_NAME,
-        Configuration::SMTP_USERNAME => self::MAIL_SMTP_USERNAME,
-        Configuration::WALLET_ADDRESS => self::ADSHARES_ADDRESS,
-        Configuration::WALLET_NODE_HOST => self::ADSHARES_NODE_HOST,
-        Configuration::WALLET_NODE_PORT => self::ADSHARES_NODE_PORT,
-        Configuration::WALLET_SECRET_KEY => self::ADSHARES_SECRET,
-    ];
-    private const ADPANEL_URL = 'adpanel-url';
+    public const ADPANEL_URL = 'adpanel-url';
     private const ADPAY_BID_STRATEGY_EXPORT_TIME = 'adpay-bid-strategy-export';
     private const ADPAY_CAMPAIGN_EXPORT_TIME = 'adpay-campaign-export';
     private const ADPAY_LAST_EXPORTED_CONVERSION_TIME = 'adpay-last-conversion-time';
     private const ADPAY_LAST_EXPORTED_EVENT_TIME = 'adpay-last-event-time';
-    private const ADPAY_URL = 'adpay-url';
+    public const ADPAY_URL = 'adpay-url';
     private const ADS_LOG_START = 'ads-log-start';
     private const ADS_OPERATOR_SERVER_URL = 'ads-operator-server-url';
     private const ADS_RPC_URL = 'ads-rpc-url';
     private const ADSELECT_INVENTORY_EXPORT_TIME = 'adselect-inventory-export';
-    private const ADSELECT_URL = 'adselect-url';
-    private const ADSERVER_NAME = 'adserver-name';
-    private const ADSHARES_ADDRESS = 'adshares-address';
-    private const ADSHARES_LICENSE_KEY = 'adshares-license-key';
+    public const ADSELECT_URL = 'adselect-url';
+    public const ADSERVER_NAME = 'adserver-name';
+    public const ADSHARES_ADDRESS = 'adshares-address';
+    public const ADSHARES_LICENSE_KEY = 'adshares-license-key';
     private const ADSHARES_LICENSE_SERVER_URL = 'adshares-license-server-url';
-    private const ADSHARES_NODE_HOST = 'adshares-node-host';
-    private const ADSHARES_NODE_PORT = 'adshares-node-port';
-    private const ADSHARES_SECRET = 'adshares-secret';
-    private const ADUSER_BASE_URL = 'aduser-base-url';
+    public const ADSHARES_NODE_HOST = 'adshares-node-host';
+    public const ADSHARES_NODE_PORT = 'adshares-node-port';
+    public const ADSHARES_SECRET = 'adshares-secret';
+    public const ADUSER_BASE_URL = 'aduser-base-url';
     private const ADUSER_INFO_URL = 'aduser-info-url';
-    private const ADUSER_INTERNAL_URL = 'aduser-internal-url';
+    public const ADUSER_INTERNAL_URL = 'aduser-internal-url';
     private const ADUSER_SERVE_SUBDOMAIN = 'aduser-serve-subdomain';
     private const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
     private const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
@@ -80,9 +57,9 @@ class AdServerConfigurationClient
     private const CAMPAIGN_TARGETING_REQUIRE = 'campaign-targeting-require';
     private const CDN_PROVIDER = 'cdn-provider';
     private const CHECK_ZONE_DOMAIN = 'check-zone-domain';
-    private const CLASSIFIER_EXTERNAL_API_KEY_NAME = 'classifier-external-api-key-name';
-    private const CLASSIFIER_EXTERNAL_API_KEY_SECRET = 'classifier-external-api-key-secret';
-    private const CLASSIFIER_EXTERNAL_BASE_URL = 'classifier-external-base-url';
+    public const CLASSIFIER_EXTERNAL_API_KEY_NAME = 'classifier-external-api-key-name';
+    public const CLASSIFIER_EXTERNAL_API_KEY_SECRET = 'classifier-external-api-key-secret';
+    public const CLASSIFIER_EXTERNAL_BASE_URL = 'classifier-external-base-url';
     private const CLASSIFIER_EXTERNAL_NAME = 'classifier-external-name';
     private const CLASSIFIER_EXTERNAL_PUBLIC_KEY = 'classifier-external-public-key';
     private const COLD_WALLET_ADDRESS = 'cold-wallet-address';
@@ -114,13 +91,13 @@ class AdServerConfigurationClient
     private const INVOICE_NUMBER_FORMAT = 'invoice-number-format';
     private const LAST_UPDATED_IMPRESSION_ID = 'last-updated-impression-id';
     private const MAIL_FROM_ADDRESS = 'mail-from-address';
-    private const MAIL_FROM_NAME = 'mail-from-name';
+    public const MAIL_FROM_NAME = 'mail-from-name';
     private const MAIL_MAILER = 'mail-mailer';
     private const MAIL_SMTP_ENCRYPTION = 'mail-smtp-encryption';
-    private const MAIL_SMTP_HOST = 'mail-smtp-host';
-    private const MAIL_SMTP_PASSWORD = 'mail-smtp-password';
-    private const MAIL_SMTP_PORT = 'mail-smtp-port';
-    private const MAIL_SMTP_USERNAME = 'mail-smtp-username';
+    public const MAIL_SMTP_HOST = 'mail-smtp-host';
+    public const MAIL_SMTP_PASSWORD = 'mail-smtp-password';
+    public const MAIL_SMTP_PORT = 'mail-smtp-port';
+    public const MAIL_SMTP_USERNAME = 'mail-smtp-username';
     private const MAIN_JS_BASE_URL = 'main-js-base-url';
     private const MAIN_JS_TLD = 'main-js-tld';
     private const MAX_PAGE_ZONES = 'max-page-zones';
@@ -146,28 +123,23 @@ class AdServerConfigurationClient
     private const SITE_FILTERING_EXCLUDE = 'site-filtering-exclude';
     private const SITE_FILTERING_REQUIRE = 'site-filtering-require';
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'site-verification-time-threshold';
-    private const SUPPORT_EMAIL = 'support-email';
+    public const SUPPORT_EMAIL = 'support-email';
     private const SKYNET_API_KEY = 'skynet-api-key';
     private const SKYNET_API_URL = 'skynet-api-url';
     private const SKYNET_CDN_URL = 'skynet-cdn-url';
-    private const TECHNICAL_EMAIL = 'technical-email';
+    public const TECHNICAL_EMAIL = 'technical-email';
     private const UPLOAD_LIMIT_IMAGE = 'upload-limit-image';
     private const UPLOAD_LIMIT_MODEL = 'upload-limit-model';
     private const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
     private const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
-    private const URL = 'url';
+    public const URL = 'url';
 
-    private HttpClientInterface $httpClient;
-    private LoggerInterface $logger;
-    private TokenStorageInterface $tokenStorage;
-    private string $adserverBaseUri;
-
-    public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger, TokenStorageInterface $tokenStorage, string $adserverBaseUri)
-    {
-        $this->httpClient = $httpClient;
-        $this->logger = $logger;
-        $this->tokenStorage = $tokenStorage;
-        $this->adserverBaseUri = $adserverBaseUri;
+    public function __construct(
+        private readonly HttpClientInterface $httpClient,
+        private readonly LoggerInterface $logger,
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly string $adserverBaseUri
+    ) {
     }
 
     public function fetch(): array
@@ -184,30 +156,13 @@ class AdServerConfigurationClient
 
         $this->checkStatusCode($response);
 
-        $body = json_decode($response->getContent(), true);
-
-        $data = [];
-        foreach (self::KEY_MAP as $localKey => $remoteKey) {
-            $data[$localKey] = $body[$remoteKey] ?? null;
-        }
-
-        return $data;
+        return json_decode($response->getContent(), true);
     }
 
     public function store(array $data): void
     {
-        $response = $this->httpClient->request(
-            'PATCH',
-            $this->buildUri(),
-            [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getToken(),
-                ],
-                'json' => $this->mapDataToAdServerFormat($data)
-            ]
-        );
-
-        $this->checkStatusCode($response);
+        $mapped = $this->mapDataToAdServerFormat($data);
+        $this->sendData($mapped);
     }
 
     private function buildUri(): string
@@ -222,13 +177,30 @@ class AdServerConfigurationClient
 
     private function mapDataToAdServerFormat(array $data): array
     {
+        $keyMap = [
+            AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
+            AdServerConfig::Name->name => self::ADSERVER_NAME,
+            AdServerConfig::Url->name => self::URL,
+            AdServerConfig::WalletAddress->name => self::ADSHARES_ADDRESS,
+            AdServerConfig::WalletNodeHost->name => self::ADSHARES_NODE_HOST,
+            AdServerConfig::WalletNodePort->name => self::ADSHARES_NODE_PORT,
+            AdServerConfig::WalletSecretKey->name => self::ADSHARES_SECRET,
+            GeneralConfig::SupportEmail->name => self::SUPPORT_EMAIL,
+            GeneralConfig::TechnicalEmail->name => self::TECHNICAL_EMAIL,
+            GeneralConfig::SmtpHost->name => self::MAIL_SMTP_HOST,
+            GeneralConfig::SmtpPassword->name => self::MAIL_SMTP_PASSWORD,
+            GeneralConfig::SmtpPort->name => self::MAIL_SMTP_PORT,
+            GeneralConfig::SmtpSender->name => self::MAIL_FROM_NAME,
+            GeneralConfig::SmtpUsername->name => self::MAIL_SMTP_USERNAME,
+        ];
+
         $mappedData = [];
         foreach ($data as $key => $value) {
-            if (isset(self::KEY_MAP[$key])) {
+            if (isset($keyMap[$key])) {
                 if (is_bool($value)) {
                     $value = $value ? '1' : '0';
                 }
-                $mappedData[self::KEY_MAP[$key]] = (string)$value;
+                $mappedData[$keyMap[$key]] = (string)$value;
             }
         }
 
@@ -257,5 +229,57 @@ class AdServerConfigurationClient
                 sprintf('AdServer responded with an invalid code (%d)', $statusCode)
             );
         }
+    }
+
+    public function setupAdClassify(string $adClassifyUrl, string $apiKeyName, string $apiKeySecret): void
+    {
+        $this->sendData(
+            [
+                self::CLASSIFIER_EXTERNAL_API_KEY_NAME => $apiKeyName,
+                self::CLASSIFIER_EXTERNAL_API_KEY_SECRET => $apiKeySecret,
+                self::CLASSIFIER_EXTERNAL_BASE_URL => $adClassifyUrl,
+            ]
+        );
+    }
+
+    public function setupAdPanel(string $adPanelUrl): void
+    {
+        $this->sendData([self::ADPANEL_URL => $adPanelUrl]);
+    }
+
+    public function setupAdPay(string $adPayUrl): void
+    {
+        $this->sendData([self::ADPAY_URL => $adPayUrl]);
+    }
+
+    public function setupAdSelect(string $adSelectUrl): void
+    {
+        $this->sendData([self::ADSELECT_URL => $adSelectUrl]);
+    }
+
+    public function setupAdUser(string $adUserUrl, string $adUserInternalUrl): void
+    {
+        $this->sendData(
+            [
+                self::ADUSER_BASE_URL => $adUserUrl,
+                self::ADUSER_INTERNAL_URL => $adUserInternalUrl,
+            ]
+        );
+    }
+
+    private function sendData(array $data): void
+    {
+        $response = $this->httpClient->request(
+            'PATCH',
+            $this->buildUri(),
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->getToken(),
+                ],
+                'json' => $data
+            ]
+        );
+
+        $this->checkStatusCode($response);
     }
 }

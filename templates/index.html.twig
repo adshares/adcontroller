@@ -1,10 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
+    {% if
+        state is constant('App\\Entity\\Enum\\AppStateEnum::AdserverAccountCreated')
+        or
+        state is constant('App\\Entity\\Enum\\AppStateEnum::MigrationCompleted')
+    %}
         {# installation #}
         {{ encore_entry_link_tags('js/installer') }}
-    {% elseif state is constant('App\\Entity\\Configuration::APP_STATE_INSTALLATION_COMPLETED') %}
+    {% elseif state is constant('App\\Entity\\Enum\\AppStateEnum::InstallationCompleted') %}
         {# installation #}
         {{ encore_entry_link_tags('js/app') }}
     {% else %}
@@ -15,10 +19,14 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% if state is constant('App\\Entity\\Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED') %}
+    {% if
+        state is constant('App\\Entity\\Enum\\AppStateEnum::AdserverAccountCreated')
+        or
+        state is constant('App\\Entity\\Enum\\AppStateEnum::MigrationCompleted')
+    %}
         {# installation #}
         {{ encore_entry_script_tags('js/installer') }}
-    {% elseif state is constant('App\\Entity\\Configuration::APP_STATE_INSTALLATION_COMPLETED') %}
+    {% elseif state is constant('App\\Entity\\Enum\\AppStateEnum::InstallationCompleted') %}
         {# configuration #}
         {{ encore_entry_script_tags('js/app') }}
     {% else %}

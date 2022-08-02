@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Configuration;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\AppStateEnum;
 use App\Exception\ServiceNotPresent;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerAdminList;
@@ -42,16 +43,13 @@ MESSAGE
             );
         }
 
-        if (null === ($state = $repository->fetchValueByName(Configuration::APP_STATE))) {
+        if (null === ($state = $repository->fetchValueByEnum(AppConfig::AppState))) {
             if ($accountList->isAdministratorAccountPresent()) {
-                $state = Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED;
-                $repository->insertOrUpdateOne(
-                    Configuration::APP_STATE,
-                    Configuration::APP_STATE_ADSERVER_ACCOUNT_CREATED
-                );
+                $state = AppStateEnum::AdserverAccountCreated->name;
+                $repository->insertOrUpdateOne(AppConfig::AppState, $state);
             }
         }
 
-        return $this->render('index.html.twig', ['state' => $state]);
+        return $this->render('index.html.twig', ['state' => AppStateEnum::tryFrom($state)]);
     }
 }

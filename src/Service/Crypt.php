@@ -8,11 +8,8 @@ class Crypt
 {
     private const CIPHER_ALGORITHM = 'aes-256-gcm';
 
-    private string $key;
-
-    public function __construct(string $appSecret)
+    public function __construct(private readonly string $appSecret)
     {
-        $this->key = $appSecret;
     }
 
     public function decrypt(string $ciphertext): string
@@ -21,7 +18,7 @@ class Crypt
 
         $iv = base64_decode($payload['iv']);
         $tag = base64_decode($payload['tag']);
-        $decrypted = openssl_decrypt($payload['value'], self::CIPHER_ALGORITHM, $this->key, 0, $iv, $tag);
+        $decrypted = openssl_decrypt($payload['value'], self::CIPHER_ALGORITHM, $this->appSecret, 0, $iv, $tag);
         if (false === $decrypted) {
             throw new CryptException('Decryption failed');
         }
@@ -32,7 +29,7 @@ class Crypt
     public function encrypt(string $message): string
     {
         $initializationVector = random_bytes(openssl_cipher_iv_length(self::CIPHER_ALGORITHM));
-        $value = openssl_encrypt($message, self::CIPHER_ALGORITHM, $this->key, 0, $initializationVector, $tag);
+        $value = openssl_encrypt($message, self::CIPHER_ALGORITHM, $this->appSecret, 0, $initializationVector, $tag);
 
         if (false === $value) {
             throw new CryptException('Encryption failed');

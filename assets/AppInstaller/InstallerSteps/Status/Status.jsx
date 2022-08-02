@@ -45,7 +45,7 @@ function Status({ handlePrevStep, step }) {
       url: null,
       code: null,
     },
-    data_required: false,
+    DataRequired: false,
   });
   const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
 
