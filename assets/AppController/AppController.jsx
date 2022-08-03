@@ -71,7 +71,7 @@ const appModules = [
         path: '/supply',
         component: Supply,
         icon: TrendingFlatIcon,
-        rotateIcon: true,
+        rotateIcon: '180deg',
       },
     ],
   },

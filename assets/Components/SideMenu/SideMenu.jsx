@@ -130,7 +130,7 @@ const getMappedMenuItems = (items) => {
     return (
       <ListItem key={item.name} disablePadding onClick={() => navigate(item.path)}>
         <ListItemButton selected={item.path === location.pathname}>
-          <ListItemIcon>{<item.icon sx={item.rotateIcon && { transform: 'rotate(180deg)' }} />}</ListItemIcon>
+          <ListItemIcon>{<item.icon sx={item.rotateIcon && { transform: `rotate(${item.rotateIcon})` }} />}</ListItemIcon>
           <ListItemText primary={item.name} primaryTypographyProps={{ sx: { fontWeight: item.path === location.pathname ? 600 : 400 } }} />
         </ListItemButton>
       </ListItem>
