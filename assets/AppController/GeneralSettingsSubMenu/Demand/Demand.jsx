@@ -29,7 +29,13 @@ export default function Demand() {
     <Card className={commonStyles.card}>
       <CardHeader title="Rejected domains:" subheader="Here you can define domains. All subdomains will be rejected." />
       <CardContent>
-        <ListOfInputs list={rejectedDomains} setListFn={setRejectedDomains} validate={validateInput} maxHeight="calc(100vh - 22rem)" />
+        <ListOfInputs
+          type="domain"
+          list={rejectedDomains}
+          setListFn={setRejectedDomains}
+          validate={validateInput}
+          maxHeight="calc(100vh - 22rem)"
+        />
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
