@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import commonStyles from '../../commonStyles.scss';
+import commonStyles from '../../common/commonStyles.scss';
 import {
   Box,
   Button,

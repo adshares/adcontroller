@@ -24,7 +24,7 @@ import PercentIcon from '@mui/icons-material/Percent';
 import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
-import commonStyles from './commonStyles.scss';
+import commonStyles from './common/commonStyles.scss';
 import Network from './GeneralSettingsSubMenu/Network/Network';
 import Supply from './GeneralSettingsSubMenu/Supply/Supply';
 import Demand from './GeneralSettingsSubMenu/Demand/Demand';

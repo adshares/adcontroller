@@ -18,7 +18,7 @@ import {
 import HelpIcon from '@mui/icons-material/Help';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
-import commonStyles from '../../commonStyles.scss';
+import commonStyles from '../../common/commonStyles.scss';
 
 function WalletSettingsCard() {
   const [walletAddress, setWalletAddress] = useState('');

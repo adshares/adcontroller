@@ -13,7 +13,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import commonStyles from '../../commonStyles.scss';
+import commonStyles from '../../common/commonStyles.scss';
 
 function Commissions() {
   const [publisherCommission, setPublisherCommission] = useState(0);

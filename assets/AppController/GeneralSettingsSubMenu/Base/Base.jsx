@@ -4,7 +4,7 @@ import { useForm } from '../../../hooks';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
-import commonStyles from '../../commonStyles.scss';
+import commonStyles from '../../common/commonStyles.scss';
 
 function Base() {
   const { fields, errorObj, onFormChange, setFields } = useForm({
