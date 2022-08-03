@@ -125,8 +125,8 @@ class SmtpStep implements InstallerStep
     private function setupMailer(array $content): Mailer
     {
         $dsn = $this->getMailerDsn(
-            $content[GeneralConfig::SmtpUsername->name],
-            $content[GeneralConfig::SmtpPassword->name],
+            urlencode($content[GeneralConfig::SmtpUsername->name]),
+            urlencode($content[GeneralConfig::SmtpPassword->name]),
             $content[GeneralConfig::SmtpHost->name],
             (int)$content[GeneralConfig::SmtpPort->name],
         );
