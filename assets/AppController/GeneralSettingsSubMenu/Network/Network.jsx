@@ -1,21 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Collapse, FormControlLabel } from '@mui/material';
+import ListOfInputs from '../../common/InputListCard/InputListCard';
+import commonStyles from '../../common/commonStyles.scss';
 import { validateAddress } from '@adshares/ads';
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Checkbox,
-  Collapse,
-  FormControlLabel,
-  IconButton,
-  InputAdornment,
-  TextField,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import commonStyles from '../../commonStyles.scss';
 
 const all = [];
 const supply = [];
@@ -40,6 +27,23 @@ export default function Network() {
     console.log(addressList);
   };
 
+  const validateInput = (value) => {
+    const isAddressValid = value ? validateAddress(value) : true;
+    const isEmptyField = !value;
+    const isValid = isAddressValid && !isEmptyField;
+    let helperText = ' ';
+
+    if (!isAddressValid) {
+      helperText = 'Invalid address';
+    } else if (isEmptyField) {
+      helperText = 'Field cannot be empty. Enter address or remove field';
+    }
+    return {
+      isValid,
+      helperText,
+    };
+  };
+
   return (
     <Card className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
       <Box className={`${commonStyles.flex} ${commonStyles.alignBaseline}`}>
@@ -62,42 +66,70 @@ export default function Network() {
             label="Separate list"
           />
         </CardActions>
+
         <CardContent>
           <Collapse in={!separateNetworkList} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-              <CardList
-                listTitle="Address list:"
-                listSubHeader={
-                  // eslint-disable-next-line max-len
-                  'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, ea incidunt modi porro sequi veniam voluptate! Accusamus assumenda autem facilis fuga, harum hic maxime odio optio quisquam?'
-                }
-                list={addressList}
-                setListFn={setAddressList}
-              />
+              <Card className={`${commonStyles.halfCard}`} raised>
+                <CardHeader
+                  title="Address list:"
+                  subheader={
+                    // eslint-disable-next-line max-len
+                    'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt,'
+                  }
+                />
+                <CardContent>
+                  <ListOfInputs
+                    list={addressList}
+                    setListFn={setAddressList}
+                    splitPattern={/[.,:;\[\]'"{}()|/\\\s]/}
+                    validate={validateInput}
+                    maxHeight="calc(100vh - 38rem)"
+                  />
+                </CardContent>
+              </Card>
             </Box>
           </Collapse>
 
           <Collapse in={separateNetworkList} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
-              <CardList
-                listTitle="Supply address list:"
-                listSubHeader={
-                  // eslint-disable-next-line max-len
-                  'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt,'
-                }
-                list={supplyAddressList}
-                setListFn={setSupplyAddressList}
-              />
+              <Card className={`${commonStyles.halfCard}`} raised>
+                <CardHeader
+                  title="Supply address list:"
+                  subheader={
+                    // eslint-disable-next-line max-len
+                    'Lorem ipsum dolor sit amet, consectetur adipisicing elit. '
+                  }
+                />
+                <CardContent>
+                  <ListOfInputs
+                    list={supplyAddressList}
+                    setListFn={setSupplyAddressList}
+                    splitPattern={/[.,:;\[\]'"{}()|/\\\s]/}
+                    validate={validateInput}
+                    maxHeight="calc(100vh - 38rem)"
+                  />
+                </CardContent>
+              </Card>
 
-              <CardList
-                listTitle="Demand address list:"
-                listSubHeader={
-                  // eslint-disable-next-line max-len
-                  'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt,'
-                }
-                list={demandAddressList}
-                setListFn={setDemandAddressList}
-              />
+              <Card className={`${commonStyles.halfCard}`} raised>
+                <CardHeader
+                  title="Demand address list:"
+                  subheader={
+                    // eslint-disable-next-line max-len
+                    'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt,'
+                  }
+                />
+                <CardContent>
+                  <ListOfInputs
+                    list={demandAddressList}
+                    setListFn={setDemandAddressList}
+                    splitPattern={/[.,:;\[\]'"{}()|/\\\s]/}
+                    validate={validateInput}
+                    maxHeight="calc(100vh - 38rem)"
+                  />
+                </CardContent>
+              </Card>
             </Box>
           </Collapse>
         </CardContent>
@@ -112,113 +144,3 @@ export default function Network() {
     </Card>
   );
 }
-
-const CardList = ({ listSubHeader, listTitle, list, setListFn }) => {
-  const [addMore, setAddMore] = useState(false);
-  const [textareaValue, setTextareaValue] = useState('');
-  const textAreaRef = useRef(null);
-
-  const handleChange = (e, idx, list, setListFn) => {
-    const newList = [...list];
-    newList[idx] = e.target.value;
-    setListFn(newList);
-  };
-
-  const onRemoveClick = (idx, list, setListFn) => {
-    const newList = [...list];
-    newList.splice(idx, 1);
-    setListFn(newList);
-  };
-
-  const createFields = (list, setListFn) => {
-    const inputs = [];
-    const duplicatedValues = list.filter((item, index) => list.indexOf(item) !== index);
-    for (let index = 0; index <= list.length; index++) {
-      const isAddressValid = list[index] ? validateAddress(list[index]) : true;
-      const isDuplicated = duplicatedValues.some((el) => el === list[index]);
-      const isValidationError = list[index] === '' || (list.length > 0 && !isAddressValid) || isDuplicated;
-      let helperText = ' ';
-
-      if (isValidationError) {
-        helperText = isDuplicated ? 'Duplicated value' : 'Invalid address';
-      }
-
-      inputs.push(
-        <Box key={index}>
-          <TextField
-            error={isValidationError}
-            helperText={helperText}
-            fullWidth
-            name={`${index}`}
-            variant="outlined"
-            size="small"
-            value={list[index] || ''}
-            onChange={(e) => handleChange(e, index, list, setListFn)}
-            InputProps={
-              index === list.length
-                ? {}
-                : {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton type="button" onClick={() => onRemoveClick(index, list, setListFn)}>
-                          <CloseIcon color="error" />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }
-            }
-          />
-        </Box>,
-      );
-    }
-    return inputs;
-  };
-
-  const onTextareaChange = (e) => {
-    setTextareaValue(e.target.value);
-  };
-
-  const onSaveClick = () => {
-    const newList = textareaValue.split(/[.,:;\[\]'"{}()|/\\\s]/).filter(Boolean);
-    setListFn((prevState) => [...prevState, ...newList]);
-    setTextareaValue('');
-    setAddMore((prevState) => !prevState);
-  };
-
-  return (
-    <Card raised className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween} ${commonStyles.halfCard}`}>
-      <Box>
-        <CardHeader title={listTitle} subheader={listSubHeader} />
-
-        <CardActions>
-          <FormControlLabel
-            label="Paste a few"
-            control={<Checkbox checked={addMore} onChange={() => setAddMore((prevState) => !prevState)} />}
-          />
-        </CardActions>
-      </Box>
-
-      <Box>
-        <Collapse in={!addMore} timeout="auto">
-          <CardContent sx={{ overflow: 'auto', height: '20rem' }}>{createFields(list, setListFn)}</CardContent>
-        </Collapse>
-
-        <Collapse in={addMore} timeout="auto">
-          <CardContent>
-            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
-              <TextField value={textareaValue} multiline rows={8} onChange={onTextareaChange} inputRef={textAreaRef} />
-              <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-                <Button type="button" variant="contained" sx={{ mr: 1 }} onClick={onSaveClick}>
-                  Save
-                </Button>
-                <Button type="button" variant="outlined" onClick={() => setAddMore((prevState) => !prevState)}>
-                  Cancel
-                </Button>
-              </Box>
-            </Box>
-          </CardContent>
-        </Collapse>
-      </Box>
-    </Card>
-  );
-};

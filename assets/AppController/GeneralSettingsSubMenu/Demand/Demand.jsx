@@ -1,33 +1,42 @@
-import React, { useRef, useState } from 'react';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
-import commonStyles from '../../commonStyles.scss';
+import React, { useState } from 'react';
+import { Box, Button, Card, CardActions, CardContent, CardHeader } from '@mui/material';
+import ListOfInputs from '../../common/InputListCard/InputListCard';
+import commonStyles from '../../common/commonStyles.scss';
 
 export default function Demand() {
-  const [textareaValue, setTextareaValue] = useState('');
-  const textareaRef = useRef(null);
-
-  const onTextareaChange = (e) => {
-    setTextareaValue(e.target.value);
-  };
+  const [rejectedDomains, setRejectedDomains] = useState([]);
 
   const onSaveClick = () => {
-    const rejectedDomains = textareaValue
-      .split(/[,;\[\]{}()|\s]/)
-      .filter(Boolean)
-      .filter((el, idx, arr) => arr.indexOf(el) === idx);
     console.log(rejectedDomains);
-    setTextareaValue(rejectedDomains.join('\n'));
     //TODO: send data
   };
 
+  const validateInput = (value) => {
+    const isEmptyField = !value;
+    const isValid = !isEmptyField;
+    let helperText = ' ';
+
+    if (isEmptyField) {
+      helperText = 'Field cannot be empty. Enter domain or remove field';
+    }
+    return {
+      isValid,
+      helperText,
+    };
+  };
+
   return (
-    <Card className={`${commonStyles.card}`}>
-      <CardHeader title="Rejected domains" subheader="Here you can define domains. All subdomains will be rejected." />
-
+    <Card className={commonStyles.card}>
+      <CardHeader title="Rejected domains:" subheader="Here you can define domains. All subdomains will be rejected." />
       <CardContent>
-        <TextField inputRef={textareaRef} value={textareaValue} multiline rows={8} fullWidth onChange={onTextareaChange} />
+        <ListOfInputs
+          list={rejectedDomains}
+          setListFn={setRejectedDomains}
+          splitPattern={/[,;\[\]{}()|\s]/}
+          validate={validateInput}
+          maxHeight="calc(100vh - 22rem)"
+        />
       </CardContent>
-
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
           <Button type="button" variant="contained" onClick={onSaveClick}>
