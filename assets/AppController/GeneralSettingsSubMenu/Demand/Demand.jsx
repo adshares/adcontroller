@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Card, CardActions, CardContent, CardHeader } from '@mui/material';
-import ListOfInputs from '../../common/InputListCard/InputListCard';
+import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
 import commonStyles from '../../common/commonStyles.scss';
 
 export default function Demand() {
@@ -14,7 +14,7 @@ export default function Demand() {
   const validateInput = (value) => {
     const isEmptyField = !value;
     const isValid = !isEmptyField;
-    let helperText = ' ';
+    let helperText = '';
 
     if (isEmptyField) {
       helperText = 'Field cannot be empty. Enter domain or remove field';
@@ -29,13 +29,7 @@ export default function Demand() {
     <Card className={commonStyles.card}>
       <CardHeader title="Rejected domains:" subheader="Here you can define domains. All subdomains will be rejected." />
       <CardContent>
-        <ListOfInputs
-          list={rejectedDomains}
-          setListFn={setRejectedDomains}
-          splitPattern={/[,;\[\]{}()|\s]/}
-          validate={validateInput}
-          maxHeight="calc(100vh - 22rem)"
-        />
+        <ListOfInputs list={rejectedDomains} setListFn={setRejectedDomains} validate={validateInput} maxHeight="calc(100vh - 22rem)" />
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>

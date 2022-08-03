@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../commonStyles.scss';
 import { TransitionGroup } from 'react-transition-group';
 
-export default function ListOfInputs({ list, setListFn, validate, maxHeight = '50vh', splitPattern = ',' }) {
+export default function ListOfInputs({ list, setListFn, validate, maxHeight = '50vh' }) {
   const [addMore, setAddMore] = useState(false);
   const [textareaValue, setTextareaValue] = useState('');
   const textAreaRef = useRef(null);
@@ -22,7 +22,7 @@ export default function ListOfInputs({ list, setListFn, validate, maxHeight = '5
   };
 
   const onSaveClick = () => {
-    const newList = textareaValue.split(splitPattern).filter(Boolean);
+    const newList = textareaValue.split(/[,;\s]/).filter(Boolean);
     setListFn((prevState) => [...prevState, ...newList]);
     setTextareaValue('');
     setAddMore((prevState) => !prevState);
@@ -35,7 +35,7 @@ export default function ListOfInputs({ list, setListFn, validate, maxHeight = '5
       const isDuplicated = duplicatedValues.some((el) => el === list[index]);
       const validationObj = validate(list[index]);
       const isValidationError = list.length !== index && (!validationObj.isValid || isDuplicated);
-      let helperText = ' ';
+      let helperText = '';
 
       if (isValidationError) {
         helperText = isDuplicated ? 'Duplicated value' : validationObj.helperText;
@@ -51,7 +51,7 @@ export default function ListOfInputs({ list, setListFn, validate, maxHeight = '5
               name={`${index}`}
               variant="outlined"
               size="small"
-              margin="none"
+              margin="dense"
               value={list[index] || ''}
               onChange={(e) => handleChange(e, index, list, setListFn)}
               InputProps={
@@ -72,7 +72,7 @@ export default function ListOfInputs({ list, setListFn, validate, maxHeight = '5
         </Collapse>,
       );
     }
-    return inputs;
+    return inputs.reverse();
   };
 
   const onTextareaChange = (e) => {

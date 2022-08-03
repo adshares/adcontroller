@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Collapse, FormControlLabel } from '@mui/material';
-import ListOfInputs from '../../common/InputListCard/InputListCard';
+import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
 import commonStyles from '../../common/commonStyles.scss';
 import { validateAddress } from '@adshares/ads';
 
@@ -79,13 +79,7 @@ export default function Network() {
                   }
                 />
                 <CardContent>
-                  <ListOfInputs
-                    list={addressList}
-                    setListFn={setAddressList}
-                    splitPattern={/[.,:;\[\]'"{}()|/\\\s]/}
-                    validate={validateInput}
-                    maxHeight="calc(100vh - 38rem)"
-                  />
+                  <ListOfInputs list={addressList} setListFn={setAddressList} validate={validateInput} maxHeight="calc(100vh - 38rem)" />
                 </CardContent>
               </Card>
             </Box>
@@ -105,7 +99,6 @@ export default function Network() {
                   <ListOfInputs
                     list={supplyAddressList}
                     setListFn={setSupplyAddressList}
-                    splitPattern={/[.,:;\[\]'"{}()|/\\\s]/}
                     validate={validateInput}
                     maxHeight="calc(100vh - 38rem)"
                   />
@@ -124,7 +117,6 @@ export default function Network() {
                   <ListOfInputs
                     list={demandAddressList}
                     setListFn={setDemandAddressList}
-                    splitPattern={/[.,:;\[\]'"{}()|/\\\s]/}
                     validate={validateInput}
                     maxHeight="calc(100vh - 38rem)"
                   />
