@@ -17,6 +17,9 @@ import Wallet from './FinanceSettingsSubMenu/Wallet/Wallet';
 import Commissions from './FinanceSettingsSubMenu/Commissions/Commissions';
 import Base from './GeneralSettingsSubMenu/Base/Base';
 import License from './GeneralSettingsSubMenu/License/License';
+import Network from './GeneralSettingsSubMenu/Network/Network';
+import Supply from './GeneralSettingsSubMenu/Supply/Supply';
+import Demand from './GeneralSettingsSubMenu/Demand/Demand';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -24,10 +27,9 @@ import PercentIcon from '@mui/icons-material/Percent';
 import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import commonStyles from './common/commonStyles.scss';
-import Network from './GeneralSettingsSubMenu/Network/Network';
-import Supply from './GeneralSettingsSubMenu/Supply/Supply';
-import Demand from './GeneralSettingsSubMenu/Demand/Demand';
 
 const appModules = [
   {
@@ -56,19 +58,20 @@ const appModules = [
         name: 'Network',
         path: '/network',
         component: Network,
-        icon: VpnKeyIcon,
-      },
-      {
-        name: 'Supply',
-        path: '/supply',
-        component: Supply,
-        icon: VpnKeyIcon,
+        icon: SyncAltIcon,
       },
       {
         name: 'Demand',
         path: '/demand',
         component: Demand,
-        icon: VpnKeyIcon,
+        icon: TrendingFlatIcon,
+      },
+      {
+        name: 'Supply',
+        path: '/supply',
+        component: Supply,
+        icon: TrendingFlatIcon,
+        rotateIcon: true,
       },
     ],
   },
