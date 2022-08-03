@@ -76,7 +76,7 @@ const sendStepData = async (stepName, body) => {
 
 const getPrevStep = async () => {
   try {
-    return await request(`${configuration.baseUrl}/api/step/`, 'GET', true);
+    return await request(`${configuration.baseUrl}/api/step`, 'GET', true);
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }
