@@ -16,6 +16,7 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use WeakMap;
 
 class DnsStep implements InstallerStep
 {
@@ -37,28 +38,27 @@ class DnsStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $config = [
-            Module::ADPANEL => AdPanelConfig::Url,
-            Module::ADSERVER => AdServerConfig::Url,
-            Module::ADUSER => AdUserConfig::Url,
-        ];
+        $config = new WeakMap();
+        $config[Module::AdPanel] = AdPanelConfig::Url;
+        $config[Module::AdServer] = AdServerConfig::Url;
+        $config[Module::AdUser] = AdUserConfig::Url;
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
-        foreach ($config as $moduleName => $enum) {
+        foreach ($config as $module => $enum) {
             $url = $this->repository->fetchValueByEnum($enum);
-            $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
+            $data[strtolower($module->name)] = $this->getModuleDnsStatus($module, $url);
         }
 
         return $data;
     }
 
-    private function getModuleStatus(Module $module, ?string $url): array
+    private function getModuleDnsStatus(Module $module, ?string $url): array
     {
         if (!$url) {
             return [
-                'module' => $module->getDisplayableName(),
+                'module' => $module->name,
                 'url' => $url,
                 'code' => Response::HTTP_PRECONDITION_FAILED,
             ];
@@ -82,7 +82,7 @@ class DnsStep implements InstallerStep
         }
 
         return [
-            'module' => $module->getDisplayableName(),
+            'module' => $module->name,
             'url' => $url,
             'code' => $status,
         ];

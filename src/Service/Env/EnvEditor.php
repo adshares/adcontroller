@@ -2,11 +2,13 @@
 
 namespace App\Service\Env;
 
+use ErrorException;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class EnvEditor
 {
-    public function __construct(private readonly string $envFile)
+    public function __construct(private readonly LoggerInterface $logger, private readonly string $envFile)
     {
     }
 
@@ -76,9 +78,10 @@ class EnvEditor
 
     private function getFileContents(): string
     {
-        $contents = file_get_contents($this->envFile);
-
-        if (false === $contents) {
+        try {
+            $contents = file_get_contents($this->envFile);
+        } catch (ErrorException $exception) {
+            $this->logger->error(sprintf('Env file cannot be read: %s', $exception->getMessage()));
             throw new RuntimeException(sprintf('Cannot read file `%s`', $this->envFile));
         }
 
