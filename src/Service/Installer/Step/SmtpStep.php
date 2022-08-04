@@ -107,7 +107,7 @@ class SmtpStep implements InstallerStep
 
     private function getMailerDsn(string $username, string $password, string $host, int $port): string
     {
-        return sprintf('smtp://%s:%s@%s:%d', urldecode($username), urldecode($password), urlencode($host), $port);
+        return sprintf('smtp://%s:%s@%s:%d', urlencode($username), urlencode($password), urlencode($host), $port);
     }
 
     public function getName(): string
