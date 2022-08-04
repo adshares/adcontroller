@@ -64,13 +64,13 @@ export default function AppInstaller() {
 
   const getCurrentStep = async () => {
     try {
-      const { installer_step } = await apiService.getPrevStep();
-      if (!installer_step) {
+      const { InstallerStep: installerStep } = await apiService.getPrevStep();
+      if (!installerStep) {
         const firstStep = installerSteps.find((el) => el.index === 1);
         setCurrentStep(firstStep.path);
         return;
       }
-      const prevEl = installerSteps.find((el) => el.path === installer_step.toLowerCase());
+      const prevEl = installerSteps.find((el) => el.path === installerStep.toLowerCase());
       const currentEl = installerSteps.find((el) => el.index === prevEl.index + 1);
       setCurrentStep(currentEl?.path || prevEl.path);
     } catch (err) {
