@@ -55,7 +55,9 @@ class LicenseStep implements InstallerStep
     private function validate(array $content): void
     {
         if (!isset($content[AdServerConfig::LicenseKey->name])) {
-            throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', AdServerConfig::LicenseKey->name));
+            throw new UnprocessableEntityHttpException(
+                sprintf('Field `%s` is required', AdServerConfig::LicenseKey->name)
+            );
         }
 
         if (null === $this->getLicenseByKey($content[AdServerConfig::LicenseKey->name])) {

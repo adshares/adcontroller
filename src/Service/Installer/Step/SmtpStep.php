@@ -49,7 +49,9 @@ class SmtpStep implements InstallerStep
         }
 
         if (!isset($content[GeneralConfig::SmtpPassword->name]) && !$this->isDataRequired()) {
-            $content[GeneralConfig::SmtpPassword->name] = $this->repository->fetchValueByEnum(GeneralConfig::SmtpPassword);
+            $content[GeneralConfig::SmtpPassword->name] = $this->repository->fetchValueByEnum(
+                GeneralConfig::SmtpPassword
+            );
         }
         $this->validate($content);
 
