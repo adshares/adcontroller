@@ -2,11 +2,13 @@
 
 namespace App\Service\Env;
 
+use ErrorException;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class EnvEditor
 {
-    public function __construct(private readonly string $envFile)
+    public function __construct(private readonly LoggerInterface $logger, private readonly string $envFile)
     {
     }
 
@@ -52,7 +54,14 @@ class EnvEditor
 
         $contents .= $append;
 
-        file_put_contents($this->envFile, $contents);
+        try {
+            file_put_contents($this->envFile, $contents);
+        } catch (ErrorException $exception) {
+            $this->logger->error(
+                sprintf('Env file (%s) cannot be saved: %s', $this->envFile, $exception->getMessage())
+            );
+            throw new RuntimeException(sprintf('Cannot save file `%s`', $this->envFile));
+        }
     }
 
     public function setOne(string $key, string $value): void
@@ -62,10 +71,17 @@ class EnvEditor
 
         $contents = preg_replace(self::pattern($key), $replacement, $contents, 1, $count);
 
-        if (0 === $count) {
-            file_put_contents($this->envFile, "\n" . $replacement, FILE_APPEND);
-        } else {
-            file_put_contents($this->envFile, $contents);
+        try {
+            if (0 === $count) {
+                file_put_contents($this->envFile, "\n" . $replacement, FILE_APPEND);
+            } else {
+                file_put_contents($this->envFile, $contents);
+            }
+        } catch (ErrorException $exception) {
+            $this->logger->error(
+                sprintf('Env file (%s) cannot be saved: %s', $this->envFile, $exception->getMessage())
+            );
+            throw new RuntimeException(sprintf('Cannot save file `%s`', $this->envFile));
         }
     }
 
@@ -76,9 +92,12 @@ class EnvEditor
 
     private function getFileContents(): string
     {
-        $contents = file_get_contents($this->envFile);
-
-        if (false === $contents) {
+        try {
+            $contents = file_get_contents($this->envFile);
+        } catch (ErrorException $exception) {
+            $this->logger->error(
+                sprintf('Env file (%s) cannot be read: %s', $this->envFile, $exception->getMessage())
+            );
             throw new RuntimeException(sprintf('Cannot read file `%s`', $this->envFile));
         }
 

@@ -12,8 +12,7 @@ use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Service\Env\AdServerEnvVar;
-use App\Service\Env\EnvEditor;
-use App\Service\ServicePresenceChecker;
+use App\Service\Env\EnvEditorFactory;
 use App\Service\ServiceUrlParser;
 use App\ValueObject\Module;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -35,7 +34,7 @@ class BaseStep implements InstallerStep
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
-        private readonly ServicePresenceChecker $servicePresenceChecker
+        private readonly EnvEditorFactory $envEditorFactory,
     ) {
     }
 
@@ -47,7 +46,7 @@ class BaseStep implements InstallerStep
         }
 
         $this->validate($content);
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+        $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdServer);
 
         $domain = $content[GeneralConfig::Domain->name];
         $adServerHost = self::getPrefixedHost($domain, self::DEFAULT_ADSERVER_HOST_PREFIX);

@@ -14,22 +14,24 @@ use App\Entity\Enum\AppStateEnum;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\Env\AdServerEnvVar;
-use App\Service\Env\EnvEditor;
-use App\Service\ServicePresenceChecker;
+use App\Service\Env\EnvEditorFactory;
 use App\ValueObject\Module;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use WeakMap;
 
 class StatusStep implements InstallerStep
 {
     public function __construct(
         private readonly ConfigurationRepository $repository,
+        private readonly EnvEditorFactory $envEditorFactory,
         private readonly HttpClientInterface $httpClient,
-        private readonly ServicePresenceChecker $servicePresenceChecker,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -42,7 +44,7 @@ class StatusStep implements InstallerStep
                 AppConfig::AppState->name => AppStateEnum::InstallationCompleted->name,
             ]
         );
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+        $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdServer);
         $envEditor->setOne(AdServerEnvVar::AppSetup->value, '0');
     }
 
@@ -53,21 +55,21 @@ class StatusStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $config = [
-            Module::ADCLASSIFY => AdClassifyConfig::Url,
-            Module::ADPANEL => AdPanelConfig::Url,
-            Module::ADPAY => AdPayConfig::Url,
-            Module::ADSELECT => AdSelectConfig::Url,
-            Module::ADSERVER => AdServerConfig::Url,
-            Module::ADUSER => AdUserConfig::Url,
-        ];
+        $config = new WeakMap();
+        $config[Module::AdClassify] = AdClassifyConfig::Url;
+        $config[Module::AdPanel] = AdPanelConfig::Url;
+        $config[Module::AdPay] = AdPayConfig::Url;
+        $config[Module::AdSelect] = AdSelectConfig::Url;
+        $config[Module::AdServer] = AdServerConfig::Url;
+        $config[Module::AdUser] = AdUserConfig::Url;
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
-        foreach ($config as $moduleName => $enum) {
+        /** @var Module $module */
+        foreach ($config as $module => $enum) {
             $url = $this->repository->fetchValueByEnum($enum);
-            $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
+            $data[$module->toLowerCase()] = $this->getModuleStatus($module, $url);
         }
 
         return $data;
@@ -76,7 +78,7 @@ class StatusStep implements InstallerStep
     private function getModuleStatus(Module $module, ?string $url): array
     {
         $data = [
-            'module' => $module->getDisplayableName(),
+            'module' => $module->name,
             'version' => '#',
             'url' => $url,
             'code' => Response::HTTP_PRECONDITION_FAILED,
@@ -101,8 +103,11 @@ class StatusStep implements InstallerStep
             ClientExceptionInterface |
             RedirectionExceptionInterface |
             ServerExceptionInterface |
-            TransportExceptionInterface
+            TransportExceptionInterface $exception
         ) {
+            $this->logger->warning(
+                sprintf('Fetching status of %s failed: %s', $module->name, $exception->getMessage())
+            );
             $status = Response::HTTP_BAD_GATEWAY;
         }
 
