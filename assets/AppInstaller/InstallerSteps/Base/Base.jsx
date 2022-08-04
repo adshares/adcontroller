@@ -178,19 +178,19 @@ function InfoTable({ stepData }) {
     <Table>
       <TableBody>
         <TableRow>
-          <TableCell align="left">AdServer name</TableCell>
+          <TableCell align="left">Adserver's name</TableCell>
           <TableCell align="left">{stepData.Name}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Domain</TableCell>
+          <TableCell align="left">Adserver's domain</TableCell>
           <TableCell align="left">{stepData.Domain}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Email to support</TableCell>
+          <TableCell align="left">Support email</TableCell>
           <TableCell align="left">{stepData.SupportEmail}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">AdServer's operator email</TableCell>
+          <TableCell align="left">Technical email</TableCell>
           <TableCell align="left">{stepData.TechnicalEmail}</TableCell>
         </TableRow>
       </TableBody>
