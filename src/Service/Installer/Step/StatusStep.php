@@ -66,9 +66,10 @@ class StatusStep implements InstallerStep
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
+        /** @var Module $module */
         foreach ($config as $module => $enum) {
             $url = $this->repository->fetchValueByEnum($enum);
-            $data[strtolower($module->name)] = $this->getModuleStatus($module, $url);
+            $data[$module->toLowerCase()] = $this->getModuleStatus($module, $url);
         }
 
         return $data;

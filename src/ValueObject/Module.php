@@ -19,4 +19,9 @@ enum Module
 
         return strtolower($this->name);
     }
+
+    public function toLowerCase(): string
+    {
+        return strtolower($this->name);
+    }
 }
