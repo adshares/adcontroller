@@ -5,8 +5,6 @@ import { useLocation } from 'react-router-dom';
 const NavStepper = ({ steps, unlockedSteps, handleCurrentStep }) => {
   const completedSteps = unlockedSteps.filter((step) => step.index < unlockedSteps.length).map((step) => step.path);
   const location = useLocation();
-  console.log(location.pathname.slice(7));
-  console.log(unlockedSteps);
 
   const items = steps.map((step) => {
     const activeStep = step.path === location.pathname.slice(7);
