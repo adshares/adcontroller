@@ -30,13 +30,7 @@ function Base({ handleNextStep, step }) {
     try {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
-      const {
-        Domain,
-        Name,
-        SupportEmail,
-        TechnicalEmail,
-        DataRequired,
-      } = response;
+      const { Domain, Name, SupportEmail, TechnicalEmail, DataRequired } = response;
       setFields({
         ...fields,
         ...{
@@ -115,7 +109,7 @@ function Base({ handleNextStep, step }) {
                 helperText={errorObj.Name}
                 size="small"
                 name="Name"
-                label="AdServer's name"
+                label="Adserver's name"
                 value={fields.Name}
                 type="text"
                 required
@@ -127,7 +121,7 @@ function Base({ handleNextStep, step }) {
                 helperText={errorObj.Domain}
                 size="small"
                 name="Domain"
-                label="AdServer's domain"
+                label="Adserver's domain"
                 value={fields.Domain}
                 type="text"
                 required
@@ -141,7 +135,7 @@ function Base({ handleNextStep, step }) {
                 helperText={errorObj.SupportEmail}
                 size="small"
                 name="SupportEmail"
-                label="Email to support"
+                label="Support email"
                 value={fields.SupportEmail}
                 type="email"
                 placeholder="support@domain.xyz"
@@ -154,7 +148,7 @@ function Base({ handleNextStep, step }) {
                 helperText={errorObj.TechnicalEmail}
                 size="small"
                 name="TechnicalEmail"
-                label="AdServer's operator email"
+                label="Technical email"
                 value={fields.TechnicalEmail}
                 type="email"
                 placeholder="tech@domain.xyz"
