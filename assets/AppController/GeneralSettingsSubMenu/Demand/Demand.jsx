@@ -11,16 +11,26 @@ export default function Demand() {
     //TODO: send data
   };
 
-  const validateInput = (value) => {
+  const validateValue = (value) => {
     const isEmptyField = !value;
-    const isValid = !isEmptyField;
+    const urlPattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))', // OR ip (v4) address
+      'i',
+    );
+    const isValidUrl = value ? urlPattern.test(value) : false;
+
+    const isValueValid = !isEmptyField && isValidUrl;
     let helperText = '';
 
     if (isEmptyField) {
       helperText = 'Field cannot be empty. Enter domain or remove field';
+    } else if (!isValidUrl) {
+      helperText = 'Field must be a domain';
     }
     return {
-      isValid,
+      isValueValid,
       helperText,
     };
   };
@@ -30,10 +40,10 @@ export default function Demand() {
       <CardHeader title="Rejected domains:" subheader="Here you can define domains. All subdomains will be rejected." />
       <CardContent>
         <ListOfInputs
-          type="domain"
+          transform="domain"
           list={rejectedDomains}
           setListFn={setRejectedDomains}
-          validate={validateInput}
+          validate={validateValue}
           maxHeight="calc(100vh - 22rem)"
         />
       </CardContent>

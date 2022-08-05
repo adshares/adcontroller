@@ -4,12 +4,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../commonStyles.scss';
 import { TransitionGroup } from 'react-transition-group';
 
-const formatUrl = (value) => {
+const sliceDomain = (value) => {
   const isValidUrl = (() => {
     try {
       new URL(value);
     } catch {
-      formatUrl('https://' + value);
+      sliceDomain('https://' + value);
       return false;
     }
     return true;
@@ -22,10 +22,14 @@ const formatUrl = (value) => {
   return value;
 };
 
-export default function ListOfInputs({ list, setListFn, validate, type = 'text', maxHeight = '50vh' }) {
+export default function ListOfInputs({ list, setListFn, validate, transform = 'text', maxHeight = '50vh' }) {
   const [addMore, setAddMore] = useState(false);
   const [textareaValue, setTextareaValue] = useState('');
   const textAreaRef = useRef(null);
+
+  const onTextareaChange = (e) => {
+    setTextareaValue(e.target.value);
+  };
 
   const handleChange = (e, idx, list, setListFn) => {
     const newList = [...list];
@@ -47,9 +51,9 @@ export default function ListOfInputs({ list, setListFn, validate, type = 'text',
   };
 
   const formatValue = (value) => {
-    switch (type) {
+    switch (transform) {
       case 'domain':
-        return formatUrl(value);
+        return sliceDomain(value);
 
       default:
         return value;
@@ -60,9 +64,9 @@ export default function ListOfInputs({ list, setListFn, validate, type = 'text',
     const inputs = [];
     const duplicatedValues = list.filter((item, index) => list.indexOf(item) !== index);
     for (let index = 0; index <= list.length; index++) {
-      const isDuplicated = duplicatedValues.some((el) => el === list[index]);
+      const isDuplicated = !!duplicatedValues.length;
       const validationObj = validate(list[index]);
-      const isValidationError = list.length !== index && (!validationObj.isValid || isDuplicated);
+      const isValidationError = list.length !== index && (!validationObj.isValueValid || isDuplicated);
       let helperText = '';
 
       if (isValidationError) {
@@ -89,6 +93,7 @@ export default function ListOfInputs({ list, setListFn, validate, type = 'text',
                   setListFn(newList);
                 })
               }
+              inputProps={{ autoComplete: 'off' }}
               InputProps={
                 index === list.length
                   ? undefined
@@ -110,10 +115,6 @@ export default function ListOfInputs({ list, setListFn, validate, type = 'text',
     return inputs.reverse();
   };
 
-  const onTextareaChange = (e) => {
-    setTextareaValue(e.target.value);
-  };
-
   return (
     <Box className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
       <Collapse in={!addMore} timeout="auto">
@@ -122,6 +123,7 @@ export default function ListOfInputs({ list, setListFn, validate, type = 'text',
             Bulk adding
           </Button>
         </Box>
+
         <List sx={{ overflow: 'auto', maxHeight: maxHeight, minHeight: '5rem' }}>
           <TransitionGroup>{createFields(list, setListFn)}</TransitionGroup>
         </List>
@@ -134,6 +136,7 @@ export default function ListOfInputs({ list, setListFn, validate, type = 'text',
             <Button type="button" variant="contained" sx={{ mr: 1 }} onClick={onSaveClick} disabled={!textareaValue}>
               Paste
             </Button>
+
             <Button type="button" variant="outlined" onClick={() => setAddMore((prevState) => !prevState)}>
               Cancel
             </Button>

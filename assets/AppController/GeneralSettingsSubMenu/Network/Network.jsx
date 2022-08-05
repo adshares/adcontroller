@@ -27,19 +27,20 @@ export default function Network() {
     console.log(addressList);
   };
 
-  const validateInput = (value) => {
-    const isAddressValid = value ? validateAddress(value) : true;
+  const validateValue = (value) => {
     const isEmptyField = !value;
-    const isValid = isAddressValid && !isEmptyField;
-    let helperText = ' ';
+    const isAddressValid = value ? validateAddress(value) : false;
+    const isValueValid = isAddressValid && !isEmptyField;
+    let helperText = '';
 
-    if (!isAddressValid) {
-      helperText = 'Invalid address';
-    } else if (isEmptyField) {
+    if (isEmptyField) {
       helperText = 'Field cannot be empty. Enter address or remove field';
+    } else if (!isAddressValid) {
+      helperText = 'Invalid address';
     }
+
     return {
-      isValid,
+      isValueValid,
       helperText,
     };
   };
@@ -79,7 +80,7 @@ export default function Network() {
                   }
                 />
                 <CardContent>
-                  <ListOfInputs list={addressList} setListFn={setAddressList} validate={validateInput} maxHeight="calc(100vh - 38rem)" />
+                  <ListOfInputs list={addressList} setListFn={setAddressList} validate={validateValue} maxHeight="calc(100vh - 38rem)" />
                 </CardContent>
               </Card>
             </Box>
@@ -99,7 +100,7 @@ export default function Network() {
                   <ListOfInputs
                     list={supplyAddressList}
                     setListFn={setSupplyAddressList}
-                    validate={validateInput}
+                    validate={validateValue}
                     maxHeight="calc(100vh - 38rem)"
                   />
                 </CardContent>
@@ -117,7 +118,7 @@ export default function Network() {
                   <ListOfInputs
                     list={demandAddressList}
                     setListFn={setDemandAddressList}
-                    validate={validateInput}
+                    validate={validateValue}
                     maxHeight="calc(100vh - 38rem)"
                   />
                 </CardContent>
