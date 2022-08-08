@@ -58,28 +58,25 @@ export default function Network() {
 
   return (
     <Card className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
-      <Box className={`${commonStyles.flex} ${commonStyles.alignBaseline}`}>
-        <CardHeader
-          title="AdServer white list"
-          // eslint-disable-next-line max-len
-          subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, ea incidunt modi porro sequi veniam voluptate!"
-        />
-        <FormControlLabel
-          label="Private AdServer"
-          sx={{ whiteSpace: 'nowrap' }}
-          control={<Checkbox checked={isPrivateAdserver} onChange={() => setIsPrivateAdserver((prevState) => !prevState)} />}
-        />
-      </Box>
+      <CardHeader
+        title="AdServer white list"
+        // eslint-disable-next-line max-len
+        subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, ea incidunt modi porro sequi veniam voluptate!"
+      />
+      <FormControlLabel
+        label="Private AdServer"
+        sx={{ pl: 2, whiteSpace: 'nowrap' }}
+        control={<Checkbox checked={isPrivateAdserver} onChange={() => setIsPrivateAdserver((prevState) => !prevState)} />}
+      />
 
       <Collapse in={!isPrivateAdserver} timeout="auto" sx={{ overflow: 'auto' }}>
-        <CardActions>
-          <FormControlLabel
-            control={<Checkbox checked={separateNetworkList} onChange={() => setSeparateNetworkList((prevState) => !prevState)} />}
-            label="Separate list"
-          />
-        </CardActions>
-
         <CardContent>
+          <CardActions sx={{ padding: 0 }}>
+            <FormControlLabel
+              control={<Checkbox checked={separateNetworkList} onChange={() => setSeparateNetworkList((prevState) => !prevState)} />}
+              label="Separate list"
+            />
+          </CardActions>
           <Collapse in={!separateNetworkList} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
               <Card className={`${commonStyles.halfCard}`} raised>
