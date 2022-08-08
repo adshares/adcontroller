@@ -79,7 +79,10 @@ class WalletStep implements InstallerStep
         }
         if (1 !== preg_match(self::SECRET_KEY_PATTERN, $content[AdServerConfig::WalletSecretKey->name])) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a hexadecimal string of 64 characters', AdServerConfig::WalletSecretKey->name)
+                sprintf(
+                    'Field `%s` must be a hexadecimal string of 64 characters',
+                    AdServerConfig::WalletSecretKey->name
+                )
             );
         }
         if (

@@ -24,7 +24,7 @@ class AppController extends AbstractController
         ServicePresenceChecker $servicePresenceChecker
     ): Response {
         try {
-            $servicePresenceChecker->check(Module::adserver());
+            $servicePresenceChecker->check(Module::AdServer);
         } catch (ServiceNotPresent $exception) {
             $errorMessage = sprintf(
                 <<<MESSAGE

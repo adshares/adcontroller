@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
@@ -133,7 +134,7 @@ class InstallerController extends AbstractController
         $content = json_decode($request->getContent(), true);
         $licenseStep->setLicenseKey($content);
 
-        return $this->redirectToRoute('api_get_step', ['step' => 'license']);
+        return $this->getStep('license');
     }
 
     #[Route('/community_license', name: 'claim_license', methods: ['GET'])]
@@ -141,7 +142,7 @@ class InstallerController extends AbstractController
     {
         $licenseStep->claimCommunityLicense();
 
-        return $this->redirectToRoute('api_get_step', ['step' => 'license']);
+        return $this->getStep('license');
     }
 
     public static function getSubscribedServices(): array
