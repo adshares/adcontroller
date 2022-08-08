@@ -144,10 +144,12 @@ const ColdWalletSettingsCard = () => {
   const [coldWalletAddress, setColdWalletAddress] = useState('');
   return (
     <Card className={commonStyles.card}>
-      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
-        <CardHeader title="Cold wallet settings" />
-        <FormControlLabel label="Enable cold wallet" control={<Checkbox checked={isEnabled} onChange={() => setEnabled(!isEnabled)} />} />
-      </Box>
+      <CardHeader title="Cold wallet settings" />
+      <FormControlLabel
+        sx={{ pl: 2 }}
+        label="Enable cold wallet"
+        control={<Checkbox checked={isEnabled} onChange={() => setEnabled(!isEnabled)} />}
+      />
 
       <Collapse in={isEnabled} timeout="auto">
         <CardContent>
