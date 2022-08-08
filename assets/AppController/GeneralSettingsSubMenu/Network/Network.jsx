@@ -13,6 +13,7 @@ export default function Network() {
   const [addressList, setAddressList] = useState(all);
   const [supplyAddressList, setSupplyAddressList] = useState(supply);
   const [demandAddressList, setDemandAddressList] = useState(demand);
+  const [isFieldsValid, setFieldsValid] = useState(true);
   const [separateNetworkList, setSeparateNetworkList] = useState(!!supplyAddressList.length || !!demandAddressList.length);
 
   const onSaveClick = () => {
@@ -27,22 +28,32 @@ export default function Network() {
     console.log(addressList);
   };
 
-  const validateValue = (value) => {
-    const isEmptyField = !value;
-    const isAddressValid = value ? validateAddress(value) : false;
-    const isValueValid = isAddressValid && !isEmptyField;
-    let helperText = '';
+  const fieldsHandler = (fields, listName) => {
+    let isAddressListValid = true;
+    let isSupplyAddressListValid = true;
+    let isDemandAddressListValid = true;
+    if (fields.length > 0) {
+      switch (listName) {
+        case 'addressList':
+          setAddressList(fields.map((field) => field.field));
+          isAddressListValid = fields.some((field) => field.isValueValid);
+          break;
 
-    if (isEmptyField) {
-      helperText = 'Field cannot be empty. Enter address or remove field';
-    } else if (!isAddressValid) {
-      helperText = 'Invalid address';
+        case 'supplyAddressList':
+          setSupplyAddressList(fields.map((field) => field.field));
+          isSupplyAddressListValid = fields.some((field) => field.isValueValid);
+          break;
+
+        case 'demandAddressList':
+          setDemandAddressList(fields.map((field) => field.field));
+          isDemandAddressListValid = fields.some((field) => field.isValueValid);
+          break;
+
+        default:
+          break;
+      }
     }
-
-    return {
-      isValueValid,
-      helperText,
-    };
+    //TODO: setFieldsValid, when get fields from server
   };
 
   return (
@@ -80,7 +91,13 @@ export default function Network() {
                   }
                 />
                 <CardContent>
-                  <ListOfInputs list={addressList} setListFn={setAddressList} validate={validateValue} maxHeight="calc(100vh - 38rem)" />
+                  <ListOfInputs
+                    initialList={addressList}
+                    fieldsHandler={fieldsHandler}
+                    listName="addressList"
+                    type="wallet"
+                    maxHeight="calc(100vh - 38rem)"
+                  />
                 </CardContent>
               </Card>
             </Box>
@@ -98,9 +115,10 @@ export default function Network() {
                 />
                 <CardContent>
                   <ListOfInputs
-                    list={supplyAddressList}
-                    setListFn={setSupplyAddressList}
-                    validate={validateValue}
+                    initialList={supplyAddressList}
+                    fieldsHandler={fieldsHandler}
+                    listName="supplyAddressList"
+                    type="wallet"
                     maxHeight="calc(100vh - 38rem)"
                   />
                 </CardContent>
@@ -116,9 +134,10 @@ export default function Network() {
                 />
                 <CardContent>
                   <ListOfInputs
-                    list={demandAddressList}
-                    setListFn={setDemandAddressList}
-                    validate={validateValue}
+                    initialList={demandAddressList}
+                    fieldsHandler={fieldsHandler}
+                    listName="demandAddressList"
+                    type="wallet"
                     maxHeight="calc(100vh - 38rem)"
                   />
                 </CardContent>
@@ -129,7 +148,7 @@ export default function Network() {
       </Collapse>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button type="button" variant="contained" onClick={onSaveClick}>
+          <Button disabled={!isFieldsValid} type="button" variant="contained" onClick={onSaveClick}>
             Save
           </Button>
         </Box>

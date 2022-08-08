@@ -5,51 +5,29 @@ import commonStyles from '../../common/commonStyles.scss';
 
 export default function Demand() {
   const [rejectedDomains, setRejectedDomains] = useState([]);
+  const [isFieldsValid, setFieldsValid] = useState(true);
 
   const onSaveClick = () => {
     console.log(rejectedDomains);
     //TODO: send data
   };
 
-  const validateValue = (value) => {
-    const isEmptyField = !value;
-    const urlPattern = new RegExp(
-      '^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))', // OR ip (v4) address
-      'i',
-    );
-    const isValidUrl = value ? urlPattern.test(value) : false;
-
-    const isValueValid = !isEmptyField && isValidUrl;
-    let helperText = '';
-
-    if (isEmptyField) {
-      helperText = 'Field cannot be empty. Enter domain or remove field';
-    } else if (!isValidUrl) {
-      helperText = 'Field must be a domain';
+  const fieldsHandler = (fields) => {
+    if (fields.length > 0) {
+      setRejectedDomains(fields.map((field) => field.field));
+      setFieldsValid(fields.some((field) => field.isValueValid));
     }
-    return {
-      isValueValid,
-      helperText,
-    };
   };
 
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Rejected domains:" subheader="Here you can define domains. All subdomains will be rejected." />
       <CardContent>
-        <ListOfInputs
-          transform="domain"
-          list={rejectedDomains}
-          setListFn={setRejectedDomains}
-          validate={validateValue}
-          maxHeight="calc(100vh - 22rem)"
-        />
+        <ListOfInputs initialList={rejectedDomains} fieldsHandler={fieldsHandler} type="domain" maxHeight="calc(100vh - 22rem)" />
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button type="button" variant="contained" onClick={onSaveClick}>
+          <Button disabled={!isFieldsValid} type="button" variant="contained" onClick={onSaveClick}>
             Save
           </Button>
         </Box>
