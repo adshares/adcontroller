@@ -11,12 +11,16 @@ function Base() {
     adserverName: '',
     technicalEmail: '',
     supportEmail: '',
+    supportChat: '',
+    supportTelegram: '',
   });
 
   const [editableField, setEditableField] = useState({
     adserverName: false,
     technicalEmail: false,
     supportEmail: false,
+    supportChat: false,
+    supportTelegram: false,
   });
 
   const [defFields, setDefFields] = useState({
@@ -26,14 +30,18 @@ function Base() {
   //TODO: Add service to read write and change base values
   useEffect(() => {
     setFields({
-      adserverName: 'AdServer',
+      adserverName: 'Adserver',
       technicalEmail: 'tech@domain.xyz',
-      supportEmail: 'support@domain.xyz',
+      supportEmail: 'office@adshares.net',
+      supportChat: 'https://t.me/adshares',
+      supportTelegram: 'AdsharesNet',
     });
     setDefFields({
-      adserverName: 'AdServer',
+      adserverName: 'Adserver',
       technicalEmail: 'tech@domain.xyz',
-      supportEmail: 'support@domain.xyz',
+      supportEmail: 'office@adshares.net',
+      supportChat: 'https://t.me/adshares',
+      supportTelegram: 'AdsharesNet',
     });
   }, []);
 
@@ -63,7 +71,7 @@ function Base() {
           <TableBody>
             <TableRow>
               <TableCell width="40%" align="left">
-                AdServer name
+                Adserver's name
               </TableCell>
               <TableCell width="40%" align="left">
                 {editableField.adserverName ? (
@@ -97,7 +105,7 @@ function Base() {
 
             <TableRow>
               <TableCell width="40%" align="left">
-                AdServer's operator email
+                Adserver's operator email
               </TableCell>
               <TableCell width="40%" align="left">
                 {editableField.technicalEmail ? (
@@ -132,7 +140,7 @@ function Base() {
 
             <TableRow>
               <TableCell width="40%" align="left">
-                Email to support
+                Support email
               </TableCell>
               <TableCell width="40%" align="left">
                 {editableField.supportEmail ? (
@@ -159,6 +167,74 @@ function Base() {
                 </IconButton>
                 {editableField.supportEmail && (
                   <IconButton onClick={() => onSaveClick('supportEmail', fields.supportEmail)} type="button">
+                    <CheckIcon color="success" />
+                  </IconButton>
+                )}
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell width="40%" align="left">
+                Support chat
+              </TableCell>
+              <TableCell width="40%" align="left">
+                {editableField.supportChat ? (
+                  <TextField
+                    autoFocus
+                    onChange={onFormChange}
+                    error={!!errorObj.supportChat}
+                    helperText={errorObj.supportChat}
+                    size="small"
+                    name="supportChat"
+                    value={fields.supportChat}
+                    type="text"
+                    variant="standard"
+                    inputProps={{ autoComplete: 'off' }}
+                  />
+                ) : (
+                  fields.supportChat
+                )}
+              </TableCell>
+              <TableCell width="20%" align="center">
+                <IconButton type="button" onClick={() => toggleEditableField('supportChat')}>
+                  {editableField.supportChat ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
+                </IconButton>
+                {editableField.supportChat && (
+                  <IconButton onClick={() => onSaveClick('supportChat', fields.supportChat)} type="button">
+                    <CheckIcon color="success" />
+                  </IconButton>
+                )}
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell width="40%" align="left">
+                Support telegram
+              </TableCell>
+              <TableCell width="40%" align="left">
+                {editableField.supportTelegram ? (
+                  <TextField
+                    autoFocus
+                    onChange={onFormChange}
+                    error={!!errorObj.supportTelegram}
+                    helperText={errorObj.supportTelegram}
+                    size="small"
+                    name="supportTelegram"
+                    value={fields.supportTelegram}
+                    type="text"
+                    variant="standard"
+                    inputProps={{ autoComplete: 'off' }}
+                  />
+                ) : (
+                  fields.supportTelegram
+                )}
+              </TableCell>
+              <TableCell width="20%" align="center">
+                <IconButton type="button" onClick={() => toggleEditableField('supportTelegram')}>
+                  {editableField.supportTelegram ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
+                </IconButton>
+                {editableField.supportTelegram && (
+                  <IconButton onClick={() => onSaveClick('supportTelegram', fields.supportTelegram)} type="button">
                     <CheckIcon color="success" />
                   </IconButton>
                 )}
