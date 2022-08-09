@@ -33,9 +33,9 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const getStepData = async () => {
     try {
       setIsLoading(true);
-      const response = await apiService.getCurrentStepData(step.path);
-      setStepData({ ...stepData, ...response.LicenseData });
-      setEditMode(response.DataRequired);
+      const { LicenseData, DataRequired } = await apiService.getCurrentStepData(step.path);
+      setStepData({ ...stepData, ...LicenseData });
+      setEditMode(DataRequired);
     } catch (err) {
       setAlert({
         type: 'error',
@@ -123,9 +123,6 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
               Get license
             </Button>
           </Box>
-
-          {editMode && (isLicenseLoading ? <Spinner /> : stepData.Owner && <InfoTable stepData={stepData} />)}
-
           <Box className={styles.freeLicense}>
             {!stepData.Owner && (
               <Button onClick={handleGetFreeLicenseClick} type="button" variant="text">
@@ -133,6 +130,8 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
               </Button>
             )}
           </Box>
+
+          {editMode && (isLicenseLoading ? <Spinner /> : stepData.Owner && <InfoTable stepData={stepData} />)}
         </Box>
       )}
 
@@ -153,7 +152,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
 export default License;
 
 const InfoTable = ({ stepData }) => (
-  <Table>
+  <Table sx={{ mt: 1 }}>
     <TableBody>
       <TableRow>
         <TableCell align="left">License owner</TableCell>

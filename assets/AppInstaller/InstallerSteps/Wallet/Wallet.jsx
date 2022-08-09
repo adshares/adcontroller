@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
@@ -145,6 +145,10 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
       </Box>
       {editMode && (
         <Box className={styles.container}>
+          <Typography variant="body2" align="justify" paragraph>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad aliquam atque nostrum numquam soluta. Consectetur cum deserunt
+            error facere fugiat hic iure magni minus, omnis, repellat, sapiente sint voluptate voluptatum?
+          </Typography>
           <Box
             component="form"
             className={styles.formBlock}
@@ -155,25 +159,25 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
             <TextField
               className={styles.textField}
               error={!!errorObj.WalletAddress}
-              helperText={errorObj.WalletAddress}
+              helperText={errorObj.WalletAddress || ' '}
               value={fields.WalletAddress}
-              margin="normal"
+              margin="dense"
               size="small"
               name="WalletAddress"
-              label="Wallet address"
+              label="ADS account address"
               type="text"
               inputProps={{ autoComplete: 'off' }}
               required
             />
             <TextField
               error={!!errorObj.WalletSecretKey}
-              helperText={errorObj.WalletSecretKey}
+              helperText={errorObj.WalletSecretKey || ' '}
               value={fields.WalletSecretKey}
-              margin="normal"
+              margin="dense"
               size="small"
               name="WalletSecretKey"
-              label="Wallet private key"
-              type="password"
+              label="ADS account secret key"
+              type="text"
               inputProps={{ autoComplete: 'off' }}
               required
             />
@@ -181,7 +185,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
           <Collapse
             className={styles.formBlock}
             component="form"
-            in={Object.values(nodeHost).some((el) => !!el) && !isKnownNode}
+            in={Object.values(nodeHost).some((el) => !!el) && !isKnownNode && !errorObj.WalletAddress}
             timeout="auto"
             unmountOnExit
             onChange={onNodeHostChange}
@@ -193,10 +197,10 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
               <>
                 <TextField
                   error={!!nodeHostError.WalletNodeHost}
-                  helperText={nodeHostError.WalletNodeHost}
+                  helperText={nodeHostError.WalletNodeHost || ' '}
                   value={nodeHost.WalletNodeHost}
                   disabled={!!nodeHost.code}
-                  margin="normal"
+                  margin="dense"
                   size="small"
                   name="WalletNodeHost"
                   label="Wallet node host"
@@ -205,10 +209,10 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
                 />
                 <TextField
                   error={!!nodeHostError.WalletNodePort}
-                  helperText={nodeHostError.WalletNodePort}
+                  helperText={nodeHostError.WalletNodePort || ' '}
                   value={nodeHost.WalletNodePort}
                   disabled={!!nodeHost.code}
-                  margin="normal"
+                  margin="dense"
                   size="small"
                   name="WalletNodePort"
                   label="Wallet node port"
@@ -225,7 +229,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell align="center">Your wallet address</TableCell>
+              <TableCell align="center">Your ADS account address</TableCell>
               <TableCell align="center">{fields.WalletAddress}</TableCell>
             </TableRow>
           </TableBody>
