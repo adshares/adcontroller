@@ -56,7 +56,13 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
       onBackClick={() => handlePrevStep(step)}
     >
       <Box className={styles.container}>
-        <Typography variant="h5">Registration in AdClassify</Typography>
+        <Typography gutterBottom ma variant="h6">
+          Registration in AdClassify
+        </Typography>
+        <Typography variant="body1" paragraph align="justify">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab, accusamus amet aperiam architecto beatae doloremque est et explicabo
+          harum id odio officia quae quas quod sint temporibus vitae voluptas voluptatem.
+        </Typography>
         {registrationInProgress && (
           <Box sx={{ width: '100%' }}>
             <LinearProgress />
