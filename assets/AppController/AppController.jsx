@@ -20,6 +20,7 @@ import License from './GeneralSettingsSubMenu/License/License';
 import Network from './GeneralSettingsSubMenu/Network/Network';
 import Supply from './GeneralSettingsSubMenu/Supply/Supply';
 import Demand from './GeneralSettingsSubMenu/Demand/Demand';
+import Users from './GeneralSettingsSubMenu/Users/Users';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -29,6 +30,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import commonStyles from './common/commonStyles.scss';
 
 const appModules = [
@@ -72,6 +74,12 @@ const appModules = [
         component: Supply,
         icon: TrendingFlatIcon,
         rotateIcon: '180deg',
+      },
+      {
+        name: 'Users',
+        path: '/users',
+        component: Users,
+        icon: ManageAccountsIcon,
       },
     ],
   },
@@ -144,7 +152,7 @@ function AppController() {
     !isLoading && (
       <>
         <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
-        <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ height: 'calc(100vh - 64px)' }}>
+        <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 64px)' }}>
           <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
           <AppWindow>
             <Routes>
