@@ -100,13 +100,12 @@ function Commissions() {
       </Box>
 
       <Card className={`${commonStyles.card}`}>
-        <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
-          <CardHeader title="Referral settings" />
-          <FormControlLabel
-            label="Enable refund referral"
-            control={<Checkbox checked={isRefundReferralEnabled} onChange={() => setIsRefundReferralEnabled(!isRefundReferralEnabled)} />}
-          />
-        </Box>
+        <CardHeader title="Referral settings" />
+        <FormControlLabel
+          label="Enable refund referral"
+          sx={{ pl: 2, whiteSpace: 'nowrap' }}
+          control={<Checkbox checked={isRefundReferralEnabled} onChange={() => setIsRefundReferralEnabled(!isRefundReferralEnabled)} />}
+        />
         <Collapse in={isRefundReferralEnabled} timeout="auto">
           <CardContent>
             <Card
