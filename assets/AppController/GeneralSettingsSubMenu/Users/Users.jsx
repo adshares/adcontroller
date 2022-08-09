@@ -32,8 +32,8 @@ const RegistrationModeCard = () => {
   const [emailVerificationRequired, setEmailVerificationRequired] = useState(false);
   const [autoAccountConfirmation, setAutoAccountConfirmation] = useState(false);
   const [autoRegistrationAllowed, setAutoRegistrationAllowed] = useState(false);
-  const [advertiserApplyFromUrl, setAdvertiserApplyFromUrl] = useState(false);
-  const [publisherApplyFromUrl, setPublisherApplyFromUrl] = useState(false);
+  const [advertiserApplyFormUrl, setAdvertiserApplyFormUrl] = useState('');
+  const [publisherApplyFormUrl, setPublisherApplyFormUrl] = useState('');
 
   const handleSelectChange = (event) => {
     setRegistrationMode(event.target.value);
@@ -45,8 +45,8 @@ const RegistrationModeCard = () => {
       emailVerificationRequired,
       autoAccountConfirmation,
       autoRegistrationAllowed,
-      advertiserApplyFromUrl,
-      publisherApplyFromUrl,
+      advertiserApplyFormUrl,
+      publisherApplyFormUrl,
     });
   };
 
@@ -59,6 +59,7 @@ const RegistrationModeCard = () => {
           <FormControl fullWidth>
             <InputLabel id="registrationModeLabel">Set registration mode</InputLabel>
             <Select
+              size="small"
               labelId="registrationModeLabel"
               id="registrationMode"
               value={registrationMode}
@@ -70,42 +71,53 @@ const RegistrationModeCard = () => {
               <MenuItem value="private">Private</MenuItem>
             </Select>
           </FormControl>
-
           <Collapse in={registrationMode === 'restricted'} timeout="auto">
-            <FormControl>
-              <FormControlLabel
-                label="Apply advertiser from URL"
-                control={
-                  <Checkbox checked={advertiserApplyFromUrl} onChange={() => setAdvertiserApplyFromUrl((prevState) => !prevState)} />
-                }
+            <FormControl fullWidth>
+              <TextField
+                fullWidth
+                variant="outlined"
+                size="small"
+                margin="dense"
+                label="Advertiser apply form URL"
+                value={advertiserApplyFormUrl}
+                onChange={(e) => setAdvertiserApplyFormUrl(e.target.value)}
+                inputProps={{ autoComplete: 'off' }}
               />
-              <FormControlLabel
-                label="Apply publisher from URL"
-                control={<Checkbox checked={publisherApplyFromUrl} onChange={() => setPublisherApplyFromUrl((prevState) => !prevState)} />}
+              <TextField
+                fullWidth
+                variant="outlined"
+                size="small"
+                margin="dense"
+                label="Publisher apply form URL"
+                value={publisherApplyFormUrl}
+                onChange={(e) => setPublisherApplyFormUrl(e.target.value)}
+                inputProps={{ autoComplete: 'off' }}
               />
             </FormControl>
           </Collapse>
 
-          <FormControl>
-            <FormControlLabel
-              label="E-mail verification required"
-              control={
-                <Checkbox checked={emailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
-              }
-            />
-            <FormControlLabel
-              label="Auto account confirmation"
-              control={
-                <Checkbox checked={autoAccountConfirmation} onChange={() => setAutoAccountConfirmation((prevState) => !prevState)} />
-              }
-            />
-            <FormControlLabel
-              label="Auto registration allowed"
-              control={
-                <Checkbox checked={autoRegistrationAllowed} onChange={() => setAutoRegistrationAllowed((prevState) => !prevState)} />
-              }
-            />
-          </FormControl>
+          <Collapse in={registrationMode !== 'private'} timeout="auto">
+            <FormControl>
+              <FormControlLabel
+                label="E-mail verification required"
+                control={
+                  <Checkbox checked={emailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
+                }
+              />
+              <FormControlLabel
+                label="Auto account confirmation"
+                control={
+                  <Checkbox checked={autoAccountConfirmation} onChange={() => setAutoAccountConfirmation((prevState) => !prevState)} />
+                }
+              />
+              <FormControlLabel
+                label="Auto registration allowed"
+                control={
+                  <Checkbox checked={autoRegistrationAllowed} onChange={() => setAutoRegistrationAllowed((prevState) => !prevState)} />
+                }
+              />
+            </FormControl>
+          </Collapse>
         </Box>
       </Box>
 
