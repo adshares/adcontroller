@@ -31,7 +31,9 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import commonStyles from './common/commonStyles.scss';
+import Panel from './GeneralSettingsSubMenu/Panel/Panel';
 
 const appModules = [
   {
@@ -80,6 +82,12 @@ const appModules = [
         path: '/users',
         component: Users,
         icon: ManageAccountsIcon,
+      },
+      {
+        name: 'Panel',
+        path: '/panel',
+        component: Panel,
+        icon: DisplaySettingsIcon,
       },
     ],
   },
