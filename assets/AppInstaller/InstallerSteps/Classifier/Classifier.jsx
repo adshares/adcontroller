@@ -6,7 +6,7 @@ import styles from './styles.scss';
 import { useForm } from '../../../hooks';
 
 function Classifier({ handleNextStep, handlePrevStep, step }) {
-  const { fields } = useForm({ apiKey: '', apiSecret: '' });
+  const { fields, onFormChange, errorObj, isFormValid } = useForm({ apiKey: '', apiSecret: '' });
   const [isLoading, setIsLoading] = useState(true);
   const [registrationInProgress, setRegistrationInProgress] = useState(false);
   const [stepData, setStepData] = useState({});
@@ -55,7 +55,7 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
       dataLoading={isLoading}
       title="Classifier information"
       onNextClick={handleSubmit}
-      disabledNext={registrationInProgress || isLoading}
+      disabledNext={registrationInProgress || isLoading || (editMode && !isFormValid)}
       onBackClick={() => handlePrevStep(step)}
     >
       <Box className={styles.container}>
@@ -66,26 +66,37 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab, accusamus amet aperiam architecto beatae doloremque est et explicabo
           harum id odio officia quae quas quod sint temporibus vitae voluptas voluptatem.
         </Typography>
+        <Box className={styles.editButtonThumb}>
+          <Button onClick={() => setEditMode((prevState) => !prevState)} type="button">
+            {editMode ? 'Cancel' : 'Already have an account'}
+          </Button>
+        </Box>
         {editMode && (
           <Box className={styles.formThumb}>
             <TextField
               sx={{ width: '50%' }}
+              error={!!errorObj.apiKey}
+              helperText={errorObj.apiKey}
               size="small"
               name="apiKey"
-              label="Your api key"
+              label="Api key"
               margin="dense"
               value={fields.apiKey}
+              onChange={onFormChange}
               type="text"
               fullWidth
               inputProps={{ autoComplete: 'off' }}
             />
             <TextField
               sx={{ width: '50%' }}
+              error={!!errorObj.apiSecret}
+              helperText={errorObj.apiSecret}
               size="small"
               name="apiSecret"
-              label="Your api secret"
+              label="Api secret"
               margin="dense"
               value={fields.apiSecret}
+              onChange={onFormChange}
               type="text"
               fullWidth
               inputProps={{ autoComplete: 'off' }}
@@ -95,13 +106,6 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
         {registrationInProgress && (
           <Box sx={{ width: '100%' }}>
             <LinearProgress />
-          </Box>
-        )}
-        {!editMode && (
-          <Box className={styles.editButtonThumb}>
-            <Button onClick={() => setEditMode(true)} type="button">
-              Already have api key
-            </Button>
           </Box>
         )}
       </Box>
