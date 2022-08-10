@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material'
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
@@ -96,6 +96,11 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       onBackClick={() => handlePrevStep(step)}
       disabledNext={!stepData.Owner}
     >
+      <Typography variant="body1" paragraph align="center">
+        You can run the adserver under free Community License.<br /><br />
+        1% of ad turnover of every adserver is burned what reduces the free floating supply of ADS.
+        Liquid staking rewards bring back the burned ADS flowing them from active users to long term holders.
+      </Typography>
       {editMode && (
         <Box className={styles.container}>
           <Box
@@ -163,7 +168,7 @@ const InfoTable = ({ stepData }) => (
         <TableCell align="left">{stepData.Type}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell align="left">License will expire</TableCell>
+        <TableCell align="left">License expiration date</TableCell>
         <TableCell align="left">{stepData.DateEnd.replace('T', ' ').slice(0, stepData.DateEnd.length - 6)}</TableCell>
       </TableRow>
       <TableRow>

@@ -138,6 +138,11 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
       disabledNext={editMode ? !isFormValid || !isNodeHostValid || isHostVerification || nodeHost.code === 422 : isLoading}
       onBackClick={() => handlePrevStep(step)}
     >
+      <Typography variant="body1" paragraph align="center">
+        The wallet is used to store users' deposits and earnings.
+        The total profit of the adserver will be deposited in this account.
+        To create a new wallet <a href="https://adshares.net/wallet" target="_blank">follow the instructions</a>.
+      </Typography>
       <Box className={styles.editButtonThumb}>
         <Button className={dataRequired ? styles.hidden : styles.visible} onClick={() => setEditMode(!editMode)} type="button">
           {editMode ? 'Cancel' : 'Edit'}
@@ -145,10 +150,6 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
       </Box>
       {editMode && (
         <Box className={styles.container}>
-          <Typography variant="body2" align="justify" paragraph>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad aliquam atque nostrum numquam soluta. Consectetur cum deserunt
-            error facere fugiat hic iure magni minus, omnis, repellat, sapiente sint voluptate voluptatum?
-          </Typography>
           <Box
             component="form"
             className={styles.formBlock}
@@ -229,7 +230,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell align="center">Your ADS account address</TableCell>
+              <TableCell align="center">ADS account address</TableCell>
               <TableCell align="center">{fields.WalletAddress}</TableCell>
             </TableRow>
           </TableBody>
