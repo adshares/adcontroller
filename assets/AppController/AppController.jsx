@@ -43,6 +43,18 @@ const appModules = [
     icon: DashboardIcon,
   },
   {
+    name: 'Users settings',
+    icon: ManageAccountsIcon,
+    children: [
+      {
+        name: 'Users',
+        path: '/users',
+        component: Users,
+        icon: ManageAccountsIcon,
+      },
+    ],
+  },
+  {
     name: 'General settings',
     icon: SettingsIcon,
     children: [
@@ -76,12 +88,6 @@ const appModules = [
         component: Supply,
         icon: TrendingFlatIcon,
         rotateIcon: '180deg',
-      },
-      {
-        name: 'Users',
-        path: '/users',
-        component: Users,
-        icon: ManageAccountsIcon,
       },
       {
         name: 'Panel',

@@ -21,8 +21,8 @@ import { logoH30, logoH60, logoH90, favicon16x16, favicon32x32, favicon48x48, fa
 export default function Panel() {
   return (
     <>
-      <Rebranding />
       <Placeholders />
+      <Rebranding />
     </>
   );
 }
@@ -94,7 +94,7 @@ const Rebranding = () => {
     const { name, files } = e.target;
     const file = files[0];
     const isFileIsImage = file && file.type.split('/')[0] === 'image';
-    const isFileExtensionIsPng = file && file.type.split('/')[1] === 'png';
+    const isFileTypeIsPng = file && file.type.split('/')[1] === 'png';
 
     if (!isFileIsImage) {
       enqueueSnackbar('File must be image', { variant: 'error' });
@@ -117,7 +117,7 @@ const Rebranding = () => {
 
       switch (name) {
         case 'favicon16x16':
-          if (width === 16 && height === 16 && isFileExtensionIsPng) {
+          if (width === 16 && height === 16 && isFileTypeIsPng) {
             setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be png with size 16x16', { variant: 'error', persist: true });
@@ -125,7 +125,7 @@ const Rebranding = () => {
           break;
 
         case 'favicon32x32':
-          if (width === 32 && height === 32 && isFileExtensionIsPng) {
+          if (width === 32 && height === 32 && isFileTypeIsPng) {
             setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be png with size 32x32', { variant: 'error' });
@@ -133,7 +133,7 @@ const Rebranding = () => {
           break;
 
         case 'favicon48x48':
-          if (width === 48 && height === 48 && isFileExtensionIsPng) {
+          if (width === 48 && height === 48 && isFileTypeIsPng) {
             setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be png with size 48x48', { variant: 'error' });
@@ -141,7 +141,7 @@ const Rebranding = () => {
           break;
 
         case 'favicon96x96':
-          if (width === 96 && height === 96 && isFileExtensionIsPng) {
+          if (width === 96 && height === 96 && isFileTypeIsPng) {
             setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be png with size 96x96', { variant: 'error' });
