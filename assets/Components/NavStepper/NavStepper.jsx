@@ -19,7 +19,7 @@ const NavStepper = ({ steps, unlockedSteps, handleCurrentStep }) => {
           sx={{ textTransform: 'capitalize', padding: '16px', margin: '-16px', borderRadius: '8px' }}
           onClick={() => handleCurrentStep(step)}
         >
-          <Typography variant="body2" sx={activeStep && { fontWeight: 600, color: 'primary.main' }}>
+          <Typography variant="body2" sx={activeStep ? { fontWeight: 600, color: 'primary.main' } : undefined}>
             {step.path === 'smtp' ? step.path.toUpperCase() : step.path}
           </Typography>
         </StepButton>

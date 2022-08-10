@@ -59,7 +59,7 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
       onBackClick={() => handlePrevStep(step)}
     >
       <Box className={styles.container}>
-        <Typography align="center" gutterBottom ma variant="h6">
+        <Typography align="center" gutterBottom variant="h6">
           Registration in AdClassify
         </Typography>
         <Typography variant="body1" paragraph align="justify">
