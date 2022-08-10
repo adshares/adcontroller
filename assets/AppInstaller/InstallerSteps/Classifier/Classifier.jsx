@@ -36,7 +36,11 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
   const handleSubmit = async () => {
     try {
       setRegistrationInProgress(true);
-      await apiService.sendStepData(step.path, {});
+      const body = editMode ? {
+        ApiKeyName: fields.apiKey,
+        ApiKeySecret: fields.apiSecret,
+      } : {};
+      await apiService.sendStepData(step.path, body);
       handleNextStep(step);
     } catch (err) {
       setAlert({
