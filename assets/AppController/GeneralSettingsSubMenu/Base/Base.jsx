@@ -1,12 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, IconButton, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  TextField,
+} from '@mui/material';
 import { useForm } from '../../../hooks';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 import commonStyles from '../../common/commonStyles.scss';
 
-function Base() {
+export default function Base() {
+  return (
+    <>
+      <BaseInformationCard />
+      <CRMNotificationsCard />
+    </>
+  );
+}
+
+const BaseInformationCard = () => {
   const { fields, errorObj, onFormChange, setFields } = useForm({
     adserverName: '',
     technicalEmail: '',
@@ -245,6 +267,75 @@ function Base() {
       </CardContent>
     </Card>
   );
-}
+};
 
-export default Base;
+const CRMNotificationsCard = () => {
+  /*
+    public const CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED = 'crm-mail-address-on-campaign-created';
+    public const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crm-mail-address-on-site-added';
+    public const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
+  */
+  const [mailOnCampaignCreated, setMailOnCampaignCreated] = useState('');
+  const [mailOnSiteAdded, setMailOnSiteAdded] = useState('');
+  const [mailOnUserRegistered, setMailOnUserRegistered] = useState('');
+
+  const onSaveClick = () => {
+    console.log({
+      mailOnCampaignCreated,
+      mailOnSiteAdded,
+      mailOnUserRegistered,
+    });
+  };
+
+  return (
+    <Card className={commonStyles.card}>
+      <CardHeader title="CRM notifications" subheader="lorem ipsum dolor set amet" />
+
+      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
+          <TextField
+            fullWidth
+            margin="dense"
+            variant="outlined"
+            size="small"
+            type="email"
+            label="CRM mail address on campaign created"
+            value={mailOnCampaignCreated}
+            onChange={(e) => setMailOnCampaignCreated(e.target.value)}
+            inputProps={{ autoComplete: 'off' }}
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            variant="outlined"
+            size="small"
+            type="email"
+            label="CRM mail address on site added"
+            value={mailOnSiteAdded}
+            onChange={(e) => setMailOnSiteAdded(e.target.value)}
+            inputProps={{ autoComplete: 'off' }}
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            variant="outlined"
+            size="small"
+            type="email"
+            label="CRM mail address on user registered"
+            value={mailOnUserRegistered}
+            onChange={(e) => setMailOnUserRegistered(e.target.value)}
+            inputProps={{ autoComplete: 'off' }}
+          />
+        </Box>
+      </CardContent>
+
+      <CardActions>
+        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+          <Button type="button" variant="contained" onClick={onSaveClick}>
+            Save
+          </Button>
+        </Box>
+      </CardActions>
+    </Card>
+  );
+};
