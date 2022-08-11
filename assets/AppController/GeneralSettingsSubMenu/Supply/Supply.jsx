@@ -11,11 +11,22 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  InputLabel,
+  OutlinedInput,
   Radio,
   RadioGroup,
 } from '@mui/material';
 
 export default function Supply() {
+  return (
+    <>
+      <SiteOptions />
+      <ZoneOptions />
+    </>
+  );
+}
+
+const SiteOptions = () => {
   const [acceptBannersManually, setAcceptBannersManually] = useState(false);
   const [classifierLocalBanners, setClassifierLocalBanners] = useState('all-by-default');
 
@@ -53,4 +64,48 @@ export default function Supply() {
       </CardActions>
     </Card>
   );
-}
+};
+
+const ZoneOptions = () => {
+  const [allowZoneInIFrame, setAllowZoneInIFrame] = useState(false);
+  const [maxPageZones, setMaxPageZones] = useState(0);
+
+  const onSaveClick = () => {
+    console.log({ allowZoneInIFrame, maxPageZones });
+  };
+  return (
+    <Card className={commonStyles.card}>
+      <CardHeader title="Zone options" subheader="lorem ipsum dolor sit amet" />
+
+      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}>
+        <FormControl>
+          <FormControlLabel
+            label="Allow zone in iframe"
+            control={<Checkbox checked={allowZoneInIFrame} onChange={() => setAllowZoneInIFrame((prevState) => !prevState)} />}
+          />
+        </FormControl>
+
+        <FormControl sc={{ width: '50%' }} margin="dense">
+          <InputLabel htmlFor="maxPageZones">Maximum page zones</InputLabel>
+          <OutlinedInput
+            id="maxPageZones"
+            size="small"
+            type="number"
+            label="Maximum page zones"
+            value={Number(maxPageZones).toString()}
+            onChange={(e) => setMaxPageZones(Number(e.target.value).toFixed(0))}
+            inputProps={{ autoComplete: 'off', min: 0 }}
+          />
+        </FormControl>
+      </CardContent>
+
+      <CardActions>
+        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+          <Button onClick={onSaveClick} variant="contained" type="button">
+            Save
+          </Button>
+        </Box>
+      </CardActions>
+    </Card>
+  );
+};
