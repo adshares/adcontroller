@@ -11,8 +11,10 @@ import {
   Collapse,
   FormControl,
   FormControlLabel,
+  InputAdornment,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
   TextField,
 } from '@mui/material';
@@ -21,6 +23,7 @@ export default function Settings() {
   return (
     <>
       <RegistrationModeCard />
+      <AutoWithdrawalCard />
       <PrivacyCard />
       <TermAndConditionCard />
     </>
@@ -120,6 +123,59 @@ const RegistrationModeCard = () => {
           </Collapse>
         </Box>
       </Box>
+
+      <CardActions>
+        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+          <Button onClick={onSaveClick} variant="contained" type="button">
+            Save
+          </Button>
+        </Box>
+      </CardActions>
+    </Card>
+  );
+};
+
+const AutoWithdrawalCard = () => {
+  const [adsWithdrawal, setAdsWithdrawal] = useState(0);
+  const [bscWithdrawal, setBscWithdrawal] = useState(0);
+  const onSaveClick = () => {
+    console.log({ adsWithdrawal: Number(adsWithdrawal), bscWithdrawal: Number(bscWithdrawal) });
+  };
+
+  return (
+    <Card className={commonStyles.card}>
+      <CardHeader title="Auto withdrawal" subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit." />
+
+      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
+          <FormControl sc={{ width: '50%' }} margin="dense">
+            <InputLabel htmlFor="adsWithdrawal">Auto ADS withdrawal</InputLabel>
+            <OutlinedInput
+              id="adsWithdrawal"
+              size="small"
+              type="number"
+              startAdornment={<InputAdornment position="start">$</InputAdornment>}
+              label="Auto ADS withdrawal"
+              value={Number(adsWithdrawal).toString()}
+              onChange={(e) => setAdsWithdrawal(Number(e.target.value).toFixed(2))}
+              inputProps={{ autoComplete: 'off', min: 0 }}
+            />
+          </FormControl>
+          <FormControl sc={{ width: '50%' }} margin="dense">
+            <InputLabel htmlFor="bscWithdrawal">Auto BSC withdrawal</InputLabel>
+            <OutlinedInput
+              id="bscWithdrawal"
+              size="small"
+              type="number"
+              startAdornment={<InputAdornment position="start">$</InputAdornment>}
+              label="Auto BSC withdrawal"
+              value={Number(bscWithdrawal).toString()}
+              onChange={(e) => setBscWithdrawal(Number(e.target.value).toFixed(2))}
+              inputProps={{ autoComplete: 'off', min: 0 }}
+            />
+          </FormControl>
+        </Box>
+      </CardContent>
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
