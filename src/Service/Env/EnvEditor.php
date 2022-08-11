@@ -7,8 +7,11 @@ use RuntimeException;
 
 class EnvEditor
 {
-    public function __construct(private readonly LoggerInterface $logger, private readonly string $envFile)
-    {
+    public function __construct(
+        private readonly EnvReloader $envReloader,
+        private readonly LoggerInterface $logger,
+        private readonly string $envFile,
+    ) {
     }
 
     public function getOne(string $key): ?string
@@ -59,6 +62,7 @@ class EnvEditor
             );
             throw new RuntimeException(sprintf('Cannot save file `%s`', $this->envFile));
         }
+        $this->envReloader->reload();
     }
 
     public function setOne(string $key, string $value): void
@@ -79,6 +83,7 @@ class EnvEditor
             );
             throw new RuntimeException(sprintf('Cannot save file `%s`', $this->envFile));
         }
+        $this->envReloader->reload();
     }
 
     private static function pattern(string $key): string
