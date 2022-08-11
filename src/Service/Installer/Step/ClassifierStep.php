@@ -18,6 +18,12 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ClassifierStep implements InstallerStep
 {
+    private const FIELDS = [
+        AdClassifyConfig::ApiKeyName,
+        AdClassifyConfig::ApiKeySecret,
+    ];
+    private const TRIMMED_BASE64_PATTERN = '#^[0-9A-Z+/]+$#i';
+
     public function __construct(
         private readonly string $adclassifyBaseUri,
         private readonly AdClassifyClient $adClassifyClient,
@@ -29,25 +35,15 @@ class ClassifierStep implements InstallerStep
 
     public function process(array $content): void
     {
-        if (!$this->isDataRequired()) {
+        if (empty($content) && !$this->isDataRequired()) {
             $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
             return;
         }
 
-        if (null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::Name))) {
-            throw new UnprocessableEntityHttpException('AdServer\'s name must be set');
-        }
-        if (null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail))) {
-            throw new UnprocessableEntityHttpException('Technical e-mail must be set');
-        }
-
-        try {
-            $apiKey = $this->adClassifyClient->createAccount($email, $name);
-        } catch (UnexpectedResponseException $exception) {
-            throw new UnprocessableEntityHttpException($exception->getMessage());
-        } catch (TransportExceptionInterface $exception) {
-            $this->logger->critical(sprintf('AdClassify is not accessible (%s)', $exception->getMessage()));
-            throw new UnprocessableEntityHttpException('AdClassify is not accessible');
+        if (empty($content)) {
+            $apiKey = $this->getApiKeyFromClassifier();
+        } else {
+            $apiKey = $this->getApiKeyFromRequest($content);
         }
 
         $this->adServerConfigurationClient->setupAdClassify(
@@ -64,6 +60,63 @@ class ClassifierStep implements InstallerStep
             ]
         );
         $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
+    }
+
+    private function getApiKeyFromClassifier(): array
+    {
+        if (null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::Name))) {
+            throw new UnprocessableEntityHttpException('AdServer\'s name must be set');
+        }
+        if (null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail))) {
+            throw new UnprocessableEntityHttpException('Technical e-mail must be set');
+        }
+
+        try {
+            $apiKey = $this->adClassifyClient->createAccount($email, $name);
+        } catch (UnexpectedResponseException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->critical(sprintf('AdClassify is not accessible (%s)', $exception->getMessage()));
+            throw new UnprocessableEntityHttpException('AdClassify is not accessible');
+        }
+        return $apiKey;
+    }
+
+    private function getApiKeyFromRequest(array $content): array
+    {
+        $this->validate($content);
+        $apiKeyName = $content[AdClassifyConfig::ApiKeyName->name];
+        $apiKeySecret = $content[AdClassifyConfig::ApiKeySecret->name];
+        try {
+            $result = $this->adClassifyClient->validateApiKey($apiKeyName, $apiKeySecret);
+        } catch (UnexpectedResponseException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->critical(sprintf('AdClassify is not accessible (%s)', $exception->getMessage()));
+            throw new UnprocessableEntityHttpException('AdClassify is not accessible');
+        }
+
+        if (!$result) {
+            throw new UnprocessableEntityHttpException('Invalid API key');
+        }
+
+        return [
+            'name' => $apiKeyName,
+            'secret' => $apiKeySecret,
+        ];
+    }
+
+    private function validate(array $content): void
+    {
+        foreach (self::FIELDS as $field) {
+            if (!isset($content[$field->name])) {
+                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field->name));
+            }
+            $var = $content[$field->name];
+            if (1 !== preg_match(self::TRIMMED_BASE64_PATTERN, $var)) {
+                throw new UnprocessableEntityHttpException(sprintf('Field `%s` must be valid', $field->name));
+            }
+        }
     }
 
     public function getName(): string

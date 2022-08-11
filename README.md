@@ -4,6 +4,13 @@
     </a>
 </p>
 <h3 align="center"><small>Adshares / AdController</small></h3>
+<p align="center">
+    <a href="https://github.com/adshares/adcontroller/issues/new?template=bug_report.md&labels=Bug">Report bug</a>
+    ·
+    <a href="https://github.com/adshares/adcontroller/issues/new?template=feature_request.md&labels=New%20Feature">Request feature</a>
+    ·
+    <a href="https://github.com/adshares/adcontroller/wiki">Wiki</a>
+</p>
 
 AdController is a web application which manages other services' configuration.
 

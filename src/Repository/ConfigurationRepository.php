@@ -6,6 +6,7 @@ use App\Entity\Configuration;
 use App\Entity\Enum\AdClassifyConfig;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\ConfigEnum;
+use App\Entity\Enum\GeneralConfig;
 use App\Service\Crypt;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -27,6 +28,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         AdClassifyConfig::ApiKeySecret,
         AdServerConfig::LicenseKey,
         AdServerConfig::WalletSecretKey,
+        GeneralConfig::SmtpPassword,
     ];
 
     public function __construct(private readonly Crypt $crypt, ManagerRegistry $registry)

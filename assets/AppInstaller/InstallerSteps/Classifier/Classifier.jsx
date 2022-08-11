@@ -36,7 +36,11 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
   const handleSubmit = async () => {
     try {
       setRegistrationInProgress(true);
-      await apiService.sendStepData(step.path, {});
+      const body = editMode ? {
+        ApiKeyName: fields.apiKey,
+        ApiKeySecret: fields.apiSecret,
+      } : {};
+      await apiService.sendStepData(step.path, body);
       handleNextStep(step);
     } catch (err) {
       setAlert({
@@ -62,9 +66,9 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
         <Typography align="center" gutterBottom variant="h6">
           Registration in AdClassify
         </Typography>
-        <Typography variant="body1" paragraph align="justify">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab, accusamus amet aperiam architecto beatae doloremque est et explicabo
-          harum id odio officia quae quas quod sint temporibus vitae voluptas voluptatem.
+        <Typography variant="body1" paragraph align="center">
+          AdClassify provides data about banners and allow Publishers to effectively filter unwanted content.
+          You can register with the adshares community adclassify for free.
         </Typography>
         <Box className={styles.editButtonThumb}>
           <Button onClick={() => setEditMode((prevState) => !prevState)} type="button">

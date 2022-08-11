@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material'
 import apiService from '../../../utils/apiService';
 import styles from './styles.scss';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
@@ -84,6 +84,9 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       disabledNext={!isFormValid}
       onBackClick={() => handlePrevStep(step)}
     >
+      <Typography variant="body1" align="center" paragraph>
+        This account is used for sending confirmation and 2FA messages.
+      </Typography>
       {editMode && (
         <>
           {!isDataRequired && (
