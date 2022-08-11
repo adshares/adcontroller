@@ -55,7 +55,7 @@ export default function useForm(defFields) {
 
   const checkIsFormValid = () => {
     const isEmptyFields = Object.keys(fields).some((el) => {
-      if (el === 'data_required' || el === 'message' || el === 'code') {
+      if (el === 'DataRequired' || el === 'message' || el === 'code') {
         return;
       }
       return !fields[el];
