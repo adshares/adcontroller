@@ -155,7 +155,7 @@ const AutoWithdrawalCard = () => {
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              label="Auto ADS withdrawal"
+              label="ADS minimum withdrawal"
               value={Number(adsWithdrawal).toString()}
               onChange={(e) => setAdsWithdrawal(Number(e.target.value).toFixed(2))}
               inputProps={{ autoComplete: 'off', min: 0 }}
@@ -168,7 +168,7 @@ const AutoWithdrawalCard = () => {
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              label="Auto BSC withdrawal"
+              label="BSC minimum withdrawal"
               value={Number(bscWithdrawal).toString()}
               onChange={(e) => setBscWithdrawal(Number(e.target.value).toFixed(2))}
               inputProps={{ autoComplete: 'off', min: 0 }}
