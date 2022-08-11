@@ -20,7 +20,8 @@ import License from './GeneralSettingsSubMenu/License/License';
 import Network from './GeneralSettingsSubMenu/Network/Network';
 import Supply from './GeneralSettingsSubMenu/Supply/Supply';
 import Demand from './GeneralSettingsSubMenu/Demand/Demand';
-import Users from './GeneralSettingsSubMenu/Users/Users';
+import Settings from './Users/Settings/Settings';
+import Panel from './GeneralSettingsSubMenu/Panel/Panel';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -33,7 +34,6 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import commonStyles from './common/commonStyles.scss';
-import Panel from './GeneralSettingsSubMenu/Panel/Panel';
 
 const appModules = [
   {
@@ -43,13 +43,13 @@ const appModules = [
     icon: DashboardIcon,
   },
   {
-    name: 'Users settings',
+    name: 'Users',
     icon: ManageAccountsIcon,
     children: [
       {
-        name: 'Users',
-        path: '/users',
-        component: Users,
+        name: 'Settings',
+        path: '/settings',
+        component: Settings,
         icon: ManageAccountsIcon,
       },
     ],

@@ -35,7 +35,7 @@ const Placeholders = () => {
   const [robots, setRobots] = useState('');
 
   const onSaveClick = () => {
-    //TODO: add sent function
+    //TODO: add send function
     console.log({
       title,
       description,

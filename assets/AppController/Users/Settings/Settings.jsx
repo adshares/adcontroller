@@ -17,7 +17,7 @@ import {
   TextField,
 } from '@mui/material';
 
-export default function Users() {
+export default function Settings() {
   return (
     <>
       <RegistrationModeCard />
