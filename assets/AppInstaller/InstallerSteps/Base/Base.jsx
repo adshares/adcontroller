@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
 import { useForm } from '../../../hooks';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
@@ -7,21 +7,11 @@ import styles from './styles.scss';
 
 function Base({ handleNextStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
-    base_adserver_name: '',
-    base_technical_email: '',
-    base_domain: '',
-    base_support_email: '',
-  });
-  const {
-    fields: advancedFields,
-    setFields: setAdvancedFields,
-    onFormChange: onAdvancedFieldsChange,
-  } = useForm({
-    base_adpanel_host_prefix: '',
-    base_adserver_host_prefix: '',
-    base_aduser_host_prefix: '',
+    Domain: '',
+    Name: '',
+    SupportEmail: '',
+    TechnicalEmail: '',
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
@@ -40,35 +30,18 @@ function Base({ handleNextStep, step }) {
     try {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
-      const {
-        base_adserver_name,
-        base_technical_email,
-        base_domain,
-        base_support_email,
-        base_adpanel_host_prefix,
-        base_adserver_host_prefix,
-        base_aduser_host_prefix,
-        data_required,
-      } = response;
+      const { Domain, Name, SupportEmail, TechnicalEmail, DataRequired } = response;
       setFields({
         ...fields,
         ...{
-          base_adserver_name: base_adserver_name || '',
-          base_technical_email: base_technical_email || '',
-          base_domain: base_domain || '',
-          base_support_email: base_support_email || '',
+          Domain: Domain || '',
+          Name: Name || '',
+          SupportEmail: SupportEmail || '',
+          TechnicalEmail: TechnicalEmail || '',
         },
       });
-      setAdvancedFields({
-        ...advancedFields,
-        ...{
-          base_adpanel_host_prefix,
-          base_adserver_host_prefix,
-          base_aduser_host_prefix,
-        },
-      });
-      setEditMode(data_required);
-      setDataRequired(data_required);
+      setEditMode(DataRequired);
+      setDataRequired(DataRequired);
     } catch (err) {
       setAlert({
         type: 'error',
@@ -90,7 +63,6 @@ function Base({ handleNextStep, step }) {
       if (isFormWasTouched) {
         await apiService.sendStepData(step.path, {
           ...fields,
-          ...advancedFields,
         });
       }
       handleNextStep(step);
@@ -133,24 +105,24 @@ function Base({ handleNextStep, step }) {
             <Box className={styles.formBlock}>
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_adserver_name}
-                helperText={errorObj.base_adserver_name}
+                error={!!errorObj.Name}
+                helperText={errorObj.Name}
                 size="small"
-                name="base_adserver_name"
-                label="AdServer name"
-                value={fields.base_adserver_name}
+                name="Name"
+                label="Adserver's name"
+                value={fields.Name}
                 type="text"
                 required
                 inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_domain}
-                helperText={errorObj.base_domain}
+                error={!!errorObj.Domain}
+                helperText={errorObj.Domain}
                 size="small"
-                name="base_domain"
-                label="Domain name"
-                value={fields.base_domain}
+                name="Domain"
+                label="Adserver's domain"
+                value={fields.Domain}
                 type="text"
                 required
                 inputProps={{ autoComplete: 'off' }}
@@ -159,12 +131,12 @@ function Base({ handleNextStep, step }) {
             <Box className={styles.formBlock}>
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_support_email}
-                helperText={errorObj.base_support_email}
+                error={!!errorObj.SupportEmail}
+                helperText={errorObj.SupportEmail}
                 size="small"
-                name="base_support_email"
-                label="Email to support"
-                value={fields.base_support_email}
+                name="SupportEmail"
+                label="Support email"
+                value={fields.SupportEmail}
                 type="email"
                 placeholder="support@domain.xyz"
                 required
@@ -172,67 +144,18 @@ function Base({ handleNextStep, step }) {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.base_technical_email}
-                helperText={errorObj.base_technical_email}
+                error={!!errorObj.TechnicalEmail}
+                helperText={errorObj.TechnicalEmail}
                 size="small"
-                name="base_technical_email"
-                label="AdServer's operator email"
-                value={fields.base_technical_email}
+                name="TechnicalEmail"
+                label="Technical email"
+                value={fields.TechnicalEmail}
                 type="email"
                 placeholder="tech@domain.xyz"
                 required
                 inputProps={{ autoComplete: 'off' }}
               />
             </Box>
-          </Box>
-
-          <Button type="button" onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>
-            Advanced options
-          </Button>
-
-          <Box
-            className={styles.formAdvanced}
-            component="form"
-            onChange={onAdvancedFieldsChange}
-            onClick={() => setFormTouched(true)}
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <Collapse in={showAdvancedOptions} timeout="auto" unmountOnExit>
-              <Box
-                sx={{
-                  marginTop: '8px',
-                }}
-                className={styles.formBlock}
-              >
-                <TextField
-                  className={styles.textField}
-                  size="small"
-                  name="base_adpanel_host_prefix"
-                  label="AdPanel host prefix"
-                  value={advancedFields.base_adpanel_host_prefix}
-                  type="text"
-                  inputProps={{ autoComplete: 'off' }}
-                />
-                <TextField
-                  className={styles.textField}
-                  size="small"
-                  name="base_aduser_host_prefix"
-                  label="AdUser host prefix"
-                  value={advancedFields.base_aduser_host_prefix}
-                  type="text"
-                  inputProps={{ autoComplete: 'off' }}
-                />
-                <TextField
-                  className={styles.textField}
-                  size="small"
-                  name="base_adserver_host_prefix"
-                  label="AdServer host prefix"
-                  value={advancedFields.base_adserver_host_prefix}
-                  type="text"
-                  inputProps={{ autoComplete: 'off' }}
-                />
-              </Box>
-            </Collapse>
           </Box>
         </Box>
       )}
@@ -241,7 +164,6 @@ function Base({ handleNextStep, step }) {
         <InfoTable
           stepData={{
             ...fields,
-            ...advancedFields,
           }}
         />
       )}
@@ -256,32 +178,20 @@ function InfoTable({ stepData }) {
     <Table>
       <TableBody>
         <TableRow>
-          <TableCell align="left">AdServer name</TableCell>
-          <TableCell align="left">{stepData.base_adserver_name}</TableCell>
+          <TableCell align="left">Adserver's name</TableCell>
+          <TableCell align="left">{stepData.Name}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Domain</TableCell>
-          <TableCell align="left">{stepData.base_domain}</TableCell>
+          <TableCell align="left">Adserver's domain</TableCell>
+          <TableCell align="left">{stepData.Domain}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Email to support</TableCell>
-          <TableCell align="left">{stepData.base_support_email}</TableCell>
+          <TableCell align="left">Support email</TableCell>
+          <TableCell align="left">{stepData.SupportEmail}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">AdServer's operator email</TableCell>
-          <TableCell align="left">{stepData.base_technical_email}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">AdPanel host prefix</TableCell>
-          <TableCell align="left">{stepData.base_adpanel_host_prefix}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">AdUser host prefix</TableCell>
-          <TableCell align="left">{stepData.base_aduser_host_prefix}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">AdServer host prefix</TableCell>
-          <TableCell align="left">{stepData.base_adserver_host_prefix}</TableCell>
+          <TableCell align="left">Technical email</TableCell>
+          <TableCell align="left">{stepData.TechnicalEmail}</TableCell>
         </TableRow>
       </TableBody>
     </Table>

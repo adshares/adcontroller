@@ -20,15 +20,15 @@
   align-items: center;
 }
 
-.visible {
-  visibility: visible;
-}
-
-.hidden {
-  visibility: hidden;
-}
-
 .editButtonThumb {
   display: flex;
   justify-content: end;
+
+  & .visible {
+    display: flex;
+  }
+
+  & .hidden {
+    display: none;
+  }
 }

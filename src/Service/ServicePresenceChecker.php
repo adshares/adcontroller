@@ -9,17 +9,14 @@ use Symfony\Component\Process\Process;
 
 class ServicePresenceChecker
 {
-    private string $adserverHomeDirectory;
-
-    public function __construct(string $adserverHomeDirectory)
+    public function __construct(private readonly string $adserverHomeDirectory)
     {
-        $this->adserverHomeDirectory = $adserverHomeDirectory;
     }
 
     public function check(Module $module): void
     {
-        switch ($module->toString()) {
-            case Module::ADSERVER:
+        switch ($module) {
+            case Module::AdServer:
                 $this->checkAdserver();
                 break;
             default:
@@ -29,12 +26,18 @@ class ServicePresenceChecker
 
     public function getEnvFile(Module $module): string
     {
-        switch ($module->toString()) {
-            case Module::ADSERVER:
-                return self::canonicalize($this->adserverHomeDirectory) . '.env';
-            default:
-                throw new ServiceNotPresent('Unsupported service');
-        }
+        return match ($module) {
+            Module::AdServer => self::canonicalize($this->adserverHomeDirectory) . '.env',
+            default => throw new ServiceNotPresent('Unsupported service'),
+        };
+    }
+
+    public function getHomeDirectory(Module $module): string
+    {
+        return match ($module) {
+            Module::AdServer => self::canonicalize($this->adserverHomeDirectory),
+            default => throw new ServiceNotPresent('Unsupported service'),
+        };
     }
 
     private function checkAdserver(): void

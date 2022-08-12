@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,6 +13,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class ExceptionListener implements EventSubscriberInterface
 {
     private const HEADER_JSON_CONTENT = 'application/json';
+
+    public function __construct(private readonly LoggerInterface $logger)
+    {
+    }
 
     public function onKernelException(ExceptionEvent $event)
     {
@@ -27,6 +32,9 @@ class ExceptionListener implements EventSubscriberInterface
                 $response->setStatusCode($exception->getStatusCode());
                 $response->headers->replace($exception->getHeaders());
             } else {
+                $this->logger->error(
+                    sprintf('Kernel exception %d (%s)', $exception->getCode(), $exception->getMessage())
+                );
                 $response = new JsonResponse([
                     'message' => 'Internal Server Error',
                     'code' => Response::HTTP_INTERNAL_SERVER_ERROR,

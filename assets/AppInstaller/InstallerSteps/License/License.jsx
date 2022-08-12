@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
@@ -10,21 +10,25 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLicenseLoading, setIsLicenseLoading] = useState(true);
   const [stepData, setStepData] = useState({
-    demand_fee: 0.01,
-    fixed_fee: 0,
-    supply_fee: 0.01,
-    owner: '',
-    date_end: '',
-    type: '',
-    date_start: '',
-    payment_address: '',
-    payment_message: '',
-    private_label: false,
-    status: 1,
+    DemandFee: 0.01,
+    FixedFee: 0,
+    SupplyFee: 0.01,
+    Owner: '',
+    DateStart: '',
+    DateEnd: '',
+    Type: '',
+    PaymentAddress: '',
+    PaymentMessage: '',
+    PrivateLabel: false,
+    Status: 1,
   });
   const [editMode, setEditMode] = useState(false);
   const { fields, errorObj, isFormValid, onFormChange, validate } = useForm({ licenseKey: '' });
-  const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
+  const [alert, setAlert] = useState({
+    type: 'error',
+    message: '',
+    title: '',
+  });
 
   useEffect(() => {
     getStepData();
@@ -33,9 +37,9 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const getStepData = async () => {
     try {
       setIsLoading(true);
-      const response = await apiService.getCurrentStepData(step.path);
-      setStepData({ ...stepData, ...response.license_data });
-      setEditMode(response.data_required);
+      const { LicenseData, DataRequired } = await apiService.getCurrentStepData(step.path);
+      setStepData({ ...stepData, ...LicenseData });
+      setEditMode(DataRequired);
     } catch (err) {
       setAlert({
         type: 'error',
@@ -51,9 +55,9 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const handleGetLicenseClick = async () => {
     try {
       setIsLicenseLoading(true);
-      const response = await apiService.getLicenseByKey({ license_key: fields.licenseKey });
+      const response = await apiService.getLicenseByKey({ LicenseKey: fields.licenseKey });
       setIsLicenseLoading(false);
-      setStepData({ ...response.license_data });
+      setStepData({ ...response.LicenseData });
     } catch (err) {
       setAlert({
         type: 'error',
@@ -69,7 +73,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
     try {
       setIsLicenseLoading(true);
       const response = await apiService.getCommunityLicense();
-      setStepData({ ...response.license_data });
+      setStepData({ ...response.LicenseData });
     } catch (err) {
       setAlert({
         type: 'error',
@@ -94,8 +98,15 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       title="License information"
       onNextClick={handleSubmit}
       onBackClick={() => handlePrevStep(step)}
-      disabledNext={!stepData.owner}
+      disabledNext={!stepData.Owner}
     >
+      <Typography variant="body1" paragraph align="center">
+        You can run the adserver under free Community License.
+        <br />
+        <br />
+        1% of ad turnover of every adserver is burned what reduces the free floating supply of ADS. Liquid staking rewards bring back the
+        burned ADS flowing them from active users to long term holders.
+      </Typography>
       {editMode && (
         <Box className={styles.container}>
           <Box
@@ -123,16 +134,15 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
               Get license
             </Button>
           </Box>
-
-          {editMode && (isLicenseLoading ? <Spinner /> : stepData.owner && <InfoTable stepData={stepData} />)}
-
           <Box className={styles.freeLicense}>
-            {!stepData.owner && (
+            {!stepData.Owner && (
               <Button onClick={handleGetFreeLicenseClick} type="button" variant="text">
                 Get free license
               </Button>
             )}
           </Box>
+
+          {editMode && (isLicenseLoading ? <Spinner /> : stepData.Owner && <InfoTable stepData={stepData} />)}
         </Box>
       )}
 
@@ -153,28 +163,28 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
 export default License;
 
 const InfoTable = ({ stepData }) => (
-  <Table>
+  <Table sx={{ mt: 1 }}>
     <TableBody>
       <TableRow>
         <TableCell align="left">License owner</TableCell>
-        <TableCell align="left">{stepData.owner}</TableCell>
+        <TableCell align="left">{stepData.Owner}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">License type</TableCell>
-        <TableCell align="left">{stepData.type}</TableCell>
+        <TableCell align="left">{stepData.Type}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell align="left">License will expire</TableCell>
-        <TableCell align="left">{stepData.date_end.replace('T', ' ').slice(0, stepData.date_end.length - 6)}</TableCell>
+        <TableCell align="left">License expiration date</TableCell>
+        <TableCell align="left">{stepData.DateEnd.replace('T', ' ').slice(0, stepData.DateEnd.length - 6)}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">Fixed fee</TableCell>
-        <TableCell align="left">{stepData.fixed_fee} ADS</TableCell>
+        <TableCell align="left">{stepData.FixedFee} ADS</TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">Supply fee / Demand fee</TableCell>
         <TableCell align="left">
-          {stepData.supply_fee * 100}% / {stepData.demand_fee * 100}%
+          {stepData.SupplyFee * 100}% / {stepData.DemandFee * 100}%
         </TableCell>
       </TableRow>
     </TableBody>

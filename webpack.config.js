@@ -1,5 +1,6 @@
 const Encore = require('@symfony/webpack-encore');
 const webpack = require('webpack');
+const dotenv = require('dotenv');
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
@@ -7,13 +8,26 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
   Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
 
+// Update environmental variable with .env* files
+dotenv.config({
+  override: true,
+  path: './.env',
+}).parsed;
+dotenv.config({
+  override: true,
+  path: './.env.local',
+}).parsed;
+
+const path = process.env.PUBLIC_URL || '';
+const prefix = path.startsWith('/') ? path.substr(1) : path;
+
 Encore
   // directory where compiled assets will be stored
   .setOutputPath('public/build/')
   // public path used by the web server to access the output path
-  .setPublicPath('/build')
+  .setPublicPath(`${path}/build`)
   // only needed for CDN's or sub-directory deploy
-  //.setManifestKeyPrefix('build/')
+  .setManifestKeyPrefix(prefix)
 
   /*
    * ENTRY CONFIG
@@ -30,11 +44,12 @@ Encore
   // .enableStimulusBridge('./assets/controllers.json')
 
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
-  .splitEntryChunks()
+  // .splitEntryChunks()
 
   // will require an extra script tag for runtime.js
   // but, you probably want this, unless you're building a single-page app
-  .enableSingleRuntimeChunk()
+  // .enableSingleRuntimeChunk()
+  .disableSingleRuntimeChunk()
 
   /*
    * FEATURE CONFIG

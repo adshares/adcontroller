@@ -3,11 +3,6 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
-parameters:
-    env(ADCLASSIFY_BASE_URI): 'https://account.adshares.pl'
-    env(ADSERVER_BASE_URI): 'http://localhost:8010'
-    env(ADSERVER_HOME_DIRECTORY): '/opt/adshares/adserver/'
-    env(LICENSE_SERVER_BASE_URI): 'https://account.adshares.pl'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -16,6 +11,7 @@ services:
         bind:
             string $adclassifyBaseUri: '%env(ADCLASSIFY_BASE_URI)%'
             string $appName: '%env(APP_NAME)%'
+            string $appSecret: '%env(APP_SECRET)%'
             string $appVersion: '%env(APP_VERSION)%'
             string $adserverBaseUri: '%env(ADSERVER_BASE_URI)%'
             string $adserverHomeDirectory: '%env(ADSERVER_HOME_DIRECTORY)%'

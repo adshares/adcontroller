@@ -8,7 +8,7 @@ import AppWindow from '../Components/AppWindow/AppWindow';
 import styles from './styles.scss';
 import commonStyles from '../AppController/common/commonStyles.scss';
 
-export const AppUserCreator = () => {
+export default function AppUserCreator() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [alert, setAlert] = useState({
@@ -136,4 +136,4 @@ export const AppUserCreator = () => {
       </Box>
     </>
   );
-};
+}

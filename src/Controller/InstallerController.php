@@ -2,8 +2,14 @@
 
 namespace App\Controller;
 
-use App\Entity\Configuration;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\AppStateEnum;
+use App\Entity\Enum\InstallerStepEnum;
+use App\Exception\ServiceNotPresent;
+use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
+use App\Service\Installer\Migrator;
 use App\Service\Installer\Step\BaseStep;
 use App\Service\Installer\Step\ClassifierStep;
 use App\Service\Installer\Step\DnsStep;
@@ -18,23 +24,37 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api', name: 'api_')]
 class InstallerController extends AbstractController
 {
+    public function __construct(
+        private readonly ConfigurationRepository $repository,
+        private readonly Migrator $migrator,
+    ) {
+    }
+
     #[Route('/step', name: 'previous_step', methods: ['GET'])]
     public function previousStep(ConfigurationRepository $repository): JsonResponse
     {
-        $step = $repository->fetchValueByName(Configuration::INSTALLER_STEP);
+        $step = $repository->fetchValueByEnum(AppConfig::InstallerStep);
 
-        return $this->json([Configuration::INSTALLER_STEP => $step]);
+        return $this->json([AppConfig::InstallerStep->name => $step]);
     }
 
     #[Route('/step/{step}', name: 'get_step', methods: ['GET'])]
     public function getStep(string $step): JsonResponse
     {
+        if (
+            AppStateEnum::AdserverAccountCreated
+            === AppStateEnum::tryFrom($this->repository->fetchValueByEnum(AppConfig::AppState))
+        ) {
+            $this->migrator->migrate();
+            $this->repository->insertOrUpdateOne(AppConfig::AppState, AppStateEnum::MigrationCompleted->name);
+        }
         if (1 !== preg_match('/^[a-z]+$/', $step)) {
             throw new UnprocessableEntityHttpException(sprintf('Invalid step (%s)', $step));
         }
@@ -45,7 +65,11 @@ class InstallerController extends AbstractController
             throw new UnprocessableEntityHttpException(sprintf('Unsupported step (%s)', $step));
         }
 
-        $data = $service->fetchData();
+        try {
+            $data = $service->fetchData();
+        } catch (UnexpectedResponseException | ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $exception->getMessage());
+        }
 
         return new JsonResponse(
             json_encode($data, JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_FORCE_OBJECT),
@@ -70,7 +94,11 @@ class InstallerController extends AbstractController
             throw new UnprocessableEntityHttpException(sprintf('Unsupported step (%s)', $step));
         }
 
-        $service->process($content);
+        try {
+            $service->process($content);
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $exception->getMessage());
+        }
 
         return $this->json(['message' => 'Data saved successfully']);
     }
@@ -80,22 +108,22 @@ class InstallerController extends AbstractController
     {
         $content = json_decode($request->getContent(), true);
         if (
-            !isset($content[Configuration::WALLET_ADDRESS]) ||
-            !is_string($content[Configuration::WALLET_ADDRESS]) ||
-            !AccountId::isValid($content[Configuration::WALLET_ADDRESS])
+            !isset($content[AdServerConfig::WalletAddress->name]) ||
+            !is_string($content[AdServerConfig::WalletAddress->name]) ||
+            !AccountId::isValid($content[AdServerConfig::WalletAddress->name])
         ) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a valid ADS account', Configuration::WALLET_ADDRESS)
+                sprintf('Field `%s` must be a valid ADS account', AdServerConfig::WalletAddress->name)
             );
         }
 
-        $accountId = new AccountId($content[Configuration::WALLET_ADDRESS]);
+        $accountId = new AccountId($content[AdServerConfig::WalletAddress->name]);
         $nodeHost = $walletStep->getNodeHostByAccountAddress($accountId);
 
         return $this->json(
             [
-                Configuration::WALLET_NODE_HOST => $nodeHost,
-                Configuration::WALLET_NODE_PORT => '6511',
+                AdServerConfig::WalletNodeHost->name => $nodeHost,
+                AdServerConfig::WalletNodePort->name => '6511',
             ]
         );
     }
@@ -106,7 +134,7 @@ class InstallerController extends AbstractController
         $content = json_decode($request->getContent(), true);
         $licenseStep->setLicenseKey($content);
 
-        return $this->redirectToRoute('api_get_step', ['step' => 'license']);
+        return $this->getStep('license');
     }
 
     #[Route('/community_license', name: 'claim_license', methods: ['GET'])]
@@ -114,7 +142,7 @@ class InstallerController extends AbstractController
     {
         $licenseStep->claimCommunityLicense();
 
-        return $this->redirectToRoute('api_get_step', ['step' => 'license']);
+        return $this->getStep('license');
     }
 
     public static function getSubscribedServices(): array

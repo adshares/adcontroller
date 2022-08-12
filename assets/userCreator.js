@@ -2,7 +2,7 @@
 import './styles/app.scss';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { AppUserCreator } from './AppUserCreator/AppUserCreator';
+import AppUserCreator from './AppUserCreator/AppUserCreator';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import theme from './utils/theme';
 import { store } from './redux/store';

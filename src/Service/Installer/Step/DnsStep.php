@@ -3,9 +3,12 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
-use App\Service\EnvEditor;
-use App\Service\ServicePresenceChecker;
 use App\ValueObject\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -13,61 +16,50 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use WeakMap;
 
 class DnsStep implements InstallerStep
 {
-    private ConfigurationRepository $repository;
-    private HttpClientInterface $httpClient;
-    private ServicePresenceChecker $servicePresenceChecker;
-
     public function __construct(
-        ConfigurationRepository $repository,
-        HttpClientInterface $httpClient,
-        ServicePresenceChecker $servicePresenceChecker
+        private readonly ConfigurationRepository $repository,
+        private readonly HttpClientInterface $httpClient
     ) {
-        $this->repository = $repository;
-        $this->httpClient = $httpClient;
-        $this->servicePresenceChecker = $servicePresenceChecker;
     }
 
     public function process(array $content): void
     {
-        $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_DNS;
+        return InstallerStepEnum::Dns->name;
     }
 
     public function fetchData(): array
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-
-        $config = [
-            Module::ADPANEL => EnvEditor::ADSERVER_ADPANEL_URL,
-            Module::ADSERVER => EnvEditor::ADSERVER_APP_URL,
-            Module::ADUSER => EnvEditor::ADSERVER_ADUSER_BASE_URL,
-        ];
-
-        $values = $envEditor->get(array_values($config));
+        $config = new WeakMap();
+        $config[Module::AdPanel] = AdPanelConfig::Url;
+        $config[Module::AdServer] = AdServerConfig::Url;
+        $config[Module::AdUser] = AdUserConfig::Url;
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
         ];
-        foreach ($config as $moduleName => $key) {
-            $url = $values[$key] ?? null;
-            $data[$moduleName] = $this->getModuleStatus(Module::fromName($moduleName), $url);
+        /** @var Module $module */
+        foreach ($config as $module => $enum) {
+            $url = $this->repository->fetchValueByEnum($enum);
+            $data[$module->toLowerCase()] = $this->getModuleDnsStatus($module, $url);
         }
 
         return $data;
     }
 
-    private function getModuleStatus(Module $module, ?string $url): array
+    private function getModuleDnsStatus(Module $module, ?string $url): array
     {
         if (!$url) {
             return [
-                'module' => $module->getDisplayableName(),
+                'module' => $module->name,
                 'url' => $url,
                 'code' => Response::HTTP_PRECONDITION_FAILED,
             ];
@@ -91,7 +83,7 @@ class DnsStep implements InstallerStep
         }
 
         return [
-            'module' => $module->getDisplayableName(),
+            'module' => $module->name,
             'url' => $url,
             'code' => $status,
         ];

@@ -9,7 +9,6 @@ import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
 import NotFoundView from '../Components/NotFound/NotFoundView';
 import AppWindow from '../Components/AppWindow/AppWindow';
-import DNS from './InstallerSteps/DNS/DNS';
 import Wallet from './InstallerSteps/Wallet/Wallet';
 import MultiStep from '../Components/MultiStep/MultiStep';
 import License from './InstallerSteps/License/License';
@@ -30,34 +29,29 @@ const installerSteps = [
     index: 1,
   },
   {
-    path: 'dns',
-    component: DNS,
-    index: 2,
-  },
-  {
     path: 'wallet',
     component: Wallet,
-    index: 3,
+    index: 2,
   },
   {
     path: 'license',
     component: License,
-    index: 4,
+    index: 3,
   },
   {
     path: 'classifier',
     component: Classifier,
-    index: 5,
+    index: 4,
   },
   {
     path: 'smtp',
     component: SMTP,
-    index: 6,
+    index: 5,
   },
   {
     path: 'status',
     component: Status,
-    index: 7,
+    index: 6,
   },
 ];
 
@@ -79,13 +73,13 @@ export default function AppInstaller() {
 
   const getCurrentStep = async () => {
     try {
-      const { installer_step } = await apiService.getPrevStep();
-      if (!installer_step) {
+      const { InstallerStep } = await apiService.getPrevStep();
+      if (!InstallerStep) {
         const firstStep = installerSteps.find((el) => el.index === 1);
         setCurrentStep(firstStep.path);
         return;
       }
-      const prevEl = installerSteps.find((el) => el.path === installer_step);
+      const prevEl = installerSteps.find((el) => el.path === InstallerStep.toLowerCase());
       const currentEl = installerSteps.find((el) => el.index === prevEl.index + 1);
       setCurrentStep(currentEl?.path || prevEl.path);
     } catch (err) {

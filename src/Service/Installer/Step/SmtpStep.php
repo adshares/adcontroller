@@ -3,10 +3,12 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\GeneralConfig;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Repository\ConfigurationRepository;
-use App\Service\EnvEditor;
-use App\Service\ServicePresenceChecker;
-use App\ValueObject\Module;
+use App\Service\AdServerConfigurationClient;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
@@ -15,43 +17,41 @@ use Symfony\Component\Mime\Email;
 
 class SmtpStep implements InstallerStep
 {
-    private const DEFAULT_ENV_ADSHARES_MAIL_FROM_NAME = 'Adshares AdServer';
+    private const DEFAULT_MAIL_SENDER = 'Adshares AdServer';
+    private const DEFAULT_SMTP_PORT = '587';
     private const FIELDS = [
-        Configuration::SMTP_HOST,
-        Configuration::SMTP_PASSWORD,
-        Configuration::SMTP_PORT,
-        Configuration::SMTP_SENDER,
-        Configuration::SMTP_USERNAME,
+        GeneralConfig::SmtpHost,
+        GeneralConfig::SmtpPassword,
+        GeneralConfig::SmtpPort,
+        GeneralConfig::SmtpSender,
+        GeneralConfig::SmtpUsername,
     ];
     private const SUCCESS = 'OK';
 
-    private ConfigurationRepository $repository;
-    private EnvEditor $envEditor;
-    private ServicePresenceChecker $servicePresenceChecker;
-
-    public function __construct(ConfigurationRepository $repository, ServicePresenceChecker $servicePresenceChecker)
-    {
-        $this->repository = $repository;
-        $this->servicePresenceChecker = $servicePresenceChecker;
-        $this->envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
+    public function __construct(
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository
+    ) {
     }
 
     public function process(array $content): void
     {
         if (empty($content) && !$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+            $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
             return;
         }
 
-        if (null === ($sender = $this->repository->fetchValueByName(Configuration::BASE_TECHNICAL_EMAIL))) {
+        if (null === ($sender = $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail))) {
             throw new UnprocessableEntityHttpException('Technical e-mail must be set');
         }
-        if (null === ($receiver = $this->repository->fetchValueByName(Configuration::BASE_SUPPORT_EMAIL))) {
+        if (null === ($receiver = $this->repository->fetchValueByEnum(GeneralConfig::SupportEmail))) {
             throw new UnprocessableEntityHttpException('Support e-mail must be set');
         }
 
-        if (!isset($content[Configuration::SMTP_PASSWORD]) && !$this->isDataRequired()) {
-            $content[Configuration::SMTP_PASSWORD] = $this->envEditor->getOne(EnvEditor::ADSERVER_MAIL_PASSWORD);
+        if (!isset($content[GeneralConfig::SmtpPassword->name]) && !$this->isDataRequired()) {
+            $content[GeneralConfig::SmtpPassword->name] = $this->repository->fetchValueByEnum(
+                GeneralConfig::SmtpPassword
+            );
         }
         $this->validate($content);
 
@@ -67,53 +67,52 @@ class SmtpStep implements InstallerStep
             ini_set('default_socket_timeout', $timeout);
         }
 
-        $this->envEditor->set(
+        $data = [
+            GeneralConfig::SmtpHost->name => $content[GeneralConfig::SmtpHost->name],
+            GeneralConfig::SmtpPassword->name => $content[GeneralConfig::SmtpPassword->name],
+            GeneralConfig::SmtpPort->name => $content[GeneralConfig::SmtpPort->name],
+            GeneralConfig::SmtpSender->name => $content[GeneralConfig::SmtpSender->name],
+            GeneralConfig::SmtpUsername->name => $content[GeneralConfig::SmtpUsername->name],
+        ];
+        $this->adServerConfigurationClient->store($data);
+
+        $this->repository->insertOrUpdate(GeneralConfig::MODULE, $data);
+        $this->repository->insertOrUpdate(
+            AppConfig::MODULE,
             [
-                EnvEditor::ADSERVER_MAIL_FROM_NAME => $content[Configuration::SMTP_SENDER],
-                EnvEditor::ADSERVER_MAIL_HOST => $content[Configuration::SMTP_HOST],
-                EnvEditor::ADSERVER_MAIL_PASSWORD => $content[Configuration::SMTP_PASSWORD],
-                EnvEditor::ADSERVER_MAIL_PORT => $content[Configuration::SMTP_PORT],
-                EnvEditor::ADSERVER_MAIL_USERNAME => $content[Configuration::SMTP_USERNAME],
+                AppConfig::EmailSent->name => self::SUCCESS,
+                AppConfig::InstallerStep->name => $this->getName(),
             ]
         );
-
-        $data = [
-            Configuration::SMTP_EMAIL_SENT => self::SUCCESS,
-            Configuration::INSTALLER_STEP => $this->getName(),
-        ];
-        foreach (self::FIELDS as $field) {
-            $data[$field] = $content[$field];
-        }
-        $this->repository->insertOrUpdate($data);
     }
 
     private function validate(array $content): void
     {
         foreach (self::FIELDS as $field) {
-            if (!isset($content[$field])) {
-                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field));
+            if (!isset($content[$field->name])) {
+                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field->name));
             }
         }
-        if (!filter_var($content[Configuration::SMTP_HOST], FILTER_VALIDATE_DOMAIN)) {
+        if (!filter_var($content[GeneralConfig::SmtpHost->name], FILTER_VALIDATE_DOMAIN)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a host', Configuration::SMTP_HOST)
+                sprintf('Field `%s` must be a host', GeneralConfig::SmtpHost->name)
             );
         }
-        if (!filter_var($content[Configuration::SMTP_PORT], FILTER_VALIDATE_INT)) {
+        if (!filter_var($content[GeneralConfig::SmtpPort->name], FILTER_VALIDATE_INT)) {
             throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be an integer', Configuration::BASE_SUPPORT_EMAIL)
+                sprintf('Field `%s` must be an integer', GeneralConfig::SupportEmail->name)
             );
         }
     }
 
     private function getMailerDsn(string $username, string $password, string $host, int $port): string
     {
-        return sprintf('smtp://%s:%s@%s:%d', urldecode($username), urldecode($password), urlencode($host), $port);
+        return sprintf('smtp://%s:%s@%s:%d', urlencode($username), urlencode($password), urlencode($host), $port);
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_SMTP;
+        return InstallerStepEnum::Smtp->name;
     }
 
     private function createTestEmailMessage(?string $sender, ?string $receiver): Email
@@ -128,10 +127,10 @@ class SmtpStep implements InstallerStep
     private function setupMailer(array $content): Mailer
     {
         $dsn = $this->getMailerDsn(
-            $content[Configuration::SMTP_USERNAME],
-            $content[Configuration::SMTP_PASSWORD],
-            $content[Configuration::SMTP_HOST],
-            (int)$content[Configuration::SMTP_PORT],
+            $content[GeneralConfig::SmtpUsername->name],
+            $content[GeneralConfig::SmtpPassword->name],
+            $content[GeneralConfig::SmtpHost->name],
+            (int)$content[GeneralConfig::SmtpPort->name],
         );
         $transport = Transport::fromDsn($dsn);
         return new Mailer($transport);
@@ -139,33 +138,30 @@ class SmtpStep implements InstallerStep
 
     public function fetchData(): array
     {
-        $localData = $this->repository->fetchValuesByNames([
-            Configuration::BASE_ADSERVER_NAME,
-            Configuration::BASE_SUPPORT_EMAIL,
-            Configuration::BASE_TECHNICAL_EMAIL,
-        ]);
-
-        if (
-            !isset($localData[Configuration::BASE_ADSERVER_NAME])
-            || !isset($localData[Configuration::BASE_SUPPORT_EMAIL])
-            || !isset($localData[Configuration::BASE_TECHNICAL_EMAIL])
-        ) {
-            throw new UnprocessableEntityHttpException('Base step must be completed');
-        }
-
-        $values = $this->envEditor->get(
+        $generalConfig = $this->repository->fetchValuesByNames(
+            GeneralConfig::MODULE,
             [
-                EnvEditor::ADSERVER_MAIL_FROM_NAME,
-                EnvEditor::ADSERVER_MAIL_HOST,
-                EnvEditor::ADSERVER_MAIL_PASSWORD,
-                EnvEditor::ADSERVER_MAIL_PORT,
-                EnvEditor::ADSERVER_MAIL_USERNAME,
+                GeneralConfig::SmtpHost->name,
+                GeneralConfig::SmtpPort->name,
+                GeneralConfig::SmtpSender->name,
+                GeneralConfig::SmtpUsername->name,
+                GeneralConfig::SupportEmail->name,
+                GeneralConfig::TechnicalEmail->name,
+                GeneralConfig::SmtpPassword->name,
             ]
         );
 
         if (
-            isset($values[EnvEditor::ADSERVER_MAIL_PASSWORD])
-            && strlen($values[EnvEditor::ADSERVER_MAIL_PASSWORD]) > 0
+            null === ($adServerName = $this->repository->fetchValueByEnum(AdServerConfig::Name))
+            || !isset($generalConfig[GeneralConfig::SupportEmail->name])
+            || !isset($generalConfig[GeneralConfig::TechnicalEmail->name])
+        ) {
+            throw new UnprocessableEntityHttpException('Base step must be completed');
+        }
+
+        if (
+            isset($generalConfig[GeneralConfig::SmtpPassword->name])
+            && strlen($generalConfig[GeneralConfig::SmtpPassword->name]) > 0
         ) {
             $password = '********';
         } else {
@@ -174,20 +170,19 @@ class SmtpStep implements InstallerStep
 
         $data = [
             Configuration::COMMON_DATA_REQUIRED => $this->isDataRequired(),
-            Configuration::SMTP_HOST => $values[EnvEditor::ADSERVER_MAIL_HOST] ?? '',
-            Configuration::SMTP_PASSWORD => $password,
-            Configuration::SMTP_PORT => $values[EnvEditor::ADSERVER_MAIL_PORT] ?? '587',
-            Configuration::SMTP_USERNAME => $values[EnvEditor::ADSERVER_MAIL_USERNAME] ?? '',
+            GeneralConfig::SmtpHost->name => $generalConfig[GeneralConfig::SmtpHost->name] ?? '',
+            GeneralConfig::SmtpPassword->name => $password,
+            GeneralConfig::SmtpPort->name => $generalConfig[GeneralConfig::SmtpPort->name] ?? self::DEFAULT_SMTP_PORT,
+            GeneralConfig::SmtpUsername->name => $generalConfig[GeneralConfig::SmtpUsername->name] ?? '',
         ];
 
-
         if (
-            isset($values[EnvEditor::ADSERVER_MAIL_FROM_NAME])
-            && self::DEFAULT_ENV_ADSHARES_MAIL_FROM_NAME !== $values[EnvEditor::ADSERVER_MAIL_FROM_NAME]
+            isset($generalConfig[GeneralConfig::SmtpSender->name])
+            && self::DEFAULT_MAIL_SENDER !== $generalConfig[GeneralConfig::SmtpSender->name]
         ) {
-            $data[Configuration::SMTP_SENDER] = $values[EnvEditor::ADSERVER_MAIL_FROM_NAME];
+            $data[GeneralConfig::SmtpSender->name] = $generalConfig[GeneralConfig::SmtpSender->name];
         } else {
-            $data[Configuration::SMTP_SENDER] = $localData[Configuration::BASE_ADSERVER_NAME];
+            $data[GeneralConfig::SmtpSender->name] = $adServerName;
         }
 
         return $data;
@@ -195,12 +190,20 @@ class SmtpStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        if (self::SUCCESS !== $this->repository->fetchValueByName(Configuration::SMTP_EMAIL_SENT)) {
+        if (self::SUCCESS !== $this->repository->fetchValueByEnum(AppConfig::EmailSent)) {
             return true;
         }
 
-        if (!$this->envEditor->getOne(EnvEditor::ADSERVER_MAIL_HOST)) {
-            return true;
+        $requiredKeys = [
+            GeneralConfig::SmtpHost->name,
+            GeneralConfig::SmtpPassword->name,
+        ];
+        $configuration = $this->repository->fetchValuesByNames(GeneralConfig::MODULE, $requiredKeys);
+
+        foreach ($requiredKeys as $requiredKey) {
+            if (!isset($configuration[$requiredKey])) {
+                return true;
+            }
         }
 
         return false;

@@ -3,46 +3,71 @@
 namespace App\Service\Installer\Step;
 
 use App\Entity\Configuration;
+use App\Entity\Enum\AdClassifyConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AppConfig;
+use App\Entity\Enum\GeneralConfig;
+use App\Entity\Enum\InstallerStepEnum;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdClassifyClient;
-use App\Service\EnvEditor;
-use App\Service\ServicePresenceChecker;
-use App\ValueObject\Module;
+use App\Service\AdServerConfigurationClient;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ClassifierStep implements InstallerStep
 {
-    private AdClassifyClient $adClassifyClient;
-    private ConfigurationRepository $repository;
-    private LoggerInterface $logger;
-    private ServicePresenceChecker $servicePresenceChecker;
+    private const FIELDS = [
+        AdClassifyConfig::ApiKeyName,
+        AdClassifyConfig::ApiKeySecret,
+    ];
+    private const TRIMMED_BASE64_PATTERN = '#^[0-9A-Z+/]+$#i';
 
     public function __construct(
-        AdClassifyClient $adClassifyClient,
-        ConfigurationRepository $repository,
-        LoggerInterface $logger,
-        ServicePresenceChecker $servicePresenceChecker
+        private readonly string $adclassifyBaseUri,
+        private readonly AdClassifyClient $adClassifyClient,
+        private readonly AdServerConfigurationClient $adServerConfigurationClient,
+        private readonly ConfigurationRepository $repository,
+        private readonly LoggerInterface $logger
     ) {
-        $this->adClassifyClient = $adClassifyClient;
-        $this->repository = $repository;
-        $this->logger = $logger;
-        $this->servicePresenceChecker = $servicePresenceChecker;
     }
 
     public function process(array $content): void
     {
-        if (!$this->isDataRequired()) {
-            $this->repository->insertOrUpdateOne(Configuration::INSTALLER_STEP, $this->getName());
+        if (empty($content) && !$this->isDataRequired()) {
+            $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
             return;
         }
 
-        if (null === ($name = $this->repository->fetchValueByName(Configuration::BASE_ADSERVER_NAME))) {
+        if (empty($content)) {
+            $apiKey = $this->getApiKeyFromClassifier();
+        } else {
+            $apiKey = $this->getApiKeyFromRequest($content);
+        }
+
+        $this->adServerConfigurationClient->setupAdClassify(
+            $this->adclassifyBaseUri,
+            $apiKey['name'],
+            $apiKey['secret']
+        );
+
+        $this->repository->insertOrUpdate(
+            AdClassifyConfig::MODULE,
+            [
+                AdClassifyConfig::ApiKeyName->name => $apiKey['name'],
+                AdClassifyConfig::ApiKeySecret->name => $apiKey['secret'],
+            ]
+        );
+        $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
+    }
+
+    private function getApiKeyFromClassifier(): array
+    {
+        if (null === ($name = $this->repository->fetchValueByEnum(AdServerConfig::Name))) {
             throw new UnprocessableEntityHttpException('AdServer\'s name must be set');
         }
-        if (null === ($email = $this->repository->fetchValueByName(Configuration::BASE_TECHNICAL_EMAIL))) {
+        if (null === ($email = $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail))) {
             throw new UnprocessableEntityHttpException('Technical e-mail must be set');
         }
 
@@ -54,46 +79,63 @@ class ClassifierStep implements InstallerStep
             $this->logger->critical(sprintf('AdClassify is not accessible (%s)', $exception->getMessage()));
             throw new UnprocessableEntityHttpException('AdClassify is not accessible');
         }
+        return $apiKey;
+    }
 
-        $apiKeyName = $apiKey['name'];
-        $apiKeySecret = $apiKey['secret'];
+    private function getApiKeyFromRequest(array $content): array
+    {
+        $this->validate($content);
+        $apiKeyName = $content[AdClassifyConfig::ApiKeyName->name];
+        $apiKeySecret = $content[AdClassifyConfig::ApiKeySecret->name];
+        try {
+            $result = $this->adClassifyClient->validateApiKey($apiKeyName, $apiKeySecret);
+        } catch (UnexpectedResponseException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->critical(sprintf('AdClassify is not accessible (%s)', $exception->getMessage()));
+            throw new UnprocessableEntityHttpException('AdClassify is not accessible');
+        }
 
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $envEditor->set([
-            EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_API_KEY_NAME => $apiKeyName,
-            EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_API_KEY_SECRET => $apiKeySecret,
-        ]);
+        if (!$result) {
+            throw new UnprocessableEntityHttpException('Invalid API key');
+        }
 
-        $this->repository->insertOrUpdate(
-            [
-                Configuration::INSTALLER_STEP => $this->getName(),
-                Configuration::CLASSIFIER_API_KEY_NAME => $apiKeyName,
-                Configuration::CLASSIFIER_API_KEY_SECRET => $apiKeySecret,
-            ]
-        );
+        return [
+            'name' => $apiKeyName,
+            'secret' => $apiKeySecret,
+        ];
+    }
+
+    private function validate(array $content): void
+    {
+        foreach (self::FIELDS as $field) {
+            if (!isset($content[$field->name])) {
+                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field->name));
+            }
+            $var = $content[$field->name];
+            if (1 !== preg_match(self::TRIMMED_BASE64_PATTERN, $var)) {
+                throw new UnprocessableEntityHttpException(sprintf('Field `%s` must be valid', $field->name));
+            }
+        }
     }
 
     public function getName(): string
     {
-        return Configuration::INSTALLER_STEP_CLASSIFIER;
+        return InstallerStepEnum::Classifier->name;
     }
 
     public function fetchData(): array
     {
         $isDataRequired = $this->isDataRequired();
 
-        if ($isDataRequired) {
-            $localData = $this->repository->fetchValuesByNames([
-                Configuration::BASE_ADSERVER_NAME,
-                Configuration::BASE_TECHNICAL_EMAIL,
-            ]);
-
-            if (
-                !isset($localData[Configuration::BASE_ADSERVER_NAME])
-                || !isset($localData[Configuration::BASE_TECHNICAL_EMAIL])
-            ) {
-                throw new UnprocessableEntityHttpException('Base step must be completed');
-            }
+        if (
+            $isDataRequired
+            && (
+                null === $this->repository->fetchValueByEnum(AdServerConfig::Name)
+                || null === $this->repository->fetchValueByEnum(GeneralConfig::TechnicalEmail)
+            )
+        ) {
+            throw new UnprocessableEntityHttpException('Base step must be completed');
         }
 
         return [
@@ -103,16 +145,14 @@ class ClassifierStep implements InstallerStep
 
     public function isDataRequired(): bool
     {
-        $envEditor = new EnvEditor($this->servicePresenceChecker->getEnvFile(Module::adserver()));
-        $values = $envEditor->get(
-            [
-                EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_API_KEY_NAME,
-                EnvEditor::ADSERVER_CLASSIFIER_EXTERNAL_API_KEY_SECRET,
-            ]
-        );
+        $requiredKeys = [
+            AdClassifyConfig::ApiKeyName->name,
+            AdClassifyConfig::ApiKeySecret->name,
+        ];
+        $configuration = $this->repository->fetchValuesByNames(AdClassifyConfig::MODULE, $requiredKeys);
 
-        foreach ($values as $value) {
-            if (!$value) {
+        foreach ($requiredKeys as $requiredKey) {
+            if (!isset($configuration[$requiredKey])) {
                 return true;
             }
         }
