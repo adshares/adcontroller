@@ -22,7 +22,7 @@ AdController is a web application which manages other services' configuration.
 git clone https://github.com/adshares/adcontroller.git
 cd adcontroller
 composer install --no-scripts
-vi .env.local.php
+vi .env.local # add DB credentials -> see .env
 composer install
 php bin/console lexik:jwt:generate-keypair
 composer dev
