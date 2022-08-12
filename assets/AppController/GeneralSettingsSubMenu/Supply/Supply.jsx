@@ -11,11 +11,14 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Icon,
   InputLabel,
   OutlinedInput,
   Radio,
   RadioGroup,
+  Tooltip,
 } from '@mui/material';
+import HelpIcon from '@mui/icons-material/Help';
 
 export default function Supply() {
   return (
@@ -77,26 +80,42 @@ const ZoneOptions = () => {
     <Card className={commonStyles.card}>
       <CardHeader title="Zone options" subheader="lorem ipsum dolor sit amet" />
 
-      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}>
-        <FormControl>
-          <FormControlLabel
-            label="Allow zone in iframe"
-            control={<Checkbox checked={allowZoneInIFrame} onChange={() => setAllowZoneInIFrame((prevState) => !prevState)} />}
-          />
-        </FormControl>
+      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <FormControl margin="dense">
+              <FormControlLabel
+                label="Maximum zones per page"
+                control={<Checkbox checked={allowZoneInIFrame} onChange={() => setAllowZoneInIFrame((prevState) => !prevState)} />}
+              />
+            </FormControl>
+            <Tooltip title="lorem ipsum dolor set amet">
+              <Icon>
+                <HelpIcon color="primary" />
+              </Icon>
+            </Tooltip>
+          </Box>
 
-        <FormControl sc={{ width: '50%' }} margin="dense">
-          <InputLabel htmlFor="maxPageZones">Maximum page zones</InputLabel>
-          <OutlinedInput
-            id="maxPageZones"
-            size="small"
-            type="number"
-            label="Maximum page zones"
-            value={Number(maxPageZones).toString()}
-            onChange={(e) => setMaxPageZones(Number(e.target.value).toFixed(0))}
-            inputProps={{ autoComplete: 'off', min: 0 }}
-          />
-        </FormControl>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <FormControl margin="dense" fullWidth>
+              <InputLabel htmlFor="maxPageZones">Maximum page zones</InputLabel>
+              <OutlinedInput
+                id="maxPageZones"
+                size="small"
+                type="number"
+                label="Maximum page zones"
+                value={Number(maxPageZones).toString()}
+                onChange={(e) => setMaxPageZones(Number(e.target.value).toFixed(0))}
+                inputProps={{ autoComplete: 'off', min: 0 }}
+              />
+            </FormControl>
+            <Tooltip title="lorem ipsum dolor set amet" sx={{ ml: 1 }}>
+              <Icon>
+                <HelpIcon color="primary" />
+              </Icon>
+            </Tooltip>
+          </Box>
+        </Box>
       </CardContent>
 
       <CardActions>

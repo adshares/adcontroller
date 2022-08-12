@@ -118,13 +118,13 @@ const BannerSettingsCard = () => {
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
           <FormControl sc={{ width: '50%' }} margin="dense">
-            <InputLabel htmlFor="uploadLimitImage">Upload image limit</InputLabel>
+            <InputLabel htmlFor="uploadLimitImage">Image size limit</InputLabel>
             <OutlinedInput
               id="uploadLimitImage"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="Upload image limit"
+              label="Image size limit"
               value={Number(uploadLimitImage).toString()}
               onChange={(e) => setUploadLimitImage(Number(e.target.value).toFixed(2))}
               inputProps={{ autoComplete: 'off', min: 0 }}
@@ -132,13 +132,13 @@ const BannerSettingsCard = () => {
           </FormControl>
 
           <FormControl sc={{ width: '50%' }} margin="dense">
-            <InputLabel htmlFor="uploadLimitVideo">Upload video limit</InputLabel>
+            <InputLabel htmlFor="uploadLimitVideo">Video size limit</InputLabel>
             <OutlinedInput
               id="uploadLimitVideo"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="Upload video limit"
+              label="Video size limit"
               value={Number(uploadLimitVideo).toString()}
               onChange={(e) => setUploadLimitVideo(Number(e.target.value).toFixed(2))}
               inputProps={{ autoComplete: 'off', min: 0 }}

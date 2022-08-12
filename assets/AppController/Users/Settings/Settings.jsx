@@ -148,7 +148,7 @@ const AutoWithdrawalCard = () => {
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="adsWithdrawal">Auto ADS withdrawal</InputLabel>
             <OutlinedInput
               id="adsWithdrawal"
@@ -161,7 +161,7 @@ const AutoWithdrawalCard = () => {
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
           </FormControl>
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="bscWithdrawal">Auto BSC withdrawal</InputLabel>
             <OutlinedInput
               id="bscWithdrawal"
