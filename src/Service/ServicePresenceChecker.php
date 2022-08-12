@@ -32,6 +32,14 @@ class ServicePresenceChecker
         };
     }
 
+    public function getHomeDirectory(Module $module): string
+    {
+        return match ($module) {
+            Module::AdServer => self::canonicalize($this->adserverHomeDirectory),
+            default => throw new ServiceNotPresent('Unsupported service'),
+        };
+    }
+
     private function checkAdserver(): void
     {
         $filesystem = new Filesystem();
