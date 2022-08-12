@@ -43,7 +43,7 @@ const CampaignSettingsCard = () => {
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="campaignMinBudget">Minimal campaign budget</InputLabel>
             <OutlinedInput
               id="campaignMinBudget"
@@ -56,7 +56,7 @@ const CampaignSettingsCard = () => {
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
           </FormControl>
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="campaignMinCpa">Minimal campaign CPA</InputLabel>
             <OutlinedInput
               id="campaignMinCpa"
@@ -69,7 +69,7 @@ const CampaignSettingsCard = () => {
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
           </FormControl>
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="campaignMinCpm">Minimal campaign CPM</InputLabel>
             <OutlinedInput
               id="campaignMinCpm"
@@ -117,7 +117,7 @@ const BannerSettingsCard = () => {
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="uploadLimitImage">Image size limit</InputLabel>
             <OutlinedInput
               id="uploadLimitImage"
@@ -131,7 +131,7 @@ const BannerSettingsCard = () => {
             />
           </FormControl>
 
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="uploadLimitVideo">Video size limit</InputLabel>
             <OutlinedInput
               id="uploadLimitVideo"
@@ -145,7 +145,7 @@ const BannerSettingsCard = () => {
             />
           </FormControl>
 
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="uploadLimitModel">Upload model limit</InputLabel>
             <OutlinedInput
               id="uploadLimitModel"
@@ -159,7 +159,7 @@ const BannerSettingsCard = () => {
             />
           </FormControl>
 
-          <FormControl sc={{ width: '50%' }} margin="dense">
+          <FormControl margin="dense">
             <InputLabel htmlFor="uploadLimitHtml">Upload HTML limit</InputLabel>
             <OutlinedInput
               id="uploadLimitHtml"
