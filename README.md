@@ -25,6 +25,8 @@ composer install
 vi .env.local # add DB credentials -> see .env
 php bin/console doctrine:migrations:migrate
 cp "${ADSERVER_HOME_DIR}/config/jwt/public.pem" config/jwt/public.pem
+yarn
+yarn dev
 composer dev
 ```
 
