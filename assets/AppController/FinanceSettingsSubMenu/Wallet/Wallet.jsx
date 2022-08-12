@@ -155,16 +155,6 @@ const ColdWalletSettingsCard = () => {
         <CardContent>
           <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceAround}`}>
             <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              <Tooltip
-                title={
-                  // eslint-disable-next-line max-len
-                  'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail'
-                }
-              >
-                <Icon>
-                  <HelpIcon color="primary" />
-                </Icon>
-              </Tooltip>
               <TextField
                 size="small"
                 name="minThresholdValue"
@@ -177,19 +167,19 @@ const ColdWalletSettingsCard = () => {
               <Typography sx={{ ml: 1 }} variant="body1">
                 ADS
               </Typography>
-            </Box>
-
-            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
               <Tooltip
                 title={
                   // eslint-disable-next-line max-len
-                  'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
+                  'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail'
                 }
               >
                 <Icon>
                   <HelpIcon color="primary" />
                 </Icon>
               </Tooltip>
+            </Box>
+
+            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
               <TextField
                 size="small"
                 name="maxThresholdValue"
@@ -202,14 +192,19 @@ const ColdWalletSettingsCard = () => {
               <Typography sx={{ ml: 1 }} variant="body1">
                 ADS
               </Typography>
-            </Box>
-
-            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              <Tooltip title="Enter your ADS account address">
+              <Tooltip
+                title={
+                  // eslint-disable-next-line max-len
+                  'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
+                }
+              >
                 <Icon>
                   <HelpIcon color="primary" />
                 </Icon>
               </Tooltip>
+            </Box>
+
+            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
               <TextField
                 size="small"
                 name="coldWalletAddress"
@@ -219,6 +214,11 @@ const ColdWalletSettingsCard = () => {
                 type="text"
                 inputProps={{ autoComplete: 'off' }}
               />
+              <Tooltip title="Enter your ADS account address">
+                <Icon>
+                  <HelpIcon color="primary" />
+                </Icon>
+              </Tooltip>
             </Box>
           </Box>
         </CardContent>
