@@ -34,6 +34,7 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import commonStyles from './common/commonStyles.scss';
+import AdClassifier from './AdClassifier/AdClassifier';
 
 const appModules = [
   {
@@ -114,6 +115,12 @@ const appModules = [
         icon: PercentIcon,
       },
     ],
+  },
+  {
+    name: 'AdClassifier',
+    path: '/adclassifier',
+    component: AdClassifier,
+    icon: DashboardIcon,
   },
   {
     name: 'AdPay',
