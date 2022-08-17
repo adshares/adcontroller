@@ -93,6 +93,10 @@ export default function useForm(options) {
   };
 
   const validate = (targetName, targetValue) => {
+    const validValueResult = {
+      isValid: true,
+      helperText: '',
+    };
     const validationResult = {};
 
     const validateValue = (option, value) => {
@@ -101,28 +105,25 @@ export default function useForm(options) {
           return testRequired(value);
 
         case 'email':
-          return testEmail(value);
+          return value ? testEmail(value) : validValueResult;
 
         case 'domain':
-          return testDomain(value);
+          return value ? testDomain(value) : validValueResult;
 
         case 'wallet':
-          return testWallet(value);
+          return value ? testWallet(value) : validValueResult;
 
         case 'walletSecret':
-          return testWalletSecret(value);
+          return value ? testWalletSecret(value) : validValueResult;
 
         case 'licenseKey':
-          return testLicenseKey(value);
+          return value ? testLicenseKey(value) : validValueResult;
 
         case 'integer':
-          return testInteger(value);
+          return value ? testInteger(value) : validValueResult;
 
         default:
-          return {
-            isValueValid: true,
-            helperText: '',
-          };
+          return validValueResult;
       }
     };
 
@@ -134,7 +135,7 @@ export default function useForm(options) {
         }
       }
     } else {
-      validationResult[targetName] = { isValid: true, helperText: '' };
+      validationResult[targetName] = validValueResult;
     }
     return validationResult;
   };

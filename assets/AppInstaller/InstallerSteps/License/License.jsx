@@ -23,12 +23,14 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
     Status: 1,
   });
   const [editMode, setEditMode] = useState(false);
-  const { fields, errorObj, isFormValid, onFormChange, validate } = useForm({ licenseKey: '' });
+  const form = useForm({ initialFields: { licenseKey: '' }, validation: { licenseKey: ['licenseKey'] } });
   const [alert, setAlert] = useState({
     type: 'error',
     message: '',
     title: '',
   });
+
+  console.log(form);
 
   useEffect(() => {
     getStepData();
@@ -55,7 +57,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const handleGetLicenseClick = async () => {
     try {
       setIsLicenseLoading(true);
-      const response = await apiService.getLicenseByKey({ LicenseKey: fields.licenseKey });
+      const response = await apiService.getLicenseByKey({ LicenseKey: form.fields.licenseKey });
       setIsLicenseLoading(false);
       setStepData({ ...response.LicenseData });
     } catch (err) {
@@ -112,25 +114,30 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
           <Box
             className={styles.form}
             component="form"
-            onChange={onFormChange}
-            onBlur={(e) => validate(e.target)}
+            onChange={form.onChange}
+            onFocus={form.setTouched}
             onSubmit={(e) => e.preventDefault()}
           >
             <Box className={styles.field}>
               <TextField
-                error={!!errorObj.licenseKey}
-                helperText={errorObj.licenseKey}
+                error={form.touchedFields.licenseKey && !form.errorObj.licenseKey.isValid}
+                helperText={form.touchedFields.licenseKey && form.errorObj.licenseKey.helperText}
                 placeholder="XXX-xxxxxx-xxxxx-xxxxx-xxxx-xxxx"
                 size="small"
                 name="licenseKey"
                 label="Your license key"
-                value={fields.licenseKey}
+                value={form.fields.licenseKey}
                 type="text"
                 fullWidth
                 inputProps={{ autoComplete: 'off' }}
               />
             </Box>
-            <Button disabled={!isFormValid} type="button" variant="contained" onClick={handleGetLicenseClick}>
+            <Button
+              disabled={!form.isFormValid || !form.fields.licenseKey}
+              type="button"
+              variant="contained"
+              onClick={handleGetLicenseClick}
+            >
               Get license
             </Button>
           </Box>
