@@ -37,8 +37,6 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
     title: '',
   });
 
-  console.log(form);
-
   useEffect(() => {
     getStepData();
   }, []);
