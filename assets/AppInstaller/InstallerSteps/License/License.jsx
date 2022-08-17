@@ -23,7 +23,14 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
     Status: 1,
   });
   const [editMode, setEditMode] = useState(false);
-  const form = useForm({ initialFields: { licenseKey: '' }, validation: { licenseKey: ['licenseKey'] } });
+  const form = useForm({
+    initialFields: {
+      licenseKey: '',
+    },
+    validation: {
+      licenseKey: ['licenseKey'],
+    },
+  });
   const [alert, setAlert] = useState({
     type: 'error',
     message: '',
