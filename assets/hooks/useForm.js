@@ -62,7 +62,9 @@ const testInteger = (value) => {
 
 export default function useForm(options) {
   const [fields, setFields] = useState(options.initialFields);
-  const [touchedFields, setTouchedFields] = useState({});
+  const [touchedFields, setTouchedFields] = useState(
+    Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}),
+  );
   const [errorObj, setErrorObj] = useState(
     Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: { isValid: true, helperText: '' } }), {}),
   );
