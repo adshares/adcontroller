@@ -74,7 +74,7 @@ export default function useForm(options) {
       result = { ...result, ...validate(name, fields[name]) };
     });
     setErrorObj(result);
-  }, [fields]);
+  }, [fields, touchedFields]);
 
   useSkipFirstRenderEffect(() => {
     setIsFormValid(Object.keys(errorObj).every((field) => errorObj[field].isValid));
@@ -127,7 +127,7 @@ export default function useForm(options) {
       }
     };
 
-    if (Object.keys(options.validation).includes(targetName)) {
+    if (options.validation && Object.keys(options.validation).includes(targetName)) {
       for (let validation of options.validation[targetName]) {
         validationResult[targetName] = validateValue(validation, targetValue);
         if (!validationResult[targetName].isValid) {
