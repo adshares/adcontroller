@@ -34,6 +34,10 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
       setStepData({ ...stepData, ...response });
+      form.setFields({
+        ...form.fields,
+        apiKey: response.ApiKeyName || '',
+      });
     } catch (err) {
       setAlert({
         type: 'error',
