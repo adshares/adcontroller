@@ -57,8 +57,8 @@ const RegistrationModeCard = () => {
     <Card className={commonStyles.card}>
       <CardHeader title="Registration mode" subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit." />
 
-      <Box sx={{ p: 2 }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box raised className={commonStyles.halfCard}>
+      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <Box className={commonStyles.halfCard}>
           <FormControl fullWidth>
             <InputLabel id="registrationModeLabel">Set registration mode</InputLabel>
             <Select
@@ -122,7 +122,7 @@ const RegistrationModeCard = () => {
             </FormControl>
           </Collapse>
         </Box>
-      </Box>
+      </CardContent>
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
@@ -149,7 +149,7 @@ const AutoWithdrawalCard = () => {
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
           <FormControl margin="dense">
-            <InputLabel htmlFor="adsWithdrawal">Auto ADS withdrawal</InputLabel>
+            <InputLabel htmlFor="adsWithdrawal">ADS minimum withdrawal</InputLabel>
             <OutlinedInput
               id="adsWithdrawal"
               size="small"
@@ -162,7 +162,7 @@ const AutoWithdrawalCard = () => {
             />
           </FormControl>
           <FormControl margin="dense">
-            <InputLabel htmlFor="bscWithdrawal">Auto BSC withdrawal</InputLabel>
+            <InputLabel htmlFor="bscWithdrawal">BSC minimum withdrawal</InputLabel>
             <OutlinedInput
               id="bscWithdrawal"
               size="small"

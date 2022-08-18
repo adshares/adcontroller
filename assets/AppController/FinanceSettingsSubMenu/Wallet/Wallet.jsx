@@ -9,7 +9,6 @@ import {
   Checkbox,
   Collapse,
   FormControlLabel,
-  Icon,
   IconButton,
   TextField,
   Tooltip,
@@ -168,14 +167,13 @@ const ColdWalletSettingsCard = () => {
                 ADS
               </Typography>
               <Tooltip
+                sx={{ ml: 0.5 }}
                 title={
                   // eslint-disable-next-line max-len
                   'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail'
                 }
               >
-                <Icon>
-                  <HelpIcon color="primary" />
-                </Icon>
+                <HelpIcon color="primary" />
               </Tooltip>
             </Box>
 
@@ -193,14 +191,13 @@ const ColdWalletSettingsCard = () => {
                 ADS
               </Typography>
               <Tooltip
+                sx={{ ml: 0.5 }}
                 title={
                   // eslint-disable-next-line max-len
                   'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
                 }
               >
-                <Icon>
-                  <HelpIcon color="primary" />
-                </Icon>
+                <HelpIcon color="primary" />
               </Tooltip>
             </Box>
 
@@ -214,10 +211,8 @@ const ColdWalletSettingsCard = () => {
                 type="text"
                 inputProps={{ autoComplete: 'off' }}
               />
-              <Tooltip title="Enter your ADS account address">
-                <Icon>
-                  <HelpIcon color="primary" />
-                </Icon>
+              <Tooltip sx={{ ml: 0.5 }} title="Enter your ADS account address">
+                <HelpIcon color="primary" />
               </Tooltip>
             </Box>
           </Box>
