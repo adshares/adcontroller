@@ -21,11 +21,12 @@ AdController is a web application which manages other services' configuration.
 ```
 git clone https://github.com/adshares/adcontroller.git
 cd adcontroller
-composer install ## DO NOT MIND DATABASE ERROR
-composer dump-env dev
-vi .env.local.php
 composer install
-php bin/console lexik:jwt:generate-keypair
+vi .env.local # add DB credentials -> see .env
+php bin/console doctrine:migrations:migrate
+cp "${ADSERVER_HOME_DIR}/config/jwt/public.pem" config/jwt/public.pem
+yarn
+yarn dev
 composer dev
 ```
 
