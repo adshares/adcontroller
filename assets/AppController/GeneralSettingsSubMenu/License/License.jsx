@@ -29,8 +29,13 @@ function License() {
     demandFee: '',
   });
   const [editMode, setEditMode] = useState(false);
-  const { onFormChange, validate, fields, errorObj, isFormValid } = useForm({
-    licenseKey: '',
+  const form = useForm({
+    initialFields: {
+      licenseKey: '',
+    },
+    validation: {
+      licenseKey: ['licenseKey'],
+    },
   });
 
   //TODO: Add service to get license info
@@ -107,25 +112,29 @@ function License() {
           <Box
             className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignStart}`}
             component="form"
-            onChange={onFormChange}
-            onBlur={(e) => validate(e.target)}
-            onSubmit={(e) => e.preventDefault()}
+            onChange={form.onChange}
+            onFocus={form.setTouched}
           >
             <Box sx={{ mr: 1 }} className={`${commonStyles.halfCard}`}>
               <TextField
-                error={!!errorObj.licenseKey}
-                helperText={errorObj.licenseKey}
+                error={form.touchedFields.licenseKey && !form.errorObj.licenseKey.isValid}
+                helperText={form.touchedFields.licenseKey && form.errorObj.licenseKey.helperText}
                 placeholder="XXX-xxxxxx-xxxxx-xxxxx-xxxx-xxxx"
                 size="small"
                 name="licenseKey"
                 label="Your license key"
-                value={fields.licenseKey}
+                value={form.fields.licenseKey}
                 type="text"
                 fullWidth
                 inputProps={{ autoComplete: 'off' }}
               />
             </Box>
-            <Button disabled={!isFormValid} type="button" variant="contained" onClick={handleGetLicenseClick}>
+            <Button
+              disabled={!form.isFormValid || !form.fields.licenseKey}
+              type="button"
+              variant="contained"
+              onClick={handleGetLicenseClick}
+            >
               Get license
             </Button>
           </Box>
