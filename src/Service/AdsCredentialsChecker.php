@@ -5,11 +5,14 @@ namespace App\Service;
 use Adshares\Ads\AdsClient;
 use Adshares\Ads\Driver\CliDriver;
 use Adshares\Ads\Exception\CommandException;
+use Adshares\Ads\Util\AdsConverter;
 use App\Exception\UnexpectedResponseException;
 use Psr\Log\LoggerInterface;
 
 class AdsCredentialsChecker
 {
+    private const REQUIRED_BALANCE = 1e11;
+
     public function __construct(private readonly LoggerInterface $logger)
     {
     }
@@ -20,11 +23,21 @@ class AdsCredentialsChecker
         $adsClient = new AdsClient($driver, $this->logger);
 
         try {
-            $adsClient->getMe();
+            $response = $adsClient->getMe();
         } catch (CommandException $exception) {
             $message = sprintf('Invalid credentials (%s)', $exception->getMessage());
             $this->logger->debug($message);
             throw new UnexpectedResponseException($message);
+        }
+
+        $balance = $response->getAccount()->getBalance();
+        if ($balance < self::REQUIRED_BALANCE) {
+            throw new UnexpectedResponseException(
+                sprintf(
+                    'Insufficient funds. At least %.4f ADS is required',
+                    (float)AdsConverter::clicksToAds(self::REQUIRED_BALANCE)
+                )
+            );
         }
     }
 }
