@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material'
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import apiService from '../../../utils/apiService';
 import styles from './styles.scss';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
@@ -7,17 +7,30 @@ import { useForm } from '../../../hooks';
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const { fields, isFormValid, errorObj, onFormChange, setFields, validate } = useForm({
-    SmtpHost: '',
-    SmtpPort: '',
-    SmtpSender: '',
-    SmtpUsername: '',
+  const smtpForm = useForm({
+    initialFields: {
+      SmtpHost: '',
+      SmtpPort: '',
+      SmtpSender: '',
+      SmtpUsername: '',
+    },
+    validation: {
+      SmtpHost: ['required', 'domain'],
+      SmtpPort: ['required', 'integer'],
+      SmtpSender: ['required'],
+      SmtpUsername: ['required'],
+    },
   });
-  const { fields: newPassword, onFormChange: onPasswordChange } = useForm({ SmtpPassword: '' });
+  const passwordForm = useForm({
+    initialFields: { SmtpPassword: '' },
+  });
   const [isDataRequired, setIsDataRequired] = useState(true);
   const [editMode, setEditMode] = useState(isDataRequired);
-  const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
-  const [isFormWasTouched, setFormTouched] = useState(false);
+  const [alert, setAlert] = useState({
+    type: 'error',
+    message: '',
+    title: '',
+  });
   const [isEmptyPassword, setIsEmptyPassword] = useState(false);
   const [isPasswordWasTouched, setPasswordTouched] = useState(false);
   useEffect(() => {
@@ -30,7 +43,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       const response = await apiService.getCurrentStepData(step.path);
       setIsDataRequired(response.DataRequired);
       setEditMode(response.DataRequired);
-      setFields({
+      smtpForm.setFields({
         SmtpHost: response.SmtpHost,
         SmtpPort: response.SmtpPort,
         SmtpSender: response.SmtpSender,
@@ -55,13 +68,13 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
         handleNextStep(step);
         return;
       }
-      if (!isFormValid) {
+      if (!smtpForm.isFormValid) {
         return;
       }
-      if (isFormWasTouched || isPasswordWasTouched) {
+      if (Object.keys(smtpForm.touchedFields).some((field) => smtpForm.touchedFields[field]) || passwordForm.touchedFields.SmtpPassword) {
         isPasswordWasTouched
-          ? await apiService.sendStepData(step.path, { ...fields, ...newPassword })
-          : await apiService.sendStepData(step.path, { ...fields, ...(isDataRequired ? newPassword : {}) });
+          ? await apiService.sendStepData(step.path, { ...smtpForm.fields, ...passwordForm.fields })
+          : await apiService.sendStepData(step.path, { ...smtpForm.fields, ...(isDataRequired ? passwordForm.fields : {}) });
       }
       handleNextStep(step);
     } catch (err) {
@@ -81,7 +94,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       dataLoading={isLoading}
       title="SMTP information"
       onNextClick={handleSubmit}
-      disabledNext={!isFormValid}
+      disabledNext={!smtpForm.isFormValid}
       onBackClick={() => handlePrevStep(step)}
     >
       <Typography variant="body1" align="center" paragraph>
@@ -100,17 +113,16 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
             <Box
               className={styles.formBlock}
               component="form"
-              onChange={onFormChange}
-              onBlur={(e) => validate(e.target)}
-              onClick={() => setFormTouched(true)}
+              onChange={smtpForm.onChange}
+              onFocus={smtpForm.setTouched}
               onSubmit={(e) => e.preventDefault()}
             >
               <TextField
                 className={styles.textField}
-                error={!!errorObj.SmtpHost}
-                helperText={errorObj.SmtpHost}
+                error={smtpForm.touchedFields.SmtpHost && !smtpForm.errorObj.SmtpHost.isValid}
+                helperText={smtpForm.touchedFields.SmtpHost && smtpForm.errorObj.SmtpHost.helperText}
                 name="SmtpHost"
-                value={fields.SmtpHost}
+                value={smtpForm.fields.SmtpHost}
                 label="SMTP host"
                 size="small"
                 type="text"
@@ -119,10 +131,10 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.SmtpPort}
-                helperText={errorObj.SmtpPort}
+                error={smtpForm.touchedFields.SmtpPort && !smtpForm.errorObj.SmtpPort.isValid}
+                helperText={smtpForm.touchedFields.SmtpPort && smtpForm.errorObj.SmtpPort.helperText}
                 name="SmtpPort"
-                value={fields.SmtpPort}
+                value={smtpForm.fields.SmtpPort}
                 label="SMTP port"
                 size="small"
                 type="text"
@@ -131,10 +143,10 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.SmtpSender}
-                helperText={errorObj.SmtpSender}
+                error={smtpForm.touchedFields.SmtpSender && !smtpForm.errorObj.SmtpSender.isValid}
+                helperText={smtpForm.touchedFields.SmtpSender && smtpForm.errorObj.SmtpSender.helperText}
                 name="SmtpSender"
-                value={fields.SmtpSender}
+                value={smtpForm.fields.SmtpSender}
                 label="SMTP sender"
                 size="small"
                 type="text"
@@ -143,10 +155,10 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.SmtpUsername}
-                helperText={errorObj.SmtpUsername}
+                error={smtpForm.touchedFields.SmtpUsername && !smtpForm.errorObj.SmtpUsername.isValid}
+                helperText={smtpForm.touchedFields.SmtpUsername && smtpForm.errorObj.SmtpUsername.helperText}
                 name="SmtpUsername"
-                value={fields.SmtpUsername}
+                value={smtpForm.fields.SmtpUsername}
                 label="SMTP username"
                 size="small"
                 type="text"
@@ -158,7 +170,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               className={styles.formBlock}
               component="form"
               onChange={(e) => {
-                onPasswordChange(e);
+                passwordForm.onChange(e);
                 if (!e.target.value.includes('↹')) {
                   setPasswordTouched(true);
                 }
@@ -167,7 +179,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
             >
               <TextField
                 className={styles.textField}
-                value={editMode && isDataRequired ? newPassword.SmtpPassword : undefined}
+                value={editMode && isDataRequired ? passwordForm.fields.SmtpPassword : undefined}
                 defaultValue={editMode && !isDataRequired && !isEmptyPassword ? '↹↹↹↹↹↹↹↹' : undefined}
                 name="SmtpPassword"
                 size="small"
@@ -188,7 +200,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
               Edit
             </Button>
           </Box>
-          <InfoTable stepData={fields} />
+          <InfoTable stepData={smtpForm.fields} />
         </>
       )}
     </InstallerStepWrapper>
