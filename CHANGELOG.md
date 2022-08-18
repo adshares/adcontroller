@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Controller
+### Fixed
+- Send partial data in installer's steps
+- Send installer's step data if required
 ### Changed
 - ADS account checker verifies balance
 

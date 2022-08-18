@@ -67,7 +67,7 @@ function Base({ handleNextStep, step }) {
         handleNextStep(step);
         return;
       }
-      if (Object.keys(form.touchedFields).some((field) => form.touchedFields[field])) {
+      if (dataRequired || Object.keys(form.touchedFields).some((field) => form.touchedFields[field])) {
         await apiService.sendStepData(step.path, {
           ...form.fields,
         });

@@ -142,12 +142,6 @@ class WalletStep implements InstallerStep
 
     public function fetchData(): array
     {
-        if ($this->isDataRequired()) {
-            return [
-                Configuration::COMMON_DATA_REQUIRED => true,
-            ];
-        }
-
         $configuration = $this->repository->fetchValuesByNames(
             AdServerConfig::MODULE,
             [
@@ -156,7 +150,7 @@ class WalletStep implements InstallerStep
                 AdServerConfig::WalletNodePort->name,
             ]
         );
-        $configuration[Configuration::COMMON_DATA_REQUIRED] = false;
+        $configuration[Configuration::COMMON_DATA_REQUIRED] = $this->isDataRequired();
 
         return $configuration;
     }
