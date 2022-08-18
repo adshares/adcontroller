@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Send partial data in installer's steps
 - Send installer's step data if required
+### Changed
+- ADS account checker verifies balance
 
 ## [0.1.0] - 2022-08-12
 ### Added
