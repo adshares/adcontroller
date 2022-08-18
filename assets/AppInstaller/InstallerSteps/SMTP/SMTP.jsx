@@ -71,10 +71,13 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       if (!smtpForm.isFormValid) {
         return;
       }
-      if (Object.keys(smtpForm.touchedFields).some((field) => smtpForm.touchedFields[field]) || passwordForm.touchedFields.SmtpPassword) {
-        isPasswordWasTouched
-          ? await apiService.sendStepData(step.path, { ...smtpForm.fields, ...passwordForm.fields })
-          : await apiService.sendStepData(step.path, { ...smtpForm.fields, ...(isDataRequired ? passwordForm.fields : {}) });
+      if (
+        isDataRequired ||
+        Object.keys(smtpForm.touchedFields).some((field) => smtpForm.touchedFields[field]) ||
+        passwordForm.touchedFields.SmtpPassword
+      ) {
+        const sendPassword = isDataRequired || isPasswordWasTouched;
+        await apiService.sendStepData(step.path, { ...smtpForm.fields, ...(sendPassword ? passwordForm.fields : {}) });
       }
       handleNextStep(step);
     } catch (err) {

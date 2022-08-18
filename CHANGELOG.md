@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Controller
 ### Fixed
-- Send partial data in installer steps
+- Send partial data in installer's steps
+- Send installer's step data if required
 
 ## [0.1.0] - 2022-08-12
 ### Added
