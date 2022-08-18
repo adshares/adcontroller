@@ -138,9 +138,16 @@ class ClassifierStep implements InstallerStep
             throw new UnprocessableEntityHttpException('Base step must be completed');
         }
 
-        return [
-            Configuration::COMMON_DATA_REQUIRED => $isDataRequired,
-        ];
+        $configuration = $this->repository->fetchValuesByNames(
+            AdClassifyConfig::MODULE,
+            [
+                AdClassifyConfig::ApiKeyName->name,
+                AdClassifyConfig::Url->name,
+            ]
+        );
+        $configuration[Configuration::COMMON_DATA_REQUIRED] = $isDataRequired;
+
+        return $configuration;
     }
 
     public function isDataRequired(): bool
