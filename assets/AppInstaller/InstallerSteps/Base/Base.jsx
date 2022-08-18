@@ -74,7 +74,6 @@ function Base({ handleNextStep, step }) {
       }
       handleNextStep(step);
     } catch (err) {
-      console.log(err);
       setAlert({
         type: 'error',
         message: err.data.message,
