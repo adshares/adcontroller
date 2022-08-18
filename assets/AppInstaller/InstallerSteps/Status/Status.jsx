@@ -82,13 +82,12 @@ function Status({ handlePrevStep, step }) {
       await apiService.sendStepData(step.path, {});
       window.location.reload();
     } catch (err) {
+      setIsLoading(false);
       setAlert({
         type: 'error',
         message: err.data.message,
         title: err.message,
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material'
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
@@ -23,8 +23,19 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
     Status: 1,
   });
   const [editMode, setEditMode] = useState(false);
-  const { fields, errorObj, isFormValid, onFormChange, validate } = useForm({ licenseKey: '' });
-  const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
+  const form = useForm({
+    initialFields: {
+      licenseKey: '',
+    },
+    validation: {
+      licenseKey: ['licenseKey'],
+    },
+  });
+  const [alert, setAlert] = useState({
+    type: 'error',
+    message: '',
+    title: '',
+  });
 
   useEffect(() => {
     getStepData();
@@ -51,7 +62,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
   const handleGetLicenseClick = async () => {
     try {
       setIsLicenseLoading(true);
-      const response = await apiService.getLicenseByKey({ LicenseKey: fields.licenseKey });
+      const response = await apiService.getLicenseByKey({ LicenseKey: form.fields.licenseKey });
       setIsLicenseLoading(false);
       setStepData({ ...response.LicenseData });
     } catch (err) {
@@ -97,34 +108,41 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       disabledNext={!stepData.Owner}
     >
       <Typography variant="body1" paragraph align="center">
-        You can run the adserver under free Community License.<br /><br />
-        1% of ad turnover of every adserver is burned what reduces the free floating supply of ADS.
-        Liquid staking rewards bring back the burned ADS flowing them from active users to long term holders.
+        You can run the adserver under free Community License.
+        <br />
+        <br />
+        1% of ad turnover of every adserver is burned what reduces the free floating supply of ADS. Liquid staking rewards bring back the
+        burned ADS flowing them from active users to long term holders.
       </Typography>
       {editMode && (
         <Box className={styles.container}>
           <Box
             className={styles.form}
             component="form"
-            onChange={onFormChange}
-            onBlur={(e) => validate(e.target)}
+            onChange={form.onChange}
+            onFocus={form.setTouched}
             onSubmit={(e) => e.preventDefault()}
           >
             <Box className={styles.field}>
               <TextField
-                error={!!errorObj.licenseKey}
-                helperText={errorObj.licenseKey}
+                error={form.touchedFields.licenseKey && !form.errorObj.licenseKey.isValid}
+                helperText={form.touchedFields.licenseKey && form.errorObj.licenseKey.helperText}
                 placeholder="XXX-xxxxxx-xxxxx-xxxxx-xxxx-xxxx"
                 size="small"
                 name="licenseKey"
                 label="Your license key"
-                value={fields.licenseKey}
+                value={form.fields.licenseKey}
                 type="text"
                 fullWidth
                 inputProps={{ autoComplete: 'off' }}
               />
             </Box>
-            <Button disabled={!isFormValid} type="button" variant="contained" onClick={handleGetLicenseClick}>
+            <Button
+              disabled={!form.isFormValid || !form.fields.licenseKey}
+              type="button"
+              variant="contained"
+              onClick={handleGetLicenseClick}
+            >
               Get license
             </Button>
           </Box>

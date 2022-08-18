@@ -1,5 +1,7 @@
 import configuration from '../controllerConfig/configuration';
 import { HttpError } from './errors';
+import { store } from '../redux/store';
+import { setAppLogout } from '../redux/auth/authSlice';
 
 const request = async (url, method, withAuthorization = true, _body) => {
   try {
@@ -26,7 +28,7 @@ const request = async (url, method, withAuthorization = true, _body) => {
   } catch (err) {
     switch (err.data.code) {
       case 401:
-        logout();
+        store.dispatch(setAppLogout());
         throw new HttpError('Authorization error', err.data);
 
       case 422:
@@ -43,26 +45,6 @@ const createUser = async (body) => {
     await request(`${configuration.baseUrl}/api/accounts`, 'POST', false, body);
   } catch (err) {
     throw new HttpError(err.message, err.data);
-  }
-};
-
-const login = async (body) => {
-  try {
-    const response = await request(`${configuration.baseUrl}/api/login`, 'POST', false, body);
-    if (response.token?.length) {
-      localStorage.setItem('authToken', response.token);
-      return response.token;
-    }
-  } catch (err) {
-    throw new HttpError(err.message, err.data);
-  }
-};
-
-const logout = () => {
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    localStorage.removeItem('authToken');
-    location.reload();
   }
 };
 
@@ -116,8 +98,6 @@ const getWalletNodeHost = async (body) => {
 
 export default {
   createUser,
-  login,
-  logout,
   sendStepData,
   getPrevStep,
   getCurrentStepData,

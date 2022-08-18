@@ -9,6 +9,9 @@
   display: flex;
   flex-direction: column;
   width: 50%;
+  &:not(:first-child){
+    margin-top: 2rem;
+  }
 }
 
 .textField {

@@ -1,67 +1,145 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { validateAddress } from '@adshares/ads';
+import useSkipFirstRenderEffect from './useSkipFirstRenderEffect';
 
-export default function useForm(defFields) {
-  const [fields, setFields] = useState(defFields);
-  const [errorObj, setErrorOnj] = useState({});
+const testRequired = (value) => ({
+  isValid: !!value,
+  helperText: !!value ? '' : 'Required field',
+});
+
+const testDomain = (value) => {
+  const isValid = new RegExp(
+    '^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))', // OR ip (v4) address
+    'i',
+  ).test(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Field must be valid domain',
+  };
+};
+
+const testEmail = (value) => {
+  const isValid = new RegExp(/^[a-z\d_.-]+@[a-z\d_.-]+\.[a-z\d_.-]+[a-z\d]+$/, 'gi').test(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Field must be valid email',
+  };
+};
+
+const testWallet = (value) => {
+  const isValid = validateAddress(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Field must be valid wallet address',
+  };
+};
+
+const testWalletSecret = (value) => {
+  const isValid = new RegExp(/^[\dA-F]{64}$/, 'g').test(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Invalid secret key',
+  };
+};
+
+const testLicenseKey = (value) => {
+  const isValid = new RegExp(/^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/, 'gi').test(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Field must be valid license key',
+  };
+};
+
+const testInteger = (value) => {
+  const isValid = new RegExp(/^\d*$/).test(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Field must be valid integer number',
+  };
+};
+
+export default function useForm(options) {
+  const [fields, setFields] = useState(options.initialFields);
+  const [touchedFields, setTouchedFields] = useState(
+    Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}),
+  );
+  const [errorObj, setErrorObj] = useState(
+    Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: { isValid: true, helperText: '' } }), {}),
+  );
   const [isFormValid, setIsFormValid] = useState(false);
 
-  useEffect(() => {
-    checkIsFormValid();
-  }, [fields, errorObj]);
+  useSkipFirstRenderEffect(() => {
+    let result = {};
+    Object.keys(fields).forEach((name) => {
+      result = { ...result, ...validate(name, fields[name]) };
+    });
+    setErrorObj(result);
+  }, [fields, touchedFields]);
 
-  const onFormChange = (e) => {
+  useSkipFirstRenderEffect(() => {
+    setIsFormValid(Object.keys(errorObj).every((field) => errorObj[field].isValid));
+  }, [errorObj]);
+
+  const setTouched = (e) => {
+    setTouchedFields((prevState) => ({ ...prevState, [e.target.name]: true }));
+  };
+
+  const onChange = (e) => {
     const { name, value } = e.target;
     setFields({
       ...fields,
       [name]: value,
     });
-    validate(e.target);
   };
 
-  const validate = (target) => {
-    const { name, value } = target;
-    const emailRegEx = /^[a-z\d_.-]+@[a-z\d_.-]+\.[a-z\d_.-]+[a-z\d]+$/gi;
-    const walletAddressRegEx = /^[0-9A-F]{4}-[0-9A-F]{8}-([0-9A-F]{4})$/g;
-    const walletSecretRegEx = /^[0-9A-F]{64}$/g;
-    const licenseKeyRegEx = /^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/gi;
-    const integer = /^\d*$/;
-    const errors = {};
+  const validate = (targetName, targetValue) => {
+    const validValueResult = {
+      isValid: true,
+      helperText: '',
+    };
+    const validationResult = {};
 
-    if (!name) {
-      return;
-    }
+    const validateValue = (option, value) => {
+      switch (option) {
+        case 'required':
+          return testRequired(value);
 
-    if (!value) {
-      errors[name] = 'Required field';
-    } else if (name.includes('email') && !emailRegEx.test(value)) {
-      errors[name] = 'Field must be an email';
-    } else if (name === 'WalletAddress' && !walletAddressRegEx.test(value)) {
-      errors[name] = 'Invalid wallet address format';
-    } else if (name === 'WalletSecretKey' && !walletSecretRegEx.test(value)) {
-      errors[name] = 'Invalid secret key';
-    } else if (name === 'licenseKey' && !licenseKeyRegEx.test(value)) {
-      errors[name] = 'Invalid license key';
-    } else if (name === 'WalletNodePort' && !integer.test(value)) {
-      errors[name] = 'Port must be an number';
-    } else {
-      errors[name] = '';
-    }
+        case 'email':
+          return value ? testEmail(value) : validValueResult;
 
-    setErrorOnj({
-      ...errorObj,
-      ...errors,
-    });
-  };
+        case 'domain':
+          return value ? testDomain(value) : validValueResult;
 
-  const checkIsFormValid = () => {
-    const isEmptyFields = Object.keys(fields).some((el) => {
-      if (el === 'DataRequired' || el === 'message' || el === 'code') {
-        return;
+        case 'wallet':
+          return value ? testWallet(value) : validValueResult;
+
+        case 'walletSecret':
+          return value ? testWalletSecret(value) : validValueResult;
+
+        case 'licenseKey':
+          return value ? testLicenseKey(value) : validValueResult;
+
+        case 'integer':
+          return value ? testInteger(value) : validValueResult;
+
+        default:
+          return validValueResult;
       }
-      return !fields[el];
-    });
-    const isFormErrors = Object.keys(errorObj).some((el) => !!errorObj[el]);
-    setIsFormValid(!isEmptyFields && !isFormErrors);
+    };
+
+    if (options.validation && Object.keys(options.validation).includes(targetName)) {
+      for (let validation of options.validation[targetName]) {
+        validationResult[targetName] = validateValue(validation, targetValue);
+        if (!validationResult[targetName].isValid) {
+          break;
+        }
+      }
+    } else {
+      validationResult[targetName] = validValueResult;
+    }
+    return validationResult;
   };
 
   return {
@@ -69,7 +147,8 @@ export default function useForm(defFields) {
     errorObj,
     setFields,
     isFormValid,
-    onFormChange,
-    validate,
+    onChange,
+    setTouched,
+    touchedFields,
   };
 }
