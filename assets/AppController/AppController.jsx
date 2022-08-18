@@ -11,8 +11,6 @@ import AppWindow from '../Components/AppWindow/AppWindow';
 import Login from '../Components/Login/Login';
 import NotFoundView from '../Components/NotFound/NotFoundView';
 import SideMenu from '../Components/SideMenu/SideMenu';
-import Dashboard from './Dashboard/Dashboard';
-import AdPay from './AdPay/AdPay';
 import Wallet from './FinanceSettingsSubMenu/Wallet/Wallet';
 import Commissions from './FinanceSettingsSubMenu/Commissions/Commissions';
 import Base from './GeneralSettingsSubMenu/Base/Base';
@@ -22,6 +20,7 @@ import Supply from './GeneralSettingsSubMenu/Supply/Supply';
 import Demand from './GeneralSettingsSubMenu/Demand/Demand';
 import Settings from './Users/Settings/Settings';
 import Panel from './GeneralSettingsSubMenu/Panel/Panel';
+import AdClassifier from './AdClassifier/AdClassifier';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -34,15 +33,8 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import commonStyles from './common/commonStyles.scss';
-import AdClassifier from './AdClassifier/AdClassifier';
 
 const appModules = [
-  {
-    name: 'Dashboard',
-    path: '/',
-    component: Dashboard,
-    icon: DashboardIcon,
-  },
   {
     name: 'Users',
     icon: ManageAccountsIcon,
@@ -120,12 +112,6 @@ const appModules = [
     name: 'AdClassifier',
     path: '/adclassifier',
     component: AdClassifier,
-    icon: DashboardIcon,
-  },
-  {
-    name: 'AdPay',
-    path: '/adpay',
-    component: AdPay,
     icon: DashboardIcon,
   },
 ];

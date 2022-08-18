@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
 import { useForm } from '../../../hooks';
 import commonStyles from '../../common/commonStyles.scss';
@@ -13,16 +13,23 @@ export default function Base() {
 }
 
 const BaseInformationCard = () => {
-  const { fields, errorObj, onFormChange } = useForm({
-    adserverName: '',
-    technicalEmail: '',
-    supportEmail: '',
-    supportChat: '',
-    supportTelegram: '',
+  const form = useForm({
+    initialFields: {
+      adserverName: '',
+      technicalEmail: '',
+      supportEmail: '',
+      supportChat: '',
+      supportTelegram: '',
+    },
+    validation: {
+      technicalEmail: ['email'],
+      supportEmail: ['email'],
+      supportChat: ['domain'],
+    },
   });
 
   const onSaveClick = () => {
-    console.log(fields);
+    console.log(form.fields);
   };
 
   return (
@@ -30,7 +37,12 @@ const BaseInformationCard = () => {
       <CardHeader title="Base information" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
+        <Box
+          component="form"
+          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
+          onChange={form.onChange}
+          onFocus={form.setTouched}
+        >
           <TextField
             fullWidth
             margin="dense"
@@ -38,10 +50,9 @@ const BaseInformationCard = () => {
             name="adserverName"
             variant="outlined"
             label="Adserver's name"
-            onChange={onFormChange}
-            error={!!errorObj.adserverName}
-            helperText={errorObj.adserverName}
-            value={fields.adserverName}
+            error={form.touchedFields.adserverName && !form.errorObj.adserverName.isValid}
+            helperText={form.touchedFields.adserverName && form.errorObj.adserverName.helperText}
+            value={form.fields.adserverName}
             type="text"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -52,10 +63,9 @@ const BaseInformationCard = () => {
             name="technicalEmail"
             variant="outlined"
             label="Technicals email"
-            onChange={onFormChange}
-            error={!!errorObj.technicalEmail}
-            helperText={errorObj.technicalEmail}
-            value={fields.technicalEmail}
+            error={form.touchedFields.technicalEmail && !form.errorObj.technicalEmail.isValid}
+            helperText={form.touchedFields.technicalEmail && form.errorObj.technicalEmail.helperText}
+            value={form.fields.technicalEmail}
             type="email"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -66,10 +76,9 @@ const BaseInformationCard = () => {
             name="supportEmail"
             variant="outlined"
             label="Support email"
-            onChange={onFormChange}
-            error={!!errorObj.supportEmail}
-            helperText={errorObj.supportEmail}
-            value={fields.supportEmail}
+            error={form.touchedFields.supportEmail && !form.errorObj.supportEmail.isValid}
+            helperText={form.touchedFields.supportEmail && form.errorObj.supportEmail.helperText}
+            value={form.fields.supportEmail}
             type="email"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -80,10 +89,9 @@ const BaseInformationCard = () => {
             name="supportChat"
             variant="outlined"
             label="Support chat"
-            onChange={onFormChange}
-            error={!!errorObj.supportChat}
-            helperText={errorObj.supportChat}
-            value={fields.supportChat}
+            error={form.touchedFields.supportChat && !form.errorObj.supportChat.isValid}
+            helperText={form.touchedFields.supportChat && form.errorObj.supportChat.helperText}
+            value={form.fields.supportChat}
             type="text"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -94,10 +102,9 @@ const BaseInformationCard = () => {
             name="supportTelegram"
             variant="outlined"
             label="Support telegram"
-            onChange={onFormChange}
-            error={!!errorObj.supportTelegram}
-            helperText={errorObj.supportTelegram}
-            value={fields.supportTelegram}
+            error={form.touchedFields.supportTelegram && !form.errorObj.supportTelegram.isValid}
+            helperText={form.touchedFields.supportTelegram && form.errorObj.supportTelegram.helperText}
+            value={form.fields.supportTelegram}
             type="text"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -116,16 +123,21 @@ const BaseInformationCard = () => {
 };
 
 const CRMNotificationsCard = () => {
-  const [mailOnCampaignCreated, setMailOnCampaignCreated] = useState('');
-  const [mailOnSiteAdded, setMailOnSiteAdded] = useState('');
-  const [mailOnUserRegistered, setMailOnUserRegistered] = useState('');
+  const form = useForm({
+    initialFields: {
+      mailOnCampaignCreated: '',
+      mailOnSiteAdded: '',
+      mailOnUserRegistered: '',
+    },
+    validation: {
+      mailOnCampaignCreated: ['email'],
+      mailOnSiteAdded: ['email'],
+      mailOnUserRegistered: ['email'],
+    },
+  });
 
   const onSaveClick = () => {
-    console.log({
-      mailOnCampaignCreated,
-      mailOnSiteAdded,
-      mailOnUserRegistered,
-    });
+    console.log(form.fields);
   };
 
   return (
@@ -133,16 +145,22 @@ const CRMNotificationsCard = () => {
       <CardHeader title="CRM notifications" subheader="lorem ipsum dolor set amet" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
+        <Box
+          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
+          component="form"
+          onChange={form.onChange}
+          onFocus={form.setTouched}
+        >
           <TextField
             fullWidth
             margin="dense"
             variant="outlined"
             size="small"
-            type="email"
             label="CRM mail address on campaign created"
-            value={mailOnCampaignCreated}
-            onChange={(e) => setMailOnCampaignCreated(e.target.value)}
+            name="mailOnCampaignCreated"
+            error={form.touchedFields.mailOnCampaignCreated && !form.errorObj.mailOnCampaignCreated.isValid}
+            helperText={form.touchedFields.mailOnCampaignCreated && form.errorObj.mailOnCampaignCreated.helperText}
+            value={form.fields.mailOnCampaignCreated}
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
@@ -150,10 +168,11 @@ const CRMNotificationsCard = () => {
             margin="dense"
             variant="outlined"
             size="small"
-            type="email"
             label="CRM mail address on site added"
-            value={mailOnSiteAdded}
-            onChange={(e) => setMailOnSiteAdded(e.target.value)}
+            name="mailOnSiteAdded"
+            error={form.touchedFields.mailOnSiteAdded && !form.errorObj.mailOnSiteAdded.isValid}
+            helperText={form.touchedFields.mailOnSiteAdded && form.errorObj.mailOnSiteAdded.helperText}
+            value={form.fields.mailOnSiteAdded}
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
@@ -161,10 +180,11 @@ const CRMNotificationsCard = () => {
             margin="dense"
             variant="outlined"
             size="small"
-            type="email"
             label="CRM mail address on user registered"
-            value={mailOnUserRegistered}
-            onChange={(e) => setMailOnUserRegistered(e.target.value)}
+            name="mailOnUserRegistered"
+            error={form.touchedFields.mailOnUserRegistered && !form.errorObj.mailOnUserRegistered.isValid}
+            helperText={form.touchedFields.mailOnUserRegistered && form.errorObj.mailOnUserRegistered.helperText}
+            value={form.fields.mailOnUserRegistered}
             inputProps={{ autoComplete: 'off' }}
           />
         </Box>
