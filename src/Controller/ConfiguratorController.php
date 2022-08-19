@@ -14,6 +14,7 @@ use App\Service\Configurator\Category\AutomaticWithdrawal;
 use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\Registration;
+use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -73,6 +74,7 @@ class ConfiguratorController extends AbstractController
             'cold-wallet-config' => ColdWallet::class,
             'commission-config' => Commission::class,
             'registration-config' => Registration::class,
+            'site-options-config' => SiteOptions::class,
             'wallet-config' => Wallet::class,
         ]);
     }

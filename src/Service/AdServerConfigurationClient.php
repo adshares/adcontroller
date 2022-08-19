@@ -123,8 +123,8 @@ class AdServerConfigurationClient
     public const OPERATOR_TX_FEE = 'payment-tx-fee';
     private const OPERATOR_WALLET_EMAIL_LAST_TIME = 'operator-wallet-transfer-email-time';
     private const SERVE_BASE_URL = 'serve-base-url';
-    private const SITE_ACCEPT_BANNERS_MANUALLY = 'site-accept-banners-manually';
-    private const SITE_CLASSIFIER_LOCAL_BANNERS = 'site-classifier-local-banners';
+    public const SITE_ACCEPT_BANNERS_MANUALLY = 'site-accept-banners-manually';
+    public const SITE_CLASSIFIER_LOCAL_BANNERS = 'site-classifier-local-banners';
     private const SITE_FILTERING_EXCLUDE = 'site-filtering-exclude';
     private const SITE_FILTERING_REQUIRE = 'site-filtering-require';
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'site-verification-time-threshold';
@@ -203,6 +203,8 @@ class AdServerConfigurationClient
             AdServerConfig::ReferralRefundCommission->name => self::REFERRAL_REFUND_COMMISSION,
             AdServerConfig::ReferralRefundEnabled->name => self::REFERRAL_REFUND_ENABLED,
             AdServerConfig::RegistrationMode->name => self::REGISTRATION_MODE,
+            AdServerConfig::SiteAcceptBannersManually->name => self::SITE_ACCEPT_BANNERS_MANUALLY,
+            AdServerConfig::SiteClassifierLocalBanners->name => self::SITE_CLASSIFIER_LOCAL_BANNERS,
             AdServerConfig::Url->name => self::URL,
             AdServerConfig::WalletAddress->name => self::ADSHARES_ADDRESS,
             AdServerConfig::WalletNodeHost->name => self::ADSHARES_NODE_HOST,

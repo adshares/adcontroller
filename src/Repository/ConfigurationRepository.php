@@ -180,6 +180,7 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::OperatorTxFee->name => ConfigType::Float,
             AdServerConfig::ReferralRefundCommission->name => ConfigType::Float,
             AdServerConfig::ReferralRefundEnabled->name => ConfigType::Bool,
+            AdServerConfig::SiteAcceptBannersManually->name => ConfigType::Bool,
             AdServerConfig::WalletNodePort->name => ConfigType::Integer,
 
 //            self::ALLOW_ZONE_IN_IFRAME => ConfigType::Bool,
@@ -208,7 +209,6 @@ class ConfigurationRepository extends ServiceEntityRepository
 //            self::NOW_PAYMENTS_MAX_AMOUNT => ConfigType::Integer,
 //            self::NOW_PAYMENTS_MIN_AMOUNT => ConfigType::Integer,
 //            self::REGISTRATION_USER_TYPES => ConfigType::Array,
-//            self::SITE_ACCEPT_BANNERS_MANUALLY => ConfigType::Bool,
 //            self::UPLOAD_LIMIT_IMAGE => ConfigType::Integer,
 //            self::UPLOAD_LIMIT_MODEL => ConfigType::Integer,
 //            self::UPLOAD_LIMIT_VIDEO => ConfigType::Integer,

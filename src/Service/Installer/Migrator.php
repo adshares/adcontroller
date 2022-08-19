@@ -48,6 +48,8 @@ class Migrator
         AdServerConfigurationClient::REFERRAL_REFUND_ENABLED => AdServerConfig::ReferralRefundEnabled,
         AdServerConfigurationClient::REFERRAL_REFUND_COMMISSION => AdServerConfig::ReferralRefundCommission,
         AdServerConfigurationClient::REGISTRATION_MODE => AdServerConfig::RegistrationMode,
+        AdServerConfigurationClient::SITE_ACCEPT_BANNERS_MANUALLY => AdServerConfig::SiteAcceptBannersManually,
+        AdServerConfigurationClient::SITE_CLASSIFIER_LOCAL_BANNERS => AdServerConfig::SiteClassifierLocalBanners,
         AdServerConfigurationClient::URL => AdServerConfig::Url,
         // AdUser
         AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::Url,
