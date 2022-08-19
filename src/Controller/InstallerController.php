@@ -5,10 +5,10 @@ namespace App\Controller;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
-use App\Entity\Enum\InstallerStepEnum;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
+use App\Service\Configurator\Category\Wallet;
 use App\Service\Installer\Migrator;
 use App\Service\Installer\Step\BaseStep;
 use App\Service\Installer\Step\ClassifierStep;
@@ -104,7 +104,7 @@ class InstallerController extends AbstractController
     }
 
     #[Route('/node_host', name: 'node_host', methods: ['POST'])]
-    public function getNodeHost(Request $request, WalletStep $walletStep): JsonResponse
+    public function getNodeHost(Request $request, Wallet $wallet): JsonResponse
     {
         $content = json_decode($request->getContent(), true);
         if (
@@ -118,12 +118,12 @@ class InstallerController extends AbstractController
         }
 
         $accountId = new AccountId($content[AdServerConfig::WalletAddress->name]);
-        $nodeHost = $walletStep->getNodeHostByAccountAddress($accountId);
+        $nodeHost = $wallet->getNodeHostByAccountAddress($accountId);
 
         return $this->json(
             [
                 AdServerConfig::WalletNodeHost->name => $nodeHost,
-                AdServerConfig::WalletNodePort->name => '6511',
+                AdServerConfig::WalletNodePort->name => 6511,
             ]
         );
     }

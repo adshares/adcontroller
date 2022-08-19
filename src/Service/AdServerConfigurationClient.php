@@ -38,6 +38,7 @@ class AdServerConfigurationClient
     private const ADUSER_INFO_URL = 'aduser-info-url';
     public const ADUSER_INTERNAL_URL = 'aduser-internal-url';
     private const ADUSER_SERVE_SUBDOMAIN = 'aduser-serve-subdomain';
+    private const ADVERTISER_APPLY_FORM_URL = 'advertiser-apply-form-url';
     private const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
     private const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
     private const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
@@ -62,11 +63,13 @@ class AdServerConfigurationClient
     public const CLASSIFIER_EXTERNAL_BASE_URL = 'classifier-external-base-url';
     private const CLASSIFIER_EXTERNAL_NAME = 'classifier-external-name';
     private const CLASSIFIER_EXTERNAL_PUBLIC_KEY = 'classifier-external-public-key';
-    private const COLD_WALLET_ADDRESS = 'cold-wallet-address';
-    private const COLD_WALLET_IS_ACTIVE = 'cold-wallet-is-active';
+    public const COLD_WALLET_ADDRESS = 'cold-wallet-address';
+    public const COLD_WALLET_IS_ACTIVE = 'cold-wallet-is-active';
     private const CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED = 'crm-mail-address-on-campaign-created';
     private const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crm-mail-address-on-site-added';
     private const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
+    private const CURRENCY = 'currency';
+    private const DISPLAY_CURRENCY = 'display-currency';
     private const EMAIL_VERIFICATION_REQUIRED = 'email-verification-required';
     private const EXCHANGE_API_KEY = 'exchange-api-key';
     private const EXCHANGE_API_SECRET = 'exchange-api-secret';
@@ -74,8 +77,8 @@ class AdServerConfigurationClient
     private const EXCHANGE_CURRENCIES = 'exchange-currencies';
     private const FIAT_DEPOSIT_MAX_AMOUNT = 'fiat-deposit-max-amount';
     private const FIAT_DEPOSIT_MIN_AMOUNT = 'fiat-deposit-min-amount';
-    private const HOT_WALLET_MAX_VALUE = 'hotwallet-max-value';
-    private const HOT_WALLET_MIN_VALUE = 'hotwallet-min-value';
+    public const HOT_WALLET_MAX_VALUE = 'hotwallet-max-value';
+    public const HOT_WALLET_MIN_VALUE = 'hotwallet-min-value';
     private const INVENTORY_EXPORT_WHITELIST = 'inventory-export-whitelist';
     private const INVENTORY_IMPORT_WHITELIST = 'inventory-import-whitelist';
     private const INVENTORY_WHITELIST = 'inventory-whitelist';
@@ -111,9 +114,11 @@ class AdServerConfigurationClient
     private const NOW_PAYMENTS_MIN_AMOUNT = 'now-payments-min-amount';
     private const PANEL_PLACEHOLDER_NOTIFICATION_TIME = 'panel-placeholder-notification-time';
     private const PANEL_PLACEHOLDER_UPDATE_TIME = 'panel-placeholder-update-time';
+    private const PUBLISHER_APPLY_FORM_URL = 'publisher-apply-form-url';
     private const REFERRAL_REFUND_ENABLED = 'referral-refund-enabled';
     private const REFERRAL_REFUND_COMMISSION = 'referral-refund-commission';
     private const REGISTRATION_MODE = 'registration-mode';
+    private const REGISTRATION_USER_TYPES = 'registration-user-types';
     private const OPERATOR_RX_FEE = 'payment-rx-fee';
     private const OPERATOR_TX_FEE = 'payment-tx-fee';
     private const OPERATOR_WALLET_EMAIL_LAST_TIME = 'operator-wallet-transfer-email-time';
@@ -123,7 +128,9 @@ class AdServerConfigurationClient
     private const SITE_FILTERING_EXCLUDE = 'site-filtering-exclude';
     private const SITE_FILTERING_REQUIRE = 'site-filtering-require';
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'site-verification-time-threshold';
+    private const SUPPORT_CHAT = 'support-chat';
     public const SUPPORT_EMAIL = 'support-email';
+    private const SUPPORT_TELEGRAM = 'support-telegram';
     private const SKYNET_API_KEY = 'skynet-api-key';
     private const SKYNET_API_URL = 'skynet-api-url';
     private const SKYNET_CDN_URL = 'skynet-cdn-url';
@@ -178,6 +185,10 @@ class AdServerConfigurationClient
     private function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
+            AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
+            AdServerConfig::ColdWalletIsActive->name => self::COLD_WALLET_IS_ACTIVE,
+            AdServerConfig::HotWalletMaxValue->name => self::HOT_WALLET_MAX_VALUE,
+            AdServerConfig::HotWalletMinValue->name => self::HOT_WALLET_MIN_VALUE,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
             AdServerConfig::Name->name => self::ADSERVER_NAME,
             AdServerConfig::Url->name => self::URL,

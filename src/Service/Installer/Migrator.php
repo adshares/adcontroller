@@ -33,6 +33,10 @@ class Migrator
         AdServerConfigurationClient::ADSHARES_NODE_HOST => AdServerConfig::WalletNodeHost,
         AdServerConfigurationClient::ADSHARES_NODE_PORT => AdServerConfig::WalletNodePort,
         AdServerConfigurationClient::ADSHARES_SECRET => AdServerConfig::WalletSecretKey,
+        AdServerConfigurationClient::COLD_WALLET_ADDRESS => AdServerConfig::ColdWalletAddress,
+        AdServerConfigurationClient::COLD_WALLET_IS_ACTIVE => AdServerConfig::ColdWalletIsActive,
+        AdServerConfigurationClient::HOT_WALLET_MAX_VALUE => AdServerConfig::HotWalletMaxValue,
+        AdServerConfigurationClient::HOT_WALLET_MIN_VALUE => AdServerConfig::HotWalletMinValue,
         // AdUser
         AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::Url,
         AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUserConfig::InternalUrl,

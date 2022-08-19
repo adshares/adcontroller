@@ -8,6 +8,7 @@ use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\ConfigEnum;
 use App\Entity\Enum\GeneralConfig;
 use App\Service\Crypt;
+use App\ValueObject\ConfigType;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -95,24 +96,30 @@ class ConfigurationRepository extends ServiceEntityRepository
             $value = $this->crypt->decrypt($value);
         }
 
-        return $value;
+        return self::mapValueType($enum->name, $value);
     }
 
     /**
      * @param string $module
      * @param array $names
+     * @param bool $withSecrets
      * @return array<string, string>
      */
-    public function fetchValuesByNames(string $module, array $names): array
+    public function fetchValuesByNames(string $module, array $names, bool $withSecrets = false): array
     {
         $entities = $this->findByNames($module, $names);
         $data = [];
         foreach ($entities as $entity) {
             $value = $entity->getValue();
             if ($this->isSecretEntity($entity)) {
-                $value = $this->crypt->decrypt($value);
+                if ($withSecrets) {
+                    $value = $this->crypt->decrypt($value);
+                } else {
+                    continue;
+                }
             }
-            $data[$entity->getName()] = $value;
+            $name = $entity->getName();
+            $data[$name] = self::mapValueType($name, $value);
         }
         return $data;
     }
@@ -154,5 +161,72 @@ class ConfigurationRepository extends ServiceEntityRepository
             )
             ->getQuery()
             ->getResult();
+    }
+
+    private static function typeConversion(): array
+    {
+        return [
+            AdServerConfig::ColdWalletIsActive->name => ConfigType::Bool,
+            AdServerConfig::HotWalletMaxValue->name => ConfigType::Integer,
+            AdServerConfig::HotWalletMinValue->name => ConfigType::Integer,
+            AdServerConfig::WalletNodePort->name => ConfigType::Integer,
+
+//            self::ALLOW_ZONE_IN_IFRAME => ConfigType::Bool,
+//            self::AUTO_CONFIRMATION_ENABLED => ConfigType::Bool,
+//            self::AUTO_REGISTRATION_ENABLED => ConfigType::Bool,
+//            self::AUTO_WITHDRAWAL_LIMIT_ADS => ConfigType::Integer,
+//            self::AUTO_WITHDRAWAL_LIMIT_BSC => ConfigType::Integer,
+//            self::AUTO_WITHDRAWAL_LIMIT_BTC => ConfigType::Integer,
+//            self::AUTO_WITHDRAWAL_LIMIT_ETH => ConfigType::Integer,
+//            self::BANNER_FORCE_HTTPS => ConfigType::Bool,
+//            self::BTC_WITHDRAW => ConfigType::Bool,
+//            self::BTC_WITHDRAW_FEE => ConfigType::Float,
+//            self::BTC_WITHDRAW_MAX_AMOUNT => ConfigType::Integer,
+//            self::BTC_WITHDRAW_MIN_AMOUNT => ConfigType::Integer,
+//            self::CAMPAIGN_MIN_BUDGET => ConfigType::Integer,
+//            self::CAMPAIGN_MIN_CPA => ConfigType::Integer,
+//            self::CAMPAIGN_MIN_CPM => ConfigType::Integer,
+//            self::CHECK_ZONE_DOMAIN => ConfigType::Bool,
+//            self::EMAIL_VERIFICATION_REQUIRED => ConfigType::Bool,
+//            self::EXCHANGE_CURRENCIES => ConfigType::Array,
+//            self::FIAT_DEPOSIT_MAX_AMOUNT => ConfigType::Integer,
+//            self::FIAT_DEPOSIT_MIN_AMOUNT => ConfigType::Integer,
+//            self::INVENTORY_EXPORT_WHITELIST => ConfigType::Array,
+//            self::INVENTORY_IMPORT_WHITELIST => ConfigType::Array,
+//            self::INVENTORY_WHITELIST => ConfigType::Array,
+//            self::INVOICE_CURRENCIES => ConfigType::Array,
+//            self::INVOICE_ENABLED => ConfigType::Bool,
+//            self::MAX_PAGE_ZONES => ConfigType::Integer,
+//            self::MAIL_SMTP_PORT => ConfigType::Integer,
+//            self::NETWORK_DATA_CACHE_TTL => ConfigType::Integer,
+//            self::NOW_PAYMENTS_EXCHANGE => ConfigType::Bool,
+//            self::NOW_PAYMENTS_FEE => ConfigType::Float,
+//            self::NOW_PAYMENTS_MAX_AMOUNT => ConfigType::Integer,
+//            self::NOW_PAYMENTS_MIN_AMOUNT => ConfigType::Integer,
+//            self::OPERATOR_TX_FEE => ConfigType::Float,
+//            self::OPERATOR_RX_FEE => ConfigType::Float,
+//            self::REFERRAL_REFUND_ENABLED => ConfigType::Bool,
+//            self::REGISTRATION_USER_TYPES => ConfigType::Array,
+//            self::SITE_ACCEPT_BANNERS_MANUALLY => ConfigType::Bool,
+//            self::UPLOAD_LIMIT_IMAGE => ConfigType::Integer,
+//            self::UPLOAD_LIMIT_MODEL => ConfigType::Integer,
+//            self::UPLOAD_LIMIT_VIDEO => ConfigType::Integer,
+//            self::UPLOAD_LIMIT_ZIP => ConfigType::Integer,
+        ];
+    }
+
+    private static function mapValueType(string $key, ?string $value): string|array|int|null|float|bool
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return match (self::typeConversion()[$key] ?? ConfigType::String) {
+            ConfigType::Array => array_filter(explode(',', $value)),
+            ConfigType::Bool => '1' === $value,
+            ConfigType::Float => (float)$value,
+            ConfigType::Integer => (int)$value,
+            default => $value,
+        };
     }
 }

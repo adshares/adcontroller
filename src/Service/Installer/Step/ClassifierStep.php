@@ -156,7 +156,7 @@ class ClassifierStep implements InstallerStep
             AdClassifyConfig::ApiKeyName->name,
             AdClassifyConfig::ApiKeySecret->name,
         ];
-        $configuration = $this->repository->fetchValuesByNames(AdClassifyConfig::MODULE, $requiredKeys);
+        $configuration = $this->repository->fetchValuesByNames(AdClassifyConfig::MODULE, $requiredKeys, true);
 
         foreach ($requiredKeys as $requiredKey) {
             if (!isset($configuration[$requiredKey])) {

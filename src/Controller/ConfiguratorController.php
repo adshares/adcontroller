@@ -2,14 +2,22 @@
 
 namespace App\Controller;
 
-use App\Exception\ServiceNotPresent;
-use App\Exception\UnexpectedResponseException;
-use App\Service\AdServerConfigurationClient;
+use App\Entity\Enum\AdClassifyConfig;
+use App\Entity\Enum\AdPanelConfig;
+use App\Entity\Enum\AdPayConfig;
+use App\Entity\Enum\AdSelectConfig;
+use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\GeneralConfig;
+use App\Repository\ConfigurationRepository;
+use App\Service\Configurator\Category\ColdWallet;
+use App\Service\Configurator\Category\Wallet;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -17,35 +25,50 @@ use Symfony\Component\Routing\Annotation\Route;
 class ConfiguratorController extends AbstractController
 {
     #[Route('/config', name: 'fetch_config', methods: ['GET'])]
-    public function fetchConfig(AdServerConfigurationClient $client): JsonResponse
+    public function fetchConfig(ConfigurationRepository $repository): JsonResponse
     {
-        try {
-            $data = $client->fetch();
-        } catch (ServiceNotPresent $exception) {
-            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
-        } catch (UnexpectedResponseException $exception) {
-            throw new UnprocessableEntityHttpException($exception->getMessage());
+        $data = [];
+        $classes = [
+            AdClassifyConfig::class,
+            AdPanelConfig::class,
+            AdPayConfig::class,
+            AdSelectConfig::class,
+            AdServerConfig::class,
+            AdUserConfig::class,
+            GeneralConfig::class,
+        ];
+
+        foreach ($classes as $class) {
+            $data[$class::MODULE] = $repository->fetchValuesByNames(
+                $class::MODULE,
+                array_map(fn($enum) => $enum->name, $class::cases())
+            );
         }
 
         return $this->jsonOk($data);
     }
 
-    #[Route('/config', name: 'store_config', methods: ['PATCH'])]
-    public function storeConfig(AdServerConfigurationClient $client, Request $request): JsonResponse
+    #[Route('/config/{category}', name: 'store_config', methods: ['PATCH'])]
+    public function storeConfig(string $category, Request $request): JsonResponse
     {
-        $content = json_decode($request->getContent(), true) ?? [];
-
-        // TODO validate
-
         try {
-            $client->store($content);
-        } catch (ServiceNotPresent $exception) {
-            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
-        } catch (UnexpectedResponseException $exception) {
-            throw new UnprocessableEntityHttpException($exception->getMessage());
+            $service = $this->container->get($category . '-config');
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface) {
+            throw new UnprocessableEntityHttpException(sprintf('Unsupported category (%s)', $category));
         }
 
+        $content = json_decode($request->getContent(), true) ?? [];
+        $service->process($content);
+
         return $this->jsonOk();
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            'cold-wallet-config' => ColdWallet::class,
+            'wallet-config' => Wallet::class,
+        ]);
     }
 
     protected function jsonOk(array $data = []): JsonResponse

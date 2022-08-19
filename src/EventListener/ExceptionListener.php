@@ -28,6 +28,7 @@ class ExceptionListener implements EventSubscriberInterface
                 $response = new JsonResponse([
                     'message' => $exception->getMessage(),
                     'code' => $exception->getStatusCode(),
+                    'data' => [],
                 ]);
                 $response->setStatusCode($exception->getStatusCode());
                 $response->headers->replace($exception->getHeaders());
@@ -38,6 +39,7 @@ class ExceptionListener implements EventSubscriberInterface
                 $response = new JsonResponse([
                     'message' => 'Internal Server Error',
                     'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                    'data' => [],
                 ]);
                 $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
             }
