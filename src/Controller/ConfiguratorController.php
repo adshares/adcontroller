@@ -16,6 +16,7 @@ use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\Registration;
 use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
+use App\Service\Configurator\Category\ZoneOptions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -76,6 +77,7 @@ class ConfiguratorController extends AbstractController
             'registration-config' => Registration::class,
             'site-options-config' => SiteOptions::class,
             'wallet-config' => Wallet::class,
+            'zone-options-config' => ZoneOptions::class,
         ]);
     }
 

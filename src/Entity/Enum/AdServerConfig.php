@@ -6,6 +6,7 @@ enum AdServerConfig implements ConfigEnum
 {
     public const MODULE = 'AdServer';
 
+    case AllowZoneInIframe;
     case AutoConfirmationEnabled;
     case AutoRegistrationEnabled;
     case AutoWithdrawalLimitAds;
@@ -19,6 +20,7 @@ enum AdServerConfig implements ConfigEnum
     case HotWalletMinValue;
     case LicenseData;
     case LicenseKey;
+    case MaxPageZones;
     case Name;
     case OperatorRxFee;
     case OperatorTxFee;

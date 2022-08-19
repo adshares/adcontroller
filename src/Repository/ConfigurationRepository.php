@@ -166,6 +166,7 @@ class ConfigurationRepository extends ServiceEntityRepository
     private static function typeConversion(): array
     {
         return [
+            AdServerConfig::AllowZoneInIframe->name => ConfigType::Bool,
             AdServerConfig::AutoConfirmationEnabled->name => ConfigType::Bool,
             AdServerConfig::AutoRegistrationEnabled->name => ConfigType::Bool,
             AdServerConfig::AutoWithdrawalLimitAds->name => ConfigType::Integer,
@@ -176,6 +177,7 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::EmailVerificationRequired->name => ConfigType::Bool,
             AdServerConfig::HotWalletMaxValue->name => ConfigType::Integer,
             AdServerConfig::HotWalletMinValue->name => ConfigType::Integer,
+            AdServerConfig::MaxPageZones->name => ConfigType::Integer,
             AdServerConfig::OperatorRxFee->name => ConfigType::Float,
             AdServerConfig::OperatorTxFee->name => ConfigType::Float,
             AdServerConfig::ReferralRefundCommission->name => ConfigType::Float,
@@ -183,7 +185,6 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::SiteAcceptBannersManually->name => ConfigType::Bool,
             AdServerConfig::WalletNodePort->name => ConfigType::Integer,
 
-//            self::ALLOW_ZONE_IN_IFRAME => ConfigType::Bool,
 //            self::BANNER_FORCE_HTTPS => ConfigType::Bool,
 //            self::BTC_WITHDRAW => ConfigType::Bool,
 //            self::BTC_WITHDRAW_FEE => ConfigType::Float,
@@ -201,7 +202,6 @@ class ConfigurationRepository extends ServiceEntityRepository
 //            self::INVENTORY_WHITELIST => ConfigType::Array,
 //            self::INVOICE_CURRENCIES => ConfigType::Array,
 //            self::INVOICE_ENABLED => ConfigType::Bool,
-//            self::MAX_PAGE_ZONES => ConfigType::Integer,
 //            self::MAIL_SMTP_PORT => ConfigType::Integer,
 //            self::NETWORK_DATA_CACHE_TTL => ConfigType::Integer,
 //            self::NOW_PAYMENTS_EXCHANGE => ConfigType::Bool,

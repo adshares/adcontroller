@@ -39,7 +39,7 @@ class AdServerConfigurationClient
     public const ADUSER_INTERNAL_URL = 'aduser-internal-url';
     private const ADUSER_SERVE_SUBDOMAIN = 'aduser-serve-subdomain';
     private const ADVERTISER_APPLY_FORM_URL = 'advertiser-apply-form-url';
-    private const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
+    public const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
     public const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
     public const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
     public const AUTO_WITHDRAWAL_LIMIT_ADS = 'auto-withdrawal-limit-ads';
@@ -103,7 +103,7 @@ class AdServerConfigurationClient
     public const MAIL_SMTP_USERNAME = 'mail-smtp-username';
     private const MAIN_JS_BASE_URL = 'main-js-base-url';
     private const MAIN_JS_TLD = 'main-js-tld';
-    private const MAX_PAGE_ZONES = 'max-page-zones';
+    public const MAX_PAGE_ZONES = 'max-page-zones';
     private const NETWORK_DATA_CACHE_TTL = 'network_data_cache-ttl';
     private const NOW_PAYMENTS_API_KEY = 'now-payments-api-key';
     private const NOW_PAYMENTS_CURRENCY = 'now-payments-currency';
@@ -185,6 +185,7 @@ class AdServerConfigurationClient
     private function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
+            AdServerConfig::AllowZoneInIframe->name => self::ALLOW_ZONE_IN_IFRAME,
             AdServerConfig::AutoConfirmationEnabled->name => self::AUTO_CONFIRMATION_ENABLED,
             AdServerConfig::AutoRegistrationEnabled->name => self::AUTO_REGISTRATION_ENABLED,
             AdServerConfig::AutoWithdrawalLimitAds->name => self::AUTO_WITHDRAWAL_LIMIT_ADS,
@@ -198,6 +199,7 @@ class AdServerConfigurationClient
             AdServerConfig::HotWalletMinValue->name => self::HOT_WALLET_MIN_VALUE,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
             AdServerConfig::Name->name => self::ADSERVER_NAME,
+            AdServerConfig::MaxPageZones->name => self::MAX_PAGE_ZONES,
             AdServerConfig::OperatorRxFee->name => self::OPERATOR_RX_FEE,
             AdServerConfig::OperatorTxFee->name => self::OPERATOR_TX_FEE,
             AdServerConfig::ReferralRefundCommission->name => self::REFERRAL_REFUND_COMMISSION,

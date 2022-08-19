@@ -85,7 +85,7 @@ const ZoneOptions = () => {
           <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
             <FormControl margin="dense">
               <FormControlLabel
-                label="Maximum zones per page"
+                label="Allow zone in IFRAME"
                 control={<Checkbox checked={allowZoneInIFrame} onChange={() => setAllowZoneInIFrame((prevState) => !prevState)} />}
               />
             </FormControl>
@@ -98,12 +98,12 @@ const ZoneOptions = () => {
 
           <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
             <FormControl margin="dense" fullWidth>
-              <InputLabel htmlFor="maxPageZones">Maximum page zones</InputLabel>
+              <InputLabel htmlFor="maxPageZones">Maximum zones per page</InputLabel>
               <OutlinedInput
                 id="maxPageZones"
                 size="small"
                 type="number"
-                label="Maximum page zones"
+                label="Maximum zones per page"
                 value={Number(maxPageZones).toString()}
                 onChange={(e) => setMaxPageZones(Number(e.target.value).toFixed(0))}
                 inputProps={{ autoComplete: 'off', min: 0 }}
