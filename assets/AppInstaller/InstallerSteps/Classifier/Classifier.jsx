@@ -4,6 +4,7 @@ import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
 import { useForm } from '../../../hooks';
+import { useSnackbar } from 'notistack';
 
 function Classifier({ handleNextStep, handlePrevStep, step }) {
   const form = useForm({
@@ -19,10 +20,7 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
   const [registrationInProgress, setRegistrationInProgress] = useState(false);
   const [stepData, setStepData] = useState({});
-  const [alert, setAlert] = useState({
-    type: '',
-    message: '',
-  });
+  const { enqueueSnackbar } = useSnackbar();
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
@@ -39,11 +37,7 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
         apiKey: response.ApiKeyName || '',
       });
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      enqueueSnackbar(`${err.message}: ${err.data.message}`, { variant: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -61,11 +55,7 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
       await apiService.sendStepData(step.path, body);
       handleNextStep(step);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      enqueueSnackbar(`${err.message}: ${err.data.message}`, { variant: 'error' });
     } finally {
       setRegistrationInProgress(false);
     }
@@ -73,7 +63,6 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
 
   return (
     <InstallerStepWrapper
-      alert={alert}
       dataLoading={isLoading}
       title="Classifier information"
       onNextClick={handleSubmit}
