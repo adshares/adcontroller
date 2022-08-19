@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import Spinner from '../../../Components/Spinner/Spinner';
+import { useErrorHandler } from '../../../hooks';
 
 function Status({ handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +48,7 @@ function Status({ handlePrevStep, step }) {
     },
     DataRequired: false,
   });
-  const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
+  const { createErrorNotification } = useErrorHandler();
 
   useEffect(() => {
     getStepData().catch((error) => console.log(error));
@@ -66,11 +67,7 @@ function Status({ handlePrevStep, step }) {
         aduser: response.aduser,
       });
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -83,17 +80,12 @@ function Status({ handlePrevStep, step }) {
       window.location.reload();
     } catch (err) {
       setIsLoading(false);
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     }
   };
 
   return (
     <InstallerStepWrapper
-      alert={alert}
       title="Status"
       disabledNext={isLoading}
       onBackClick={() => handlePrevStep(step)}

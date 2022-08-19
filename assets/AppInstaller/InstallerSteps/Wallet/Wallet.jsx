@@ -6,6 +6,7 @@ import styles from './styles.scss';
 import { useForm, useSkipFirstRenderEffect } from '../../../hooks';
 import Spinner from '../../../Components/Spinner/Spinner';
 import { validateAddress } from '@adshares/ads';
+import useErrorHandler from '../../../hooks/useErrorHandler';
 
 function Wallet({ handleNextStep, handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -26,12 +27,8 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
-  const [alert, setAlert] = useState({
-    type: '',
-    message: '',
-    title: '',
-  });
   const [isKnownNode, setKnownNode] = useState(false);
+  const { createErrorNotification } = useErrorHandler();
 
   useEffect(() => {
     getStepData();
@@ -61,11 +58,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
         });
       }
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -81,11 +74,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
         WalletNodeHost: '',
         WalletNodePort: '',
       });
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsHostVerification(false);
     }
@@ -120,11 +109,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
       await apiService.sendStepData(step.path, body);
       handleNextStep(step);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -132,7 +117,6 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
 
   return (
     <InstallerStepWrapper
-      alert={alert}
       dataLoading={isLoading}
       title="Wallet information"
       onNextClick={handleSubmit}

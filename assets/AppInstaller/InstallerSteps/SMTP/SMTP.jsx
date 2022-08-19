@@ -3,7 +3,7 @@ import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typograp
 import apiService from '../../../utils/apiService';
 import styles from './styles.scss';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
-import { useForm } from '../../../hooks';
+import { useForm, useErrorHandler } from '../../../hooks';
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -26,13 +26,10 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   });
   const [isDataRequired, setIsDataRequired] = useState(true);
   const [editMode, setEditMode] = useState(isDataRequired);
-  const [alert, setAlert] = useState({
-    type: 'error',
-    message: '',
-    title: '',
-  });
+  const { createErrorNotification } = useErrorHandler();
   const [isEmptyPassword, setIsEmptyPassword] = useState(false);
   const [isPasswordWasTouched, setPasswordTouched] = useState(false);
+
   useEffect(() => {
     getStepData();
   }, []);
@@ -51,11 +48,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       });
       setIsEmptyPassword(!response.SmtpPassword.length);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -81,11 +74,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       }
       handleNextStep(step);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +82,6 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
 
   return (
     <InstallerStepWrapper
-      alert={alert}
       dataLoading={isLoading}
       title="SMTP information"
       onNextClick={handleSubmit}
