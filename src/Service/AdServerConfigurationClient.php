@@ -115,12 +115,12 @@ class AdServerConfigurationClient
     private const PANEL_PLACEHOLDER_NOTIFICATION_TIME = 'panel-placeholder-notification-time';
     private const PANEL_PLACEHOLDER_UPDATE_TIME = 'panel-placeholder-update-time';
     private const PUBLISHER_APPLY_FORM_URL = 'publisher-apply-form-url';
-    private const REFERRAL_REFUND_ENABLED = 'referral-refund-enabled';
-    private const REFERRAL_REFUND_COMMISSION = 'referral-refund-commission';
+    public const REFERRAL_REFUND_COMMISSION = 'referral-refund-commission';
+    public const REFERRAL_REFUND_ENABLED = 'referral-refund-enabled';
     private const REGISTRATION_MODE = 'registration-mode';
     private const REGISTRATION_USER_TYPES = 'registration-user-types';
-    private const OPERATOR_RX_FEE = 'payment-rx-fee';
-    private const OPERATOR_TX_FEE = 'payment-tx-fee';
+    public const OPERATOR_RX_FEE = 'payment-rx-fee';
+    public const OPERATOR_TX_FEE = 'payment-tx-fee';
     private const OPERATOR_WALLET_EMAIL_LAST_TIME = 'operator-wallet-transfer-email-time';
     private const SERVE_BASE_URL = 'serve-base-url';
     private const SITE_ACCEPT_BANNERS_MANUALLY = 'site-accept-banners-manually';
@@ -191,6 +191,10 @@ class AdServerConfigurationClient
             AdServerConfig::HotWalletMinValue->name => self::HOT_WALLET_MIN_VALUE,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
             AdServerConfig::Name->name => self::ADSERVER_NAME,
+            AdServerConfig::OperatorRxFee->name => self::OPERATOR_RX_FEE,
+            AdServerConfig::OperatorTxFee->name => self::OPERATOR_TX_FEE,
+            AdServerConfig::ReferralRefundCommission->name => self::REFERRAL_REFUND_COMMISSION,
+            AdServerConfig::ReferralRefundEnabled->name => self::REFERRAL_REFUND_ENABLED,
             AdServerConfig::Url->name => self::URL,
             AdServerConfig::WalletAddress->name => self::ADSHARES_ADDRESS,
             AdServerConfig::WalletNodeHost->name => self::ADSHARES_NODE_HOST,

@@ -85,7 +85,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         }
     }
 
-    public function fetchValueByEnum(ConfigEnum $enum): ?string
+    public function fetchValueByEnum(ConfigEnum $enum): string|array|int|null|float|bool
     {
         if (null === ($configuration = $this->findOneByEnum($enum))) {
             return null;
@@ -103,7 +103,7 @@ class ConfigurationRepository extends ServiceEntityRepository
      * @param string $module
      * @param array $names
      * @param bool $withSecrets
-     * @return array<string, string>
+     * @return array<string, string|array|int|null|float|bool>
      */
     public function fetchValuesByNames(string $module, array $names, bool $withSecrets = false): array
     {
@@ -169,6 +169,10 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::ColdWalletIsActive->name => ConfigType::Bool,
             AdServerConfig::HotWalletMaxValue->name => ConfigType::Integer,
             AdServerConfig::HotWalletMinValue->name => ConfigType::Integer,
+            AdServerConfig::OperatorRxFee->name => ConfigType::Float,
+            AdServerConfig::OperatorTxFee->name => ConfigType::Float,
+            AdServerConfig::ReferralRefundCommission->name => ConfigType::Float,
+            AdServerConfig::ReferralRefundEnabled->name => ConfigType::Bool,
             AdServerConfig::WalletNodePort->name => ConfigType::Integer,
 
 //            self::ALLOW_ZONE_IN_IFRAME => ConfigType::Bool,
@@ -203,9 +207,6 @@ class ConfigurationRepository extends ServiceEntityRepository
 //            self::NOW_PAYMENTS_FEE => ConfigType::Float,
 //            self::NOW_PAYMENTS_MAX_AMOUNT => ConfigType::Integer,
 //            self::NOW_PAYMENTS_MIN_AMOUNT => ConfigType::Integer,
-//            self::OPERATOR_TX_FEE => ConfigType::Float,
-//            self::OPERATOR_RX_FEE => ConfigType::Float,
-//            self::REFERRAL_REFUND_ENABLED => ConfigType::Bool,
 //            self::REGISTRATION_USER_TYPES => ConfigType::Array,
 //            self::SITE_ACCEPT_BANNERS_MANUALLY => ConfigType::Bool,
 //            self::UPLOAD_LIMIT_IMAGE => ConfigType::Integer,

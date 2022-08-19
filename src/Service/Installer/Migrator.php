@@ -37,6 +37,10 @@ class Migrator
         AdServerConfigurationClient::COLD_WALLET_IS_ACTIVE => AdServerConfig::ColdWalletIsActive,
         AdServerConfigurationClient::HOT_WALLET_MAX_VALUE => AdServerConfig::HotWalletMaxValue,
         AdServerConfigurationClient::HOT_WALLET_MIN_VALUE => AdServerConfig::HotWalletMinValue,
+        AdServerConfigurationClient::OPERATOR_RX_FEE => AdServerConfig::OperatorRxFee,
+        AdServerConfigurationClient::OPERATOR_TX_FEE => AdServerConfig::OperatorTxFee,
+        AdServerConfigurationClient::REFERRAL_REFUND_ENABLED => AdServerConfig::ReferralRefundEnabled,
+        AdServerConfigurationClient::REFERRAL_REFUND_COMMISSION => AdServerConfig::ReferralRefundCommission,
         // AdUser
         AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::Url,
         AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUserConfig::InternalUrl,

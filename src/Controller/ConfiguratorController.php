@@ -11,6 +11,7 @@ use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Repository\ConfigurationRepository;
 use App\Service\Configurator\Category\ColdWallet;
+use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\Wallet;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -67,6 +68,7 @@ class ConfiguratorController extends AbstractController
     {
         return array_merge(parent::getSubscribedServices(), [
             'cold-wallet-config' => ColdWallet::class,
+            'commission-config' => Commission::class,
             'wallet-config' => Wallet::class,
         ]);
     }

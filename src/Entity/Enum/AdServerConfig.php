@@ -13,6 +13,10 @@ enum AdServerConfig implements ConfigEnum
     case LicenseData;
     case LicenseKey;
     case Name;
+    case OperatorRxFee;
+    case OperatorTxFee;
+    case ReferralRefundCommission;
+    case ReferralRefundEnabled;
     case Url;
     case WalletAddress;
     case WalletNodeHost;
