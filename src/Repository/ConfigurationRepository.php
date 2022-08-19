@@ -168,6 +168,10 @@ class ConfigurationRepository extends ServiceEntityRepository
         return [
             AdServerConfig::AutoConfirmationEnabled->name => ConfigType::Bool,
             AdServerConfig::AutoRegistrationEnabled->name => ConfigType::Bool,
+            AdServerConfig::AutoWithdrawalLimitAds->name => ConfigType::Integer,
+            AdServerConfig::AutoWithdrawalLimitBsc->name => ConfigType::Integer,
+            AdServerConfig::AutoWithdrawalLimitBtc->name => ConfigType::Integer,
+            AdServerConfig::AutoWithdrawalLimitEth->name => ConfigType::Integer,
             AdServerConfig::ColdWalletIsActive->name => ConfigType::Bool,
             AdServerConfig::EmailVerificationRequired->name => ConfigType::Bool,
             AdServerConfig::HotWalletMaxValue->name => ConfigType::Integer,
@@ -179,10 +183,6 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::WalletNodePort->name => ConfigType::Integer,
 
 //            self::ALLOW_ZONE_IN_IFRAME => ConfigType::Bool,
-//            self::AUTO_WITHDRAWAL_LIMIT_ADS => ConfigType::Integer,
-//            self::AUTO_WITHDRAWAL_LIMIT_BSC => ConfigType::Integer,
-//            self::AUTO_WITHDRAWAL_LIMIT_BTC => ConfigType::Integer,
-//            self::AUTO_WITHDRAWAL_LIMIT_ETH => ConfigType::Integer,
 //            self::BANNER_FORCE_HTTPS => ConfigType::Bool,
 //            self::BTC_WITHDRAW => ConfigType::Bool,
 //            self::BTC_WITHDRAW_FEE => ConfigType::Float,

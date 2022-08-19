@@ -8,6 +8,10 @@ enum AdServerConfig implements ConfigEnum
 
     case AutoConfirmationEnabled;
     case AutoRegistrationEnabled;
+    case AutoWithdrawalLimitAds;
+    case AutoWithdrawalLimitBsc;
+    case AutoWithdrawalLimitBtc;
+    case AutoWithdrawalLimitEth;
     case ColdWalletAddress;
     case ColdWalletIsActive;
     case EmailVerificationRequired;

@@ -10,6 +10,7 @@ use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Repository\ConfigurationRepository;
+use App\Service\Configurator\Category\AutomaticWithdrawal;
 use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\Registration;
@@ -68,6 +69,7 @@ class ConfiguratorController extends AbstractController
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
+            'auto-withdrawal-config' => AutomaticWithdrawal::class,
             'cold-wallet-config' => ColdWallet::class,
             'commission-config' => Commission::class,
             'registration-config' => Registration::class,

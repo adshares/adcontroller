@@ -42,10 +42,10 @@ class AdServerConfigurationClient
     private const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
     public const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
     public const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
-    private const AUTO_WITHDRAWAL_LIMIT_ADS = 'auto-withdrawal-limit-ads';
-    private const AUTO_WITHDRAWAL_LIMIT_BSC = 'auto-withdrawal-limit-bsc';
-    private const AUTO_WITHDRAWAL_LIMIT_BTC = 'auto-withdrawal-limit-btc';
-    private const AUTO_WITHDRAWAL_LIMIT_ETH = 'auto-withdrawal-limit-eth';
+    public const AUTO_WITHDRAWAL_LIMIT_ADS = 'auto-withdrawal-limit-ads';
+    public const AUTO_WITHDRAWAL_LIMIT_BSC = 'auto-withdrawal-limit-bsc';
+    public const AUTO_WITHDRAWAL_LIMIT_BTC = 'auto-withdrawal-limit-btc';
+    public const AUTO_WITHDRAWAL_LIMIT_ETH = 'auto-withdrawal-limit-eth';
     private const BANNER_FORCE_HTTPS = 'banner-force-https';
     private const BTC_WITHDRAW = 'btc-withdraw';
     private const BTC_WITHDRAW_FEE = 'btc-withdraw-fee';
@@ -187,6 +187,10 @@ class AdServerConfigurationClient
         $keyMap = [
             AdServerConfig::AutoConfirmationEnabled->name => self::AUTO_CONFIRMATION_ENABLED,
             AdServerConfig::AutoRegistrationEnabled->name => self::AUTO_REGISTRATION_ENABLED,
+            AdServerConfig::AutoWithdrawalLimitAds->name => self::AUTO_WITHDRAWAL_LIMIT_ADS,
+            AdServerConfig::AutoWithdrawalLimitBsc->name => self::AUTO_WITHDRAWAL_LIMIT_BSC,
+            AdServerConfig::AutoWithdrawalLimitBtc->name => self::AUTO_WITHDRAWAL_LIMIT_BTC,
+            AdServerConfig::AutoWithdrawalLimitEth->name => self::AUTO_WITHDRAWAL_LIMIT_ETH,
             AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
             AdServerConfig::ColdWalletIsActive->name => self::COLD_WALLET_IS_ACTIVE,
             AdServerConfig::EmailVerificationRequired->name => self::EMAIL_VERIFICATION_REQUIRED,
