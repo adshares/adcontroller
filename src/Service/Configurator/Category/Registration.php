@@ -26,7 +26,6 @@ class Registration implements ConfiguratorCategory
     {
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
-
         if (empty($input)) {
             throw new UnprocessableEntityHttpException('Data is required');
         }

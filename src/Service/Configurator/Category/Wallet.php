@@ -7,6 +7,7 @@ use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdsCredentialsChecker;
 use App\Service\AdServerConfigurationClient;
+use App\Utility\ArrayUtils;
 use App\Utility\Validator\AdsAccountValidator;
 use App\ValueObject\AccountId;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -15,10 +16,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class Wallet implements ConfiguratorCategory
 {
     private const DEFAULT_NODE_PORT = 6511;
-    private const FIELDS = [
-        AdServerConfig::WalletAddress,
-        AdServerConfig::WalletSecretKey,
-    ];
     private const SECRET_KEY_PATTERN = '/^[0-9A-F]{64}$/i';
 
     public function __construct(
@@ -31,45 +28,50 @@ class Wallet implements ConfiguratorCategory
 
     public function process(array $content): void
     {
-        $this->validate($content);
-
-        if (!isset($content[AdServerConfig::WalletNodeHost->name])) {
-            $accountId = new AccountId($content[AdServerConfig::WalletAddress->name]);
-            $content[AdServerConfig::WalletNodeHost->name] = $this->getNodeHostByAccountAddress($accountId);
+        $fields = self::fields();
+        $input = ArrayUtils::filterByKeys($content, $fields);
+        if (empty($input)) {
+            throw new UnprocessableEntityHttpException('Data is required');
         }
-        $content[AdServerConfig::WalletNodePort->name] =
-            (int)($content[AdServerConfig::WalletNodePort->name] ?? self::DEFAULT_NODE_PORT);
+
+        $this->validate($input);
+
+        if (!isset($input[AdServerConfig::WalletNodeHost->name])) {
+            $accountId = new AccountId($input[AdServerConfig::WalletAddress->name]);
+            $input[AdServerConfig::WalletNodeHost->name] = $this->getNodeHostByAccountAddress($accountId);
+        }
+        $input[AdServerConfig::WalletNodePort->name] =
+            (int)($input[AdServerConfig::WalletNodePort->name] ?? self::DEFAULT_NODE_PORT);
 
         try {
             $this->adsCredentialsChecker->check(
-                $content[AdServerConfig::WalletAddress->name],
-                $content[AdServerConfig::WalletSecretKey->name],
-                $content[AdServerConfig::WalletNodeHost->name],
-                $content[AdServerConfig::WalletNodePort->name]
+                $input[AdServerConfig::WalletAddress->name],
+                $input[AdServerConfig::WalletSecretKey->name],
+                $input[AdServerConfig::WalletNodeHost->name],
+                $input[AdServerConfig::WalletNodePort->name]
             );
         } catch (UnexpectedResponseException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage());
         }
 
-        $data = [
-            AdServerConfig::WalletAddress->name => $content[AdServerConfig::WalletAddress->name],
-            AdServerConfig::WalletNodeHost->name => $content[AdServerConfig::WalletNodeHost->name],
-            AdServerConfig::WalletNodePort->name => $content[AdServerConfig::WalletNodePort->name],
-            AdServerConfig::WalletSecretKey->name => $content[AdServerConfig::WalletSecretKey->name],
-        ];
-        $this->adServerConfigurationClient->store($data);
-
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $data);
+        $this->adServerConfigurationClient->store($input);
+        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
     }
 
-    private function validate(array $content): void
+    private function validate(array $input): void
     {
-        foreach (self::FIELDS as $field) {
-            if (!isset($content[$field->name])) {
-                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field->name));
+        foreach (
+            [
+                AdServerConfig::WalletAddress->name,
+                AdServerConfig::WalletSecretKey->name
+            ] as $field
+        ) {
+            if (!isset($input[$field])) {
+                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field));
             }
         }
-        if (1 !== preg_match(self::SECRET_KEY_PATTERN, $content[AdServerConfig::WalletSecretKey->name])) {
+
+        if (1 !== preg_match(self::SECRET_KEY_PATTERN, $input[AdServerConfig::WalletSecretKey->name])) {
             throw new UnprocessableEntityHttpException(
                 sprintf(
                     'Field `%s` must be a hexadecimal string of 64 characters',
@@ -77,20 +79,20 @@ class Wallet implements ConfiguratorCategory
                 )
             );
         }
-        if (!(new AdsAccountValidator())->valid($content[AdServerConfig::WalletAddress->name])) {
+        if (!(new AdsAccountValidator())->valid($input[AdServerConfig::WalletAddress->name])) {
             throw new UnprocessableEntityHttpException(
                 sprintf('Field `%s` must be a valid ADS account', AdServerConfig::WalletAddress->name)
             );
         }
 
         if (
-            !isset($content[AdServerConfig::WalletNodeHost->name])
-            && !isset($content[AdServerConfig::WalletNodePort->name])
+            !isset($input[AdServerConfig::WalletNodeHost->name])
+            && !isset($input[AdServerConfig::WalletNodePort->name])
         ) {
             return;
         }
 
-        if (!isset($content[AdServerConfig::WalletNodeHost->name])) {
+        if (!isset($input[AdServerConfig::WalletNodeHost->name])) {
             throw new UnprocessableEntityHttpException(
                 sprintf(
                     'Field `%s` is required if field `%s` is present',
@@ -99,7 +101,7 @@ class Wallet implements ConfiguratorCategory
                 )
             );
         }
-        if (!isset($content[AdServerConfig::WalletNodePort->name])) {
+        if (!isset($input[AdServerConfig::WalletNodePort->name])) {
             throw new UnprocessableEntityHttpException(
                 sprintf(
                     'Field `%s` is required if field `%s` is present',
@@ -110,14 +112,14 @@ class Wallet implements ConfiguratorCategory
         }
 
         if (
-            !filter_var($content[AdServerConfig::WalletNodeHost->name], FILTER_VALIDATE_DOMAIN)
-            && !filter_var($content[AdServerConfig::WalletNodeHost->name], FILTER_VALIDATE_IP)
+            !filter_var($input[AdServerConfig::WalletNodeHost->name], FILTER_VALIDATE_DOMAIN)
+            && !filter_var($input[AdServerConfig::WalletNodeHost->name], FILTER_VALIDATE_IP)
         ) {
             throw new UnprocessableEntityHttpException(
                 sprintf('Field `%s` must be a host', AdServerConfig::WalletNodeHost->name)
             );
         }
-        if (false === filter_var($content[AdServerConfig::WalletNodePort->name], FILTER_VALIDATE_INT)) {
+        if (false === filter_var($input[AdServerConfig::WalletNodePort->name], FILTER_VALIDATE_INT)) {
             throw new UnprocessableEntityHttpException(
                 sprintf('Field `%s` must be an integer', AdServerConfig::WalletNodePort->name)
             );
@@ -165,5 +167,15 @@ class Wallet implements ConfiguratorCategory
     private function getAdsharesNodeHostById(string $nodeId): string
     {
         return sprintf('n%s.e11.click', substr($nodeId, 2, 2));
+    }
+
+    private static function fields(): array
+    {
+        return [
+            AdServerConfig::WalletAddress->name,
+            AdServerConfig::WalletSecretKey->name,
+            AdServerConfig::WalletNodeHost->name,
+            AdServerConfig::WalletNodePort->name,
+        ];
     }
 }
