@@ -6,8 +6,11 @@ enum AdServerConfig implements ConfigEnum
 {
     public const MODULE = 'AdServer';
 
+    case AutoConfirmationEnabled;
+    case AutoRegistrationEnabled;
     case ColdWalletAddress;
     case ColdWalletIsActive;
+    case EmailVerificationRequired;
     case HotWalletMaxValue;
     case HotWalletMinValue;
     case LicenseData;
@@ -17,6 +20,7 @@ enum AdServerConfig implements ConfigEnum
     case OperatorTxFee;
     case ReferralRefundCommission;
     case ReferralRefundEnabled;
+    case RegistrationMode;
     case Url;
     case WalletAddress;
     case WalletNodeHost;

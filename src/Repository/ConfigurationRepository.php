@@ -166,7 +166,10 @@ class ConfigurationRepository extends ServiceEntityRepository
     private static function typeConversion(): array
     {
         return [
+            AdServerConfig::AutoConfirmationEnabled->name => ConfigType::Bool,
+            AdServerConfig::AutoRegistrationEnabled->name => ConfigType::Bool,
             AdServerConfig::ColdWalletIsActive->name => ConfigType::Bool,
+            AdServerConfig::EmailVerificationRequired->name => ConfigType::Bool,
             AdServerConfig::HotWalletMaxValue->name => ConfigType::Integer,
             AdServerConfig::HotWalletMinValue->name => ConfigType::Integer,
             AdServerConfig::OperatorRxFee->name => ConfigType::Float,
@@ -176,8 +179,6 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::WalletNodePort->name => ConfigType::Integer,
 
 //            self::ALLOW_ZONE_IN_IFRAME => ConfigType::Bool,
-//            self::AUTO_CONFIRMATION_ENABLED => ConfigType::Bool,
-//            self::AUTO_REGISTRATION_ENABLED => ConfigType::Bool,
 //            self::AUTO_WITHDRAWAL_LIMIT_ADS => ConfigType::Integer,
 //            self::AUTO_WITHDRAWAL_LIMIT_BSC => ConfigType::Integer,
 //            self::AUTO_WITHDRAWAL_LIMIT_BTC => ConfigType::Integer,
@@ -191,7 +192,6 @@ class ConfigurationRepository extends ServiceEntityRepository
 //            self::CAMPAIGN_MIN_CPA => ConfigType::Integer,
 //            self::CAMPAIGN_MIN_CPM => ConfigType::Integer,
 //            self::CHECK_ZONE_DOMAIN => ConfigType::Bool,
-//            self::EMAIL_VERIFICATION_REQUIRED => ConfigType::Bool,
 //            self::EXCHANGE_CURRENCIES => ConfigType::Array,
 //            self::FIAT_DEPOSIT_MAX_AMOUNT => ConfigType::Integer,
 //            self::FIAT_DEPOSIT_MIN_AMOUNT => ConfigType::Integer,

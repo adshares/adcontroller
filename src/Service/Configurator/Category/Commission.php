@@ -28,19 +28,18 @@ class Commission implements ConfiguratorCategory
 
         if (isset($input[AdServerConfig::ReferralRefundEnabled->name])) {
             if (
-                null === filter_var(
+                null === ($value = filter_var(
                     $input[AdServerConfig::ReferralRefundEnabled->name],
                     FILTER_VALIDATE_BOOL,
                     FILTER_NULL_ON_FAILURE
-                )
+                ))
             ) {
                 throw new UnprocessableEntityHttpException(
                     sprintf('Field `%s` must be a boolean', AdServerConfig::ReferralRefundEnabled->name)
                 );
             }
 
-            $input[AdServerConfig::ReferralRefundEnabled->name] =
-                (bool)$input[AdServerConfig::ReferralRefundEnabled->name];
+            $input[AdServerConfig::ReferralRefundEnabled->name] = $value;
         }
 
         $commissionValidator = new CommissionValidator();

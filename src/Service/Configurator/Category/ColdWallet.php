@@ -29,17 +29,16 @@ class ColdWallet implements ConfiguratorCategory
 
         if (isset($input[AdServerConfig::ColdWalletIsActive->name])) {
             if (
-                null === filter_var(
+                null === ($isActive = filter_var(
                     $input[AdServerConfig::ColdWalletIsActive->name],
                     FILTER_VALIDATE_BOOL,
                     FILTER_NULL_ON_FAILURE
-                )
+                ))
             ) {
                 throw new UnprocessableEntityHttpException(
                     sprintf('Field `%s` must be a boolean', AdServerConfig::ColdWalletIsActive->name)
                 );
             }
-            $isActive = (bool)$input[AdServerConfig::ColdWalletIsActive->name];
             if (!$isActive) {
                 $data = [
                     AdServerConfig::ColdWalletIsActive->name => false,

@@ -40,8 +40,8 @@ class AdServerConfigurationClient
     private const ADUSER_SERVE_SUBDOMAIN = 'aduser-serve-subdomain';
     private const ADVERTISER_APPLY_FORM_URL = 'advertiser-apply-form-url';
     private const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
-    private const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
-    private const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
+    public const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
+    public const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
     private const AUTO_WITHDRAWAL_LIMIT_ADS = 'auto-withdrawal-limit-ads';
     private const AUTO_WITHDRAWAL_LIMIT_BSC = 'auto-withdrawal-limit-bsc';
     private const AUTO_WITHDRAWAL_LIMIT_BTC = 'auto-withdrawal-limit-btc';
@@ -70,7 +70,7 @@ class AdServerConfigurationClient
     private const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
     private const CURRENCY = 'currency';
     private const DISPLAY_CURRENCY = 'display-currency';
-    private const EMAIL_VERIFICATION_REQUIRED = 'email-verification-required';
+    public const EMAIL_VERIFICATION_REQUIRED = 'email-verification-required';
     private const EXCHANGE_API_KEY = 'exchange-api-key';
     private const EXCHANGE_API_SECRET = 'exchange-api-secret';
     private const EXCHANGE_API_URL = 'exchange-api-url';
@@ -117,7 +117,7 @@ class AdServerConfigurationClient
     private const PUBLISHER_APPLY_FORM_URL = 'publisher-apply-form-url';
     public const REFERRAL_REFUND_COMMISSION = 'referral-refund-commission';
     public const REFERRAL_REFUND_ENABLED = 'referral-refund-enabled';
-    private const REGISTRATION_MODE = 'registration-mode';
+    public const REGISTRATION_MODE = 'registration-mode';
     private const REGISTRATION_USER_TYPES = 'registration-user-types';
     public const OPERATOR_RX_FEE = 'payment-rx-fee';
     public const OPERATOR_TX_FEE = 'payment-tx-fee';
@@ -185,8 +185,11 @@ class AdServerConfigurationClient
     private function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
+            AdServerConfig::AutoConfirmationEnabled->name => self::AUTO_CONFIRMATION_ENABLED,
+            AdServerConfig::AutoRegistrationEnabled->name => self::AUTO_REGISTRATION_ENABLED,
             AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
             AdServerConfig::ColdWalletIsActive->name => self::COLD_WALLET_IS_ACTIVE,
+            AdServerConfig::EmailVerificationRequired->name => self::EMAIL_VERIFICATION_REQUIRED,
             AdServerConfig::HotWalletMaxValue->name => self::HOT_WALLET_MAX_VALUE,
             AdServerConfig::HotWalletMinValue->name => self::HOT_WALLET_MIN_VALUE,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
@@ -195,6 +198,7 @@ class AdServerConfigurationClient
             AdServerConfig::OperatorTxFee->name => self::OPERATOR_TX_FEE,
             AdServerConfig::ReferralRefundCommission->name => self::REFERRAL_REFUND_COMMISSION,
             AdServerConfig::ReferralRefundEnabled->name => self::REFERRAL_REFUND_ENABLED,
+            AdServerConfig::RegistrationMode->name => self::REGISTRATION_MODE,
             AdServerConfig::Url->name => self::URL,
             AdServerConfig::WalletAddress->name => self::ADSHARES_ADDRESS,
             AdServerConfig::WalletNodeHost->name => self::ADSHARES_NODE_HOST,
