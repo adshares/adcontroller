@@ -15,6 +15,9 @@ enum AdServerConfig implements ConfigEnum
     case AutoWithdrawalLimitEth;
     case ColdWalletAddress;
     case ColdWalletIsActive;
+    case CrmMailAddressOnCampaignCreated;
+    case CrmMailAddressOnSiteAdded;
+    case CrmMailAddressOnUserRegistered;
     case EmailVerificationRequired;
     case HotWalletMaxValue;
     case HotWalletMinValue;

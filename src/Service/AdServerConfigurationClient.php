@@ -65,9 +65,9 @@ class AdServerConfigurationClient
     private const CLASSIFIER_EXTERNAL_PUBLIC_KEY = 'classifier-external-public-key';
     public const COLD_WALLET_ADDRESS = 'cold-wallet-address';
     public const COLD_WALLET_IS_ACTIVE = 'cold-wallet-is-active';
-    private const CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED = 'crm-mail-address-on-campaign-created';
-    private const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crm-mail-address-on-site-added';
-    private const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
+    public const CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED = 'crm-mail-address-on-campaign-created';
+    public const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crm-mail-address-on-site-added';
+    public const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
     private const CURRENCY = 'currency';
     private const DISPLAY_CURRENCY = 'display-currency';
     public const EMAIL_VERIFICATION_REQUIRED = 'email-verification-required';
@@ -194,6 +194,9 @@ class AdServerConfigurationClient
             AdServerConfig::AutoWithdrawalLimitEth->name => self::AUTO_WITHDRAWAL_LIMIT_ETH,
             AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
             AdServerConfig::ColdWalletIsActive->name => self::COLD_WALLET_IS_ACTIVE,
+            AdServerConfig::CrmMailAddressOnCampaignCreated->name => self::CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED,
+            AdServerConfig::CrmMailAddressOnSiteAdded->name => self::CRM_MAIL_ADDRESS_ON_SITE_ADDED,
+            AdServerConfig::CrmMailAddressOnUserRegistered->name => self::CRM_MAIL_ADDRESS_ON_USER_REGISTERED,
             AdServerConfig::EmailVerificationRequired->name => self::EMAIL_VERIFICATION_REQUIRED,
             AdServerConfig::HotWalletMaxValue->name => self::HOT_WALLET_MAX_VALUE,
             AdServerConfig::HotWalletMinValue->name => self::HOT_WALLET_MIN_VALUE,

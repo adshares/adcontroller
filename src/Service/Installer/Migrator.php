@@ -41,6 +41,11 @@ class Migrator
         AdServerConfigurationClient::AUTO_WITHDRAWAL_LIMIT_ETH => AdServerConfig::AutoWithdrawalLimitEth,
         AdServerConfigurationClient::COLD_WALLET_ADDRESS => AdServerConfig::ColdWalletAddress,
         AdServerConfigurationClient::COLD_WALLET_IS_ACTIVE => AdServerConfig::ColdWalletIsActive,
+        AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED =>
+            AdServerConfig::CrmMailAddressOnCampaignCreated,
+        AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_SITE_ADDED => AdServerConfig::CrmMailAddressOnSiteAdded,
+        AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_USER_REGISTERED =>
+            AdServerConfig::CrmMailAddressOnUserRegistered,
         AdServerConfigurationClient::EMAIL_VERIFICATION_REQUIRED => AdServerConfig::EmailVerificationRequired,
         AdServerConfigurationClient::HOT_WALLET_MAX_VALUE => AdServerConfig::HotWalletMaxValue,
         AdServerConfigurationClient::HOT_WALLET_MIN_VALUE => AdServerConfig::HotWalletMinValue,

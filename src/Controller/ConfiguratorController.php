@@ -14,6 +14,7 @@ use App\Repository\ConfigurationRepository;
 use App\Service\Configurator\Category\AutomaticWithdrawal;
 use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
+use App\Service\Configurator\Category\CrmNotifications;
 use App\Service\Configurator\Category\Registration;
 use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
@@ -79,6 +80,7 @@ class ConfiguratorController extends AbstractController
             'auto-withdrawal-config' => AutomaticWithdrawal::class,
             'cold-wallet-config' => ColdWallet::class,
             'commission-config' => Commission::class,
+            'crm-notifications-config' => CrmNotifications::class,
             'registration-config' => Registration::class,
             'site-options-config' => SiteOptions::class,
             'wallet-config' => Wallet::class,
