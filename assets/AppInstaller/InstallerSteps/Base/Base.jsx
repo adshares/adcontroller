@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
-import { useForm } from '../../../hooks';
+import { useForm, useErrorHandler } from '../../../hooks';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
@@ -23,12 +23,7 @@ function Base({ handleNextStep, step }) {
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
-  const [alert, setAlert] = useState({
-    type: '',
-    message: '',
-    title: '',
-  });
-
+  const { createErrorNotification } = useErrorHandler();
   useEffect(() => {
     getStepData();
   }, []);
@@ -50,11 +45,7 @@ function Base({ handleNextStep, step }) {
       setEditMode(DataRequired);
       setDataRequired(DataRequired);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -74,11 +65,7 @@ function Base({ handleNextStep, step }) {
       }
       handleNextStep(step);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +73,6 @@ function Base({ handleNextStep, step }) {
 
   return (
     <InstallerStepWrapper
-      alert={alert}
       dataLoading={isLoading}
       title="Base information"
       onNextClick={handleSubmit}

@@ -4,7 +4,7 @@ import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
 import Spinner from '../../../Components/Spinner/Spinner';
-import { useForm } from '../../../hooks';
+import { useForm, useErrorHandler } from '../../../hooks';
 
 const License = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -31,11 +31,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       licenseKey: ['licenseKey'],
     },
   });
-  const [alert, setAlert] = useState({
-    type: 'error',
-    message: '',
-    title: '',
-  });
+  const { createErrorNotification } = useErrorHandler();
 
   useEffect(() => {
     getStepData();
@@ -48,11 +44,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       setStepData({ ...stepData, ...LicenseData });
       setEditMode(DataRequired);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
       setIsLicenseLoading(false);
@@ -66,11 +58,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       setIsLicenseLoading(false);
       setStepData({ ...response.LicenseData });
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLicenseLoading(false);
     }
@@ -82,11 +70,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       const response = await apiService.getCommunityLicense();
       setStepData({ ...response.LicenseData });
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLicenseLoading(false);
     }
@@ -100,7 +84,6 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
 
   return (
     <InstallerStepWrapper
-      alert={alert}
       dataLoading={isLoading}
       title="License information"
       onNextClick={handleSubmit}
