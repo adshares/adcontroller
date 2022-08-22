@@ -128,9 +128,9 @@ class AdServerConfigurationClient
     private const SITE_FILTERING_EXCLUDE = 'site-filtering-exclude';
     private const SITE_FILTERING_REQUIRE = 'site-filtering-require';
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'site-verification-time-threshold';
-    private const SUPPORT_CHAT = 'support-chat';
+    public const SUPPORT_CHAT = 'support-chat';
     public const SUPPORT_EMAIL = 'support-email';
-    private const SUPPORT_TELEGRAM = 'support-telegram';
+    public const SUPPORT_TELEGRAM = 'support-telegram';
     private const SKYNET_API_KEY = 'skynet-api-key';
     private const SKYNET_API_URL = 'skynet-api-url';
     private const SKYNET_CDN_URL = 'skynet-cdn-url';
@@ -218,7 +218,9 @@ class AdServerConfigurationClient
             AdServerConfig::WalletNodeHost->name => self::ADSHARES_NODE_HOST,
             AdServerConfig::WalletNodePort->name => self::ADSHARES_NODE_PORT,
             AdServerConfig::WalletSecretKey->name => self::ADSHARES_SECRET,
+            GeneralConfig::SupportChat->name => self::SUPPORT_CHAT,
             GeneralConfig::SupportEmail->name => self::SUPPORT_EMAIL,
+            GeneralConfig::SupportTelegram->name => self::SUPPORT_TELEGRAM,
             GeneralConfig::TechnicalEmail->name => self::TECHNICAL_EMAIL,
             GeneralConfig::SmtpHost->name => self::MAIL_SMTP_HOST,
             GeneralConfig::SmtpPassword->name => self::MAIL_SMTP_PASSWORD,

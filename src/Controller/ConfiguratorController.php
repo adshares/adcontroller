@@ -12,6 +12,7 @@ use App\Entity\Enum\GeneralConfig;
 use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\Configurator\Category\AutomaticWithdrawal;
+use App\Service\Configurator\Category\BaseInformation;
 use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\CrmNotifications;
@@ -90,6 +91,7 @@ class ConfiguratorController extends AbstractController
     {
         return array_merge(parent::getSubscribedServices(), [
             'auto-withdrawal-config' => AutomaticWithdrawal::class,
+            'base-information-config' => BaseInformation::class,
             'cold-wallet-config' => ColdWallet::class,
             'commission-config' => Commission::class,
             'crm-notifications-config' => CrmNotifications::class,

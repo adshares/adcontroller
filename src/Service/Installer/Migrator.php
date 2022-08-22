@@ -65,7 +65,9 @@ class Migrator
         AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::Url,
         AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUserConfig::InternalUrl,
         // General
+        AdServerConfigurationClient::SUPPORT_CHAT => GeneralConfig::SupportChat,
         AdServerConfigurationClient::SUPPORT_EMAIL => GeneralConfig::SupportEmail,
+        AdServerConfigurationClient::SUPPORT_TELEGRAM => GeneralConfig::SupportTelegram,
         AdServerConfigurationClient::TECHNICAL_EMAIL => GeneralConfig::TechnicalEmail,
         AdServerConfigurationClient::MAIL_SMTP_HOST => GeneralConfig::SmtpHost,
         AdServerConfigurationClient::MAIL_SMTP_PASSWORD => GeneralConfig::SmtpPassword,
