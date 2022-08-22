@@ -3,10 +3,10 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
+use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Utility\ArrayUtils;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class SiteOptions implements ConfiguratorCategory
 {
@@ -27,24 +27,9 @@ class SiteOptions implements ConfiguratorCategory
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
         if (empty($input)) {
-            throw new UnprocessableEntityHttpException('Data is required');
+            throw new InvalidArgumentException('Data is required');
         }
-
-        if (isset($input[AdServerConfig::SiteAcceptBannersManually->name])) {
-            if (
-                null === ($value = filter_var(
-                    $input[AdServerConfig::SiteAcceptBannersManually->name],
-                    FILTER_VALIDATE_BOOL,
-                    FILTER_NULL_ON_FAILURE
-                ))
-            ) {
-                throw new UnprocessableEntityHttpException(
-                    sprintf('Field `%s` must be a boolean', AdServerConfig::SiteAcceptBannersManually->name)
-                );
-            }
-
-            $input[AdServerConfig::SiteAcceptBannersManually->name] = $value;
-        }
+        ArrayUtils::assureBoolTypeForField($input, AdServerConfig::SiteAcceptBannersManually->name);
 
         if (
             isset($input[AdServerConfig::SiteClassifierLocalBanners->name]) &&
@@ -54,7 +39,7 @@ class SiteOptions implements ConfiguratorCategory
                 true
             )
         ) {
-            throw new UnprocessableEntityHttpException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Field `%s` must be one of (%s)',
                     AdServerConfig::SiteClassifierLocalBanners->name,

@@ -3,11 +3,10 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
+use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Utility\ArrayUtils;
-use App\Utility\Validator\PositiveIntegerValidator;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class AutomaticWithdrawal implements ConfiguratorCategory
 {
@@ -22,21 +21,9 @@ class AutomaticWithdrawal implements ConfiguratorCategory
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
         if (empty($input)) {
-            throw new UnprocessableEntityHttpException('Data is required');
+            throw new InvalidArgumentException('Data is required');
         }
-
-        $validator = new PositiveIntegerValidator();
-        foreach ($fields as $field) {
-            if (isset($input[$field])) {
-                if (!$validator->valid($input[$field])) {
-                    throw new UnprocessableEntityHttpException(
-                        sprintf('Field `%s` must be a positive integer', $field)
-                    );
-                }
-
-                $input[$field] = (int)$input[$field];
-            }
-        }
+        ArrayUtils::assurePositiveIntegerTypesForFields($input, $fields);
 
         $this->adServerConfigurationClient->store($input);
         $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);

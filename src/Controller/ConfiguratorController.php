@@ -9,6 +9,7 @@ use App\Entity\Enum\AdSelectConfig;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
+use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\Configurator\Category\AutomaticWithdrawal;
 use App\Service\Configurator\Category\ColdWallet;
@@ -63,7 +64,11 @@ class ConfiguratorController extends AbstractController
         }
 
         $content = json_decode($request->getContent(), true) ?? [];
-        $service->process($content);
+        try {
+            $service->process($content);
+        } catch (InvalidArgumentException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
+        }
 
         return $this->jsonOk();
     }

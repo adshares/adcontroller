@@ -3,11 +3,11 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
+use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Utility\ArrayUtils;
 use App\Utility\Validator\CommissionValidator;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class Commission implements ConfiguratorCategory
 {
@@ -22,49 +22,24 @@ class Commission implements ConfiguratorCategory
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
         if (empty($input)) {
-            throw new UnprocessableEntityHttpException('Data is required');
+            throw new InvalidArgumentException('Data is required');
         }
-
-        if (isset($input[AdServerConfig::ReferralRefundEnabled->name])) {
-            if (
-                null === ($value = filter_var(
-                    $input[AdServerConfig::ReferralRefundEnabled->name],
-                    FILTER_VALIDATE_BOOL,
-                    FILTER_NULL_ON_FAILURE
-                ))
-            ) {
-                throw new UnprocessableEntityHttpException(
-                    sprintf('Field `%s` must be a boolean', AdServerConfig::ReferralRefundEnabled->name)
-                );
-            }
-
-            $input[AdServerConfig::ReferralRefundEnabled->name] = $value;
-        }
-
-        $commissionValidator = new CommissionValidator();
-        foreach (
+        ArrayUtils::assureBoolTypeForField($input, AdServerConfig::ReferralRefundEnabled->name);
+        self::assureCommissionTypeForFields(
+            $input,
             [
                 AdServerConfig::OperatorRxFee->name,
                 AdServerConfig::OperatorTxFee->name,
                 AdServerConfig::ReferralRefundCommission->name,
-            ] as $field
-        ) {
-            if (isset($input[$field])) {
-                if (!$commissionValidator->valid($input[$field])) {
-                    throw new UnprocessableEntityHttpException(
-                        sprintf('Field `%s` must be a commission', $field)
-                    );
-                }
-                $input[$field] = (float)$input[$field];
-            }
-        }
+            ]
+        );
 
         if (
             ($input[AdServerConfig::ReferralRefundEnabled->name] ?? false) &&
             !isset($input[AdServerConfig::ReferralRefundCommission->name]) &&
             null === $this->repository->fetchValueByEnum(AdServerConfig::ReferralRefundCommission)
         ) {
-            throw new UnprocessableEntityHttpException(
+            throw new InvalidArgumentException(
                 sprintf('Field `%s` is required', AdServerConfig::ReferralRefundCommission->name)
             );
         }
@@ -81,5 +56,20 @@ class Commission implements ConfiguratorCategory
             AdServerConfig::ReferralRefundEnabled->name,
             AdServerConfig::ReferralRefundCommission->name,
         ];
+    }
+
+    private static function assureCommissionTypeForFields(array &$input, array $fields): void
+    {
+        $commissionValidator = new CommissionValidator();
+        foreach ($fields as $field) {
+            if (isset($input[$field])) {
+                if (!$commissionValidator->valid($input[$field])) {
+                    throw new InvalidArgumentException(
+                        sprintf('Field `%s` must be a commission', $field)
+                    );
+                }
+                $input[$field] = (float)$input[$field];
+            }
+        }
     }
 }
