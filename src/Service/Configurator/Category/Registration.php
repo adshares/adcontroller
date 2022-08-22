@@ -13,8 +13,9 @@ class Registration implements ConfiguratorCategory
     private const ALLOWED_REGISTRATION_MODE = [
         'public',
         'restricted',
-        'private',
+        self::REGISTRATION_MODE_PRIVATE,
     ];
+    private const REGISTRATION_MODE_PRIVATE = 'private';
 
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
@@ -59,6 +60,28 @@ class Registration implements ConfiguratorCategory
                     join(', ', self::ALLOWED_REGISTRATION_MODE)
                 )
             );
+        }
+
+        $conflictingSettings = [
+            AdServerConfig::AutoRegistrationEnabled->name,
+            AdServerConfig::RegistrationMode->name,
+        ];
+        $data = array_merge(
+            $this->repository->fetchValuesByNames(AdServerConfig::MODULE, $conflictingSettings),
+            $input,
+        );
+        foreach ($conflictingSettings as $field) {
+            if (!isset($data[$field])) {
+                throw new UnprocessableEntityHttpException(
+                    sprintf('Field `%s` is required', $field)
+                );
+            }
+            if (
+                $data[AdServerConfig::AutoRegistrationEnabled->name] &&
+                self::REGISTRATION_MODE_PRIVATE === $data[AdServerConfig::RegistrationMode->name]
+            ) {
+                throw new UnprocessableEntityHttpException('Automatic registration is forbidden in private mode');
+            }
         }
 
         $this->adServerConfigurationClient->store($input);
