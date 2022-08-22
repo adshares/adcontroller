@@ -21,6 +21,10 @@ enum AdServerConfig implements ConfigEnum
     case EmailVerificationRequired;
     case HotWalletMaxValue;
     case HotWalletMinValue;
+    case InventoryExportWhitelist;
+    case InventoryImportWhitelist;
+    case InventoryPrivate;
+    case InventoryWhitelist;
     case LicenseData;
     case LicenseKey;
     case MaxPageZones;

@@ -59,7 +59,7 @@ export default function Network() {
   return (
     <Card className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
       <CardHeader
-        title="AdServer white list"
+        title="AdServer's whitelist"
         // eslint-disable-next-line max-len
         subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, ea incidunt modi porro sequi veniam voluptate!"
       />

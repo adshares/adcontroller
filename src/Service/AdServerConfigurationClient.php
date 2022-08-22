@@ -79,9 +79,9 @@ class AdServerConfigurationClient
     private const FIAT_DEPOSIT_MIN_AMOUNT = 'fiat-deposit-min-amount';
     public const HOT_WALLET_MAX_VALUE = 'hotwallet-max-value';
     public const HOT_WALLET_MIN_VALUE = 'hotwallet-min-value';
-    private const INVENTORY_EXPORT_WHITELIST = 'inventory-export-whitelist';
-    private const INVENTORY_IMPORT_WHITELIST = 'inventory-import-whitelist';
-    private const INVENTORY_WHITELIST = 'inventory-whitelist';
+    public const INVENTORY_EXPORT_WHITELIST = 'inventory-export-whitelist';
+    public const INVENTORY_IMPORT_WHITELIST = 'inventory-import-whitelist';
+    public const INVENTORY_WHITELIST = 'inventory-whitelist';
     private const INVOICE_CURRENCIES = 'invoice-currencies';
     private const INVOICE_COMPANY_ADDRESS = 'invoice-company-address';
     private const INVOICE_COMPANY_BANK_ACCOUNTS = 'invoice-company-bank-accounts';
@@ -200,6 +200,9 @@ class AdServerConfigurationClient
             AdServerConfig::EmailVerificationRequired->name => self::EMAIL_VERIFICATION_REQUIRED,
             AdServerConfig::HotWalletMaxValue->name => self::HOT_WALLET_MAX_VALUE,
             AdServerConfig::HotWalletMinValue->name => self::HOT_WALLET_MIN_VALUE,
+            AdServerConfig::InventoryExportWhitelist->name => self::INVENTORY_EXPORT_WHITELIST,
+            AdServerConfig::InventoryImportWhitelist->name => self::INVENTORY_IMPORT_WHITELIST,
+            AdServerConfig::InventoryWhitelist->name => self::INVENTORY_WHITELIST,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
             AdServerConfig::Name->name => self::ADSERVER_NAME,
             AdServerConfig::MaxPageZones->name => self::MAX_PAGE_ZONES,
@@ -230,7 +233,7 @@ class AdServerConfigurationClient
                 if (is_bool($value)) {
                     $value = $value ? '1' : '0';
                 }
-                $mappedData[$keyMap[$key]] = (string)$value;
+                $mappedData[$keyMap[$key]] = null !== $value ? (string)$value : null;
             }
         }
 

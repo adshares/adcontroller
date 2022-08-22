@@ -49,6 +49,9 @@ class Migrator
         AdServerConfigurationClient::EMAIL_VERIFICATION_REQUIRED => AdServerConfig::EmailVerificationRequired,
         AdServerConfigurationClient::HOT_WALLET_MAX_VALUE => AdServerConfig::HotWalletMaxValue,
         AdServerConfigurationClient::HOT_WALLET_MIN_VALUE => AdServerConfig::HotWalletMinValue,
+        AdServerConfigurationClient::INVENTORY_EXPORT_WHITELIST => AdServerConfig::InventoryExportWhitelist,
+        AdServerConfigurationClient::INVENTORY_IMPORT_WHITELIST => AdServerConfig::InventoryImportWhitelist,
+        AdServerConfigurationClient::INVENTORY_WHITELIST => AdServerConfig::InventoryWhitelist,
         AdServerConfigurationClient::MAX_PAGE_ZONES => AdServerConfig::MaxPageZones,
         AdServerConfigurationClient::OPERATOR_RX_FEE => AdServerConfig::OperatorRxFee,
         AdServerConfigurationClient::OPERATOR_TX_FEE => AdServerConfig::OperatorTxFee,
@@ -91,7 +94,11 @@ class Migrator
         $config = [];
         foreach (self::KEY_MAP as $adServerKey => $enum) {
             if (isset($adServerConfig[$adServerKey])) {
-                $config[$enum->getModule()][$enum->name] = $adServerConfig[$adServerKey];
+                $value = $adServerConfig[$adServerKey];
+                if (is_array($value)) {
+                    $value = join(',', $value);
+                }
+                $config[$enum->getModule()][$enum->name] = $value;
             }
         }
         return $config;

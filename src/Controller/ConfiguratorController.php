@@ -18,7 +18,9 @@ use App\Service\Configurator\Category\CrmNotifications;
 use App\Service\Configurator\Category\Registration;
 use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
+use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
+use App\Service\Installer\Migrator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,8 +53,18 @@ class ConfiguratorController extends AbstractController
                 array_map(fn($enum) => $enum->name, $class::cases())
             );
         }
+        self::appendAdServerPrivateInventory($data);
 
         return $this->jsonOk($data);
+    }
+
+    private static function appendAdServerPrivateInventory(array &$data): void
+    {
+        $whiteList = $data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name];
+        $privateInventory = 1 === count($whiteList) &&
+            $whiteList[0] === $data[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name];
+
+        $data[AdServerConfig::MODULE][AdServerConfig::InventoryPrivate->name] = $privateInventory;
     }
 
     #[Route('/config/{category}', name: 'store_config', methods: ['PATCH'])]
@@ -84,6 +96,7 @@ class ConfiguratorController extends AbstractController
             'registration-config' => Registration::class,
             'site-options-config' => SiteOptions::class,
             'wallet-config' => Wallet::class,
+            'whitelist-config' => Whitelist::class,
             'zone-options-config' => ZoneOptions::class,
         ]);
     }
