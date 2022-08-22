@@ -13,6 +13,9 @@ enum AdServerConfig implements ConfigEnum
     case AutoWithdrawalLimitBsc;
     case AutoWithdrawalLimitBtc;
     case AutoWithdrawalLimitEth;
+    case CampaignMinBudget;
+    case CampaignMinCpa;
+    case CampaignMinCpm;
     case ColdWalletAddress;
     case ColdWalletIsActive;
     case CrmMailAddressOnCampaignCreated;
@@ -36,6 +39,10 @@ enum AdServerConfig implements ConfigEnum
     case RegistrationMode;
     case SiteAcceptBannersManually;
     case SiteClassifierLocalBanners;
+    case UploadLimitImage;
+    case UploadLimitModel;
+    case UploadLimitVideo;
+    case UploadLimitZip;
     case Url;
     case WalletAddress;
     case WalletNodeHost;

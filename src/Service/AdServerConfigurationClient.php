@@ -51,9 +51,9 @@ class AdServerConfigurationClient
     private const BTC_WITHDRAW_FEE = 'btc-withdraw-fee';
     private const BTC_WITHDRAW_MAX_AMOUNT = 'btc-withdraw-max-amount';
     private const BTC_WITHDRAW_MIN_AMOUNT = 'btc-withdraw-min-amount';
-    private const CAMPAIGN_MIN_BUDGET = 'campaign-min-budget';
-    private const CAMPAIGN_MIN_CPA = 'campaign-min-cpa';
-    private const CAMPAIGN_MIN_CPM = 'campaign-min-cpm';
+    public const CAMPAIGN_MIN_BUDGET = 'campaign-min-budget';
+    public const CAMPAIGN_MIN_CPA = 'campaign-min-cpa';
+    public const CAMPAIGN_MIN_CPM = 'campaign-min-cpm';
     private const CAMPAIGN_TARGETING_EXCLUDE = 'campaign-targeting-exclude';
     private const CAMPAIGN_TARGETING_REQUIRE = 'campaign-targeting-require';
     private const CDN_PROVIDER = 'cdn-provider';
@@ -135,10 +135,10 @@ class AdServerConfigurationClient
     private const SKYNET_API_URL = 'skynet-api-url';
     private const SKYNET_CDN_URL = 'skynet-cdn-url';
     public const TECHNICAL_EMAIL = 'technical-email';
-    private const UPLOAD_LIMIT_IMAGE = 'upload-limit-image';
-    private const UPLOAD_LIMIT_MODEL = 'upload-limit-model';
-    private const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
-    private const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
+    public const UPLOAD_LIMIT_IMAGE = 'upload-limit-image';
+    public const UPLOAD_LIMIT_MODEL = 'upload-limit-model';
+    public const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
+    public const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
     public const URL = 'url';
 
     public function __construct(
@@ -192,6 +192,9 @@ class AdServerConfigurationClient
             AdServerConfig::AutoWithdrawalLimitBsc->name => self::AUTO_WITHDRAWAL_LIMIT_BSC,
             AdServerConfig::AutoWithdrawalLimitBtc->name => self::AUTO_WITHDRAWAL_LIMIT_BTC,
             AdServerConfig::AutoWithdrawalLimitEth->name => self::AUTO_WITHDRAWAL_LIMIT_ETH,
+            AdServerConfig::CampaignMinBudget->name => self::CAMPAIGN_MIN_BUDGET,
+            AdServerConfig::CampaignMinCpa->name => self::CAMPAIGN_MIN_CPA,
+            AdServerConfig::CampaignMinCpm->name => self::CAMPAIGN_MIN_CPM,
             AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
             AdServerConfig::ColdWalletIsActive->name => self::COLD_WALLET_IS_ACTIVE,
             AdServerConfig::CrmMailAddressOnCampaignCreated->name => self::CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED,
@@ -213,6 +216,10 @@ class AdServerConfigurationClient
             AdServerConfig::RegistrationMode->name => self::REGISTRATION_MODE,
             AdServerConfig::SiteAcceptBannersManually->name => self::SITE_ACCEPT_BANNERS_MANUALLY,
             AdServerConfig::SiteClassifierLocalBanners->name => self::SITE_CLASSIFIER_LOCAL_BANNERS,
+            AdServerConfig::UploadLimitImage->name => self::UPLOAD_LIMIT_IMAGE,
+            AdServerConfig::UploadLimitModel->name => self::UPLOAD_LIMIT_MODEL,
+            AdServerConfig::UploadLimitVideo->name => self::UPLOAD_LIMIT_VIDEO,
+            AdServerConfig::UploadLimitZip->name => self::UPLOAD_LIMIT_ZIP,
             AdServerConfig::Url->name => self::URL,
             AdServerConfig::WalletAddress->name => self::ADSHARES_ADDRESS,
             AdServerConfig::WalletNodeHost->name => self::ADSHARES_NODE_HOST,
