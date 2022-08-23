@@ -21,6 +21,7 @@ use App\Service\Configurator\Category\CrmNotifications;
 use App\Service\Configurator\Category\PanelPlaceholders;
 use App\Service\Configurator\Category\Registration;
 use App\Service\Configurator\Category\Regulations;
+use App\Service\Configurator\Category\RejectedDomains;
 use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
@@ -104,6 +105,7 @@ class ConfiguratorController extends AbstractController
             'panel-placeholders-config' => PanelPlaceholders::class,
             'registration-config' => Registration::class,
             'regulations-config' => Regulations::class,
+            'rejected-domains-config' => RejectedDomains::class,
             'site-options-config' => SiteOptions::class,
             'wallet-config' => Wallet::class,
             'whitelist-config' => Whitelist::class,

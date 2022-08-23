@@ -188,6 +188,7 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::OperatorTxFee->name => ConfigType::Float,
             AdServerConfig::ReferralRefundCommission->name => ConfigType::Float,
             AdServerConfig::ReferralRefundEnabled->name => ConfigType::Bool,
+            AdServerConfig::RejectedDomains->name => ConfigType::Array,
             AdServerConfig::SiteAcceptBannersManually->name => ConfigType::Bool,
             AdServerConfig::WalletNodePort->name => ConfigType::Integer,
             AdServerConfig::UploadLimitImage->name => ConfigType::Integer,

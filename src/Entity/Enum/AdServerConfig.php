@@ -38,6 +38,7 @@ enum AdServerConfig implements ConfigEnum
     case ReferralRefundCommission;
     case ReferralRefundEnabled;
     case RegistrationMode;
+    case RejectedDomains;
     case SiteAcceptBannersManually;
     case SiteClassifierLocalBanners;
     case Terms;

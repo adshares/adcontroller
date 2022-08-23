@@ -17,6 +17,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AdServerConfigurationClient
 {
+    // Config
     public const ADPANEL_URL = 'adpanel-url';
     private const ADPAY_BID_STRATEGY_EXPORT_TIME = 'adpay-bid-strategy-export';
     private const ADPAY_CAMPAIGN_EXPORT_TIME = 'adpay-campaign-export';
@@ -141,7 +142,7 @@ class AdServerConfigurationClient
     public const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
     public const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
     public const URL = 'url';
-
+    // PanelPlaceholder
     public const PLACEHOLDER_INDEX_DESCRIPTION = 'index-description';
     public const PLACEHOLDER_INDEX_KEYWORDS = 'index-keywords';
     public const PLACEHOLDER_INDEX_META_TAGS = 'index-meta-tags';
@@ -149,6 +150,8 @@ class AdServerConfigurationClient
     public const PLACEHOLDER_ROBOTS_TXT = 'robots-txt';
     public const PLACEHOLDER_PRIVACY_POLICY = 'privacy-policy';
     public const PLACEHOLDER_TERMS = 'terms';
+    // SiteRejectedDomain
+    public const REJECTED_DOMAINS = 'rejected-domains';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -225,6 +228,7 @@ class AdServerConfigurationClient
             AdServerConfig::ReferralRefundCommission->name => self::REFERRAL_REFUND_COMMISSION,
             AdServerConfig::ReferralRefundEnabled->name => self::REFERRAL_REFUND_ENABLED,
             AdServerConfig::RegistrationMode->name => self::REGISTRATION_MODE,
+            AdServerConfig::RejectedDomains->name => self::REJECTED_DOMAINS,
             AdServerConfig::SiteAcceptBannersManually->name => self::SITE_ACCEPT_BANNERS_MANUALLY,
             AdServerConfig::SiteClassifierLocalBanners->name => self::SITE_CLASSIFIER_LOCAL_BANNERS,
             AdServerConfig::UploadLimitImage->name => self::UPLOAD_LIMIT_IMAGE,

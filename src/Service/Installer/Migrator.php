@@ -57,6 +57,7 @@ class Migrator
         AdServerConfigurationClient::OPERATOR_TX_FEE => AdServerConfig::OperatorTxFee,
         AdServerConfigurationClient::REFERRAL_REFUND_ENABLED => AdServerConfig::ReferralRefundEnabled,
         AdServerConfigurationClient::REFERRAL_REFUND_COMMISSION => AdServerConfig::ReferralRefundCommission,
+        AdServerConfigurationClient::REJECTED_DOMAINS => AdServerConfig::RejectedDomains,
         AdServerConfigurationClient::REGISTRATION_MODE => AdServerConfig::RegistrationMode,
         AdServerConfigurationClient::SITE_ACCEPT_BANNERS_MANUALLY => AdServerConfig::SiteAcceptBannersManually,
         AdServerConfigurationClient::SITE_CLASSIFIER_LOCAL_BANNERS => AdServerConfig::SiteClassifierLocalBanners,
