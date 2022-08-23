@@ -34,11 +34,13 @@ enum AdServerConfig implements ConfigEnum
     case Name;
     case OperatorRxFee;
     case OperatorTxFee;
+    case PrivacyPolicy;
     case ReferralRefundCommission;
     case ReferralRefundEnabled;
     case RegistrationMode;
     case SiteAcceptBannersManually;
     case SiteClassifierLocalBanners;
+    case Terms;
     case UploadLimitImage;
     case UploadLimitModel;
     case UploadLimitVideo;

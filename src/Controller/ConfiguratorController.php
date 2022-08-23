@@ -18,7 +18,9 @@ use App\Service\Configurator\Category\CampaignSettings;
 use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\CrmNotifications;
+use App\Service\Configurator\Category\PanelPlaceholders;
 use App\Service\Configurator\Category\Registration;
+use App\Service\Configurator\Category\Regulations;
 use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
@@ -63,7 +65,7 @@ class ConfiguratorController extends AbstractController
 
     private static function appendAdServerPrivateInventory(array &$data): void
     {
-        $whiteList = $data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name];
+        $whiteList = $data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name] ?? [];
         $privateInventory = 1 === count($whiteList) &&
             $whiteList[0] === $data[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name];
 
@@ -99,7 +101,9 @@ class ConfiguratorController extends AbstractController
             'cold-wallet-config' => ColdWallet::class,
             'commission-config' => Commission::class,
             'crm-notifications-config' => CrmNotifications::class,
+            'panel-placeholders-config' => PanelPlaceholders::class,
             'registration-config' => Registration::class,
+            'regulations-config' => Regulations::class,
             'site-options-config' => SiteOptions::class,
             'wallet-config' => Wallet::class,
             'whitelist-config' => Whitelist::class,

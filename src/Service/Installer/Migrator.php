@@ -75,6 +75,15 @@ class Migrator
         AdServerConfigurationClient::MAIL_FROM_NAME => GeneralConfig::SmtpSender,
         AdServerConfigurationClient::MAIL_SMTP_USERNAME => GeneralConfig::SmtpUsername,
     ];
+    private const PLACEHOLDER_KEY_MAP = [
+        AdServerConfigurationClient::PLACEHOLDER_INDEX_DESCRIPTION => AdPanelConfig::PlaceholderIndexDescription,
+        AdServerConfigurationClient::PLACEHOLDER_INDEX_KEYWORDS => AdPanelConfig::PlaceholderIndexKeywords,
+        AdServerConfigurationClient::PLACEHOLDER_INDEX_META_TAGS => AdPanelConfig::PlaceholderIndexMetaTags,
+        AdServerConfigurationClient::PLACEHOLDER_INDEX_TITLE => AdPanelConfig::PlaceholderIndexTitle,
+        AdServerConfigurationClient::PLACEHOLDER_ROBOTS_TXT => AdPanelConfig::PlaceholderRobotsTxt,
+        AdServerConfigurationClient::PLACEHOLDER_PRIVACY_POLICY => AdServerConfig::PrivacyPolicy,
+        AdServerConfigurationClient::PLACEHOLDER_TERMS => AdServerConfig::Terms,
+    ];
 
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
@@ -85,16 +94,18 @@ class Migrator
     public function migrate(): void
     {
         $adServerConfig = $this->adServerConfigurationClient->fetch();
-
-        $config = $this->map($adServerConfig);
-
+        $config = $this->map(self::KEY_MAP, $adServerConfig);
         $this->store($config);
+
+        $adServerPlaceholders = $this->adServerConfigurationClient->fetchPlaceholders();
+        $placeholders = $this->map(self::PLACEHOLDER_KEY_MAP, $adServerPlaceholders);
+        $this->store($placeholders);
     }
 
-    private function map(array $adServerConfig): array
+    private function map(array $keyMap, array $adServerConfig): array
     {
         $config = [];
-        foreach (self::KEY_MAP as $adServerKey => $enum) {
+        foreach ($keyMap as $adServerKey => $enum) {
             if (isset($adServerConfig[$adServerKey])) {
                 $value = $adServerConfig[$adServerKey];
                 if (is_array($value)) {

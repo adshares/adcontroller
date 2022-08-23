@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Exception\ServiceNotPresent;
@@ -141,6 +142,14 @@ class AdServerConfigurationClient
     public const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
     public const URL = 'url';
 
+    public const PLACEHOLDER_INDEX_DESCRIPTION = 'index-description';
+    public const PLACEHOLDER_INDEX_KEYWORDS = 'index-keywords';
+    public const PLACEHOLDER_INDEX_META_TAGS = 'index-meta-tags';
+    public const PLACEHOLDER_INDEX_TITLE = 'index-title';
+    public const PLACEHOLDER_ROBOTS_TXT = 'robots-txt';
+    public const PLACEHOLDER_PRIVACY_POLICY = 'privacy-policy';
+    public const PLACEHOLDER_TERMS = 'terms';
+
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
@@ -151,38 +160,40 @@ class AdServerConfigurationClient
 
     public function fetch(): array
     {
-        $response = $this->httpClient->request(
-            'GET',
-            $this->buildUri(),
-            [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getToken(),
-                ],
-            ]
-        );
+        return $this->getData($this->buildConfigUri());
+    }
 
-        $this->checkStatusCode($response);
-
-        return json_decode($response->getContent(), true);
+    public function fetchPlaceholders(): array
+    {
+        return $this->getData($this->buildPlaceholdersUri());
     }
 
     public function store(array $data): void
     {
-        $mapped = $this->mapDataToAdServerFormat($data);
-        $this->sendData($mapped);
+        $this->patchData($this->buildConfigUri(), self::mapDataToAdServerFormat($data));
     }
 
-    private function buildUri(): string
+    public function storePlaceholders(array $data): void
+    {
+        $this->patchData($this->buildPlaceholdersUri(), self::mapPlaceholderDataToAdServerFormat($data));
+    }
+
+    private function buildConfigUri(): string
     {
         return sprintf('%s/api/config', $this->adserverBaseUri);
     }
 
-    private function getToken(): string
+    private function buildPlaceholdersUri(): string
     {
-        return $this->tokenStorage->getToken()->getCredentials();
+        return sprintf('%s/api/config/placeholders', $this->adserverBaseUri);
     }
 
-    private function mapDataToAdServerFormat(array $data): array
+    private function getAuthorizationHeader(): string
+    {
+        return 'Bearer ' . $this->tokenStorage->getToken()->getCredentials();
+    }
+
+    private static function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
             AdServerConfig::AllowZoneInIframe->name => self::ALLOW_ZONE_IN_IFRAME,
@@ -253,6 +264,32 @@ class AdServerConfigurationClient
         return $mappedData;
     }
 
+    private static function mapPlaceholderDataToAdServerFormat(array $data): array
+    {
+        $keyMap = [
+            AdPanelConfig::PlaceholderIndexDescription->name => self::PLACEHOLDER_INDEX_DESCRIPTION,
+            AdPanelConfig::PlaceholderIndexKeywords->name => self::PLACEHOLDER_INDEX_KEYWORDS,
+            AdPanelConfig::PlaceholderIndexMetaTags->name => self::PLACEHOLDER_INDEX_META_TAGS,
+            AdPanelConfig::PlaceholderIndexTitle->name => self::PLACEHOLDER_INDEX_TITLE,
+            AdPanelConfig::PlaceholderRobotsTxt->name => self::PLACEHOLDER_ROBOTS_TXT,
+            AdServerConfig::PrivacyPolicy->name => self::PLACEHOLDER_PRIVACY_POLICY,
+            AdServerConfig::Terms->name => self::PLACEHOLDER_TERMS,
+        ];
+
+        $mappedData = [];
+        foreach ($data as $key => $value) {
+            if (isset($keyMap[$key])) {
+                $mappedData[$keyMap[$key]] = null !== $value ? (string)$value : null;
+            }
+        }
+
+        if (!$mappedData) {
+            throw new InvalidArgumentException('No data to store');
+        }
+
+        return $mappedData;
+    }
+
     private function checkStatusCode(ResponseInterface $response): void
     {
         try {
@@ -275,7 +312,8 @@ class AdServerConfigurationClient
 
     public function setupAdClassify(string $adClassifyUrl, string $apiKeyName, string $apiKeySecret): void
     {
-        $this->sendData(
+        $this->patchData(
+            $this->buildConfigUri(),
             [
                 self::CLASSIFIER_EXTERNAL_API_KEY_NAME => $apiKeyName,
                 self::CLASSIFIER_EXTERNAL_API_KEY_SECRET => $apiKeySecret,
@@ -286,22 +324,23 @@ class AdServerConfigurationClient
 
     public function setupAdPanel(string $adPanelUrl): void
     {
-        $this->sendData([self::ADPANEL_URL => $adPanelUrl]);
+        $this->patchData($this->buildConfigUri(), [self::ADPANEL_URL => $adPanelUrl]);
     }
 
     public function setupAdPay(string $adPayUrl): void
     {
-        $this->sendData([self::ADPAY_URL => $adPayUrl]);
+        $this->patchData($this->buildConfigUri(), [self::ADPAY_URL => $adPayUrl]);
     }
 
     public function setupAdSelect(string $adSelectUrl): void
     {
-        $this->sendData([self::ADSELECT_URL => $adSelectUrl]);
+        $this->patchData($this->buildConfigUri(), [self::ADSELECT_URL => $adSelectUrl]);
     }
 
     public function setupAdUser(string $adUserUrl, string $adUserInternalUrl): void
     {
-        $this->sendData(
+        $this->patchData(
+            $this->buildConfigUri(),
             [
                 self::ADUSER_BASE_URL => $adUserUrl,
                 self::ADUSER_INTERNAL_URL => $adUserInternalUrl,
@@ -309,19 +348,34 @@ class AdServerConfigurationClient
         );
     }
 
-    private function sendData(array $data): void
+    private function getData(string $url): mixed
+    {
+        $response = $this->httpClient->request(
+            'GET',
+            $url,
+            [
+                'headers' => [
+                    'Authorization' => $this->getAuthorizationHeader(),
+                ],
+            ]
+        );
+        $this->checkStatusCode($response);
+
+        return json_decode($response->getContent(), true);
+    }
+
+    private function patchData(string $url, array $data): void
     {
         $response = $this->httpClient->request(
             'PATCH',
-            $this->buildUri(),
+            $url,
             [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getToken(),
+                    'Authorization' => $this->getAuthorizationHeader(),
                 ],
                 'json' => $data
             ]
         );
-
         $this->checkStatusCode($response);
     }
 }
