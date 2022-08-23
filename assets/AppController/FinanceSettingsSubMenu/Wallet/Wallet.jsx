@@ -1,4 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useSetWalletMutation } from '../../../redux/config/configApi';
+import apiService from '../../../utils/apiService';
+import { useForm, useSkipFirstRenderEffect, useErrorHandler } from '../../../hooks';
+import { validateAddress } from '@adshares/ads';
+import Spinner from '../../../Components/Spinner/Spinner';
 import {
   Box,
   Button,
@@ -19,12 +26,75 @@ import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../common/commonStyles.scss';
 
-function WalletSettingsCard() {
-  const [walletAddress, setWalletAddress] = useState('');
-  const [secretKey, setSecretKey] = useState('');
-  const [nodeHost, setNodeHost] = useState('');
-  const [nodePort, setNodePort] = useState('');
+const WalletSettingsCard = () => {
+  const appData = useSelector(configSelectors.getAppData);
   const [editMode, setEditMode] = useState(false);
+  const [isHostVerification, setIsHostVerification] = useState(false);
+  const [isKnownNode, setKnownNode] = useState(false);
+  const { createErrorNotification } = useErrorHandler();
+  const walletForm = useForm({
+    initialFields: { WalletAddress: '', WalletSecretKey: '' },
+    validation: {
+      WalletAddress: ['required', 'wallet'],
+      WalletSecretKey: ['required', 'walletSecret'],
+    },
+  });
+  const nodeForm = useForm({
+    initialFields: { WalletNodeHost: '', WalletNodePort: '' },
+    validation: {
+      WalletNodeHost: ['required', 'domain'],
+      WalletNodePort: ['required', 'integer'],
+    },
+  });
+  const [setWallet, { isLoading }] = useSetWalletMutation();
+
+  useSkipFirstRenderEffect(() => {
+    if (walletForm.errorObj.WalletAddress.isValid) {
+      getWalletNodes();
+    }
+  }, [walletForm.errorObj.WalletAddress.isValid]);
+
+  useEffect(() => {
+    checkIsKnownNode(walletForm.fields.WalletAddress);
+  }, [walletForm.fields.WalletAddress]);
+
+  const getWalletNodes = async () => {
+    try {
+      setIsHostVerification(true);
+      const response = await apiService.getWalletNodeHost({ WalletAddress: walletForm.fields.WalletAddress });
+      nodeForm.setFields({ ...response });
+    } catch (err) {
+      nodeForm.setFields({
+        WalletNodeHost: '',
+        WalletNodePort: '',
+      });
+      createErrorNotification(err);
+    } finally {
+      setIsHostVerification(false);
+    }
+  };
+
+  const checkIsKnownNode = (walletAddress) => {
+    const isValidWalletAddress = validateAddress(walletAddress);
+    if (!isValidWalletAddress) {
+      return;
+    }
+    const expression = walletAddress.slice(0, 4);
+    if (parseInt(expression, 16) > 0 && parseInt(expression, 16) <= 34) {
+      setKnownNode(true);
+      return;
+    }
+    setKnownNode(false);
+  };
+
+  const onSaveClick = async () => {
+    try {
+      await setWallet({ ...walletForm.fields, ...nodeForm.fields }).unwrap();
+    } catch (err) {
+      createErrorNotification(err);
+    }
+  };
+
   return (
     <Card className={commonStyles.card}>
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
@@ -39,60 +109,90 @@ function WalletSettingsCard() {
             <Box className={`${commonStyles.flex}`}>
               <Typography variant="h6">You wallet address:</Typography>
               <Typography variant="h6" sx={{ ml: 1 }}>
-                {/*TODO: Add service to read wallet address*/}
-                0002-0000064A-3695
+                {appData.AdServer && appData.AdServer.WalletAddress}
               </Typography>
             </Box>
           </Collapse>
-          <Collapse in={editMode} timeout="auto">
-            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifySpaceEvenly}`}>
+          <Collapse in={editMode} timeout="auto" unmountOnExit>
+            <Box
+              sx={{ marginLeft: 'auto', marginRight: 'auto' }}
+              className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn}`}
+              component="form"
+              onChange={walletForm.onChange}
+              onFocus={walletForm.setTouched}
+            >
               <TextField
-                sx={{ width: '40%' }}
                 size="small"
-                name="walletAddress"
+                margin="dense"
+                name="WalletAddress"
                 label="Wallet address"
-                value={walletAddress}
-                onChange={(e) => setWalletAddress(e.target.value)}
+                error={walletForm.touchedFields.WalletAddress && !walletForm.errorObj.WalletAddress.isValid}
+                helperText={walletForm.touchedFields.WalletAddress && walletForm.errorObj.WalletAddress.helperText}
+                value={walletForm.fields.WalletAddress}
                 type="text"
                 inputProps={{ autoComplete: 'off' }}
               />
 
               <TextField
-                sx={{ width: '40%' }}
                 size="small"
-                name="secretKey"
+                margin="dense"
+                name="WalletSecretKey"
                 label="Secret key"
-                value={secretKey}
-                onChange={(e) => setSecretKey(e.target.value)}
+                error={walletForm.touchedFields.WalletSecretKey && !walletForm.errorObj.WalletSecretKey.isValid}
+                helperText={walletForm.touchedFields.WalletSecretKey && walletForm.errorObj.WalletSecretKey.helperText}
+                value={walletForm.fields.WalletSecretKey}
                 type="text"
                 inputProps={{ autoComplete: 'off' }}
               />
             </Box>
-            <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifySpaceEvenly}`}>
-              <TextField
-                sx={{ width: '40%' }}
-                size="small"
-                name="nodeHost"
-                label="Node host"
-                value={nodeHost}
-                onChange={(e) => setNodeHost(e.target.value)}
-                type="text"
-                inputProps={{ autoComplete: 'off' }}
-              />
+            <Collapse
+              in={Object.values(nodeForm.fields).some((el) => !!el) && !isKnownNode && walletForm.errorObj.WalletAddress.isValid}
+              timeout="auto"
+              unmountOnExit
+            >
+              {isHostVerification ? (
+                <Spinner />
+              ) : (
+                <Box
+                  sx={{ marginLeft: 'auto', marginRight: 'auto' }}
+                  className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn}`}
+                  component="form"
+                  onChange={nodeForm.onChange}
+                  onFocus={nodeForm.setTouched}
+                >
+                  <TextField
+                    size="small"
+                    margin="dense"
+                    name="WalletNodeHost"
+                    label="Node host"
+                    error={nodeForm.touchedFields.WalletNodeHost && !nodeForm.errorObj.WalletNodeHost.isValid}
+                    helperText={nodeForm.touchedFields.WalletNodeHost && nodeForm.errorObj.WalletNodeHost.helperText}
+                    value={nodeForm.fields.WalletNodeHost}
+                    type="text"
+                    inputProps={{ autoComplete: 'off' }}
+                  />
 
-              <TextField
-                sx={{ width: '40%' }}
-                size="small"
-                name="nodePort"
-                label="Node port"
-                value={nodePort}
-                onChange={(e) => setNodePort(e.target.value)}
-                type="text"
-                inputProps={{ autoComplete: 'off' }}
-              />
-            </Box>
+                  <TextField
+                    size="small"
+                    margin="dense"
+                    name="WalletNodePort"
+                    label="Node port"
+                    error={nodeForm.touchedFields.WalletNodePort && !nodeForm.errorObj.WalletNodePort.isValid}
+                    helperText={nodeForm.touchedFields.WalletNodePort && nodeForm.errorObj.WalletNodePort.helperText}
+                    value={nodeForm.fields.WalletNodePort}
+                    type="text"
+                    inputProps={{ autoComplete: 'off' }}
+                  />
+                </Box>
+              )}
+            </Collapse>
             <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-              <Button variant="contained" type="button">
+              <Button
+                onClick={onSaveClick}
+                disabled={isLoading || !walletForm.isFormValid || !nodeForm.isFormValid || isHostVerification}
+                variant="contained"
+                type="button"
+              >
                 Save
               </Button>
             </Box>
@@ -101,7 +201,7 @@ function WalletSettingsCard() {
       </CardContent>
     </Card>
   );
-}
+};
 
 const WalletStatusCard = () => {
   return (
@@ -229,7 +329,7 @@ const ColdWalletSettingsCard = () => {
   );
 };
 
-const Wallet = () => {
+function Wallet() {
   return (
     <>
       <WalletSettingsCard />
@@ -237,6 +337,6 @@ const Wallet = () => {
       <ColdWalletSettingsCard />
     </>
   );
-};
+}
 
 export default Wallet;
