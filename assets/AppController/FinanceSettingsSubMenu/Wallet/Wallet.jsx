@@ -95,11 +95,19 @@ const WalletSettingsCard = () => {
     }
   };
 
+  const toggleEditMode = () => {
+    if (editMode) {
+      walletForm.resetForm();
+      nodeForm.resetForm();
+    }
+    setEditMode(!editMode);
+  };
+
   return (
     <Card className={commonStyles.card}>
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="Wallet settings" />
-        <IconButton type="button" onClick={() => setEditMode(!editMode)}>
+        <IconButton type="button" onClick={toggleEditMode}>
           {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
         </IconButton>
       </Box>

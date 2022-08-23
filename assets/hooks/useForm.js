@@ -142,6 +142,11 @@ export default function useForm(options) {
     return validationResult;
   };
 
+  const resetForm = () => {
+    setFields(options.initialFields);
+    setTouchedFields(Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}));
+  };
+
   return {
     fields,
     errorObj,
@@ -150,5 +155,6 @@ export default function useForm(options) {
     onChange,
     setTouched,
     touchedFields,
+    resetForm,
   };
 }
