@@ -10,10 +10,12 @@ use App\Entity\Enum\AdSelectConfig;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
+use App\Entity\Enum\RebrandingConfig;
 use App\Exception\InvalidArgumentException;
 use App\Exception\OutdatedLicense;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
+use App\Repository\AssetRepository;
 use App\Repository\ConfigurationRepository;
 use App\Service\Configurator\Category\AutomaticWithdrawal;
 use App\Service\Configurator\Category\BannerSettings;
@@ -22,6 +24,7 @@ use App\Service\Configurator\Category\CampaignSettings;
 use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\CrmNotifications;
+use App\Service\Configurator\Category\PanelAssets;
 use App\Service\Configurator\Category\PanelPlaceholders;
 use App\Service\Configurator\Category\Registration;
 use App\Service\Configurator\Category\Regulations;
@@ -38,6 +41,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -102,6 +106,37 @@ class ConfiguratorController extends AbstractController
         }
 
         return $this->jsonOk([Configuration::LICENSE_DATA => $license->toArray()]);
+    }
+
+    #[Route('/config/panel-assets/{fileId}', name: 'fetch_panel_assets', methods: ['GET'])]
+    public function fetchPanelAssets(string $fileId, AssetRepository $repository, PanelAssets $panelAssets): Response
+    {
+        $panelAssets->validateFileId($fileId);
+        $entity = $repository->findOneBy(['module' => RebrandingConfig::MODULE, 'name' => $fileId]);
+
+        $response = new StreamedResponse(function () use ($entity) {
+            echo stream_get_contents($entity->getContent());
+        });
+        $response->headers->set('Content-Type', $entity->getMimeType());
+
+        return $response;
+    }
+
+    #[Route('/config/panel-assets', name: 'store_panel_assets', methods: ['POST'])]
+    public function storePanelAssets(Request $request, PanelAssets $panelAssets): JsonResponse
+    {
+        $content = [];
+        foreach ($request->files as $filename => $file) {
+            $content[$filename] = $file;
+        }
+
+        try {
+            $panelAssets->process($content);
+        } catch (InvalidArgumentException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
+        }
+
+        return $this->jsonOk();
     }
 
     #[Route('/config/{category}', name: 'store_config', methods: ['PATCH'])]
