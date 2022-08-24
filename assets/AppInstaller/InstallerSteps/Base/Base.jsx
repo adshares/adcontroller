@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
-import { useForm, useErrorHandler } from '../../../hooks';
+import { useForm, useCreateNotification } from '../../../hooks';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
@@ -23,7 +23,7 @@ function Base({ handleNextStep, step }) {
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
-  const { createErrorNotification } = useErrorHandler();
+  const { createErrorNotification } = useCreateNotification();
   useEffect(() => {
     getStepData();
   }, []);

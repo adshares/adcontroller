@@ -30,9 +30,16 @@ export const configApi = createApi({
         method: 'GET',
       }),
     }),
-    setWallet: builder.mutation({
+    setWalletConfig: builder.mutation({
       query: (body) => ({
         url: '/api/config/wallet',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setColdWalletConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/cold-wallet',
         method: 'PATCH',
         body,
       }),
@@ -40,4 +47,4 @@ export const configApi = createApi({
   }),
 });
 
-export const { useGetAppConfigQuery, useSetWalletMutation } = configApi;
+export const { useGetAppConfigQuery, useSetWalletConfigMutation, useSetColdWalletConfigMutation } = configApi;

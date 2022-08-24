@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import Spinner from '../../../Components/Spinner/Spinner';
-import { useErrorHandler } from '../../../hooks';
+import { useCreateNotification } from '../../../hooks';
 
 function Status({ handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +48,7 @@ function Status({ handlePrevStep, step }) {
     },
     DataRequired: false,
   });
-  const { createErrorNotification } = useErrorHandler();
+  const { createErrorNotification } = useCreateNotification();
 
   useEffect(() => {
     getStepData().catch((error) => console.log(error));

@@ -33,7 +33,6 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import commonStyles from './common/commonStyles.scss';
-import { setConfig } from '../redux/config/configSlice';
 import { useGetAppConfigQuery } from '../redux/config/configApi';
 import { skipToken } from '@reduxjs/toolkit/query';
 
@@ -152,22 +151,16 @@ function AppController() {
   const [isLoading, setIsLoading] = useState(true);
   const [showSideMenu, toggleSideMenu] = useState(true);
   const pages = getAppPages(appModules, isLoggedIn);
-  const { data: appData, isLoading: appDataLoading } = useGetAppConfigQuery(token ?? skipToken);
+  const { isLoading: isAppDataLoading } = useGetAppConfigQuery(token ?? skipToken);
 
   useEffect(() => {
     dispatch(checkAppAuth());
     setIsLoading(false);
   }, [token]);
 
-  useEffect(() => {
-    if (isLoggedIn && appData) {
-      dispatch(setConfig(appData.data));
-    }
-  }, [appDataLoading, isLoggedIn]);
-
   return (
     !isLoading &&
-    !appDataLoading && (
+    !isAppDataLoading && (
       <>
         <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
         <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>

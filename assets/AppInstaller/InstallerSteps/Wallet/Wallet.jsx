@@ -6,7 +6,7 @@ import styles from './styles.scss';
 import { useForm, useSkipFirstRenderEffect } from '../../../hooks';
 import Spinner from '../../../Components/Spinner/Spinner';
 import { validateAddress } from '@adshares/ads';
-import useErrorHandler from '../../../hooks/useErrorHandler';
+import useCreateNotification from '../../../hooks/useCreateNotification';
 
 function Wallet({ handleNextStep, handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +28,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
   const [isKnownNode, setKnownNode] = useState(false);
-  const { createErrorNotification } = useErrorHandler();
+  const { createErrorNotification } = useCreateNotification();
 
   useEffect(() => {
     getStepData();

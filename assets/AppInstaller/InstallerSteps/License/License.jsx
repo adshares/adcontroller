@@ -4,7 +4,7 @@ import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
 import Spinner from '../../../Components/Spinner/Spinner';
-import { useForm, useErrorHandler } from '../../../hooks';
+import { useForm, useCreateNotification } from '../../../hooks';
 
 const License = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +31,7 @@ const License = ({ handleNextStep, handlePrevStep, step }) => {
       licenseKey: ['licenseKey'],
     },
   });
-  const { createErrorNotification } = useErrorHandler();
+  const { createErrorNotification } = useCreateNotification();
 
   useEffect(() => {
     getStepData();

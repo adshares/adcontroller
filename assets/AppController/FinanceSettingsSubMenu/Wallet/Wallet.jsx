@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
-import { useSetWalletMutation } from '../../../redux/config/configApi';
+import { useSetWalletConfigMutation, useSetColdWalletConfigMutation } from '../../../redux/config/configApi';
 import apiService from '../../../utils/apiService';
-import { useForm, useSkipFirstRenderEffect, useErrorHandler } from '../../../hooks';
+import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../../hooks';
 import { validateAddress } from '@adshares/ads';
 import Spinner from '../../../Components/Spinner/Spinner';
 import {
@@ -31,7 +31,7 @@ const WalletSettingsCard = () => {
   const [editMode, setEditMode] = useState(false);
   const [isHostVerification, setIsHostVerification] = useState(false);
   const [isKnownNode, setKnownNode] = useState(false);
-  const { createErrorNotification } = useErrorHandler();
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
   const walletForm = useForm({
     initialFields: { WalletAddress: '', WalletSecretKey: '' },
     validation: {
@@ -46,7 +46,7 @@ const WalletSettingsCard = () => {
       WalletNodePort: ['required', 'integer'],
     },
   });
-  const [setWallet, { isLoading }] = useSetWalletMutation();
+  const [setWalletConfig, { isLoading }] = useSetWalletConfigMutation();
 
   useSkipFirstRenderEffect(() => {
     if (walletForm.errorObj.WalletAddress.isValid) {
@@ -89,7 +89,11 @@ const WalletSettingsCard = () => {
 
   const onSaveClick = async () => {
     try {
-      await setWallet({ ...walletForm.fields, ...nodeForm.fields }).unwrap();
+      await setWalletConfig({ ...walletForm.fields, ...nodeForm.fields }).unwrap();
+      setEditMode((prevState) => !prevState);
+      walletForm.resetForm();
+      nodeForm.resetForm();
+      createSuccessNotification();
     } catch (err) {
       createErrorNotification(err);
     }
@@ -117,7 +121,7 @@ const WalletSettingsCard = () => {
             <Box className={`${commonStyles.flex}`}>
               <Typography variant="h6">You wallet address:</Typography>
               <Typography variant="h6" sx={{ ml: 1 }}>
-                {appData.AdServer && appData.AdServer.WalletAddress}
+                {appData.AdServer.WalletAddress}
               </Typography>
             </Box>
           </Collapse>
@@ -245,30 +249,56 @@ const WalletStatusCard = () => {
 };
 
 const ColdWalletSettingsCard = () => {
-  const [isEnabled, setEnabled] = useState(true);
-  const [minThresholdValue, setMinThresholdValue] = useState('');
-  const [maxThresholdValue, setMaxThresholdValue] = useState('');
-  const [coldWalletAddress, setColdWalletAddress] = useState('');
+  const appData = useSelector(configSelectors.getAppData);
+  const [setColdWalletConfig, { isLoading }] = useSetColdWalletConfigMutation();
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const [ColdWalletIsActive, setColdWalletIsActive] = useState(appData.AdServer.ColdWalletIsActive || false);
+  const form = useForm({
+    initialFields: {
+      HotWalletMinValue: appData.AdServer.HotWalletMinValue,
+      HotWalletMaxValue: appData.AdServer.HotWalletMaxValue,
+      ColdWalletAddress: appData.AdServer.ColdWalletAddress,
+    },
+    validation: {
+      ColdWalletAddress: ['required', 'wallet'],
+    },
+  });
+
+  const onSaveClick = async () => {
+    try {
+      await setColdWalletConfig(ColdWalletIsActive ? { ColdWalletIsActive, ...form.fields } : { ColdWalletIsActive }).unwrap();
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
+  };
+
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Cold wallet settings" />
       <FormControlLabel
         sx={{ pl: 2 }}
         label="Enable cold wallet"
-        control={<Checkbox checked={isEnabled} onChange={() => setEnabled(!isEnabled)} />}
+        control={<Checkbox checked={ColdWalletIsActive} onChange={() => setColdWalletIsActive((prevState) => !prevState)} />}
       />
 
-      <Collapse in={isEnabled} timeout="auto">
+      <Collapse in={ColdWalletIsActive} timeout="auto">
         <CardContent>
-          <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceAround}`}>
+          <Box
+            className={`${commonStyles.flex} ${commonStyles.justifySpaceAround} ${commonStyles.alignStart}`}
+            component="form"
+            onChange={form.onChange}
+            onFocus={form.setTouched}
+          >
             <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
               <TextField
                 size="small"
-                name="minThresholdValue"
+                name="HotWalletMinValue"
                 label="Min threshold value"
-                value={minThresholdValue}
-                onChange={(e) => setMinThresholdValue(e.target.value)}
-                type="text"
+                error={form.touchedFields.HotWalletMinValue && !form.errorObj.HotWalletMinValue.isValid}
+                helperText={form.touchedFields.HotWalletMinValue && form.errorObj.HotWalletMinValue.helperText}
+                value={form.fields.HotWalletMinValue}
+                type="number"
                 inputProps={{ autoComplete: 'off' }}
               />
               <Typography sx={{ ml: 1 }} variant="body1">
@@ -288,11 +318,12 @@ const ColdWalletSettingsCard = () => {
             <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
               <TextField
                 size="small"
-                name="maxThresholdValue"
+                name="HotWalletMaxValue"
                 label="Max threshold value"
-                value={maxThresholdValue}
-                onChange={(e) => setMaxThresholdValue(e.target.value)}
-                type="text"
+                error={form.touchedFields.HotWalletMaxValue && !form.errorObj.HotWalletMaxValue.isValid}
+                helperText={form.touchedFields.HotWalletMaxValue && form.errorObj.HotWalletMaxValue.helperText}
+                value={form.fields.HotWalletMaxValue}
+                type="number"
                 inputProps={{ autoComplete: 'off' }}
               />
               <Typography sx={{ ml: 1 }} variant="body1">
@@ -309,26 +340,34 @@ const ColdWalletSettingsCard = () => {
               </Tooltip>
             </Box>
 
-            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Box className={`${commonStyles.flex}`}>
               <TextField
                 size="small"
-                name="coldWalletAddress"
+                name="ColdWalletAddress"
                 label="Cold wallet address"
-                value={coldWalletAddress}
-                onChange={(e) => setColdWalletAddress(e.target.value)}
+                error={form.touchedFields.ColdWalletAddress && !form.errorObj.ColdWalletAddress.isValid}
+                helperText={form.touchedFields.ColdWalletAddress && form.errorObj.ColdWalletAddress.helperText}
+                value={form.fields.ColdWalletAddress}
                 type="text"
                 inputProps={{ autoComplete: 'off' }}
               />
-              <Tooltip sx={{ ml: 0.5 }} title="Enter your ADS account address">
-                <HelpIcon color="primary" />
-              </Tooltip>
+              <Box sx={{ height: '40px' }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                <Tooltip sx={{ ml: 0.5 }} title="Enter your ADS account address">
+                  <HelpIcon color="primary" />
+                </Tooltip>
+              </Box>
             </Box>
           </Box>
         </CardContent>
       </Collapse>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button variant="contained" type="button">
+          <Button
+            disabled={(appData.AdServer.ColdWalletIsActive === ColdWalletIsActive && !form.isFormWasChanged) || isLoading}
+            onClick={onSaveClick}
+            variant="contained"
+            type="button"
+          >
             Save
           </Button>
         </Box>
