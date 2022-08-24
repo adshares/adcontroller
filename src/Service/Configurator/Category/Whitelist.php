@@ -66,6 +66,7 @@ class Whitelist implements ConfiguratorCategory
             AdServerConfig::InventoryImportWhitelist->name => $importWhitelist,
             AdServerConfig::InventoryWhitelist->name => null,
         ]);
+        $this->repository->remove(AdServerConfig::InventoryWhitelist, false);
         $this->repository->insertOrUpdate(
             AdServerConfig::MODULE,
             [
@@ -73,7 +74,6 @@ class Whitelist implements ConfiguratorCategory
                 AdServerConfig::InventoryImportWhitelist->name => $importWhitelist,
             ]
         );
-        $this->repository->remove(AdServerConfig::InventoryWhitelist);
     }
 
     private static function fields(): array
@@ -115,8 +115,8 @@ class Whitelist implements ConfiguratorCategory
             AdServerConfig::InventoryImportWhitelist->name => null,
             AdServerConfig::InventoryWhitelist->name => $whitelist,
         ]);
-        $this->repository->remove(AdServerConfig::InventoryExportWhitelist);
-        $this->repository->remove(AdServerConfig::InventoryImportWhitelist);
+        $this->repository->remove(AdServerConfig::InventoryExportWhitelist, false);
+        $this->repository->remove(AdServerConfig::InventoryImportWhitelist, false);
         $this->repository->insertOrUpdateOne(AdServerConfig::InventoryWhitelist, $whitelist);
     }
 }

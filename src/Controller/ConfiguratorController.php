@@ -153,6 +153,10 @@ class ConfiguratorController extends AbstractController
             $service->process($content);
         } catch (InvalidArgumentException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage());
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
         }
 
         return $this->jsonOk();
