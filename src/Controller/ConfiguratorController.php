@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Configuration;
 use App\Entity\Enum\AdClassifyConfig;
 use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\AdPayConfig;
@@ -10,6 +11,9 @@ use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Exception\InvalidArgumentException;
+use App\Exception\OutdatedLicense;
+use App\Exception\ServiceNotPresent;
+use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\Configurator\Category\AutomaticWithdrawal;
 use App\Service\Configurator\Category\BannerSettings;
@@ -27,12 +31,15 @@ use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
 use App\Service\Installer\Migrator;
+use App\Service\LicenseReader;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -71,6 +78,30 @@ class ConfiguratorController extends AbstractController
             $whiteList[0] === $data[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name];
 
         $data[AdServerConfig::MODULE][AdServerConfig::InventoryPrivate->name] = $privateInventory;
+    }
+
+    #[Route('/config/license-data', name: 'fetch_config_license_data', methods: ['GET'])]
+    public function fetchLicenseData(
+        ConfigurationRepository $repository,
+        LicenseReader $licenseReader,
+    ): JsonResponse {
+        $licenseKey = $repository->fetchValueByEnum(AdServerConfig::LicenseKey);
+
+        if (null === $licenseKey) {
+            throw new NotFoundHttpException('License key is missing');
+        }
+
+        try {
+            $license = $licenseReader->read($licenseKey);
+        } catch (OutdatedLicense) {
+            throw new UnprocessableEntityHttpException('License is outdated');
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+        }
+
+        return $this->jsonOk([Configuration::LICENSE_DATA => $license->toArray()]);
     }
 
     #[Route('/config/{category}', name: 'store_config', methods: ['PATCH'])]
