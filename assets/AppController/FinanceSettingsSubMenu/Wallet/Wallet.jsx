@@ -4,6 +4,7 @@ import configSelectors from '../../../redux/config/configSelectors';
 import { useSetWalletConfigMutation, useSetColdWalletConfigMutation } from '../../../redux/config/configApi';
 import apiService from '../../../utils/apiService';
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../../hooks';
+import { adsToClicks, clicksToAds, returnNumber } from '../../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
 import Spinner from '../../../Components/Spinner/Spinner';
 import {
@@ -255,18 +256,29 @@ const ColdWalletSettingsCard = () => {
   const [ColdWalletIsActive, setColdWalletIsActive] = useState(appData.AdServer.ColdWalletIsActive || false);
   const form = useForm({
     initialFields: {
-      HotWalletMinValue: appData.AdServer.HotWalletMinValue,
-      HotWalletMaxValue: appData.AdServer.HotWalletMaxValue,
+      HotWalletMinValue: clicksToAds(appData.AdServer.HotWalletMinValue),
+      HotWalletMaxValue: clicksToAds(appData.AdServer.HotWalletMaxValue),
       ColdWalletAddress: appData.AdServer.ColdWalletAddress,
     },
     validation: {
       ColdWalletAddress: ['required', 'wallet'],
+      HotWalletMinValue: ['number'],
+      HotWalletMaxValue: ['number'],
     },
   });
 
   const onSaveClick = async () => {
     try {
-      await setColdWalletConfig(ColdWalletIsActive ? { ColdWalletIsActive, ...form.fields } : { ColdWalletIsActive }).unwrap();
+      await setColdWalletConfig(
+        ColdWalletIsActive
+          ? {
+              ColdWalletIsActive,
+              HotWalletMinValue: adsToClicks(returnNumber(form.fields.HotWalletMinValue)),
+              HotWalletMaxValue: adsToClicks(returnNumber(form.fields.HotWalletMaxValue)),
+              ColdWalletAddress: form.fields.ColdWalletAddress,
+            }
+          : { ColdWalletIsActive },
+      ).unwrap();
       createSuccessNotification();
     } catch (err) {
       createErrorNotification(err);
@@ -290,7 +302,7 @@ const ColdWalletSettingsCard = () => {
             onChange={form.onChange}
             onFocus={form.setTouched}
           >
-            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Box className={`${commonStyles.flex}`}>
               <TextField
                 size="small"
                 name="HotWalletMinValue"
@@ -298,24 +310,24 @@ const ColdWalletSettingsCard = () => {
                 error={form.touchedFields.HotWalletMinValue && !form.errorObj.HotWalletMinValue.isValid}
                 helperText={form.touchedFields.HotWalletMinValue && form.errorObj.HotWalletMinValue.helperText}
                 value={form.fields.HotWalletMinValue}
-                type="number"
                 inputProps={{ autoComplete: 'off' }}
               />
-              <Typography sx={{ ml: 1 }} variant="body1">
-                ADS
-              </Typography>
-              <Tooltip
-                sx={{ ml: 0.5 }}
-                title={
-                  // eslint-disable-next-line max-len
-                  'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail'
-                }
-              >
-                <HelpIcon color="primary" />
-              </Tooltip>
+              <Box sx={{ height: '40px', ml: 0.5 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                <Typography sx={{ ml: 1 }} variant="body1">
+                  ADS
+                </Typography>
+                <Tooltip
+                  title={
+                    // eslint-disable-next-line max-len
+                    'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail'
+                  }
+                >
+                  <HelpIcon color="primary" />
+                </Tooltip>
+              </Box>
             </Box>
 
-            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Box className={`${commonStyles.flex}`}>
               <TextField
                 size="small"
                 name="HotWalletMaxValue"
@@ -323,21 +335,21 @@ const ColdWalletSettingsCard = () => {
                 error={form.touchedFields.HotWalletMaxValue && !form.errorObj.HotWalletMaxValue.isValid}
                 helperText={form.touchedFields.HotWalletMaxValue && form.errorObj.HotWalletMaxValue.helperText}
                 value={form.fields.HotWalletMaxValue}
-                type="number"
                 inputProps={{ autoComplete: 'off' }}
               />
-              <Typography sx={{ ml: 1 }} variant="body1">
-                ADS
-              </Typography>
-              <Tooltip
-                sx={{ ml: 0.5 }}
-                title={
-                  // eslint-disable-next-line max-len
-                  'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
-                }
-              >
-                <HelpIcon color="primary" />
-              </Tooltip>
+              <Box sx={{ height: '40px', ml: 0.5 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                <Typography sx={{ ml: 1 }} variant="body1">
+                  ADS
+                </Typography>
+                <Tooltip
+                  title={
+                    // eslint-disable-next-line max-len
+                    'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
+                  }
+                >
+                  <HelpIcon color="primary" />
+                </Tooltip>
+              </Box>
             </Box>
 
             <Box className={`${commonStyles.flex}`}>
@@ -351,8 +363,8 @@ const ColdWalletSettingsCard = () => {
                 type="text"
                 inputProps={{ autoComplete: 'off' }}
               />
-              <Box sx={{ height: '40px' }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-                <Tooltip sx={{ ml: 0.5 }} title="Enter your ADS account address">
+              <Box sx={{ height: '40px', ml: 0.5 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                <Tooltip title="Enter your ADS account address">
                   <HelpIcon color="primary" />
                 </Tooltip>
               </Box>
@@ -363,7 +375,9 @@ const ColdWalletSettingsCard = () => {
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
           <Button
-            disabled={(appData.AdServer.ColdWalletIsActive === ColdWalletIsActive && !form.isFormWasChanged) || isLoading}
+            disabled={
+              (appData.AdServer.ColdWalletIsActive === ColdWalletIsActive && !form.isFormWasChanged) || isLoading || !form.isFormValid
+            }
             onClick={onSaveClick}
             variant="contained"
             type="button"
