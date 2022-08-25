@@ -25,11 +25,11 @@ class ClassifierStep implements InstallerStep
     private const TRIMMED_BASE64_PATTERN = '#^[0-9A-Z+/]+$#i';
 
     public function __construct(
-        private readonly string $adclassifyBaseUri,
+        private readonly string $adClassifyBaseUri,
         private readonly AdClassifyClient $adClassifyClient,
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -47,7 +47,7 @@ class ClassifierStep implements InstallerStep
         }
 
         $this->adServerConfigurationClient->setupAdClassify(
-            $this->adclassifyBaseUri,
+            $this->adClassifyBaseUri,
             $apiKey['name'],
             $apiKey['secret']
         );

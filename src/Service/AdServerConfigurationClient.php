@@ -157,7 +157,7 @@ class AdServerConfigurationClient
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly string $adserverBaseUri
+        private readonly string $adServerBaseUri
     ) {
     }
 
@@ -183,12 +183,12 @@ class AdServerConfigurationClient
 
     private function buildConfigUri(): string
     {
-        return sprintf('%s/api/config', $this->adserverBaseUri);
+        return sprintf('%s/api/config', $this->adServerBaseUri);
     }
 
     private function buildPlaceholdersUri(): string
     {
-        return sprintf('%s/api/config/placeholders', $this->adserverBaseUri);
+        return sprintf('%s/api/config/placeholders', $this->adServerBaseUri);
     }
 
     private function getAuthorizationHeader(): string

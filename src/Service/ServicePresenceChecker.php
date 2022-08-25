@@ -9,7 +9,7 @@ use Symfony\Component\Process\Process;
 
 class ServicePresenceChecker
 {
-    public function __construct(private readonly string $adserverHomeDirectory)
+    public function __construct(private readonly string $adServerHomeDirectory)
     {
     }
 
@@ -27,7 +27,7 @@ class ServicePresenceChecker
     public function getEnvFile(Module $module): string
     {
         return match ($module) {
-            Module::AdServer => self::canonicalize($this->adserverHomeDirectory) . '.env',
+            Module::AdServer => $this->getHomeDirectory($module) . '.env',
             default => throw new ServiceNotPresent('Unsupported service'),
         };
     }
@@ -35,7 +35,7 @@ class ServicePresenceChecker
     public function getHomeDirectory(Module $module): string
     {
         return match ($module) {
-            Module::AdServer => self::canonicalize($this->adserverHomeDirectory),
+            Module::AdServer => self::canonicalize($this->adServerHomeDirectory),
             default => throw new ServiceNotPresent('Unsupported service'),
         };
     }
@@ -44,11 +44,11 @@ class ServicePresenceChecker
     {
         $filesystem = new Filesystem();
 
-        if (!$filesystem->exists($this->adserverHomeDirectory)) {
+        if (!$filesystem->exists($this->adServerHomeDirectory)) {
             throw new ServiceNotPresent('Home directory does not exists');
         }
 
-        $homeDirectory = self::canonicalize($this->adserverHomeDirectory);
+        $homeDirectory = self::canonicalize($this->adServerHomeDirectory);
         $files = [
             'artisan',
             '.env'
