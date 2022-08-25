@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { validateAddress } from '@adshares/ads';
+import { useEffect, useState } from 'react';
 import useSkipFirstRenderEffect from './useSkipFirstRenderEffect';
+import { returnNumber } from '../utils/helpers';
+import { validateAddress } from '@adshares/ads';
 
 const testRequired = (value) => ({
   isValid: !!value,
@@ -60,6 +61,14 @@ const testInteger = (value) => {
   };
 };
 
+const testNumber = (value) => {
+  const isValid = !isNaN(returnNumber(value));
+  return {
+    isValid: isValid,
+    helperText: isValid ? '' : 'Field must be valid number',
+  };
+};
+
 export default function useForm(options) {
   const [fields, setFields] = useState(options.initialFields);
   const [touchedFields, setTouchedFields] = useState(
@@ -68,9 +77,10 @@ export default function useForm(options) {
   const [errorObj, setErrorObj] = useState(
     Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: { isValid: true, helperText: '' } }), {}),
   );
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(true);
+  const [isFormWasChanged, setIsFormWasChanged] = useState(false);
 
-  useSkipFirstRenderEffect(() => {
+  useEffect(() => {
     let result = {};
     Object.keys(fields).forEach((name) => {
       result = { ...result, ...validate(name, fields[name]) };
@@ -78,9 +88,13 @@ export default function useForm(options) {
     setErrorObj(result);
   }, [fields, touchedFields]);
 
-  useSkipFirstRenderEffect(() => {
+  useEffect(() => {
     setIsFormValid(Object.keys(errorObj).every((field) => errorObj[field].isValid));
   }, [errorObj]);
+
+  useSkipFirstRenderEffect(() => {
+    checkFormChanged();
+  }, [options.initialFields]);
 
   const setTouched = (e) => {
     setTouchedFields((prevState) => ({ ...prevState, [e.target.name]: true }));
@@ -88,10 +102,22 @@ export default function useForm(options) {
 
   const onChange = (e) => {
     const { name, value } = e.target;
+
     setFields({
       ...fields,
-      [name]: value,
+      [name]: options.validation[name].includes('number') ? value.replace(',', '.') : value,
     });
+  };
+
+  const resetForm = () => {
+    setFields(options.initialFields);
+    setTouchedFields(Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}));
+  };
+
+  const checkFormChanged = () => {
+    setIsFormWasChanged(
+      Object.keys(options.initialFields).some((field) => fields[field].toString() !== options.initialFields[field].toString()),
+    );
   };
 
   const validate = (targetName, targetValue) => {
@@ -124,6 +150,9 @@ export default function useForm(options) {
         case 'integer':
           return value ? testInteger(value) : validValueResult;
 
+        case 'number':
+          return value ? testNumber(value) : validValueResult;
+
         default:
           return validValueResult;
       }
@@ -150,5 +179,7 @@ export default function useForm(options) {
     onChange,
     setTouched,
     touchedFields,
+    resetForm,
+    isFormWasChanged,
   };
 }

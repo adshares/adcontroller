@@ -3,7 +3,7 @@ import { Box, Button, LinearProgress, TextField, Typography } from '@mui/materia
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
-import { useForm, useErrorHandler } from '../../../hooks';
+import { useForm, useCreateNotification } from '../../../hooks';
 
 function Classifier({ handleNextStep, handlePrevStep, step }) {
   const form = useForm({
@@ -20,7 +20,7 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
   const [registrationInProgress, setRegistrationInProgress] = useState(false);
   const [stepData, setStepData] = useState({});
   const [editMode, setEditMode] = useState(false);
-  const { createErrorNotification } = useErrorHandler();
+  const { createErrorNotification } = useCreateNotification();
 
   useEffect(() => {
     getStepData();

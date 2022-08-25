@@ -33,6 +33,8 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import commonStyles from './common/commonStyles.scss';
+import { useGetAppConfigQuery } from '../redux/config/configApi';
+import { skipToken } from '@reduxjs/toolkit/query';
 
 const appModules = [
   {
@@ -149,6 +151,7 @@ function AppController() {
   const [isLoading, setIsLoading] = useState(true);
   const [showSideMenu, toggleSideMenu] = useState(true);
   const pages = getAppPages(appModules, isLoggedIn);
+  const { isLoading: isAppDataLoading } = useGetAppConfigQuery(token ?? skipToken);
 
   useEffect(() => {
     dispatch(checkAppAuth());
@@ -156,7 +159,8 @@ function AppController() {
   }, [token]);
 
   return (
-    !isLoading && (
+    !isLoading &&
+    !isAppDataLoading && (
       <>
         <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
         <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
