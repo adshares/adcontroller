@@ -10,7 +10,7 @@ use App\Entity\Enum\AdSelectConfig;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
-use App\Entity\Enum\RebrandingConfig;
+use App\Entity\Enum\PanelAssetConfig;
 use App\Exception\InvalidArgumentException;
 use App\Exception\OutdatedLicense;
 use App\Exception\ServiceNotPresent;
@@ -111,7 +111,7 @@ class ConfiguratorController extends AbstractController
     public function fetchPanelAssets(string $fileId, AssetRepository $repository, PanelAssets $panelAssets): Response
     {
         $panelAssets->validateFileId($fileId);
-        $entity = $repository->findOneBy(['module' => RebrandingConfig::MODULE, 'name' => $fileId]);
+        $entity = $repository->findOneBy(['module' => PanelAssetConfig::MODULE, 'name' => $fileId]);
 
         $response = new StreamedResponse(function () use ($entity) {
             echo stream_get_contents($entity->getContent());

@@ -3,23 +3,33 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Asset;
-use App\Entity\Enum\RebrandingConfig;
+use App\Entity\Enum\PanelAssetConfig;
 use App\Exception\InvalidArgumentException;
 use App\Repository\AssetRepository;
+use App\Service\Env\AdPanelEnvVar;
+use App\Service\Env\EnvEditorFactory;
+use App\Utility\DirUtils;
+use App\ValueObject\Module;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PanelAssets implements ConfiguratorCategory
 {
+    private const ASSETS_DIRECTORY = 'var/panel-assets/';
     private const MAXIMAL_FILE_SIZE = 512 * 1024;
 
-    public function __construct(private readonly AssetRepository $assetRepository)
-    {
+    public function __construct(
+        private readonly AssetRepository $assetRepository,
+        private readonly EnvEditorFactory $envEditorFactory,
+        private readonly string $appDirectory,
+    ) {
     }
 
     public function process(array $content): void
     {
         $this->validate($content);
         $this->store($content);
+        $this->deploy();
     }
 
     public function validateFileId(string $fileId): void
@@ -94,7 +104,7 @@ class PanelAssets implements ConfiguratorCategory
          */
         foreach ($content as $filename => $file) {
             $asset = new Asset();
-            $asset->setModule(RebrandingConfig::MODULE);
+            $asset->setModule(PanelAssetConfig::MODULE);
             $asset->setName($filename);
             $asset->setMimeType($file->getMimeType());
             $asset->setContent($file->getContent());
@@ -105,8 +115,36 @@ class PanelAssets implements ConfiguratorCategory
 
     public function remove(): void
     {
-        $assets = $this->assetRepository->findBy(['module' => RebrandingConfig::MODULE]);
+        $assets = $this->assetRepository->findBy(['module' => PanelAssetConfig::MODULE]);
         $this->assetRepository->remove($assets);
+        $this->undeploy();
+    }
+
+    private function deploy(): void
+    {
+        $directory = DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        $assets = $this->assetRepository->findBy(['module' => PanelAssetConfig::MODULE]);
+        foreach ($assets as $asset) {
+            /** @var PanelAssetConfig $enum */
+            $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $asset->getName()));
+            file_put_contents($directory . $enum->file(), $asset->getContent());
+        }
+
+        $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
+        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $directory);
+    }
+
+    private function undeploy(): void
+    {
+        $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
+        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, '');
+
+        $directory = DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
+        (new Filesystem())->remove($directory);
     }
 
     private static function fields(): array
@@ -120,19 +158,19 @@ class PanelAssets implements ConfiguratorCategory
     private static function fieldsLogo(): array
     {
         return [
-            RebrandingConfig::LogoH30->name,
-            RebrandingConfig::LogoH60->name,
-            RebrandingConfig::LogoH90->name,
+            PanelAssetConfig::LogoH30->name,
+            PanelAssetConfig::LogoH60->name,
+            PanelAssetConfig::LogoH90->name,
         ];
     }
 
     private static function fieldsFavicon(): array
     {
         return [
-            RebrandingConfig::Favicon16x16->name,
-            RebrandingConfig::Favicon32x32->name,
-            RebrandingConfig::Favicon48x48->name,
-            RebrandingConfig::Favicon96x96->name,
+            PanelAssetConfig::Favicon16x16->name,
+            PanelAssetConfig::Favicon32x32->name,
+            PanelAssetConfig::Favicon48x48->name,
+            PanelAssetConfig::Favicon96x96->name,
         ];
     }
 }
