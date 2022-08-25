@@ -22,6 +22,11 @@ class AssetRepository extends ServiceEntityRepository
         parent::__construct($registry, Asset::class);
     }
 
+    /**
+     * @param Asset[] $entities
+     * @param bool $flush
+     * @return void
+     */
     public function upsert(array $entities, bool $flush = true): void
     {
         $now = new DateTimeImmutable();
@@ -32,7 +37,7 @@ class AssetRepository extends ServiceEntityRepository
                 $dbEntity = $entity;
                 $dbEntity->setCreatedAt($now);
             } else {
-                $dbEntity->setContent($entity->getValue());
+                $dbEntity->setContent($entity->getContent());
             }
             $dbEntity->setUpdatedAt($now);
 
@@ -44,6 +49,11 @@ class AssetRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param Asset[] $entities
+     * @param bool $flush
+     * @return void
+     */
     public function remove(array $entities, bool $flush = true): void
     {
         foreach ($entities as $entity) {
