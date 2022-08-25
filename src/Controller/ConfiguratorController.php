@@ -33,6 +33,7 @@ use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
+use App\Service\Installer\Migrator;
 use App\Service\LicenseReader;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -165,6 +166,14 @@ class ConfiguratorController extends AbstractController
         } catch (UnexpectedResponseException $exception) {
             throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
         }
+
+        return $this->jsonOk();
+    }
+
+    #[Route('/sync', name: 'sync_data', methods: ['GET'])]
+    public function syncData(Migrator $migrator): JsonResponse
+    {
+        $migrator->migrate();
 
         return $this->jsonOk();
     }
