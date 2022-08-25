@@ -7,14 +7,15 @@ use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Entity\Enum\InstallerStepEnum;
+use App\Exception\OutdatedLicense;
+use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
-use App\Service\LicenseDecoder;
+use App\Service\LicenseReader;
 use App\Service\LicenseServerClient;
 use App\ValueObject\License;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
@@ -25,6 +26,7 @@ class LicenseStep implements InstallerStep
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
+        private readonly LicenseReader $licenseReader,
         private readonly LicenseServerClient $licenseServerClient,
         private readonly LoggerInterface $logger
     ) {
@@ -103,33 +105,12 @@ class LicenseStep implements InstallerStep
         }
 
         try {
-            $encodedData = $this->licenseServerClient->fetchEncodedLicenseData($this->getLicenseIdFromKey($licenseKey));
-        } catch (UnexpectedResponseException $exception) {
-            $this->logger->debug(sprintf('Unexpected response from license server (%s)', $exception->getMessage()));
-            return null;
-        } catch (TransportExceptionInterface $exception) {
-            $this->logger->critical(sprintf('License server is not accessible (%s)', $exception->getMessage()));
-            return null;
-        }
-
-        try {
-            $license = (new LicenseDecoder($licenseKey))->decode($encodedData);
-        } catch (RuntimeException $exception) {
-            $this->logger->debug(sprintf('License cannot be decoded (%s)', $exception->getMessage()));
-            return null;
-        }
-
-        if (!$license->isValid()) {
-            $this->logger->debug('License is not valid');
+            $license = $this->licenseReader->read($licenseKey);
+        } catch (OutdatedLicense | ServiceNotPresent | UnexpectedResponseException) {
             return null;
         }
 
         return $license;
-    }
-
-    private function getLicenseIdFromKey(string $licenseKey): string
-    {
-        return substr($licenseKey, 0, 10);
     }
 
     public function claimCommunityLicense(): void

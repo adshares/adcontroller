@@ -12,7 +12,9 @@ enum GeneralConfig implements ConfigEnum
     case SmtpPort;
     case SmtpSender;
     case SmtpUsername;
+    case SupportChat;
     case SupportEmail;
+    case SupportTelegram;
     case TechnicalEmail;
 
     public function getModule(): string

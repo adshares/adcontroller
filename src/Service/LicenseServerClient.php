@@ -23,12 +23,13 @@ class LicenseServerClient
     /**
      * Fetches license data
      *
-     * @param string $id license id
+     * @param string $licenseKey license key
      * @return string encoded license data
      * @throws TransportExceptionInterface
      */
-    public function fetchEncodedLicenseData(string $id): string
+    public function fetchEncodedLicenseData(string $licenseKey): string
     {
+        $id = substr($licenseKey, 0, 10);
         $response = $this->httpClient->request(
             'GET',
             $this->licenseServerBaseUri . self::FETCH_URI . $id

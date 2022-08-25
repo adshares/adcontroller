@@ -3,12 +3,12 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
+use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Utility\ArrayUtils;
 use App\Utility\Validator\AdsAccountValidator;
 use App\Utility\Validator\ClickAmountValidator;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class ColdWallet implements ConfiguratorCategory
 {
@@ -23,53 +23,38 @@ class ColdWallet implements ConfiguratorCategory
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
         if (empty($input)) {
-            throw new UnprocessableEntityHttpException('Data is required');
+            throw new InvalidArgumentException('Data is required');
         }
+        ArrayUtils::assureBoolTypeForField($input, AdServerConfig::ColdWalletIsActive->name);
 
-        if (isset($input[AdServerConfig::ColdWalletIsActive->name])) {
-            if (
-                null === ($isActive = filter_var(
-                    $input[AdServerConfig::ColdWalletIsActive->name],
-                    FILTER_VALIDATE_BOOL,
-                    FILTER_NULL_ON_FAILURE
-                ))
-            ) {
-                throw new UnprocessableEntityHttpException(
-                    sprintf('Field `%s` must be a boolean', AdServerConfig::ColdWalletIsActive->name)
-                );
-            }
-            if (!$isActive) {
-                $data = [
-                    AdServerConfig::ColdWalletIsActive->name => false,
-                ];
-                $this->adServerConfigurationClient->store($data);
-                $this->repository->insertOrUpdate(AdServerConfig::MODULE, $data);
-                return;
-            }
-
-            $input[AdServerConfig::ColdWalletIsActive->name] = true;
+        if (
+            isset($input[AdServerConfig::ColdWalletIsActive->name]) &&
+            false === $input[AdServerConfig::ColdWalletIsActive->name]
+        ) {
+            $data = [
+                AdServerConfig::ColdWalletIsActive->name => false,
+            ];
+            $this->adServerConfigurationClient->store($data);
+            $this->repository->insertOrUpdate(AdServerConfig::MODULE, $data);
+            return;
         }
 
         if (
             isset($input[AdServerConfig::ColdWalletAddress->name]) &&
             !(new AdsAccountValidator())->valid($input[AdServerConfig::ColdWalletAddress->name])
         ) {
-            throw new UnprocessableEntityHttpException(
+            throw new InvalidArgumentException(
                 sprintf('Field `%s` must be an ADS account', AdServerConfig::ColdWalletAddress->name)
             );
         }
 
-        $clickAmountValidator = new ClickAmountValidator();
-        foreach ([AdServerConfig::HotWalletMaxValue->name, AdServerConfig::HotWalletMinValue->name] as $field) {
-            if (isset($input[$field])) {
-                if (!$clickAmountValidator->valid($input[$field])) {
-                    throw new UnprocessableEntityHttpException(
-                        sprintf('Field `%s` must be a click amount', $field)
-                    );
-                }
-                $input[$field] = (int)$input[$field];
-            }
-        }
+        self::assureClickAmountTypeForFields(
+            $input,
+            [
+                AdServerConfig::HotWalletMaxValue->name,
+                AdServerConfig::HotWalletMinValue->name,
+            ]
+        );
 
         $data = array_merge(
             $this->repository->fetchValuesByNames(AdServerConfig::MODULE, $fields),
@@ -78,11 +63,11 @@ class ColdWallet implements ConfiguratorCategory
 
         foreach ($fields as $field) {
             if (!isset($data[$field])) {
-                throw new UnprocessableEntityHttpException(sprintf('Field `%s` is required', $field));
+                throw new InvalidArgumentException(sprintf('Field `%s` is required', $field));
             }
         }
         if ($data[AdServerConfig::HotWalletMaxValue->name] <= $data[AdServerConfig::HotWalletMinValue->name]) {
-            throw new UnprocessableEntityHttpException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Field `%s` must be greater than `%s`',
                     AdServerConfig::HotWalletMaxValue->name,
@@ -103,5 +88,21 @@ class ColdWallet implements ConfiguratorCategory
             AdServerConfig::HotWalletMaxValue->name,
             AdServerConfig::HotWalletMinValue->name,
         ];
+    }
+
+    private function assureClickAmountTypeForFields(array &$input, array $fields): void
+    {
+        $validator = new ClickAmountValidator();
+        foreach ($fields as $field) {
+            if (isset($input[$field])) {
+                if (!$validator->valid($input[$field])) {
+                    throw new InvalidArgumentException(
+                        sprintf('Field `%s` must be a click amount', $field)
+                    );
+                }
+
+                $input[$field] = (int)$input[$field];
+            }
+        }
     }
 }

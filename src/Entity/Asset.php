@@ -2,17 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\ConfigurationRepository;
+use App\Repository\AssetRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
+#[ORM\Entity(repositoryClass: AssetRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQUE_NAME', columns: ['module', 'name'])]
-class Configuration
+class Asset
 {
-    public const COMMON_DATA_REQUIRED = 'DataRequired';
-    public const LICENSE_DATA = 'LicenseData';
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -24,14 +22,17 @@ class Configuration
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $value = null;
+    #[ORM\Column(type: Types::BLOB)]
+    private $content = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $updated_at = null;
+
+    #[ORM\Column(length: 127)]
+    private ?string $mime_type = null;
 
     public function getId(): ?int
     {
@@ -62,14 +63,14 @@ class Configuration
         return $this;
     }
 
-    public function getValue(): ?string
+    public function getContent()
     {
-        return $this->value;
+        return $this->content;
     }
 
-    public function setValue(string $value): self
+    public function setContent($content): self
     {
-        $this->value = $value;
+        $this->content = $content;
 
         return $this;
     }
@@ -94,6 +95,18 @@ class Configuration
     public function setUpdatedAt(DateTimeImmutable $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getMimeType(): ?string
+    {
+        return $this->mime_type;
+    }
+
+    public function setMimeType(string $mimeType): self
+    {
+        $this->mime_type = $mimeType;
 
         return $this;
     }

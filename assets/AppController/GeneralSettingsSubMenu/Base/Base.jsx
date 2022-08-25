@@ -62,7 +62,7 @@ const BaseInformationCard = () => {
             size="small"
             name="technicalEmail"
             variant="outlined"
-            label="Technicals email"
+            label="Technical email"
             error={form.touchedFields.technicalEmail && !form.errorObj.technicalEmail.isValid}
             helperText={form.touchedFields.technicalEmail && form.errorObj.technicalEmail.helperText}
             value={form.fields.technicalEmail}

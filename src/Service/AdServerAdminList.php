@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class AdServerAdminList
 {
-    public function __construct(private readonly string $adserverHomeDirectory)
+    public function __construct(private readonly string $adServerHomeDirectory)
     {
     }
 
@@ -15,7 +15,7 @@ class AdServerAdminList
     {
         $process = new Process(
             ['php', 'artisan', 'ops:admin:list'],
-            $this->adserverHomeDirectory,
+            $this->adServerHomeDirectory,
         );
         $process->setTimeout(3);
         $process->run();

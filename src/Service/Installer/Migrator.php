@@ -41,14 +41,23 @@ class Migrator
         AdServerConfigurationClient::AUTO_WITHDRAWAL_LIMIT_ETH => AdServerConfig::AutoWithdrawalLimitEth,
         AdServerConfigurationClient::COLD_WALLET_ADDRESS => AdServerConfig::ColdWalletAddress,
         AdServerConfigurationClient::COLD_WALLET_IS_ACTIVE => AdServerConfig::ColdWalletIsActive,
+        AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED =>
+            AdServerConfig::CrmMailAddressOnCampaignCreated,
+        AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_SITE_ADDED => AdServerConfig::CrmMailAddressOnSiteAdded,
+        AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_USER_REGISTERED =>
+            AdServerConfig::CrmMailAddressOnUserRegistered,
         AdServerConfigurationClient::EMAIL_VERIFICATION_REQUIRED => AdServerConfig::EmailVerificationRequired,
         AdServerConfigurationClient::HOT_WALLET_MAX_VALUE => AdServerConfig::HotWalletMaxValue,
         AdServerConfigurationClient::HOT_WALLET_MIN_VALUE => AdServerConfig::HotWalletMinValue,
+        AdServerConfigurationClient::INVENTORY_EXPORT_WHITELIST => AdServerConfig::InventoryExportWhitelist,
+        AdServerConfigurationClient::INVENTORY_IMPORT_WHITELIST => AdServerConfig::InventoryImportWhitelist,
+        AdServerConfigurationClient::INVENTORY_WHITELIST => AdServerConfig::InventoryWhitelist,
         AdServerConfigurationClient::MAX_PAGE_ZONES => AdServerConfig::MaxPageZones,
         AdServerConfigurationClient::OPERATOR_RX_FEE => AdServerConfig::OperatorRxFee,
         AdServerConfigurationClient::OPERATOR_TX_FEE => AdServerConfig::OperatorTxFee,
         AdServerConfigurationClient::REFERRAL_REFUND_ENABLED => AdServerConfig::ReferralRefundEnabled,
         AdServerConfigurationClient::REFERRAL_REFUND_COMMISSION => AdServerConfig::ReferralRefundCommission,
+        AdServerConfigurationClient::REJECTED_DOMAINS => AdServerConfig::RejectedDomains,
         AdServerConfigurationClient::REGISTRATION_MODE => AdServerConfig::RegistrationMode,
         AdServerConfigurationClient::SITE_ACCEPT_BANNERS_MANUALLY => AdServerConfig::SiteAcceptBannersManually,
         AdServerConfigurationClient::SITE_CLASSIFIER_LOCAL_BANNERS => AdServerConfig::SiteClassifierLocalBanners,
@@ -57,13 +66,24 @@ class Migrator
         AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::Url,
         AdServerConfigurationClient::ADUSER_INTERNAL_URL => AdUserConfig::InternalUrl,
         // General
+        AdServerConfigurationClient::SUPPORT_CHAT => GeneralConfig::SupportChat,
         AdServerConfigurationClient::SUPPORT_EMAIL => GeneralConfig::SupportEmail,
+        AdServerConfigurationClient::SUPPORT_TELEGRAM => GeneralConfig::SupportTelegram,
         AdServerConfigurationClient::TECHNICAL_EMAIL => GeneralConfig::TechnicalEmail,
         AdServerConfigurationClient::MAIL_SMTP_HOST => GeneralConfig::SmtpHost,
         AdServerConfigurationClient::MAIL_SMTP_PASSWORD => GeneralConfig::SmtpPassword,
         AdServerConfigurationClient::MAIL_SMTP_PORT => GeneralConfig::SmtpPort,
         AdServerConfigurationClient::MAIL_FROM_NAME => GeneralConfig::SmtpSender,
         AdServerConfigurationClient::MAIL_SMTP_USERNAME => GeneralConfig::SmtpUsername,
+    ];
+    private const PLACEHOLDER_KEY_MAP = [
+        AdServerConfigurationClient::PLACEHOLDER_INDEX_DESCRIPTION => AdPanelConfig::PlaceholderIndexDescription,
+        AdServerConfigurationClient::PLACEHOLDER_INDEX_KEYWORDS => AdPanelConfig::PlaceholderIndexKeywords,
+        AdServerConfigurationClient::PLACEHOLDER_INDEX_META_TAGS => AdPanelConfig::PlaceholderIndexMetaTags,
+        AdServerConfigurationClient::PLACEHOLDER_INDEX_TITLE => AdPanelConfig::PlaceholderIndexTitle,
+        AdServerConfigurationClient::PLACEHOLDER_ROBOTS_TXT => AdPanelConfig::PlaceholderRobotsTxt,
+        AdServerConfigurationClient::PLACEHOLDER_PRIVACY_POLICY => AdServerConfig::PrivacyPolicy,
+        AdServerConfigurationClient::PLACEHOLDER_TERMS => AdServerConfig::Terms,
     ];
 
     public function __construct(
@@ -75,18 +95,24 @@ class Migrator
     public function migrate(): void
     {
         $adServerConfig = $this->adServerConfigurationClient->fetch();
-
-        $config = $this->map($adServerConfig);
-
+        $config = $this->map(self::KEY_MAP, $adServerConfig);
         $this->store($config);
+
+        $adServerPlaceholders = $this->adServerConfigurationClient->fetchPlaceholders();
+        $placeholders = $this->map(self::PLACEHOLDER_KEY_MAP, $adServerPlaceholders);
+        $this->store($placeholders);
     }
 
-    private function map(array $adServerConfig): array
+    private function map(array $keyMap, array $adServerConfig): array
     {
         $config = [];
-        foreach (self::KEY_MAP as $adServerKey => $enum) {
+        foreach ($keyMap as $adServerKey => $enum) {
             if (isset($adServerConfig[$adServerKey])) {
-                $config[$enum->getModule()][$enum->name] = $adServerConfig[$adServerKey];
+                $value = $adServerConfig[$adServerKey];
+                if (is_array($value)) {
+                    $value = join(',', $value);
+                }
+                $config[$enum->getModule()][$enum->name] = $value;
             }
         }
         return $config;

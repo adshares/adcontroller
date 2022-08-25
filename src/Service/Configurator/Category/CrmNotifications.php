@@ -3,13 +3,12 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
+use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Utility\ArrayUtils;
-use App\Utility\Validator\PositiveIntegerValidator;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
-class ZoneOptions implements ConfiguratorCategory
+class CrmNotifications implements ConfiguratorCategory
 {
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
@@ -19,12 +18,17 @@ class ZoneOptions implements ConfiguratorCategory
 
     public function process(array $content): void
     {
-        $input = ArrayUtils::filterByKeys($content, self::fields());
+        $fields = self::fields();
+        $input = ArrayUtils::filterByKeys($content, $fields);
         if (empty($input)) {
-            throw new UnprocessableEntityHttpException('Data is required');
+            throw new InvalidArgumentException('Data is required');
         }
-        ArrayUtils::assureBoolTypeForField($input, AdServerConfig::AllowZoneInIframe->name);
-        ArrayUtils::assurePositiveIntegerTypesForFields($input, [AdServerConfig::MaxPageZones->name]);
+
+        foreach ($fields as $field) {
+            if (isset($input[$field]) && false === filter_var($input[$field], FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidArgumentException(sprintf('Field `%s` must be an e-mail', $field));
+            }
+        }
 
         $this->adServerConfigurationClient->store($input);
         $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
@@ -33,8 +37,9 @@ class ZoneOptions implements ConfiguratorCategory
     private static function fields(): array
     {
         return [
-            AdServerConfig::AllowZoneInIframe->name,
-            AdServerConfig::MaxPageZones->name,
+            AdServerConfig::CrmMailAddressOnCampaignCreated->name,
+            AdServerConfig::CrmMailAddressOnSiteAdded->name,
+            AdServerConfig::CrmMailAddressOnUserRegistered->name,
         ];
     }
 }

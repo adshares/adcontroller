@@ -25,7 +25,7 @@ class LoginController extends AbstractController
     private const ADSERVER_LOG_IN_URI = '/auth/jwt/login';
     private const ADSERVER_LOG_OUT_URI = '/auth/jwt/logout';
 
-    public function __construct(private readonly LoggerInterface $logger, private readonly string $adserverBaseUri)
+    public function __construct(private readonly LoggerInterface $logger, private readonly string $adServerBaseUri)
     {
     }
 
@@ -64,7 +64,7 @@ class LoginController extends AbstractController
 
         $response = $httpClient->request(
             'POST',
-            $this->adserverBaseUri . self::ADSERVER_LOG_IN_URI,
+            $this->adServerBaseUri . self::ADSERVER_LOG_IN_URI,
             [
                 'json' => ['email' => $email, 'password' => $password],
             ]
@@ -102,7 +102,7 @@ class LoginController extends AbstractController
     {
         $response = $httpClient->request(
             'POST',
-            $this->adserverBaseUri . self::ADSERVER_LOG_OUT_URI,
+            $this->adServerBaseUri . self::ADSERVER_LOG_OUT_URI,
             [
                 'headers' => [
                     'Authorization' => $request->headers->get('Authorization'),

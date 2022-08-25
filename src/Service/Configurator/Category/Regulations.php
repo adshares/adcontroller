@@ -8,8 +8,10 @@ use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Utility\ArrayUtils;
 
-class AutomaticWithdrawal implements ConfiguratorCategory
+class Regulations implements ConfiguratorCategory
 {
+    private const MAXIMUM_CONTENT_LENGTH = 16777210;
+
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
@@ -23,19 +25,25 @@ class AutomaticWithdrawal implements ConfiguratorCategory
         if (empty($input)) {
             throw new InvalidArgumentException('Data is required');
         }
-        ArrayUtils::assurePositiveIntegerTypesForFields($input, $fields);
 
-        $this->adServerConfigurationClient->store($input);
+        foreach ($fields as $field) {
+            if (
+                isset($input[$field]) &&
+                (!is_string($input[$field]) || strlen($input[$field]) > self::MAXIMUM_CONTENT_LENGTH)
+            ) {
+                throw new InvalidArgumentException(sprintf('Field `%s` must be a string', $field));
+            }
+        }
+
+        $this->adServerConfigurationClient->storePlaceholders($input);
         $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
     }
 
     private static function fields(): array
     {
         return [
-            AdServerConfig::AutoWithdrawalLimitAds->name,
-            AdServerConfig::AutoWithdrawalLimitBsc->name,
-            AdServerConfig::AutoWithdrawalLimitBtc->name,
-            AdServerConfig::AutoWithdrawalLimitEth->name,
+            AdServerConfig::PrivacyPolicy->name,
+            AdServerConfig::Terms->name,
         ];
     }
 }

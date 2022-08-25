@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
+use App\Exception\InvalidArgumentException;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
@@ -96,6 +97,8 @@ class InstallerController extends AbstractController
 
         try {
             $service->process($content);
+        } catch (InvalidArgumentException $invalidArgumentException) {
+            throw new UnprocessableEntityHttpException($invalidArgumentException->getMessage());
         } catch (UnexpectedResponseException $exception) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $exception->getMessage());
         }
@@ -118,7 +121,11 @@ class InstallerController extends AbstractController
         }
 
         $accountId = new AccountId($content[AdServerConfig::WalletAddress->name]);
-        $nodeHost = $wallet->getNodeHostByAccountAddress($accountId);
+        try {
+            $nodeHost = $wallet->getNodeHostByAccountAddress($accountId);
+        } catch (InvalidArgumentException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
+        }
 
         return $this->json(
             [

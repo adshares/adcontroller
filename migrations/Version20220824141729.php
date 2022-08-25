@@ -7,21 +7,22 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20220714125437 extends AbstractMigration
+final class Version20220824141729 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create table configuration';
+        return 'Create table asset';
     }
 
     public function up(Schema $schema): void
     {
         $this->addSql(<<<SQL
-CREATE TABLE configuration (
+CREATE TABLE asset (
   id INT AUTO_INCREMENT NOT NULL,
   module VARCHAR(31) NOT NULL,
   name VARCHAR(255) NOT NULL,
-  value MEDIUMTEXT NOT NULL,
+  mime_type VARCHAR(127) NOT NULL,
+  content LONGBLOB NOT NULL,
   created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_NAME (module, name),
@@ -33,6 +34,6 @@ SQL
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP TABLE configuration');
+        $this->addSql('DROP TABLE asset');
     }
 }

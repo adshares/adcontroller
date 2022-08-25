@@ -3,10 +3,10 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
+use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
 use App\Utility\ArrayUtils;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class Registration implements ConfiguratorCategory
 {
@@ -25,12 +25,10 @@ class Registration implements ConfiguratorCategory
 
     public function process(array $content): void
     {
-        $fields = self::fields();
-        $input = ArrayUtils::filterByKeys($content, $fields);
+        $input = ArrayUtils::filterByKeys($content, self::fields());
         if (empty($input)) {
-            throw new UnprocessableEntityHttpException('Data is required');
+            throw new InvalidArgumentException('Data is required');
         }
-
         foreach (
             [
                 AdServerConfig::AutoConfirmationEnabled->name,
@@ -38,22 +36,14 @@ class Registration implements ConfiguratorCategory
                 AdServerConfig::EmailVerificationRequired->name,
             ] as $field
         ) {
-            if (isset($input[$field])) {
-                if (null === ($value = filter_var($input[$field], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE))) {
-                    throw new UnprocessableEntityHttpException(
-                        sprintf('Field `%s` must be a boolean', $field)
-                    );
-                }
-
-                $input[$field] = $value;
-            }
+            ArrayUtils::assureBoolTypeForField($input, $field);
         }
 
         if (
             isset($input[AdServerConfig::RegistrationMode->name]) &&
             !in_array($input[AdServerConfig::RegistrationMode->name], self::ALLOWED_REGISTRATION_MODE, true)
         ) {
-            throw new UnprocessableEntityHttpException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Field `%s` must be one of (%s)',
                     AdServerConfig::RegistrationMode->name,
@@ -72,7 +62,7 @@ class Registration implements ConfiguratorCategory
         );
         foreach ($conflictingSettings as $field) {
             if (!isset($data[$field])) {
-                throw new UnprocessableEntityHttpException(
+                throw new InvalidArgumentException(
                     sprintf('Field `%s` is required', $field)
                 );
             }
@@ -80,7 +70,7 @@ class Registration implements ConfiguratorCategory
                 $data[AdServerConfig::AutoRegistrationEnabled->name] &&
                 self::REGISTRATION_MODE_PRIVATE === $data[AdServerConfig::RegistrationMode->name]
             ) {
-                throw new UnprocessableEntityHttpException('Automatic registration is forbidden in private mode');
+                throw new InvalidArgumentException('Automatic registration is forbidden in private mode');
             }
         }
 
