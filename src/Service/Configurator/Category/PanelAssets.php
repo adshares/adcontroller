@@ -29,7 +29,6 @@ class PanelAssets implements ConfiguratorCategory
         }
     }
 
-
     private function validate(array $content): void
     {
         if (empty($content)) {
@@ -101,7 +100,13 @@ class PanelAssets implements ConfiguratorCategory
             $asset->setContent($file->getContent());
             $assets[] = $asset;
         }
-        $this->assetRepository->upsert($assets, true);
+        $this->assetRepository->upsert($assets);
+    }
+
+    public function remove(): void
+    {
+        $assets = $this->assetRepository->findBy(['module' => RebrandingConfig::MODULE]);
+        $this->assetRepository->remove($assets);
     }
 
     private static function fields(): array

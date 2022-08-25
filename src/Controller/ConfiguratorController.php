@@ -33,7 +33,6 @@ use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
-use App\Service\Installer\Migrator;
 use App\Service\LicenseReader;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -135,6 +134,14 @@ class ConfiguratorController extends AbstractController
         } catch (InvalidArgumentException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage());
         }
+
+        return $this->jsonOk();
+    }
+
+    #[Route('/config/panel-assets', name: 'remove_panel_assets', methods: ['DELETE'])]
+    public function removePanelAssets(PanelAssets $panelAssets): JsonResponse
+    {
+        $panelAssets->remove();
 
         return $this->jsonOk();
     }
