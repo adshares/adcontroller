@@ -9,7 +9,6 @@ use App\Entity\Enum\ConfigEnum;
 use App\Entity\Enum\GeneralConfig;
 use App\Service\Crypt;
 use App\ValueObject\ConfigType;
-use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
@@ -44,7 +43,9 @@ class ConfigurationRepository extends ServiceEntityRepository
 
     public function insertOrUpdate(string $module, array $data, bool $flush = true): void
     {
+        $this->_em->getFilters()->disable('softdeleteable');
         $entities = $this->findByNames($module, array_keys($data));
+        $this->_em->getFilters()->enable('softdeleteable');
         $names = array_map(fn($entity) => $entity->getName(), $entities);
         $entities = array_combine($names, $entities);
 
@@ -55,6 +56,7 @@ class ConfigurationRepository extends ServiceEntityRepository
                 $entity->setName($name);
             } else {
                 $entity = $entities[$name];
+                $entity->restore();
             }
             if ($this->isSecretEntity($entity)) {
                 $value = $this->crypt->encrypt($value);

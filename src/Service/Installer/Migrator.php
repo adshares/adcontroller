@@ -11,6 +11,9 @@ use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Psr\Log\LoggerInterface;
 
 class Migrator
 {
@@ -89,21 +92,32 @@ class Migrator
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function migrate(): void
+    public function synchronizeData(): void
     {
         $adServerConfig = $this->adServerConfigurationClient->fetch();
-        $config = $this->map(self::KEY_MAP, $adServerConfig);
-        $this->store($config);
+        $config = self::map(self::KEY_MAP, $adServerConfig);
 
         $adServerPlaceholders = $this->adServerConfigurationClient->fetchPlaceholders();
-        $placeholders = $this->map(self::PLACEHOLDER_KEY_MAP, $adServerPlaceholders);
-        $this->store($placeholders);
+        $placeholders = self::map(self::PLACEHOLDER_KEY_MAP, $adServerPlaceholders);
+
+        $this->entityManager->getConnection()->beginTransaction();
+        try {
+            $this->store($config);
+            $this->store($placeholders);
+            $this->entityManager->commit();
+        } catch (Exception $exception) {
+            $this->logger->error(sprintf('Migration failed: (%s)', $exception->getMessage()));
+            $this->entityManager->rollback();
+            throw $exception;
+        }
     }
 
-    private function map(array $keyMap, array $adServerConfig): array
+    private static function map(array $keyMap, array $adServerConfig): array
     {
         $config = [];
         foreach ($keyMap as $adServerKey => $enum) {

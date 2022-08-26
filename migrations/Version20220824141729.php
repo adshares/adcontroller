@@ -17,6 +17,15 @@ final class Version20220824141729 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql(<<<SQL
+ALTER TABLE configuration
+  ADD deleted_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
+  CHANGE name name VARCHAR(255) NOT NULL,
+  CHANGE module module VARCHAR(31) NOT NULL,
+  CHANGE value value LONGTEXT NOT NULL;
+SQL
+        );
+
+        $this->addSql(<<<SQL
 CREATE TABLE asset (
   id INT AUTO_INCREMENT NOT NULL,
   module VARCHAR(31) NOT NULL,
@@ -25,9 +34,10 @@ CREATE TABLE asset (
   content LONGBLOB NOT NULL,
   created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  deleted_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_NAME (module, name),
   PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`;
 SQL
         );
 
@@ -55,5 +65,13 @@ SQL
     {
         $this->addSql('DROP TABLE ext_log_entries');
         $this->addSql('DROP TABLE asset');
+        $this->addSql(<<<SQL
+ALTER TABLE configuration
+  DROP deleted_at,
+      CHANGE module module VARCHAR(31),
+      CHANGE name name VARCHAR(255),
+      CHANGE value value TEXT
+SQL
+        );
     }
 }

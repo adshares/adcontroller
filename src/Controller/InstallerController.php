@@ -53,7 +53,7 @@ class InstallerController extends AbstractController
             AppStateEnum::AdserverAccountCreated
             === AppStateEnum::tryFrom($this->repository->fetchValueByEnum(AppConfig::AppState))
         ) {
-            $this->migrator->migrate();
+            $this->migrator->synchronizeData();
             $this->repository->insertOrUpdateOne(AppConfig::AppState, AppStateEnum::MigrationCompleted->name);
         }
         if (1 !== preg_match('/^[a-z]+$/', $step)) {

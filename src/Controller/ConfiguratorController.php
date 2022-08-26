@@ -35,6 +35,7 @@ use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
 use App\Service\Installer\Migrator;
 use App\Service\LicenseReader;
+use App\Utility\ArrayUtils;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,17 +71,31 @@ class ConfiguratorController extends AbstractController
                 array_map(fn($enum) => $enum->name, $class::cases())
             );
         }
-        self::appendAdServerPrivateInventory($data);
+        self::processInventory($data);
 
         return $this->jsonOk($data);
     }
 
-    private static function appendAdServerPrivateInventory(array &$data): void
+    private static function processInventory(array &$data): void
     {
-        $whiteList = $data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name] ?? [];
-        $privateInventory = 1 === count($whiteList) &&
-            $whiteList[0] === $data[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name];
+        $adServerData = $data[AdServerConfig::MODULE];
+        if (
+            ArrayUtils::equal(
+                $adServerData[AdServerConfig::InventoryExportWhitelist->name],
+                $adServerData[AdServerConfig::InventoryImportWhitelist->name],
+            )
+        ) {
+            $data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name] =
+                $adServerData[AdServerConfig::InventoryExportWhitelist->name];
+            unset($data[AdServerConfig::MODULE][AdServerConfig::InventoryExportWhitelist->name]);
+            unset($data[AdServerConfig::MODULE][AdServerConfig::InventoryImportWhitelist->name]);
+        } else {
+            unset($data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name]);
+        }
 
+        $whiteList = $adServerData[AdServerConfig::InventoryWhitelist->name];
+        $privateInventory = 1 === count($whiteList) &&
+            $whiteList[0] === $adServerData[AdServerConfig::WalletAddress->name];
         $data[AdServerConfig::MODULE][AdServerConfig::InventoryPrivate->name] = $privateInventory;
     }
 
@@ -173,7 +188,7 @@ class ConfiguratorController extends AbstractController
     #[Route('/sync', name: 'sync_data', methods: ['GET'])]
     public function syncData(Migrator $migrator): JsonResponse
     {
-        $migrator->migrate();
+        $migrator->synchronizeData();
 
         return $this->jsonOk();
     }

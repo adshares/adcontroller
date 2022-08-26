@@ -66,12 +66,12 @@ class Whitelist implements ConfiguratorCategory
             AdServerConfig::InventoryImportWhitelist->name => $importWhitelist,
             AdServerConfig::InventoryWhitelist->name => null,
         ]);
-        $this->repository->remove(AdServerConfig::InventoryWhitelist, false);
         $this->repository->insertOrUpdate(
             AdServerConfig::MODULE,
             [
                 AdServerConfig::InventoryExportWhitelist->name => $exportWhitelist,
                 AdServerConfig::InventoryImportWhitelist->name => $importWhitelist,
+                AdServerConfig::InventoryWhitelist->name => '',
             ]
         );
     }
@@ -96,6 +96,7 @@ class Whitelist implements ConfiguratorCategory
                         sprintf('Field `%s` must be an array', $field)
                     );
                 }
+                $input[$field] = array_unique($input[$field]);
                 foreach ($input[$field] as $item) {
                     if (!$validator->valid($item)) {
                         throw new InvalidArgumentException(
@@ -115,8 +116,13 @@ class Whitelist implements ConfiguratorCategory
             AdServerConfig::InventoryImportWhitelist->name => null,
             AdServerConfig::InventoryWhitelist->name => $whitelist,
         ]);
-        $this->repository->remove(AdServerConfig::InventoryExportWhitelist, false);
-        $this->repository->remove(AdServerConfig::InventoryImportWhitelist, false);
-        $this->repository->insertOrUpdateOne(AdServerConfig::InventoryWhitelist, $whitelist);
+        $this->repository->insertOrUpdate(
+            AdServerConfig::MODULE,
+            [
+                AdServerConfig::InventoryExportWhitelist->name => $whitelist,
+                AdServerConfig::InventoryImportWhitelist->name => $whitelist,
+                AdServerConfig::InventoryWhitelist->name => $whitelist,
+            ]
+        );
     }
 }

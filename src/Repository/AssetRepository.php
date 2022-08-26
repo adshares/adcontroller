@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Asset;
-use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -29,16 +28,19 @@ class AssetRepository extends ServiceEntityRepository
      */
     public function upsert(array $entities, bool $flush = true): void
     {
+        $this->_em->getFilters()->disable('softdeleteable');
         foreach ($entities as $entity) {
             $dbEntity = $this->findOneBy(['module' => $entity->getModule(), 'name' => $entity->getName()]);
             if (null === $dbEntity) {
                 $dbEntity = $entity;
             } else {
                 $dbEntity->setContent($entity->getContent());
+                $dbEntity->restore();
             }
 
             $this->getEntityManager()->persist($dbEntity);
         }
+        $this->_em->getFilters()->enable('softdeleteable');
 
         if ($flush) {
             $this->getEntityManager()->flush();

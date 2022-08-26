@@ -7,6 +7,13 @@ use App\Utility\Validator\PositiveIntegerValidator;
 
 class ArrayUtils
 {
+    public static function equal(array $a, array $b): bool
+    {
+        array_multisort($a);
+        array_multisort($b);
+        return (serialize($a) === serialize($b));
+    }
+
     public static function filterByKeys(array $data, array $keys): array
     {
         $filtered = [];

@@ -10,6 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQUE_NAME', columns: ['module', 'name'])]
 #[Gedmo\Loggable]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt')]
 class Configuration
 {
     public const COMMON_DATA_REQUIRED = 'DataRequired';
@@ -30,13 +31,16 @@ class Configuration
     #[Gedmo\Versioned]
     private ?string $value = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'created_at')]
     #[Gedmo\Timestampable(on: 'create')]
-    private ?DateTimeImmutable $created_at = null;
+    private ?DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'updated_at')]
     #[Gedmo\Timestampable]
-    private ?DateTimeImmutable $updated_at = null;
+    private ?DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(name: 'deleted_at', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
 
     public function getId(): ?int
     {
@@ -51,7 +55,6 @@ class Configuration
     public function setModule(string $module): self
     {
         $this->module = $module;
-
         return $this;
     }
 
@@ -63,7 +66,6 @@ class Configuration
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -75,31 +77,45 @@ class Configuration
     public function setValue(string $value): self
     {
         $this->value = $value;
-
         return $this;
     }
 
     public function getCreatedAt(): ?DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeImmutable $created_at): self
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
-        $this->created_at = $created_at;
-
+        $this->createdAt = $createdAt;
         return $this;
     }
 
     public function getUpdatedAt(): ?DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(DateTimeImmutable $updatedAt): self
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
 
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    public function restore(): self
+    {
+        $this->deletedAt = null;
         return $this;
     }
 }
