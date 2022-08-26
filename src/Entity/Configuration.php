@@ -5,9 +5,11 @@ namespace App\Entity;
 use App\Repository\ConfigurationRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQUE_NAME', columns: ['module', 'name'])]
+#[Gedmo\Loggable]
 class Configuration
 {
     public const COMMON_DATA_REQUIRED = 'DataRequired';
@@ -25,6 +27,7 @@ class Configuration
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Gedmo\Versioned]
     private ?string $value = null;
 
     #[ORM\Column]
