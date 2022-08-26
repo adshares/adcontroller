@@ -33,7 +33,7 @@ use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
-use App\Service\Installer\Migrator;
+use App\Service\DataCollector;
 use App\Service\LicenseReader;
 use App\Utility\ArrayUtils;
 use Psr\Container\ContainerExceptionInterface;
@@ -186,9 +186,9 @@ class ConfiguratorController extends AbstractController
     }
 
     #[Route('/sync', name: 'sync_data', methods: ['GET'])]
-    public function syncData(Migrator $migrator): JsonResponse
+    public function synchronizeData(DataCollector $dataCollector): JsonResponse
     {
-        $migrator->synchronizeData();
+        $dataCollector->synchronizeData();
 
         return $this->jsonOk();
     }

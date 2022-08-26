@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Installer;
+namespace App\Service;
 
 use App\Entity\Enum\AdClassifyConfig;
 use App\Entity\Enum\AdPanelConfig;
@@ -10,12 +10,11 @@ use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 
-class Migrator
+class DataCollector
 {
     private const KEY_MAP = [
         // AdClassify
@@ -111,7 +110,7 @@ class Migrator
             $this->store($placeholders);
             $this->entityManager->commit();
         } catch (Exception $exception) {
-            $this->logger->error(sprintf('Migration failed: (%s)', $exception->getMessage()));
+            $this->logger->error(sprintf('Synchronization failed: (%s)', $exception->getMessage()));
             $this->entityManager->rollback();
             throw $exception;
         }

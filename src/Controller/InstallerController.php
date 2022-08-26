@@ -10,7 +10,7 @@ use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\Configurator\Category\Wallet;
-use App\Service\Installer\Migrator;
+use App\Service\DataCollector;
 use App\Service\Installer\Step\BaseStep;
 use App\Service\Installer\Step\ClassifierStep;
 use App\Service\Installer\Step\DnsStep;
@@ -34,7 +34,7 @@ class InstallerController extends AbstractController
 {
     public function __construct(
         private readonly ConfigurationRepository $repository,
-        private readonly Migrator $migrator,
+        private readonly DataCollector $dataCollector,
     ) {
     }
 
@@ -53,7 +53,7 @@ class InstallerController extends AbstractController
             AppStateEnum::AdserverAccountCreated
             === AppStateEnum::tryFrom($this->repository->fetchValueByEnum(AppConfig::AppState))
         ) {
-            $this->migrator->synchronizeData();
+            $this->dataCollector->synchronizeData();
             $this->repository->insertOrUpdateOne(AppConfig::AppState, AppStateEnum::MigrationCompleted->name);
         }
         if (1 !== preg_match('/^[a-z]+$/', $step)) {
