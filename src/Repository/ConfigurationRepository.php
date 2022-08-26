@@ -44,8 +44,6 @@ class ConfigurationRepository extends ServiceEntityRepository
 
     public function insertOrUpdate(string $module, array $data, bool $flush = true): void
     {
-        $now = new DateTimeImmutable();
-
         $entities = $this->findByNames($module, array_keys($data));
         $names = array_map(fn($entity) => $entity->getName(), $entities);
         $entities = array_combine($names, $entities);
@@ -55,7 +53,6 @@ class ConfigurationRepository extends ServiceEntityRepository
                 $entity = new Configuration();
                 $entity->setModule($module);
                 $entity->setName($name);
-                $entity->setCreatedAt($now);
             } else {
                 $entity = $entities[$name];
             }
@@ -63,7 +60,6 @@ class ConfigurationRepository extends ServiceEntityRepository
                 $value = $this->crypt->encrypt($value);
             }
             $entity->setValue($value);
-            $entity->setUpdatedAt($now);
 
             $this->getEntityManager()->persist($entity);
         }
@@ -195,6 +191,7 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::UploadLimitModel->name => ConfigType::Integer,
             AdServerConfig::UploadLimitVideo->name => ConfigType::Integer,
             AdServerConfig::UploadLimitZip->name => ConfigType::Integer,
+            GeneralConfig::SmtpPort->name => ConfigType::Integer,
 
 //            self::BANNER_FORCE_HTTPS => ConfigType::Bool,
 //            self::BTC_WITHDRAW => ConfigType::Bool,
@@ -207,7 +204,6 @@ class ConfigurationRepository extends ServiceEntityRepository
 //            self::FIAT_DEPOSIT_MIN_AMOUNT => ConfigType::Integer,
 //            self::INVOICE_CURRENCIES => ConfigType::Array,
 //            self::INVOICE_ENABLED => ConfigType::Bool,
-//            self::MAIL_SMTP_PORT => ConfigType::Integer,
 //            self::NETWORK_DATA_CACHE_TTL => ConfigType::Integer,
 //            self::NOW_PAYMENTS_EXCHANGE => ConfigType::Bool,
 //            self::NOW_PAYMENTS_FEE => ConfigType::Float,

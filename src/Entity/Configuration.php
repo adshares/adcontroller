@@ -31,9 +31,11 @@ class Configuration
     private ?string $value = null;
 
     #[ORM\Column]
+    #[Gedmo\Timestampable(on: 'create')]
     private ?DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
+    #[Gedmo\Timestampable]
     private ?DateTimeImmutable $updated_at = null;
 
     public function getId(): ?int

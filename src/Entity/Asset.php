@@ -6,6 +6,7 @@ use App\Repository\AssetRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQUE_NAME', columns: ['module', 'name'])]
@@ -26,9 +27,11 @@ class Asset
     private $content = null;
 
     #[ORM\Column]
+    #[Gedmo\Timestampable(on: 'create')]
     private ?DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
+    #[Gedmo\Timestampable]
     private ?DateTimeImmutable $updated_at = null;
 
     #[ORM\Column(length: 127)]

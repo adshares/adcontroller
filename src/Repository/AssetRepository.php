@@ -29,17 +29,13 @@ class AssetRepository extends ServiceEntityRepository
      */
     public function upsert(array $entities, bool $flush = true): void
     {
-        $now = new DateTimeImmutable();
-
         foreach ($entities as $entity) {
             $dbEntity = $this->findOneBy(['module' => $entity->getModule(), 'name' => $entity->getName()]);
             if (null === $dbEntity) {
                 $dbEntity = $entity;
-                $dbEntity->setCreatedAt($now);
             } else {
                 $dbEntity->setContent($entity->getContent());
             }
-            $dbEntity->setUpdatedAt($now);
 
             $this->getEntityManager()->persist($dbEntity);
         }
