@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useSetCommissionsConfigMutation } from '../../../redux/config/configApi';
+import { returnNumber, setDecimalPlaces } from '../../../utils/helpers';
+import { useCreateNotification, useForm } from '../../../hooks';
 import {
   Alert,
   Box,
@@ -16,17 +21,38 @@ import {
 import commonStyles from '../../common/commonStyles.scss';
 
 function Commissions() {
-  const [publisherCommission, setPublisherCommission] = useState(0);
-  const [advertiserCommission, setAdvertiserCommission] = useState(0);
-  const [isRefundReferralEnabled, setIsRefundReferralEnabled] = useState(true);
-  const [refundReferral, setRefundReferral] = useState(0);
+  const appData = useSelector(configSelectors.getAppData);
+  const [setCommissionsConfig, { isLoading }] = useSetCommissionsConfigMutation();
+  const form = useForm({
+    initialFields: {
+      OperatorRxFee: (Math.round(appData.AdServer.OperatorRxFee * 10000) / 100).toString(),
+      OperatorTxFee: (Math.round(appData.AdServer.OperatorTxFee * 10000) / 100).toString(),
+      ReferralRefundCommission: (Math.round(appData.AdServer.ReferralRefundCommission * 10000) / 100).toString(),
+    },
+    validation: {
+      OperatorRxFee: ['number'],
+      OperatorTxFee: ['number'],
+      ReferralRefundCommission: ['number'],
+    },
+  });
+  const [ReferralRefundEnabled, setReferralRefundEnabled] = useState(appData.AdServer.ReferralRefundEnabled);
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  //TODO: Add service to read write and change commissions values
-  useEffect(() => {
-    setPublisherCommission(10);
-    setAdvertiserCommission(20);
-    setRefundReferral(10.53);
-  }, []);
+  const onSaveClick = async () => {
+    const body = { ...(ReferralRefundEnabled !== appData.AdServer.ReferralRefundEnabled ? { ReferralRefundEnabled } : {}) };
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = returnNumber(form.fields[field]) / 100;
+      }
+    });
+
+    try {
+      await setCommissionsConfig(body).unwrap();
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
+  };
 
   return (
     <>
@@ -42,19 +68,30 @@ function Commissions() {
                 step={0.01}
                 valueLabelDisplay="auto"
                 size="small"
-                value={Number(advertiserCommission) || 0}
-                onChange={(e) => setAdvertiserCommission(e.target.value)}
+                name="OperatorTxFee"
+                value={returnNumber(form.fields.OperatorTxFee) || 0}
+                onChange={form.onChange}
+                onFocus={form.setTouched}
               />
-              <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+              <Box className={`${commonStyles.flex}`}>
                 <TextField
-                  variant="standard"
                   sx={{ width: '5em' }}
+                  variant="standard"
                   size="small"
-                  name="publisherCommission"
-                  inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01, autoComplete: 'off' }}
-                  value={Number(advertiserCommission).toString()}
-                  onChange={(e) => setAdvertiserCommission(Number(e.target.value).toFixed(2))}
+                  name="OperatorTxFee"
+                  error={form.touchedFields.OperatorTxFee && !form.errorObj.OperatorTxFee.isValid}
+                  helperText={form.touchedFields.OperatorTxFee && form.errorObj.OperatorTxFee.helperText}
+                  value={setDecimalPlaces(form.fields.OperatorTxFee, 2)}
+                  onChange={form.onChange}
+                  onFocus={form.setTouched}
                   type="number"
+                  inputProps={{
+                    style: { textAlign: 'center' },
+                    min: 0,
+                    max: 100,
+                    step: 0.01,
+                    autoComplete: 'off',
+                  }}
                 />
                 <Typography variant="h6" sx={{ ml: 1 }}>
                   %
@@ -76,19 +113,30 @@ function Commissions() {
                 step={0.01}
                 valueLabelDisplay="auto"
                 size="small"
-                value={Number(publisherCommission) || 0}
-                onChange={(e) => setPublisherCommission(e.target.value)}
+                name="OperatorRxFee"
+                value={returnNumber(form.fields.OperatorRxFee) || 0}
+                onChange={form.onChange}
+                onFocus={form.setTouched}
               />
               <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
                 <TextField
-                  variant="standard"
                   sx={{ width: '5em' }}
+                  variant="standard"
                   size="small"
-                  name="publisherCommission"
-                  inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01, autoComplete: 'off' }}
-                  value={Number(publisherCommission).toString()}
-                  onChange={(e) => setPublisherCommission(Number(e.target.value).toFixed(2))}
+                  name="OperatorRxFee"
+                  error={form.touchedFields.OperatorRxFee && !form.errorObj.OperatorRxFee.isValid}
+                  helperText={form.touchedFields.OperatorRxFee && form.errorObj.OperatorRxFee.helperText}
+                  value={setDecimalPlaces(form.fields.OperatorRxFee, 2)}
+                  onChange={form.onChange}
+                  onFocus={form.setTouched}
                   type="number"
+                  inputProps={{
+                    style: { textAlign: 'center' },
+                    min: 0,
+                    max: 100,
+                    step: 0.01,
+                    autoComplete: 'off',
+                  }}
                 />
                 <Typography variant="h6" sx={{ ml: 1 }}>
                   %
@@ -104,9 +152,9 @@ function Commissions() {
         <FormControlLabel
           label="Enable refund referral"
           sx={{ pl: 2, whiteSpace: 'nowrap' }}
-          control={<Checkbox checked={isRefundReferralEnabled} onChange={() => setIsRefundReferralEnabled(!isRefundReferralEnabled)} />}
+          control={<Checkbox checked={ReferralRefundEnabled} onChange={() => setReferralRefundEnabled((prevState) => !prevState)} />}
         />
-        <Collapse in={isRefundReferralEnabled} timeout="auto">
+        <Collapse in={ReferralRefundEnabled} timeout="auto">
           <CardContent>
             <Card
               raised
@@ -121,26 +169,37 @@ function Commissions() {
                     step={0.01}
                     valueLabelDisplay="auto"
                     size="small"
-                    value={Number(refundReferral) || 0}
-                    onChange={(e) => setRefundReferral(e.target.value)}
+                    name="ReferralRefundCommission"
+                    value={returnNumber(form.fields.ReferralRefundCommission) || 0}
+                    onChange={form.onChange}
+                    onFocus={form.setTouched}
                   />
                   <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
                     <TextField
-                      variant="standard"
                       sx={{ width: '5em' }}
+                      variant="standard"
                       size="small"
-                      name="publisherCommission"
-                      inputProps={{ style: { textAlign: 'center' }, min: 0, max: 100, step: 0.01, autoComplete: 'off' }}
-                      value={Number(refundReferral).toString()}
-                      onChange={(e) => setRefundReferral(Number(e.target.value).toFixed(2))}
+                      name="ReferralRefundCommission"
+                      error={form.touchedFields.ReferralRefundCommission && !form.errorObj.ReferralRefundCommission.isValid}
+                      helperText={form.touchedFields.ReferralRefundCommission && form.errorObj.ReferralRefundCommission.helperText}
+                      value={setDecimalPlaces(form.fields.ReferralRefundCommission, 2)}
+                      onChange={form.onChange}
+                      onFocus={form.setTouched}
                       type="number"
+                      inputProps={{
+                        style: { textAlign: 'center' },
+                        min: 0,
+                        max: 100,
+                        step: 0.01,
+                        autoComplete: 'off',
+                      }}
                     />
                     <Typography variant="h6" sx={{ ml: 1 }}>
                       %
                     </Typography>
                   </Box>
                 </Box>
-                <Collapse in={publisherCommission < refundReferral} timeout="auto">
+                <Collapse in={Number(form.fields.OperatorRxFee) < Number(form.fields.ReferralRefundCommission)} timeout="auto">
                   <Alert severity="warning">Referral refund should not be greater than a publisher commission</Alert>
                 </Collapse>
               </CardContent>
@@ -150,7 +209,14 @@ function Commissions() {
       </Card>
 
       <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-        <Button variant="contained" type="button">
+        <Button
+          disabled={
+            (appData.AdServer.ReferralRefundEnabled === ReferralRefundEnabled && !form.isFormWasChanged) || isLoading || !form.isFormValid
+          }
+          onClick={onSaveClick}
+          variant="contained"
+          type="button"
+        >
           Save
         </Button>
       </Box>

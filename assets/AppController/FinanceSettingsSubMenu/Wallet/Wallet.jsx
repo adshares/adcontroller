@@ -310,7 +310,8 @@ const ColdWalletSettingsCard = () => {
                 error={form.touchedFields.HotWalletMinValue && !form.errorObj.HotWalletMinValue.isValid}
                 helperText={form.touchedFields.HotWalletMinValue && form.errorObj.HotWalletMinValue.helperText}
                 value={form.fields.HotWalletMinValue}
-                inputProps={{ autoComplete: 'off' }}
+                type="number"
+                inputProps={{ autoComplete: 'off', min: 0 }}
               />
               <Box sx={{ height: '40px', ml: 0.5 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
                 <Typography sx={{ ml: 1 }} variant="body1">
@@ -335,7 +336,8 @@ const ColdWalletSettingsCard = () => {
                 error={form.touchedFields.HotWalletMaxValue && !form.errorObj.HotWalletMaxValue.isValid}
                 helperText={form.touchedFields.HotWalletMaxValue && form.errorObj.HotWalletMaxValue.helperText}
                 value={form.fields.HotWalletMaxValue}
-                inputProps={{ autoComplete: 'off' }}
+                type="number"
+                inputProps={{ autoComplete: 'off', min: 0 }}
               />
               <Box sx={{ height: '40px', ml: 0.5 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
                 <Typography sx={{ ml: 1 }} variant="body1">
