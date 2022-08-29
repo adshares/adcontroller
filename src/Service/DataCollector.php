@@ -184,8 +184,10 @@ class DataCollector
         foreach ($logs as $log) {
             if (Configuration::class === $log->getObjectClass()) {
                 $previousLog = $this->getPreviousLog($log);
+                $entity = $this->repository->find($log->getObjectId());
                 $changes[] = [
                     'action' => $log->getAction(),
+                    'field' => sprintf('%s::%s', $entity->getModule(), $entity->getName()),
                     'previousValue' => $previousLog?->getData()['value'] ?? null,
                     'value' => $log->getData()['value'] ?? null,
                 ];
