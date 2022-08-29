@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Configuration;
 use App\Entity\Enum\AdClassifyConfig;
 use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\AdPayConfig;
@@ -10,8 +11,13 @@ use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Repository\ConfigurationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query\Parameter;
 use Exception;
+use Gedmo\Loggable\Entity\LogEntry;
+use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
 use Psr\Log\LoggerInterface;
 
 class DataCollector
@@ -88,16 +94,29 @@ class DataCollector
         AdServerConfigurationClient::PLACEHOLDER_TERMS => AdServerConfig::Terms,
     ];
 
+    private LogEntryRepository $logEntryRepository;
+
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
     ) {
+        $this->logEntryRepository = new LogEntryRepository(
+            $entityManager,
+            $entityManager->getClassMetadata(LogEntry::class)
+        );
     }
 
-    public function synchronizeData(): void
+    public function synchronize(): array
     {
+        return [AdServerConfig::MODULE => $this->synchronizeAdServer()];
+    }
+
+    private function synchronizeAdServer(): array
+    {
+        $synchronizeStart = $this->getLatestLogId();
+
         $adServerConfig = $this->adServerConfigurationClient->fetch();
         $config = self::map(self::KEY_MAP, $adServerConfig);
 
@@ -110,10 +129,12 @@ class DataCollector
             $this->store($placeholders);
             $this->entityManager->commit();
         } catch (Exception $exception) {
-            $this->logger->error(sprintf('Synchronization failed: (%s)', $exception->getMessage()));
+            $this->logger->error(sprintf('AdServer synchronization failed: (%s)', $exception->getMessage()));
             $this->entityManager->rollback();
             throw $exception;
         }
+
+        return $this->fetchChanges($synchronizeStart);
     }
 
     private static function map(array $keyMap, array $adServerConfig): array
@@ -136,5 +157,63 @@ class DataCollector
         foreach ($config as $module => $data) {
             $this->repository->insertOrUpdate($module, $data);
         }
+    }
+
+    private function getLatestLogId(): int
+    {
+        try {
+            return $this->logEntryRepository->createQueryBuilder('log')
+                ->select('MAX(log.id)')
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (NoResultException) {
+            return 0;
+        }
+    }
+
+    private function fetchChanges(int $id): array
+    {
+        $changes = [];
+        $logs = $this->logEntryRepository->createQueryBuilder('log')
+            ->where('log.id > :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getResult();
+
+        /** @var LogEntry $log */
+        foreach ($logs as $log) {
+            if (Configuration::class === $log->getObjectClass()) {
+                $previousLog = $this->getPreviousLog($log);
+                $changes[] = [
+                    'action' => $log->getAction(),
+                    'previousValue' => $previousLog?->getData()['value'] ?? null,
+                    'value' => $log->getData()['value'] ?? null,
+                ];
+            }
+        }
+        return $changes;
+    }
+
+    private function getPreviousLog(LogEntry $log): ?LogEntry
+    {
+        if ($log->getVersion() <= 1) {
+            return null;
+        }
+
+        return $this->logEntryRepository->createQueryBuilder('log')
+            ->where(' log.objectId = :objectId')
+            ->andWhere('log.objectClass = :objectClass')
+            ->andWhere('log.version < :version')
+            ->orderBy('log.version', 'DESC')
+            ->setMaxResults(1)
+            ->setParameters(
+                new ArrayCollection([
+                    new Parameter('objectId', $log->getObjectId()),
+                    new Parameter('objectClass', $log->getObjectClass()),
+                    new Parameter('version', $log->getVersion()),
+                ])
+            )
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }
