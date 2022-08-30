@@ -15,6 +15,16 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            gedmo_loggable:
+                is_bundle: false
+                dir: '%kernel.project_dir%/vendor/gedmo/doctrine-extensions/src/Loggable/Entity'
+                prefix: Gedmo\Loggable\Entity
+                alias: GedmoLoggable # (optional) it will default to the name set for the mapping
+                type: attribute
+        filters:
+            softdeleteable:
+                class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+                enabled: true
 
 when@test:
     doctrine:

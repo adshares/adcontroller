@@ -33,8 +33,9 @@ use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
-use App\Service\Installer\Migrator;
+use App\Service\DataCollector;
 use App\Service\LicenseReader;
+use App\Utility\ArrayUtils;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,6 +51,24 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'api_')]
 class ConfiguratorController extends AbstractController
 {
+    private const CONFIGURATION_SERVICES = [
+        'auto-withdrawal-config' => AutomaticWithdrawal::class,
+        'banner-settings-config' => BannerSettings::class,
+        'campaign-settings-config' => CampaignSettings::class,
+        'base-information-config' => BaseInformation::class,
+        'cold-wallet-config' => ColdWallet::class,
+        'commission-config' => Commission::class,
+        'crm-notifications-config' => CrmNotifications::class,
+        'panel-placeholders-config' => PanelPlaceholders::class,
+        'registration-config' => Registration::class,
+        'regulations-config' => Regulations::class,
+        'rejected-domains-config' => RejectedDomains::class,
+        'site-options-config' => SiteOptions::class,
+        'wallet-config' => Wallet::class,
+        'whitelist-config' => Whitelist::class,
+        'zone-options-config' => ZoneOptions::class,
+    ];
+
     #[Route('/config', name: 'fetch_config', methods: ['GET'])]
     public function fetchConfig(ConfigurationRepository $repository): JsonResponse
     {
@@ -70,17 +89,31 @@ class ConfiguratorController extends AbstractController
                 array_map(fn($enum) => $enum->name, $class::cases())
             );
         }
-        self::appendAdServerPrivateInventory($data);
+        self::processInventory($data);
 
         return $this->jsonOk($data);
     }
 
-    private static function appendAdServerPrivateInventory(array &$data): void
+    private static function processInventory(array &$data): void
     {
-        $whiteList = $data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name] ?? [];
-        $privateInventory = 1 === count($whiteList) &&
-            $whiteList[0] === $data[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name];
+        $adServerData = $data[AdServerConfig::MODULE];
+        if (
+            ArrayUtils::equal(
+                $adServerData[AdServerConfig::InventoryExportWhitelist->name],
+                $adServerData[AdServerConfig::InventoryImportWhitelist->name],
+            )
+        ) {
+            $data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name] =
+                $adServerData[AdServerConfig::InventoryExportWhitelist->name];
+            unset($data[AdServerConfig::MODULE][AdServerConfig::InventoryExportWhitelist->name]);
+            unset($data[AdServerConfig::MODULE][AdServerConfig::InventoryImportWhitelist->name]);
+        } else {
+            unset($data[AdServerConfig::MODULE][AdServerConfig::InventoryWhitelist->name]);
+        }
 
+        $whiteList = $adServerData[AdServerConfig::InventoryWhitelist->name];
+        $privateInventory = 1 === count($whiteList) &&
+            $whiteList[0] === $adServerData[AdServerConfig::WalletAddress->name];
         $data[AdServerConfig::MODULE][AdServerConfig::InventoryPrivate->name] = $privateInventory;
     }
 
@@ -170,33 +203,23 @@ class ConfiguratorController extends AbstractController
         return $this->jsonOk();
     }
 
-    #[Route('/sync', name: 'sync_data', methods: ['GET'])]
-    public function syncData(Migrator $migrator): JsonResponse
+    #[Route('/synchronize-config', name: 'synchronize_config', methods: ['GET'])]
+    public function synchronizeConfig(DataCollector $dataCollector): JsonResponse
     {
-        $migrator->migrate();
+        try {
+            $changes = $dataCollector->synchronize();
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+        }
 
-        return $this->jsonOk();
+        return $this->jsonOk($changes);
     }
 
     public static function getSubscribedServices(): array
     {
-        return array_merge(parent::getSubscribedServices(), [
-            'auto-withdrawal-config' => AutomaticWithdrawal::class,
-            'banner-settings-config' => BannerSettings::class,
-            'campaign-settings-config' => CampaignSettings::class,
-            'base-information-config' => BaseInformation::class,
-            'cold-wallet-config' => ColdWallet::class,
-            'commission-config' => Commission::class,
-            'crm-notifications-config' => CrmNotifications::class,
-            'panel-placeholders-config' => PanelPlaceholders::class,
-            'registration-config' => Registration::class,
-            'regulations-config' => Regulations::class,
-            'rejected-domains-config' => RejectedDomains::class,
-            'site-options-config' => SiteOptions::class,
-            'wallet-config' => Wallet::class,
-            'whitelist-config' => Whitelist::class,
-            'zone-options-config' => ZoneOptions::class,
-        ]);
+        return array_merge(parent::getSubscribedServices(), self::CONFIGURATION_SERVICES);
     }
 
     protected function jsonOk(array $data = []): JsonResponse
