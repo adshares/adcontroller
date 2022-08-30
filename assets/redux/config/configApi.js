@@ -30,6 +30,20 @@ export const configApi = createApi({
         method: 'GET',
       }),
     }),
+    setBaseInformation: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/base-information',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setCrmNotificationsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/crm-notifications',
+        method: 'PATCH',
+        body,
+      }),
+    }),
     setWalletConfig: builder.mutation({
       query: (body) => ({
         url: '/api/config/wallet',
@@ -54,5 +68,11 @@ export const configApi = createApi({
   }),
 });
 
-export const { useGetAppConfigQuery, useSetWalletConfigMutation, useSetColdWalletConfigMutation, useSetCommissionsConfigMutation } =
-  configApi;
+export const {
+  useGetAppConfigQuery,
+  useSetBaseInformationMutation,
+  useSetCrmNotificationsConfigMutation,
+  useSetWalletConfigMutation,
+  useSetColdWalletConfigMutation,
+  useSetCommissionsConfigMutation,
+} = configApi;

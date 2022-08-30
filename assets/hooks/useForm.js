@@ -7,6 +7,19 @@ const testRequired = (value) => ({
   helperText: !!value ? '' : 'Required field',
 });
 
+const testUrl = (value) => {
+  const isValid = new RegExp(
+    '^(https?:\\/\\/)' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))', // OR ip (v4) address
+    'i',
+  ).test(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Field must be valid URL',
+  };
+};
+
 const testDomain = (value) => {
   const isValid = new RegExp(
     '^(https?:\\/\\/)?' + // protocol
@@ -142,6 +155,9 @@ export default function useForm(options) {
 
         case 'domain':
           return value ? testDomain(value) : validValueResult;
+
+        case 'url':
+          return value ? testUrl(value) : validValueResult;
 
         case 'wallet':
           return value ? testWallet(value) : validValueResult;
