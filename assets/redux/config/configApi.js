@@ -44,7 +44,15 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setCommissionsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/commission',
+        method: 'PATCH',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetAppConfigQuery, useSetWalletConfigMutation, useSetColdWalletConfigMutation } = configApi;
+export const { useGetAppConfigQuery, useSetWalletConfigMutation, useSetColdWalletConfigMutation, useSetCommissionsConfigMutation } =
+  configApi;

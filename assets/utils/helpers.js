@@ -17,4 +17,10 @@ function returnNumber(value) {
   return Number(value.toString().replace(',', '.'));
 }
 
-export { adsToClicks, clicksToAds, returnNumber };
+function setDecimalPlaces(value, toFix = 2) {
+  let tmp = value;
+  value = tmp.indexOf('.') >= 0 ? tmp.substr(0, tmp.indexOf('.')) + tmp.substr(tmp.indexOf('.'), toFix + 1) : tmp;
+  return value;
+}
+
+export { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces };
