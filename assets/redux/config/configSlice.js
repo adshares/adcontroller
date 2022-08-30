@@ -23,6 +23,9 @@ const configSlice = createSlice({
     builder.addMatcher(configApi.endpoints.setBaseInformation.matchFulfilled, (state, { meta }) => {
       Object.entries(meta.arg.originalArgs).forEach((changedArg) => (state.appData.AdServer[changedArg[0]] = changedArg[1]));
     });
+    builder.addMatcher(configApi.endpoints.setCrmNotificationsConfig.matchFulfilled, (state, { meta }) => {
+      Object.entries(meta.arg.originalArgs).forEach((changedArg) => (state.appData.AdServer[changedArg[0]] = changedArg[1]));
+    });
     builder.addMatcher(configApi.endpoints.setColdWalletConfig.matchFulfilled, (state, { meta }) => {
       Object.entries(meta.arg.originalArgs).forEach((changedArg) => (state.appData.AdServer[changedArg[0]] = changedArg[1]));
     });

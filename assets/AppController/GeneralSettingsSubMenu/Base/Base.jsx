@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
-import { useSetBaseInformationMutation } from '../../../redux/config/configApi';
+import { useSetBaseInformationMutation, useSetCrmNotificationsConfigMutation } from '../../../redux/config/configApi';
 import { useCreateNotification, useForm } from '../../../hooks';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
 import commonStyles from '../../common/commonStyles.scss';
@@ -147,21 +147,36 @@ const BaseInformationCard = () => {
 };
 
 const CRMNotificationsCard = () => {
+  const appData = useSelector(configSelectors.getAppData);
   const form = useForm({
     initialFields: {
-      mailOnCampaignCreated: '',
-      mailOnSiteAdded: '',
-      mailOnUserRegistered: '',
+      CrmMailAddressOnCampaignCreated: appData.AdServer.CrmMailAddressOnCampaignCreated || '',
+      CrmMailAddressOnSiteAdded: appData.AdServer.CrmMailAddressOnSiteAdded || '',
+      CrmMailAddressOnUserRegistered: appData.AdServer.CrmMailAddressOnUserRegistered || '',
     },
     validation: {
-      mailOnCampaignCreated: ['email'],
-      mailOnSiteAdded: ['email'],
-      mailOnUserRegistered: ['email'],
+      CrmMailAddressOnCampaignCreated: ['required', 'email'],
+      CrmMailAddressOnSiteAdded: ['required', 'email'],
+      CrmMailAddressOnUserRegistered: ['required', 'email'],
     },
   });
+  const [setCrmNotificationsConfig, { isLoading }] = useSetCrmNotificationsConfigMutation();
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log(form.fields);
+  const onSaveClick = async () => {
+    const body = {};
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = form.fields[field];
+      }
+    });
+
+    try {
+      await setCrmNotificationsConfig(body).unwrap();
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -181,10 +196,10 @@ const CRMNotificationsCard = () => {
             variant="outlined"
             size="small"
             label="CRM mail address on campaign created"
-            name="mailOnCampaignCreated"
-            error={form.touchedFields.mailOnCampaignCreated && !form.errorObj.mailOnCampaignCreated.isValid}
-            helperText={form.touchedFields.mailOnCampaignCreated && form.errorObj.mailOnCampaignCreated.helperText}
-            value={form.fields.mailOnCampaignCreated}
+            name="CrmMailAddressOnCampaignCreated"
+            error={form.changedFields.CrmMailAddressOnCampaignCreated && !form.errorObj.CrmMailAddressOnCampaignCreated.isValid}
+            helperText={form.changedFields.CrmMailAddressOnCampaignCreated && form.errorObj.CrmMailAddressOnCampaignCreated.helperText}
+            value={form.fields.CrmMailAddressOnCampaignCreated}
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
@@ -193,10 +208,10 @@ const CRMNotificationsCard = () => {
             variant="outlined"
             size="small"
             label="CRM mail address on site added"
-            name="mailOnSiteAdded"
-            error={form.touchedFields.mailOnSiteAdded && !form.errorObj.mailOnSiteAdded.isValid}
-            helperText={form.touchedFields.mailOnSiteAdded && form.errorObj.mailOnSiteAdded.helperText}
-            value={form.fields.mailOnSiteAdded}
+            name="CrmMailAddressOnSiteAdded"
+            error={form.changedFields.CrmMailAddressOnSiteAdded && !form.errorObj.CrmMailAddressOnSiteAdded.isValid}
+            helperText={form.changedFields.CrmMailAddressOnSiteAdded && form.errorObj.CrmMailAddressOnSiteAdded.helperText}
+            value={form.fields.CrmMailAddressOnSiteAdded}
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
@@ -205,10 +220,10 @@ const CRMNotificationsCard = () => {
             variant="outlined"
             size="small"
             label="CRM mail address on user registered"
-            name="mailOnUserRegistered"
-            error={form.touchedFields.mailOnUserRegistered && !form.errorObj.mailOnUserRegistered.isValid}
-            helperText={form.touchedFields.mailOnUserRegistered && form.errorObj.mailOnUserRegistered.helperText}
-            value={form.fields.mailOnUserRegistered}
+            name="CrmMailAddressOnUserRegistered"
+            error={form.changedFields.CrmMailAddressOnUserRegistered && !form.errorObj.CrmMailAddressOnUserRegistered.isValid}
+            helperText={form.changedFields.CrmMailAddressOnUserRegistered && form.errorObj.CrmMailAddressOnUserRegistered.helperText}
+            value={form.fields.CrmMailAddressOnUserRegistered}
             inputProps={{ autoComplete: 'off' }}
           />
         </Box>
@@ -216,7 +231,12 @@ const CRMNotificationsCard = () => {
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button type="button" variant="contained" onClick={onSaveClick}>
+          <Button
+            disabled={!form.isFormWasChanged || isLoading || !form.isFormValid}
+            type="button"
+            variant="contained"
+            onClick={onSaveClick}
+          >
             Save
           </Button>
         </Box>
