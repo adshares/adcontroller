@@ -49,8 +49,29 @@ class BaseInformation implements ConfiguratorCategory
             }
         }
 
+        [$adServerInput, $generalInput] = self::splitInput($input);
         $this->adServerConfigurationClient->store($input);
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
+        if (!empty($adServerInput)) {
+            $this->repository->insertOrUpdate(AdServerConfig::MODULE, $adServerInput);
+        }
+        if (!empty($generalInput)) {
+            $this->repository->insertOrUpdate(GeneralConfig::MODULE, $generalInput);
+        }
+    }
+
+    private static function splitInput(array $input): array
+    {
+        $adServerInput = [];
+        $generalInput = [];
+
+        foreach ($input as $key => $value) {
+            if (AdServerConfig::Name->name === $key) {
+                $adServerInput[$key] = $value;
+            } else {
+                $generalInput[$key] = $value;
+            }
+        }
+        return [$adServerInput, $generalInput];
     }
 
     private static function fields(): array
