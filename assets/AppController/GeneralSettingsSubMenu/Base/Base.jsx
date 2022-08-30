@@ -30,7 +30,7 @@ const BaseInformationCard = () => {
       Name: ['required'],
       TechnicalEmail: ['required', 'email'],
       SupportEmail: ['required', 'email'],
-      SupportChat: ['required', 'url'],
+      SupportChat: ['url'],
     },
   });
   const { createErrorNotification, createSuccessNotification } = useCreateNotification();
@@ -42,7 +42,6 @@ const BaseInformationCard = () => {
         body[field] = form.fields[field];
       }
     });
-    console.log(body);
 
     try {
       await setBaseInformation(body).unwrap();
