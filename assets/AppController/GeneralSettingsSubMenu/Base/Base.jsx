@@ -1,6 +1,9 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useSetBaseInformationMutation } from '../../../redux/config/configApi';
+import { useCreateNotification, useForm } from '../../../hooks';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
-import { useForm } from '../../../hooks';
 import commonStyles from '../../common/commonStyles.scss';
 
 export default function Base() {
@@ -13,23 +16,40 @@ export default function Base() {
 }
 
 const BaseInformationCard = () => {
+  const appData = useSelector(configSelectors.getAppData);
+  const [setBaseInformation, { isLoading }] = useSetBaseInformationMutation();
   const form = useForm({
     initialFields: {
-      adserverName: '',
-      technicalEmail: '',
-      supportEmail: '',
-      supportChat: '',
-      supportTelegram: '',
+      Name: appData.AdServer.Name || '',
+      TechnicalEmail: appData.General.TechnicalEmail || '',
+      SupportEmail: appData.General.SupportEmail || '',
+      SupportChat: appData.General.SupportChat || '',
+      SupportTelegram: appData.General.SupportTelegram || '',
     },
     validation: {
-      technicalEmail: ['email'],
-      supportEmail: ['email'],
-      supportChat: ['domain'],
+      Name: ['required'],
+      TechnicalEmail: ['required', 'email'],
+      SupportEmail: ['required', 'email'],
+      SupportChat: ['required', 'url'],
     },
   });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log(form.fields);
+  const onSaveClick = async () => {
+    const body = {};
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = form.fields[field];
+      }
+    });
+    console.log(body);
+
+    try {
+      await setBaseInformation(body).unwrap();
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -47,12 +67,12 @@ const BaseInformationCard = () => {
             fullWidth
             margin="dense"
             size="small"
-            name="adserverName"
+            name="Name"
             variant="outlined"
             label="Adserver's name"
-            error={form.touchedFields.adserverName && !form.errorObj.adserverName.isValid}
-            helperText={form.touchedFields.adserverName && form.errorObj.adserverName.helperText}
-            value={form.fields.adserverName}
+            error={form.changedFields.Name && !form.errorObj.Name.isValid}
+            helperText={form.changedFields.Name && form.errorObj.Name.helperText}
+            value={form.fields.Name}
             type="text"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -60,12 +80,12 @@ const BaseInformationCard = () => {
             fullWidth
             margin="dense"
             size="small"
-            name="technicalEmail"
+            name="TechnicalEmail"
             variant="outlined"
             label="Technical email"
-            error={form.touchedFields.technicalEmail && !form.errorObj.technicalEmail.isValid}
-            helperText={form.touchedFields.technicalEmail && form.errorObj.technicalEmail.helperText}
-            value={form.fields.technicalEmail}
+            error={form.changedFields.TechnicalEmail && !form.errorObj.TechnicalEmail.isValid}
+            helperText={form.changedFields.TechnicalEmail && form.errorObj.TechnicalEmail.helperText}
+            value={form.fields.TechnicalEmail}
             type="email"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -73,12 +93,12 @@ const BaseInformationCard = () => {
             fullWidth
             margin="dense"
             size="small"
-            name="supportEmail"
+            name="SupportEmail"
             variant="outlined"
             label="Support email"
-            error={form.touchedFields.supportEmail && !form.errorObj.supportEmail.isValid}
-            helperText={form.touchedFields.supportEmail && form.errorObj.supportEmail.helperText}
-            value={form.fields.supportEmail}
+            error={form.changedFields.SupportEmail && !form.errorObj.SupportEmail.isValid}
+            helperText={form.changedFields.SupportEmail && form.errorObj.SupportEmail.helperText}
+            value={form.fields.SupportEmail}
             type="email"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -86,12 +106,12 @@ const BaseInformationCard = () => {
             fullWidth
             margin="dense"
             size="small"
-            name="supportChat"
+            name="SupportChat"
             variant="outlined"
             label="Support chat"
-            error={form.touchedFields.supportChat && !form.errorObj.supportChat.isValid}
-            helperText={form.touchedFields.supportChat && form.errorObj.supportChat.helperText}
-            value={form.fields.supportChat}
+            error={form.changedFields.SupportChat && !form.errorObj.SupportChat.isValid}
+            helperText={form.changedFields.SupportChat && form.errorObj.SupportChat.helperText}
+            value={form.fields.SupportChat}
             type="text"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -99,12 +119,12 @@ const BaseInformationCard = () => {
             fullWidth
             margin="dense"
             size="small"
-            name="supportTelegram"
+            name="SupportTelegram"
             variant="outlined"
             label="Support telegram"
-            error={form.touchedFields.supportTelegram && !form.errorObj.supportTelegram.isValid}
-            helperText={form.touchedFields.supportTelegram && form.errorObj.supportTelegram.helperText}
-            value={form.fields.supportTelegram}
+            error={form.changedFields.SupportTelegram && !form.errorObj.SupportTelegram.isValid}
+            helperText={form.changedFields.SupportTelegram && form.errorObj.SupportTelegram.helperText}
+            value={form.fields.SupportTelegram}
             type="text"
             inputProps={{ autoComplete: 'off' }}
           />
@@ -113,7 +133,12 @@ const BaseInformationCard = () => {
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button type="button" variant="contained" onClick={onSaveClick}>
+          <Button
+            disabled={!form.isFormWasChanged || isLoading || !form.isFormValid}
+            type="button"
+            variant="contained"
+            onClick={onSaveClick}
+          >
             Save
           </Button>
         </Box>
