@@ -30,6 +30,19 @@ export const configApi = createApi({
         method: 'GET',
       }),
     }),
+    getLicenseData: builder.query({
+      query: () => ({
+        url: '/api/config/license-data',
+        method: 'GET',
+      }),
+    }),
+    setExistingLicense: builder.mutation({
+      query: (body) => ({
+        url: '/api/license_key',
+        method: 'POST',
+        body,
+      }),
+    }),
     setBaseInformation: builder.mutation({
       query: (body) => ({
         url: '/api/config/base-information',
@@ -70,6 +83,8 @@ export const configApi = createApi({
 
 export const {
   useGetAppConfigQuery,
+  useGetLicenseDataQuery,
+  useSetExistingLicenseMutation,
   useSetBaseInformationMutation,
   useSetCrmNotificationsConfigMutation,
   useSetWalletConfigMutation,
