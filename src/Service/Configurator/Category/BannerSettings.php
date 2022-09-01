@@ -4,19 +4,15 @@ namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
-use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
+use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 
 class BannerSettings implements ConfiguratorCategory
 {
-    public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
-        private readonly ConfigurationRepository $repository,
-    ) {
+    public function __construct(private readonly DataCollector $dataCollector) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
@@ -25,8 +21,7 @@ class BannerSettings implements ConfiguratorCategory
         }
         ArrayUtils::assurePositiveIntegerTypesForFields($input, $fields);
 
-        $this->adServerConfigurationClient->store($input);
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
+        return $this->dataCollector->push($input);
     }
 
     private static function fields(): array

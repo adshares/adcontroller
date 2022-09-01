@@ -25,11 +25,13 @@ class PanelAssets implements ConfiguratorCategory
     ) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $this->validate($content);
         $this->store($content);
         $this->deploy();
+
+        return [];
     }
 
     public function validateFileId(string $fileId): void

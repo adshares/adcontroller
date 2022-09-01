@@ -5,24 +5,32 @@ namespace App\Service\Configurator\Category;
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
+use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 use App\Utility\Validator\CommissionValidator;
 
 class Commission implements ConfiguratorCategory
 {
     public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
+        private readonly DataCollector $dataCollector,
     ) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
         if (empty($input)) {
             throw new InvalidArgumentException('Data is required');
+        }
+        if (
+            array_key_exists(AdServerConfig::ReferralRefundEnabled->name, $input) &&
+            null === $input[AdServerConfig::ReferralRefundEnabled->name]
+        ) {
+            throw new InvalidArgumentException(
+                sprintf('Field `%s` must be a boolean', AdServerConfig::ReferralRefundEnabled->name)
+            );
         }
         ArrayUtils::assureBoolTypeForField($input, AdServerConfig::ReferralRefundEnabled->name);
         self::assureCommissionTypeForFields(
@@ -36,7 +44,7 @@ class Commission implements ConfiguratorCategory
 
         if (
             ($input[AdServerConfig::ReferralRefundEnabled->name] ?? false) &&
-            !isset($input[AdServerConfig::ReferralRefundCommission->name]) &&
+            !array_key_exists(AdServerConfig::ReferralRefundCommission->name, $input) &&
             null === $this->repository->fetchValueByEnum(AdServerConfig::ReferralRefundCommission)
         ) {
             throw new InvalidArgumentException(
@@ -44,8 +52,7 @@ class Commission implements ConfiguratorCategory
             );
         }
 
-        $this->adServerConfigurationClient->store($input);
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
+        return $this->dataCollector->push($input);
     }
 
     private static function fields(): array

@@ -47,6 +47,9 @@ class DataCollector
         AdServerConfigurationClient::AUTO_WITHDRAWAL_LIMIT_BSC => AdServerConfig::AutoWithdrawalLimitBsc,
         AdServerConfigurationClient::AUTO_WITHDRAWAL_LIMIT_BTC => AdServerConfig::AutoWithdrawalLimitBtc,
         AdServerConfigurationClient::AUTO_WITHDRAWAL_LIMIT_ETH => AdServerConfig::AutoWithdrawalLimitEth,
+        AdServerConfigurationClient::CAMPAIGN_MIN_BUDGET => AdServerConfig::CampaignMinBudget,
+        AdServerConfigurationClient::CAMPAIGN_MIN_CPA => AdServerConfig::CampaignMinCpa,
+        AdServerConfigurationClient::CAMPAIGN_MIN_CPM => AdServerConfig::CampaignMinCpm,
         AdServerConfigurationClient::COLD_WALLET_ADDRESS => AdServerConfig::ColdWalletAddress,
         AdServerConfigurationClient::COLD_WALLET_IS_ACTIVE => AdServerConfig::ColdWalletIsActive,
         AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED =>
@@ -69,6 +72,10 @@ class DataCollector
         AdServerConfigurationClient::REGISTRATION_MODE => AdServerConfig::RegistrationMode,
         AdServerConfigurationClient::SITE_ACCEPT_BANNERS_MANUALLY => AdServerConfig::SiteAcceptBannersManually,
         AdServerConfigurationClient::SITE_CLASSIFIER_LOCAL_BANNERS => AdServerConfig::SiteClassifierLocalBanners,
+        AdServerConfigurationClient::UPLOAD_LIMIT_IMAGE => AdServerConfig::UploadLimitImage,
+        AdServerConfigurationClient::UPLOAD_LIMIT_MODEL => AdServerConfig::UploadLimitModel,
+        AdServerConfigurationClient::UPLOAD_LIMIT_VIDEO => AdServerConfig::UploadLimitVideo,
+        AdServerConfigurationClient::UPLOAD_LIMIT_ZIP => AdServerConfig::UploadLimitZip,
         AdServerConfigurationClient::URL => AdServerConfig::Url,
         // AdUser
         AdServerConfigurationClient::ADUSER_BASE_URL => AdUserConfig::Url,
@@ -143,9 +150,6 @@ class DataCollector
         foreach ($keyMap as $adServerKey => $enum) {
             if (isset($adServerConfig[$adServerKey])) {
                 $value = $adServerConfig[$adServerKey];
-                if (is_array($value)) {
-                    $value = join(',', $value);
-                }
                 $config[$enum->getModule()][$enum->name] = $value;
             }
         }
@@ -155,6 +159,11 @@ class DataCollector
     private function store(array $config): void
     {
         foreach ($config as $module => $data) {
+            foreach ($data as $key => $value) {
+                if (is_array($value)) {
+                    $data[$key] = join(',', $value);
+                }
+            }
             $this->repository->insertOrUpdate($module, $data);
         }
     }
@@ -217,5 +226,23 @@ class DataCollector
             )
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function push(array $data): array
+    {
+        $content = $this->adServerConfigurationClient->store($data);
+        $config = self::map(self::KEY_MAP, $content);
+        $this->store($config);
+
+        return $config;
+    }
+
+    public function pushPlaceholders(array $data): array
+    {
+        $content = $this->adServerConfigurationClient->storePlaceholders($data);
+        $placeholders = self::map(self::PLACEHOLDER_KEY_MAP, $content);
+        $this->store($placeholders);
+
+        return $placeholders;
     }
 }

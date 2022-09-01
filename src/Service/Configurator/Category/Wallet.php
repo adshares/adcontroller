@@ -5,9 +5,8 @@ namespace App\Service\Configurator\Category;
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
 use App\Exception\UnexpectedResponseException;
-use App\Repository\ConfigurationRepository;
 use App\Service\AdsCredentialsChecker;
-use App\Service\AdServerConfigurationClient;
+use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 use App\Utility\Validator\AdsAccountValidator;
 use App\ValueObject\AccountId;
@@ -20,13 +19,12 @@ class Wallet implements ConfiguratorCategory
 
     public function __construct(
         private readonly AdsCredentialsChecker $adsCredentialsChecker,
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
-        private readonly ConfigurationRepository $repository,
+        private readonly DataCollector $dataCollector,
         private readonly HttpClientInterface $httpClient,
     ) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
@@ -54,8 +52,7 @@ class Wallet implements ConfiguratorCategory
             throw new InvalidArgumentException($exception->getMessage());
         }
 
-        $this->adServerConfigurationClient->store($input);
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
+        return $this->dataCollector->push($input);
     }
 
     private function validate(array $input): void
@@ -66,7 +63,7 @@ class Wallet implements ConfiguratorCategory
                 AdServerConfig::WalletSecretKey->name
             ] as $field
         ) {
-            if (!isset($input[$field])) {
+            if (!array_key_exists($field, $input)) {
                 throw new InvalidArgumentException(sprintf('Field `%s` is required', $field));
             }
         }

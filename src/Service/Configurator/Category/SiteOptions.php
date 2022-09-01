@@ -4,8 +4,7 @@ namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
-use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
+use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 
 class SiteOptions implements ConfiguratorCategory
@@ -16,23 +15,28 @@ class SiteOptions implements ConfiguratorCategory
         'local-only',
     ];
 
-    public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
-        private readonly ConfigurationRepository $repository,
-    ) {
+    public function __construct(private readonly DataCollector $dataCollector) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
         if (empty($input)) {
             throw new InvalidArgumentException('Data is required');
         }
+        if (
+            array_key_exists(AdServerConfig::SiteAcceptBannersManually->name, $input) &&
+            null === $input[AdServerConfig::SiteAcceptBannersManually->name]
+        ) {
+            throw new InvalidArgumentException(
+                sprintf('Field `%s` must be a boolean', AdServerConfig::SiteAcceptBannersManually->name)
+            );
+        }
         ArrayUtils::assureBoolTypeForField($input, AdServerConfig::SiteAcceptBannersManually->name);
 
         if (
-            isset($input[AdServerConfig::SiteClassifierLocalBanners->name]) &&
+            array_key_exists(AdServerConfig::SiteClassifierLocalBanners->name, $input) &&
             !in_array(
                 $input[AdServerConfig::SiteClassifierLocalBanners->name],
                 self::ALLOWED_CLASSIFIER_LOCAL_BANNERS_OPTIONS,
@@ -48,8 +52,7 @@ class SiteOptions implements ConfiguratorCategory
             );
         }
 
-        $this->adServerConfigurationClient->store($input);
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
+        return $this->dataCollector->push($input);
     }
 
     private static function fields(): array

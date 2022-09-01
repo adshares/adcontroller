@@ -5,7 +5,7 @@ namespace App\Service\Configurator\Category;
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
+use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 
 class Registration implements ConfiguratorCategory
@@ -18,12 +18,12 @@ class Registration implements ConfiguratorCategory
     private const REGISTRATION_MODE_PRIVATE = 'private';
 
     public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
+        private readonly DataCollector $dataCollector,
     ) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $input = ArrayUtils::filterByKeys($content, self::fields());
         if (empty($input)) {
@@ -40,7 +40,7 @@ class Registration implements ConfiguratorCategory
         }
 
         if (
-            isset($input[AdServerConfig::RegistrationMode->name]) &&
+            array_key_exists(AdServerConfig::RegistrationMode->name, $input) &&
             !in_array($input[AdServerConfig::RegistrationMode->name], self::ALLOWED_REGISTRATION_MODE, true)
         ) {
             throw new InvalidArgumentException(
@@ -62,9 +62,7 @@ class Registration implements ConfiguratorCategory
         );
         foreach ($conflictingSettings as $field) {
             if (!isset($data[$field])) {
-                throw new InvalidArgumentException(
-                    sprintf('Field `%s` is required', $field)
-                );
+                throw new InvalidArgumentException(sprintf('Field `%s` is required', $field));
             }
             if (
                 $data[AdServerConfig::AutoRegistrationEnabled->name] &&
@@ -74,8 +72,7 @@ class Registration implements ConfiguratorCategory
             }
         }
 
-        $this->adServerConfigurationClient->store($input);
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
+        return $this->dataCollector->push($input);
     }
 
     private static function fields(): array

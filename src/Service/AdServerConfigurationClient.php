@@ -171,14 +171,14 @@ class AdServerConfigurationClient
         return $this->getData($this->buildPlaceholdersUri());
     }
 
-    public function store(array $data): void
+    public function store(array $data): array
     {
-        $this->patchData($this->buildConfigUri(), self::mapDataToAdServerFormat($data));
+        return $this->patchData($this->buildConfigUri(), self::mapDataToAdServerFormat($data));
     }
 
-    public function storePlaceholders(array $data): void
+    public function storePlaceholders(array $data): array
     {
-        $this->patchData($this->buildPlaceholdersUri(), self::mapPlaceholderDataToAdServerFormat($data));
+        return $this->patchData($this->buildPlaceholdersUri(), self::mapPlaceholderDataToAdServerFormat($data));
     }
 
     private function buildConfigUri(): string
@@ -368,7 +368,7 @@ class AdServerConfigurationClient
         return json_decode($response->getContent(), true);
     }
 
-    private function patchData(string $url, array $data): void
+    private function patchData(string $url, array $data): array
     {
         $response = $this->httpClient->request(
             'PATCH',
@@ -381,5 +381,7 @@ class AdServerConfigurationClient
             ]
         );
         $this->checkStatusCode($response);
+
+        return json_decode($response->getContent(), true);
     }
 }
