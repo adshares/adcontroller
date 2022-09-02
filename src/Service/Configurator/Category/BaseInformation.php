@@ -31,7 +31,7 @@ class BaseInformation implements ConfiguratorCategory
         }
         if (
             array_key_exists(AdServerConfig::Name->name, $input) &&
-            (!is_string($input[AdServerConfig::Name->name]) || 0 === strlen($input[$field]))
+            (!is_string($input[AdServerConfig::Name->name]) || 0 === strlen($input[AdServerConfig::Name->name]))
         ) {
             throw new InvalidArgumentException(
                 sprintf('Field `%s` must be a non-empty string', AdServerConfig::Name->name)
