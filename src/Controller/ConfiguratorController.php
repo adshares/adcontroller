@@ -119,30 +119,6 @@ class ConfiguratorController extends AbstractController
         return $data;
     }
 
-    #[Route('/config/license-data', name: 'fetch_config_license_data', methods: ['GET'])]
-    public function fetchLicenseData(
-        ConfigurationRepository $repository,
-        LicenseReader $licenseReader,
-    ): JsonResponse {
-        $licenseKey = $repository->fetchValueByEnum(AdServerConfig::LicenseKey);
-
-        if (null === $licenseKey) {
-            throw new NotFoundHttpException('License key is missing');
-        }
-
-        try {
-            $license = $licenseReader->read($licenseKey);
-        } catch (OutdatedLicense) {
-            throw new UnprocessableEntityHttpException('License is outdated');
-        } catch (ServiceNotPresent $exception) {
-            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
-        } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
-        }
-
-        return $this->jsonOk([Configuration::LICENSE_DATA => $license->toArray()]);
-    }
-
     #[Route('/config/panel-assets/{fileId}', name: 'fetch_panel_assets', methods: ['GET'])]
     public function fetchPanelAssets(string $fileId, AssetRepository $repository, PanelAssets $panelAssets): Response
     {

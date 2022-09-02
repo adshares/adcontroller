@@ -166,6 +166,11 @@ class AdServerConfigurationClient
         return $this->getData($this->buildConfigUri());
     }
 
+    public function fetchMonitoringData(string $resource): array
+    {
+        return $this->getData($this->buildMonitoringUri($resource));
+    }
+
     public function fetchPlaceholders(): array
     {
         return $this->getData($this->buildPlaceholdersUri());
@@ -184,6 +189,11 @@ class AdServerConfigurationClient
     private function buildConfigUri(): string
     {
         return sprintf('%s/api/config', $this->adServerBaseUri);
+    }
+
+    private function buildMonitoringUri(string $resource): string
+    {
+        return sprintf('%s/api/monitoring/%s', $this->adServerBaseUri, $resource);
     }
 
     private function buildPlaceholdersUri(): string
