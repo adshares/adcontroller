@@ -1,59 +1,100 @@
 import React, { useState } from 'react';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Collapse, FormControlLabel } from '@mui/material';
+import { useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useSetInventoryWhitelistConfigMutation } from '../../../redux/config/configApi';
+import { useCreateNotification } from '../../../hooks';
 import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Collapse, FormControlLabel } from '@mui/material';
 import commonStyles from '../../common/commonStyles.scss';
-import { validateAddress } from '@adshares/ads';
-
-const all = [];
-const supply = [];
-const demand = [];
 
 export default function Network() {
-  const [isPrivateAdserver, setIsPrivateAdserver] = useState(false);
-  const [addressList, setAddressList] = useState(all);
-  const [supplyAddressList, setSupplyAddressList] = useState(supply);
-  const [demandAddressList, setDemandAddressList] = useState(demand);
-  const [isFieldsValid, setFieldsValid] = useState(true);
-  const [separateNetworkList, setSeparateNetworkList] = useState(!!supplyAddressList.length || !!demandAddressList.length);
+  const appData = useSelector(configSelectors.getAppData);
+  const [setInventoryWhitelistConfig, { isLoading }] = useSetInventoryWhitelistConfigMutation();
+  const [InventoryPrivate, setInventoryPrivate] = useState(appData.AdServer.InventoryPrivate);
+  const [separateList, setSeparateList] = useState(
+    !!appData.AdServer.InventoryExportWhitelist?.length || !!appData.AdServer.InventoryImportWhitelist?.length,
+  );
+  const [InventoryWhitelist, setInventoryWhitelist] = useState([]);
+  const [InventoryImportWhitelist, setInventoryImportWhitelist] = useState([]);
+  const [InventoryExportWhitelist, setInventoryExportWhitelist] = useState([]);
+  const [isListValid, setIsListValid] = useState({
+    InventoryWhitelist: true,
+    InventoryImportWhitelist: true,
+    InventoryExportWhitelist: true,
+  });
+  const [isListWasChanged, setIsListWasChanged] = useState({
+    InventoryWhitelist: false,
+    InventoryImportWhitelist: false,
+    InventoryExportWhitelist: false,
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    //TODO: add send function and send this lists
-    if (supplyAddressList.length || demandAddressList.length) {
-      console.log(supplyAddressList);
-      console.log(demandAddressList);
-      setAddressList([]);
-      //TODO: send empty address list
-      return;
+  const onSaveClick = async () => {
+    const body = {
+      ...(InventoryPrivate && appData.AdServer.InventoryPrivate !== InventoryPrivate
+        ? {
+            InventoryPrivate,
+            InventoryWhitelist: [],
+            InventoryImportWhitelist: [],
+            InventoryExportWhitelist: [],
+          }
+        : { InventoryPrivate }),
+      ...(!InventoryPrivate && !separateList && { InventoryWhitelist }),
+      ...(!InventoryPrivate && separateList && { InventoryImportWhitelist, InventoryExportWhitelist }),
+    };
+
+    try {
+      await setInventoryWhitelistConfig(body).unwrap();
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
     }
-    console.log(addressList);
   };
 
-  const fieldsHandler = (fields, listName) => {
-    let isAddressListValid = true;
-    let isSupplyAddressListValid = true;
-    let isDemandAddressListValid = true;
-    if (fields.length > 0) {
-      switch (listName) {
-        case 'addressList':
-          setAddressList(fields.map((field) => field.field));
-          isAddressListValid = fields.some((field) => field.isValueValid);
-          break;
+  const fieldsHandler = (event) => {
+    const { listName, isValuesValid, isListWasChanged, createdList } = event;
 
-        case 'supplyAddressList':
-          setSupplyAddressList(fields.map((field) => field.field));
-          isSupplyAddressListValid = fields.some((field) => field.isValueValid);
-          break;
+    switch (listName) {
+      case 'InventoryWhitelist':
+        setInventoryWhitelist(createdList);
+        setIsListValid((prevState) => ({
+          ...prevState,
+          [listName]: createdList.length > 0 ? isValuesValid : true,
+        }));
+        setIsListWasChanged((prevState) => ({
+          ...prevState,
+          [listName]: isListWasChanged,
+        }));
+        break;
 
-        case 'demandAddressList':
-          setDemandAddressList(fields.map((field) => field.field));
-          isDemandAddressListValid = fields.some((field) => field.isValueValid);
-          break;
+      case 'InventoryImportWhitelist':
+        setInventoryImportWhitelist(createdList);
+        setIsListValid((prevState) => ({
+          ...prevState,
+          [listName]: createdList.length > 0 ? isValuesValid : true,
+        }));
+        setIsListWasChanged((prevState) => ({
+          ...prevState,
+          [listName]: isListWasChanged,
+        }));
+        break;
 
-        default:
-          break;
-      }
+      case 'InventoryExportWhitelist':
+        setInventoryExportWhitelist(createdList);
+        setIsListValid((prevState) => ({
+          ...prevState,
+          [listName]: createdList.length > 0 ? isValuesValid : true,
+        }));
+        setIsListWasChanged((prevState) => ({
+          ...prevState,
+          [listName]: isListWasChanged,
+        }));
+
+        break;
+
+      default:
+        break;
     }
-    //TODO: setFieldsValid, when get fields from server
   };
 
   return (
@@ -66,18 +107,18 @@ export default function Network() {
       <FormControlLabel
         label="Private AdServer"
         sx={{ pl: 2, whiteSpace: 'nowrap' }}
-        control={<Checkbox checked={isPrivateAdserver} onChange={() => setIsPrivateAdserver((prevState) => !prevState)} />}
+        control={<Checkbox checked={InventoryPrivate} onChange={() => setInventoryPrivate((prevState) => !prevState)} />}
       />
 
-      <Collapse in={!isPrivateAdserver} timeout="auto" sx={{ overflow: 'auto' }}>
+      <Collapse in={!InventoryPrivate} timeout="auto" sx={{ overflow: 'auto' }}>
         <CardContent>
           <CardActions sx={{ padding: 0 }}>
             <FormControlLabel
-              control={<Checkbox checked={separateNetworkList} onChange={() => setSeparateNetworkList((prevState) => !prevState)} />}
+              control={<Checkbox checked={separateList} onChange={() => setSeparateList((prevState) => !prevState)} />}
               label="Separate list"
             />
           </CardActions>
-          <Collapse in={!separateNetworkList} timeout="auto">
+          <Collapse in={!separateList} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader
@@ -89,9 +130,9 @@ export default function Network() {
                 />
                 <CardContent>
                   <ListOfInputs
-                    initialList={addressList}
+                    initialList={appData.AdServer.InventoryWhitelist}
                     fieldsHandler={fieldsHandler}
-                    listName="addressList"
+                    listName="InventoryWhitelist"
                     type="wallet"
                     maxHeight="calc(100vh - 38rem)"
                   />
@@ -100,7 +141,7 @@ export default function Network() {
             </Box>
           </Collapse>
 
-          <Collapse in={separateNetworkList} timeout="auto">
+          <Collapse in={separateList} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader
@@ -112,9 +153,9 @@ export default function Network() {
                 />
                 <CardContent>
                   <ListOfInputs
-                    initialList={supplyAddressList}
+                    initialList={appData.AdServer.InventoryImportWhitelist}
                     fieldsHandler={fieldsHandler}
-                    listName="supplyAddressList"
+                    listName="InventoryImportWhitelist"
                     type="wallet"
                     maxHeight="calc(100vh - 38rem)"
                   />
@@ -131,9 +172,9 @@ export default function Network() {
                 />
                 <CardContent>
                   <ListOfInputs
-                    initialList={demandAddressList}
+                    initialList={appData.AdServer.InventoryExportWhitelist}
                     fieldsHandler={fieldsHandler}
-                    listName="demandAddressList"
+                    listName="InventoryExportWhitelist"
                     type="wallet"
                     maxHeight="calc(100vh - 38rem)"
                   />
@@ -145,7 +186,23 @@ export default function Network() {
       </Collapse>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={!isFieldsValid} type="button" variant="contained" onClick={onSaveClick}>
+          <Button
+            disabled={
+              (appData.AdServer.InventoryPrivate === InventoryPrivate &&
+                (separateList
+                  ? (InventoryImportWhitelist.length === 0 ||
+                      !isListValid.InventoryImportWhitelist ||
+                      !isListWasChanged.InventoryImportWhitelist) &&
+                    (InventoryExportWhitelist.length === 0 ||
+                      !isListValid.InventoryExportWhitelist ||
+                      !isListWasChanged.InventoryExportWhitelist)
+                  : InventoryWhitelist.length === 0 || !isListValid.InventoryWhitelist || !isListWasChanged.InventoryWhitelist)) ||
+              isLoading
+            }
+            type="button"
+            variant="contained"
+            onClick={onSaveClick}
+          >
             Save
           </Button>
         </Box>

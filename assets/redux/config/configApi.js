@@ -78,6 +78,13 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setInventoryWhitelistConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/whitelist',
+        method: 'PATCH',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -90,4 +97,5 @@ export const {
   useSetWalletConfigMutation,
   useSetColdWalletConfigMutation,
   useSetCommissionsConfigMutation,
+  useSetInventoryWhitelistConfigMutation,
 } = configApi;
