@@ -87,10 +87,10 @@ class PanelAssets implements ConfiguratorCategory
                     );
                 }
             } elseif (in_array($fileId, self::fieldsLogo())) {
-                $expectedHeight = (int)substr($fileId, strlen('LogoH'));
-                if ($height !== $expectedHeight) {
+                $expectedMinimalHeight = (int)substr($fileId, strlen('LogoH'));
+                if ($height < $expectedMinimalHeight) {
                     throw new InvalidArgumentException(
-                        sprintf('File `%s` must be %d pixels high', $fileId, $expectedHeight)
+                        sprintf('File `%s` must be at least %d pixels high', $fileId, $expectedMinimalHeight)
                     );
                 }
             }
