@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Configuration;
 use App\Entity\Enum\AdClassifyConfig;
 use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\AdPayConfig;
@@ -12,7 +11,6 @@ use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Entity\Enum\PanelAssetConfig;
 use App\Exception\InvalidArgumentException;
-use App\Exception\OutdatedLicense;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\AssetRepository;
@@ -34,7 +32,6 @@ use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
 use App\Service\DataCollector;
-use App\Service\LicenseReader;
 use App\Utility\ArrayUtils;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -124,6 +121,9 @@ class ConfiguratorController extends AbstractController
     {
         $panelAssets->validateFileId($fileId);
         $entity = $repository->findOneBy(['module' => PanelAssetConfig::MODULE, 'name' => $fileId]);
+        if (null === $entity) {
+            throw new NotFoundHttpException(sprintf('File `%s` not found', $fileId));
+        }
 
         $response = new StreamedResponse(function () use ($entity) {
             echo stream_get_contents($entity->getContent());
