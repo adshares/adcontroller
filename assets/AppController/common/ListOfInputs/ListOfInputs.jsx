@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { validateAddress } from '@adshares/ads';
 import { Box, Button, Collapse, IconButton, InputAdornment, List, ListItem, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../commonStyles.scss';
-import { validateAddress } from '@adshares/ads';
 
 const formatValue = (value, type) => {
   const sliceDomain = (value) => {
@@ -87,8 +87,12 @@ const validateValue = (list, value, type) => {
   }
 };
 
-export default function ListOfInputs({ initialList, fieldsHandler, listName = undefined, type = 'text', maxHeight = '50vh' }) {
-  const [list, setList] = useState(initialList);
+const compareArray = (arr1, arr2) => {
+  return Array.isArray(arr1) && Array.isArray(arr2) && arr1.length === arr2.length && arr1.every((val, index) => val === arr2[index]);
+};
+
+export default function ListOfInputs({ initialList = null, fieldsHandler, listName = undefined, type = 'text', maxHeight = '50vh' }) {
+  const [list, setList] = useState(initialList || []);
   const [inputs, setInputs] = useState([]);
   const [bulkAdding, setBulkAdding] = useState(false);
   const [textareaValue, setTextareaValue] = useState('');
@@ -97,8 +101,16 @@ export default function ListOfInputs({ initialList, fieldsHandler, listName = un
   useEffect(() => {
     const { inputs, fields } = createFields(list);
     setInputs(inputs);
-    fieldsHandler(fields, listName);
-  }, [list]);
+    const createdList = fields.map((field) => field.field);
+    const isValuesValid = fields.every((field) => field.isValueValid);
+    const isListWasChanged = !compareArray(initialList || [], createdList);
+    fieldsHandler({
+      listName,
+      isValuesValid,
+      isListWasChanged,
+      createdList,
+    });
+  }, [list, initialList]);
 
   const onTextareaChange = (e) => {
     setTextareaValue(e.target.value);
@@ -199,7 +211,7 @@ export default function ListOfInputs({ initialList, fieldsHandler, listName = un
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
           <TextField value={textareaValue} multiline rows={8} onChange={onTextareaChange} inputRef={textAreaRef} />
           <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-            <Button type="button" variant="contained" sx={{ mr: 1 }} onClick={() => onSaveClick(setList)} disabled={!textareaValue}>
+            <Button type="button" variant="contained" sx={{ mr: 1 }} onClick={onSaveClick} disabled={!textareaValue}>
               Paste
             </Button>
 
