@@ -18,10 +18,9 @@ final class Version20220824141729 extends AbstractMigration
     {
         $this->addSql(<<<SQL
 ALTER TABLE configuration
-  ADD deleted_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
   CHANGE name name VARCHAR(255) NOT NULL,
   CHANGE module module VARCHAR(31) NOT NULL,
-  CHANGE value value LONGTEXT NOT NULL;
+  CHANGE value value LONGTEXT DEFAULT NULL;
 SQL
         );
 
@@ -67,7 +66,6 @@ SQL
         $this->addSql('DROP TABLE asset');
         $this->addSql(<<<SQL
 ALTER TABLE configuration
-  DROP deleted_at,
       CHANGE module module VARCHAR(31),
       CHANGE name name VARCHAR(255),
       CHANGE value value TEXT

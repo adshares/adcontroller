@@ -43,22 +43,19 @@ class ConfigurationRepository extends ServiceEntityRepository
 
     public function insertOrUpdate(string $module, array $data, bool $flush = true): void
     {
-        $this->_em->getFilters()->disable('softdeleteable');
         $entities = $this->findByNames($module, array_keys($data));
-        $this->_em->getFilters()->enable('softdeleteable');
         $names = array_map(fn($entity) => $entity->getName(), $entities);
         $entities = array_combine($names, $entities);
 
         foreach ($data as $name => $value) {
-            if (!isset($entities[$name])) {
+            if (isset($entities[$name])) {
+                $entity = $entities[$name];
+            } else {
                 $entity = new Configuration();
                 $entity->setModule($module);
                 $entity->setName($name);
-            } else {
-                $entity = $entities[$name];
-                $entity->restore();
             }
-            if ($this->isSecretEntity($entity)) {
+            if (null !== $value && $this->isSecretEntity($entity)) {
                 $value = $this->crypt->encrypt($value);
             }
             $entity->setValue($value);
@@ -90,7 +87,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         }
 
         $value = $configuration->getValue();
-        if (in_array($enum, self::SECRETS_ENUM)) {
+        if (null !== $value && in_array($enum, self::SECRETS_ENUM)) {
             $value = $this->crypt->decrypt($value);
         }
 
@@ -110,10 +107,11 @@ class ConfigurationRepository extends ServiceEntityRepository
         foreach ($entities as $entity) {
             $value = $entity->getValue();
             if ($this->isSecretEntity($entity)) {
-                if ($withSecrets) {
-                    $value = $this->crypt->decrypt($value);
-                } else {
+                if (!$withSecrets) {
                     continue;
+                }
+                if (null !== $value) {
+                    $value = $this->crypt->decrypt($value);
                 }
             }
             $name = $entity->getName();

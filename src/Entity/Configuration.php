@@ -10,7 +10,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQUE_NAME', columns: ['module', 'name'])]
 #[Gedmo\Loggable]
-#[Gedmo\SoftDeleteable(fieldName: 'deletedAt')]
 class Configuration
 {
     public const COMMON_DATA_REQUIRED = 'DataRequired';
@@ -27,7 +26,7 @@ class Configuration
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Gedmo\Versioned]
     private ?string $value = null;
 
@@ -38,9 +37,6 @@ class Configuration
     #[ORM\Column(name: 'updated_at')]
     #[Gedmo\Timestampable]
     private ?DateTimeImmutable $updatedAt = null;
-
-    #[ORM\Column(name: 'deleted_at', nullable: true)]
-    private ?DateTimeImmutable $deletedAt = null;
 
     public function getId(): ?int
     {
@@ -74,7 +70,7 @@ class Configuration
         return $this->value;
     }
 
-    public function setValue(string $value): self
+    public function setValue(?string $value): self
     {
         $this->value = $value;
         return $this;
@@ -99,23 +95,6 @@ class Configuration
     public function setUpdatedAt(DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    public function getDeletedAt(): ?DateTimeImmutable
-    {
-        return $this->deletedAt;
-    }
-
-    public function setDeletedAt(?DateTimeImmutable $deletedAt): self
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    public function restore(): self
-    {
-        $this->deletedAt = null;
         return $this;
     }
 }

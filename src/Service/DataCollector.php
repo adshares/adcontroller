@@ -148,7 +148,7 @@ class DataCollector
     {
         $config = [];
         foreach ($keyMap as $adServerKey => $enum) {
-            if (isset($adServerConfig[$adServerKey])) {
+            if (array_key_exists($adServerKey, $adServerConfig)) {
                 $value = $adServerConfig[$adServerKey];
                 $config[$enum->getModule()][$enum->name] = $value;
             }
@@ -174,7 +174,7 @@ class DataCollector
             return $this->logEntryRepository->createQueryBuilder('log')
                 ->select('MAX(log.id)')
                 ->getQuery()
-                ->getSingleScalarResult();
+                ->getSingleScalarResult() ?? 0;
         } catch (NoResultException) {
             return 0;
         }
