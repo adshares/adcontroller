@@ -9,7 +9,8 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class ZoneOptions implements ConfiguratorCategory
 {
-    public function __construct(private readonly DataCollector $dataCollector) {
+    public function __construct(private readonly DataCollector $dataCollector)
+    {
     }
 
     public function process(array $content): array

@@ -47,7 +47,11 @@ class BaseInformation implements ConfiguratorCategory
         }
         if (
             isset($input[GeneralConfig::SupportTelegram->name]) &&
-            (!is_string($input[GeneralConfig::SupportTelegram->name]) || 0 === strlen($input[$field]))) {
+            (
+                !is_string($input[GeneralConfig::SupportTelegram->name]) ||
+                0 === strlen($input[GeneralConfig::SupportTelegram->name])
+            )
+        ) {
             throw new InvalidArgumentException(
                 sprintf('Field `%s` must be a non-empty string or null', GeneralConfig::SupportTelegram->name)
             );
