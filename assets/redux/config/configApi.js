@@ -32,7 +32,7 @@ export const configApi = createApi({
     }),
     getLicenseData: builder.query({
       query: () => ({
-        url: '/api/config/license-data',
+        url: '/api/monitoring/license-data',
         method: 'GET',
       }),
     }),

@@ -10,7 +10,8 @@ use App\Utility\Validator\DomainValidator;
 
 class RejectedDomains implements ConfiguratorCategory
 {
-    public function __construct(private readonly DataCollector $dataCollector) {
+    public function __construct(private readonly DataCollector $dataCollector)
+    {
     }
 
     public function process(array $content): array

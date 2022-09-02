@@ -9,7 +9,8 @@ use App\Utility\ArrayUtils;
 
 class AutomaticWithdrawal implements ConfiguratorCategory
 {
-    public function __construct(private readonly DataCollector $dataCollector) {
+    public function __construct(private readonly DataCollector $dataCollector)
+    {
     }
 
     public function process(array $content): array
