@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import commonStyles from '../../common/commonStyles.scss';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSetSiteOptionsConfigMutation, useSetZoneOptionsConfigMutation } from '../../../redux/config/configApi';
+import { changeSiteOptionsInformation, changeZoneOptionsInformation } from '../../../redux/config/configSlice';
+import { useCreateNotification, useForm } from '../../../hooks';
+import { returnNumber } from '../../../utils/helpers';
 import {
   Box,
   Button,
@@ -12,13 +17,13 @@ import {
   FormControlLabel,
   FormLabel,
   Icon,
-  InputLabel,
-  OutlinedInput,
   Radio,
   RadioGroup,
+  TextField,
   Tooltip,
 } from '@mui/material';
 import HelpIcon from '@mui/icons-material/Help';
+import commonStyles from '../../common/commonStyles.scss';
 
 export default function Supply() {
   return (
@@ -30,12 +35,25 @@ export default function Supply() {
 }
 
 const SiteOptions = () => {
-  const [acceptBannersManually, setAcceptBannersManually] = useState(false);
-  const [classifierLocalBanners, setClassifierLocalBanners] = useState('all-by-default');
+  const appData = useSelector(configSelectors.getAppData);
+  const [setSiteOptionsConfig, { isLoading }] = useSetSiteOptionsConfigMutation();
+  const dispatch = useDispatch();
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const [SiteAcceptBannersManually, setSiteAcceptBannersManually] = useState(appData.AdServer.SiteAcceptBannersManually);
+  const [SiteClassifierLocalBanners, setSiteClassifierLocalBanners] = useState(appData.AdServer.SiteClassifierLocalBanners);
 
-  const onSaveClick = () => {
-    //TODO: send data
-    console.log({ acceptBannersManually, classifierLocalBanners });
+  const onSaveClick = async () => {
+    const body = {
+      ...(appData.AdServer.SiteAcceptBannersManually === SiteAcceptBannersManually ? {} : { SiteAcceptBannersManually }),
+      ...(appData.AdServer.SiteClassifierLocalBanners === SiteClassifierLocalBanners ? {} : { SiteClassifierLocalBanners }),
+    };
+    try {
+      const response = await setSiteOptionsConfig(body).unwrap();
+      dispatch(changeSiteOptionsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
   return (
     <Card className={`${commonStyles.card}`}>
@@ -44,12 +62,14 @@ const SiteOptions = () => {
         <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceEvenly} ${commonStyles.alignStart}`}>
           <FormControlLabel
             label="Require banner acceptance by default"
-            control={<Checkbox checked={acceptBannersManually} onChange={() => setAcceptBannersManually((prevState) => !prevState)} />}
+            control={
+              <Checkbox checked={SiteAcceptBannersManually} onChange={() => setSiteAcceptBannersManually((prevState) => !prevState)} />
+            }
           />
 
           <FormControl>
             <FormLabel focused={false}>Classification of banners from the server</FormLabel>
-            <RadioGroup value={classifierLocalBanners} onChange={(e) => setClassifierLocalBanners(e.target.value)}>
+            <RadioGroup value={SiteClassifierLocalBanners} onChange={(e) => setSiteClassifierLocalBanners(e.target.value)}>
               <FormControlLabel value="all-by-default" control={<Radio />} label="Default from all servers" />
               <FormControlLabel value="local-by-default" control={<Radio />} label="Default from local server" />
               <FormControlLabel value="local-only" control={<Radio />} label="Only from local server" />
@@ -60,7 +80,16 @@ const SiteOptions = () => {
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button type="button" variant="contained" onClick={onSaveClick}>
+          <Button
+            disabled={
+              (appData.AdServer.SiteAcceptBannersManually === SiteAcceptBannersManually &&
+                appData.AdServer.SiteClassifierLocalBanners === SiteClassifierLocalBanners) ||
+              isLoading
+            }
+            type="button"
+            variant="contained"
+            onClick={onSaveClick}
+          >
             Save
           </Button>
         </Box>
@@ -70,12 +99,32 @@ const SiteOptions = () => {
 };
 
 const ZoneOptions = () => {
-  const [allowZoneInIFrame, setAllowZoneInIFrame] = useState(false);
-  const [maxPageZones, setMaxPageZones] = useState(0);
+  const appData = useSelector(configSelectors.getAppData);
+  const [setZoneOptionsConfig, { isLoading }] = useSetZoneOptionsConfigMutation();
+  const dispatch = useDispatch();
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const [AllowZoneInIframe, setAllowZoneInIframe] = useState(appData.AdServer.AllowZoneInIframe);
+  const form = useForm({
+    initialFields: { MaxPageZones: appData.AdServer.MaxPageZones.toString() },
+    validation: {
+      MaxPageZones: ['required', 'number', 'integer'],
+    },
+  });
 
-  const onSaveClick = () => {
-    console.log({ allowZoneInIFrame, maxPageZones });
+  const onSaveClick = async () => {
+    const body = {
+      ...(appData.AdServer.AllowZoneInIframe !== AllowZoneInIframe && { AllowZoneInIframe }),
+      ...(form.changedFields.MaxPageZones ? { MaxPageZones: returnNumber(form.fields.MaxPageZones) } : {}),
+    };
+    try {
+      const response = await setZoneOptionsConfig(body).unwrap();
+      dispatch(changeZoneOptionsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
+
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Zone options" subheader="lorem ipsum dolor sit amet" />
@@ -86,7 +135,7 @@ const ZoneOptions = () => {
             <FormControl margin="dense">
               <FormControlLabel
                 label="Allow zone in IFRAME"
-                control={<Checkbox checked={allowZoneInIFrame} onChange={() => setAllowZoneInIFrame((prevState) => !prevState)} />}
+                control={<Checkbox checked={AllowZoneInIframe} onChange={() => setAllowZoneInIframe((prevState) => !prevState)} />}
               />
             </FormControl>
             <Tooltip title="lorem ipsum dolor set amet">
@@ -97,18 +146,21 @@ const ZoneOptions = () => {
           </Box>
 
           <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-            <FormControl margin="dense" fullWidth>
-              <InputLabel htmlFor="maxPageZones">Maximum zones per page</InputLabel>
-              <OutlinedInput
-                id="maxPageZones"
+            <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+              <TextField
+                id="MaxPageZones"
+                name="MaxPageZones"
                 size="small"
                 type="number"
                 label="Maximum zones per page"
-                value={Number(maxPageZones).toString()}
-                onChange={(e) => setMaxPageZones(Number(e.target.value).toFixed(0))}
+                margin="dense"
+                fullWidth
+                value={form.fields.MaxPageZones}
+                error={form.touchedFields.MaxPageZones && !form.errorObj.MaxPageZones.isValid}
+                helperText={form.touchedFields.MaxPageZones && form.errorObj.MaxPageZones.helperText}
                 inputProps={{ autoComplete: 'off', min: 0 }}
               />
-            </FormControl>
+            </Box>
             <Tooltip title="lorem ipsum dolor set amet" sx={{ ml: 1 }}>
               <Icon>
                 <HelpIcon color="primary" />
@@ -120,7 +172,12 @@ const ZoneOptions = () => {
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button
+            disabled={isLoading || (appData.AdServer.AllowZoneInIframe === AllowZoneInIframe && !form.isFormWasChanged)}
+            onClick={onSaveClick}
+            variant="contained"
+            type="button"
+          >
             Save
           </Button>
         </Box>

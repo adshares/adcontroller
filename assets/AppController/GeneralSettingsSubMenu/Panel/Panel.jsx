@@ -1,4 +1,9 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useSetPlaceholdersConfigMutation, useUploadAssetsMutation } from '../../../redux/config/configApi';
+import { changePlaceholdersInformation } from '../../../redux/config/configSlice';
+import { useCreateNotification, useForm } from '../../../hooks';
 import {
   Box,
   Button,
@@ -6,7 +11,6 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  FormControl,
   Table,
   TableBody,
   TableCell,
@@ -28,53 +32,93 @@ export default function Panel() {
 }
 
 const Placeholders = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [keywords, setKeywords] = useState('');
-  const [customHeadMetaTags, setCustomHeadMetaTags] = useState('');
-  const [robots, setRobots] = useState('');
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setPlaceholdersConfig, { isLoading }] = useSetPlaceholdersConfigMutation();
+  const form = useForm({
+    initialFields: {
+      PlaceholderIndexDescription: appData.AdPanel.PlaceholderIndexDescription || '',
+      PlaceholderIndexKeywords: appData.AdPanel.PlaceholderIndexKeywords || '',
+      PlaceholderIndexMetaTags: appData.AdPanel.PlaceholderIndexMetaTags || '',
+      PlaceholderIndexTitle: appData.AdPanel.PlaceholderIndexTitle || '',
+      PlaceholderRobotsTxt: appData.AdPanel.PlaceholderRobotsTxt || '',
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    //TODO: add send function
-    console.log({
-      title,
-      description,
-      keywords,
-      customHeadMetaTags,
-      robots,
+  const onSaveClick = async () => {
+    const body = {};
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = form.fields[field] || null;
+      }
     });
+    try {
+      const response = await setPlaceholdersConfig(body).unwrap();
+      dispatch(changePlaceholdersInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Panel placeholders" subheader="Here you can read and edit placeholders for index.html and robots.txt" />
       <CardContent>
-        <FormControl fullWidth size="small">
-          <TextField value={title} onChange={(e) => setTitle(e.target.value)} label="Title" size="small" margin="dense" />
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <TextField
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={form.fields.PlaceholderIndexTitle}
+            name="PlaceholderIndexTitle"
+            label="Title"
+            size="small"
+            margin="dense"
+            fullWidth
+          />
+          <TextField
+            value={form.fields.PlaceholderIndexDescription}
+            name="PlaceholderIndexDescription"
             label="Description"
             multiline
             rows={8}
             margin="dense"
+            fullWidth
+            size="small"
           />
-          <TextField value={keywords} onChange={(e) => setKeywords(e.target.value)} label="Keywords" size="small" margin="dense" />
           <TextField
-            value={customHeadMetaTags}
-            onChange={(e) => setCustomHeadMetaTags(e.target.value)}
+            value={form.fields.PlaceholderIndexKeywords}
+            name="PlaceholderIndexKeywords"
+            label="Keywords"
+            size="small"
+            margin="dense"
+            fullWidth
+          />
+          <TextField
+            value={form.fields.PlaceholderIndexMetaTags}
+            name="PlaceholderIndexMetaTags"
             label="Custom HEAD meta-tags"
             multiline
             rows={8}
             margin="dense"
+            fullWidth
+            size="small"
           />
-          <TextField value={robots} onChange={(e) => setRobots(e.target.value)} label="robots.txt" multiline rows={8} margin="dense" />
-        </FormControl>
+          <TextField
+            value={form.fields.PlaceholderRobotsTxt}
+            name="PlaceholderRobotsTxt"
+            label="robots.txt"
+            multiline
+            rows={8}
+            margin="dense"
+            fullWidth
+            size="small"
+          />
+        </Box>
       </CardContent>
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>
@@ -84,11 +128,21 @@ const Placeholders = () => {
 };
 
 const Rebranding = () => {
+  const [uploadAssets, { isLoading }] = useUploadAssetsMutation();
   const [changedImages, setChangedImages] = useState({});
   const { enqueueSnackbar } = useSnackbar();
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log(changedImages);
+  const onSaveClick = async () => {
+    if (changedImages.formData) {
+      try {
+        await uploadAssets(changedImages.formData).unwrap();
+        setChangedImages({});
+        createSuccessNotification();
+      } catch (err) {
+        createErrorNotification(err);
+      }
+    }
   };
 
   const onInputChange = (e) => {
@@ -116,10 +170,13 @@ const Rebranding = () => {
       const width = image.width;
       const height = image.height;
 
+      const formData = new FormData();
+
       switch (name) {
         case 'favicon16x16':
           if (width === 16 && height === 16 && isFileTypeIsPng) {
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+            formData.append('Favicon16x16', file);
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
           } else {
             enqueueSnackbar('Image should be png with size 16x16', { variant: 'error', persist: true });
           }
@@ -127,7 +184,8 @@ const Rebranding = () => {
 
         case 'favicon32x32':
           if (width === 32 && height === 32 && isFileTypeIsPng) {
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+            formData.append('Favicon32x32', file);
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
           } else {
             enqueueSnackbar('Image should be png with size 32x32', { variant: 'error' });
           }
@@ -135,7 +193,8 @@ const Rebranding = () => {
 
         case 'favicon48x48':
           if (width === 48 && height === 48 && isFileTypeIsPng) {
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+            formData.append('Favicon48x48', file);
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
           } else {
             enqueueSnackbar('Image should be png with size 48x48', { variant: 'error' });
           }
@@ -143,16 +202,32 @@ const Rebranding = () => {
 
         case 'favicon96x96':
           if (width === 96 && height === 96 && isFileTypeIsPng) {
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+            formData.append('Favicon96x96', file);
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
           } else {
             enqueueSnackbar('Image should be png with size 96x96', { variant: 'error' });
           }
           break;
 
         case 'logoH30':
+          if (height >= 30) {
+            formData.append('LogoH30', file);
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+          } else {
+            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
+          }
+          break;
         case 'logoH60':
+          if (height >= 30) {
+            formData.append('LogoH60', file);
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+          } else {
+            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
+          }
+          break;
         case 'logoH90':
           if (height >= 30) {
+            formData.append('LogoH90', file);
             setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
@@ -188,7 +263,12 @@ const Rebranding = () => {
             <TableBody>
               <TableRow>
                 <TableCell width="40%">
-                  <Box component="img" src={changedImages.preview_favicon16x16 || favicon16x16} height="16px" width="16px" />
+                  <Box
+                    component="img"
+                    src={changedImages.preview_favicon16x16 || 'http://localhost:8030/api/config/panel-assets/Favicon16x16'}
+                    height="16px"
+                    width="16px"
+                  />
                 </TableCell>
                 <TableCell align="center" width="20%">
                   <Typography variant="body1">16x16</Typography>
@@ -316,7 +396,7 @@ const Rebranding = () => {
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || !changedImages.formData} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>

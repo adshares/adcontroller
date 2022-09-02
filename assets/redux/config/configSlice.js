@@ -12,6 +12,7 @@ const initialState = {
       PlaceholderIndexKeywords: null,
       PlaceholderIndexMetaTags: null,
       PlaceholderIndexTitle: null,
+      PlaceholderRobotsTxt: null,
       Url: null,
     },
     AdPay: {
@@ -47,6 +48,7 @@ const initialState = {
       ReferralRefundCommission: null,
       RejectedDomains: null,
       SiteClassifierLocalBanners: null,
+      SiteAcceptBannersManually: null,
       Url: null,
       PrivacyPolicy: null,
       Terms: null,
@@ -79,6 +81,15 @@ const configSlice = createSlice({
     changeBaseInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
       state.appData.General = { ...state.appData.General, ...payload.General };
+    },
+    changePlaceholdersInformation: (state, { payload }) => {
+      state.appData.AdPanel = { ...state.appData.AdPanel, ...payload.AdPanel };
+    },
+    changeSiteOptionsInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
+    changeZoneOptionsInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
   },
   extraReducers: (builder) => {
@@ -120,5 +131,6 @@ const configSlice = createSlice({
   },
 });
 
-export const { changeBaseInformation } = configSlice.actions;
+export const { changeBaseInformation, changePlaceholdersInformation, changeSiteOptionsInformation, changeZoneOptionsInformation } =
+  configSlice.actions;
 export default configSlice.reducer;
