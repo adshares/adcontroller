@@ -4,6 +4,7 @@ import configSelectors from '../../../redux/config/configSelectors';
 import { useSetPlaceholdersConfigMutation, useUploadAssetsMutation } from '../../../redux/config/configApi';
 import { changePlaceholdersInformation } from '../../../redux/config/configSlice';
 import { useCreateNotification, useForm } from '../../../hooks';
+import configuration from '../../../controllerConfig/configuration';
 import {
   Box,
   Button,
@@ -20,7 +21,6 @@ import {
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import commonStyles from '../../common/commonStyles.scss';
-import { logoH30, logoH60, logoH90, favicon16x16, favicon32x32, favicon48x48, favicon96x96 } from '../../../img/tmp';
 
 export default function Panel() {
   return (
@@ -212,7 +212,7 @@ const Rebranding = () => {
         case 'logoH30':
           if (height >= 30) {
             formData.append('LogoH30', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
@@ -220,7 +220,7 @@ const Rebranding = () => {
         case 'logoH60':
           if (height >= 30) {
             formData.append('LogoH60', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
@@ -228,7 +228,7 @@ const Rebranding = () => {
         case 'logoH90':
           if (height >= 30) {
             formData.append('LogoH90', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file) }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
@@ -265,7 +265,7 @@ const Rebranding = () => {
                 <TableCell width="40%">
                   <Box
                     component="img"
-                    src={changedImages.preview_favicon16x16 || 'http://localhost:8030/api/config/panel-assets/Favicon16x16'}
+                    src={changedImages.preview_favicon16x16 || `${configuration.baseUrl}/assets/panel/Favicon16x16`}
                     height="16px"
                     width="16px"
                   />
@@ -283,7 +283,12 @@ const Rebranding = () => {
 
               <TableRow>
                 <TableCell width="40%">
-                  <Box component="img" src={changedImages.preview_favicon32x32 || favicon32x32} height="32px" width="32px" />
+                  <Box
+                    component="img"
+                    src={changedImages.preview_favicon32x32 || `${configuration.baseUrl}/assets/panel/Favicon32x32`}
+                    height="32px"
+                    width="32px"
+                  />
                 </TableCell>
                 <TableCell width="20%">
                   <Typography align="center" variant="body1">
@@ -300,7 +305,12 @@ const Rebranding = () => {
 
               <TableRow>
                 <TableCell>
-                  <Box component="img" src={changedImages.preview_favicon48x48 || favicon48x48} height="48px" width="48px" />
+                  <Box
+                    component="img"
+                    src={changedImages.preview_favicon48x48 || `${configuration.baseUrl}/assets/panel/Favicon48x48`}
+                    height="48px"
+                    width="48px"
+                  />
                 </TableCell>
                 <TableCell>
                   <Typography align="center" variant="body1">
@@ -317,7 +327,12 @@ const Rebranding = () => {
 
               <TableRow>
                 <TableCell>
-                  <Box component="img" src={changedImages.preview_favicon96x96 || favicon96x96} height="96px" width="96px" />
+                  <Box
+                    component="img"
+                    src={changedImages.preview_favicon96x96 || `${configuration.baseUrl}/assets/panel/Favicon96x96`}
+                    height="96px"
+                    width="96px"
+                  />
                 </TableCell>
                 <TableCell>
                   <Typography align="center" variant="body1">
@@ -342,7 +357,12 @@ const Rebranding = () => {
             <TableBody>
               <TableRow>
                 <TableCell width="40%">
-                  <Box component="img" src={changedImages.preview_logoH30 || logoH30} height="30px" maxWidth="100%" />
+                  <Box
+                    component="img"
+                    src={changedImages.preview_logoH30 || `${configuration.baseUrl}/assets/panel/LogoH30`}
+                    height="30px"
+                    maxWidth="100%"
+                  />
                 </TableCell>
                 <TableCell width="20%">
                   <Typography align="center" variant="body1">
@@ -359,7 +379,12 @@ const Rebranding = () => {
 
               <TableRow>
                 <TableCell>
-                  <Box component="img" src={changedImages.preview_logoH60 || logoH60} height="60px" maxWidth="100%" />
+                  <Box
+                    component="img"
+                    src={changedImages.preview_logoH60 || `${configuration.baseUrl}/assets/panel/LogoH60`}
+                    height="60px"
+                    maxWidth="100%"
+                  />
                 </TableCell>
                 <TableCell>
                   <Typography align="center" variant="body1">
@@ -376,7 +401,12 @@ const Rebranding = () => {
 
               <TableRow>
                 <TableCell>
-                  <Box component="img" src={changedImages.preview_logoH90 || logoH90} height="90px" maxWidth="100%" />
+                  <Box
+                    component="img"
+                    src={changedImages.preview_logoH90 || `${configuration.baseUrl}/assets/panel/LogoH90`}
+                    height="90px"
+                    maxWidth="100%"
+                  />
                 </TableCell>
                 <TableCell>
                   <Typography align="center" variant="body1">
