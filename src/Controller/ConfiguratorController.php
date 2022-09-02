@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Configuration;
 use App\Entity\Enum\AdClassifyConfig;
 use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\AdPayConfig;
@@ -10,12 +9,9 @@ use App\Entity\Enum\AdSelectConfig;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
-use App\Entity\Enum\PanelAssetConfig;
 use App\Exception\InvalidArgumentException;
-use App\Exception\OutdatedLicense;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
-use App\Repository\AssetRepository;
 use App\Repository\ConfigurationRepository;
 use App\Service\Configurator\Category\AutomaticWithdrawal;
 use App\Service\Configurator\Category\BannerSettings;
@@ -34,7 +30,6 @@ use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
 use App\Service\DataCollector;
-use App\Service\LicenseReader;
 use App\Utility\ArrayUtils;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -42,9 +37,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -119,20 +112,6 @@ class ConfiguratorController extends AbstractController
         return $data;
     }
 
-    #[Route('/config/panel-assets/{fileId}', name: 'fetch_panel_assets', methods: ['GET'])]
-    public function fetchPanelAssets(string $fileId, AssetRepository $repository, PanelAssets $panelAssets): Response
-    {
-        $panelAssets->validateFileId($fileId);
-        $entity = $repository->findOneBy(['module' => PanelAssetConfig::MODULE, 'name' => $fileId]);
-
-        $response = new StreamedResponse(function () use ($entity) {
-            echo stream_get_contents($entity->getContent());
-        });
-        $response->headers->set('Content-Type', $entity->getMimeType());
-
-        return $response;
-    }
-
     #[Route('/config/panel-assets', name: 'store_panel_assets', methods: ['POST'])]
     public function storePanelAssets(Request $request, PanelAssets $panelAssets): JsonResponse
     {
@@ -159,7 +138,7 @@ class ConfiguratorController extends AbstractController
     }
 
     #[Route('/config/{category}', name: 'store_config', methods: ['PATCH'])]
-    public function storeConfig(string $category, Request $request): JsonResponse
+    public function storeConfig(string $category, ConfigurationRepository $repository, Request $request): JsonResponse
     {
         try {
             $service = $this->container->get($category . '-config');
@@ -179,7 +158,10 @@ class ConfiguratorController extends AbstractController
         }
 
         if (Whitelist::class === $service::class) {
+            $result[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name] =
+                $repository->fetchValueByEnum(AdServerConfig::WalletAddress);
             $result = self::processInventory($result);
+            unset($result[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name]);
         }
         return $this->jsonOk($result);
     }
