@@ -5,23 +5,31 @@ namespace App\Service\Configurator\Category;
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
+use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 use App\Utility\Validator\AdsAccountValidator;
 
 class Whitelist implements ConfiguratorCategory
 {
     public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
+        private readonly DataCollector $dataCollector,
     ) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $input = ArrayUtils::filterByKeys($content, self::fields());
         if (empty($input)) {
             throw new InvalidArgumentException('Data is required');
+        }
+        if (
+            array_key_exists(AdServerConfig::InventoryPrivate->name, $input) &&
+            null === $input[AdServerConfig::InventoryPrivate->name]
+        ) {
+            throw new InvalidArgumentException(
+                sprintf('Field `%s` must be a boolean', AdServerConfig::InventoryPrivate->name)
+            );
         }
         ArrayUtils::assureBoolTypeForField($input, AdServerConfig::InventoryPrivate->name);
 
@@ -30,8 +38,7 @@ class Whitelist implements ConfiguratorCategory
             true === $input[AdServerConfig::InventoryPrivate->name]
         ) {
             $walletAddress = $this->repository->fetchValueByEnum(AdServerConfig::WalletAddress);
-            $this->setCommonWhitelist($walletAddress);
-            return;
+            return $this->setCommonWhitelist($walletAddress);
         }
 
         self::assureAccountIdListTypeForFields(
@@ -44,8 +51,7 @@ class Whitelist implements ConfiguratorCategory
         );
 
         if (isset($input[AdServerConfig::InventoryWhitelist->name])) {
-            $this->setCommonWhitelist($input[AdServerConfig::InventoryWhitelist->name]);
-            return;
+            return $this->setCommonWhitelist($input[AdServerConfig::InventoryWhitelist->name]);
         }
 
         foreach (
@@ -59,21 +65,11 @@ class Whitelist implements ConfiguratorCategory
             }
         }
 
-        $exportWhitelist = $input[AdServerConfig::InventoryExportWhitelist->name];
-        $importWhitelist = $input[AdServerConfig::InventoryImportWhitelist->name];
-        $this->adServerConfigurationClient->store([
-            AdServerConfig::InventoryExportWhitelist->name => $exportWhitelist,
-            AdServerConfig::InventoryImportWhitelist->name => $importWhitelist,
+        return $this->dataCollector->push([
+            AdServerConfig::InventoryExportWhitelist->name => $input[AdServerConfig::InventoryExportWhitelist->name],
+            AdServerConfig::InventoryImportWhitelist->name => $input[AdServerConfig::InventoryImportWhitelist->name],
             AdServerConfig::InventoryWhitelist->name => null,
         ]);
-        $this->repository->insertOrUpdate(
-            AdServerConfig::MODULE,
-            [
-                AdServerConfig::InventoryExportWhitelist->name => $exportWhitelist,
-                AdServerConfig::InventoryImportWhitelist->name => $importWhitelist,
-                AdServerConfig::InventoryWhitelist->name => '',
-            ]
-        );
     }
 
     private static function fields(): array
@@ -109,18 +105,12 @@ class Whitelist implements ConfiguratorCategory
         }
     }
 
-    private function setCommonWhitelist(string $whitelist): void
+    private function setCommonWhitelist(string $whitelist): array
     {
-        $this->adServerConfigurationClient->store([
-            AdServerConfig::InventoryExportWhitelist->name => null,
-            AdServerConfig::InventoryImportWhitelist->name => null,
-            AdServerConfig::InventoryWhitelist->name => $whitelist,
-        ]);
-        $this->repository->insertOrUpdate(
-            AdServerConfig::MODULE,
+        return $this->dataCollector->push(
             [
-                AdServerConfig::InventoryExportWhitelist->name => $whitelist,
-                AdServerConfig::InventoryImportWhitelist->name => $whitelist,
+                AdServerConfig::InventoryExportWhitelist->name => null,
+                AdServerConfig::InventoryImportWhitelist->name => null,
                 AdServerConfig::InventoryWhitelist->name => $whitelist,
             ]
         );

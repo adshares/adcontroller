@@ -4,20 +4,16 @@ namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
-use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
+use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 use App\Utility\Validator\DomainValidator;
 
 class RejectedDomains implements ConfiguratorCategory
 {
-    public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
-        private readonly ConfigurationRepository $repository,
-    ) {
+    public function __construct(private readonly DataCollector $dataCollector) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
@@ -42,8 +38,7 @@ class RejectedDomains implements ConfiguratorCategory
             $input[AdServerConfig::RejectedDomains->name] = join(',', $input[AdServerConfig::RejectedDomains->name]);
         }
 
-        $this->adServerConfigurationClient->store($input);
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
+        return $this->dataCollector->push($input);
     }
 
     private static function fields(): array

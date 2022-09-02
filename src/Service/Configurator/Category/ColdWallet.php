@@ -5,7 +5,7 @@ namespace App\Service\Configurator\Category;
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdServerConfigurationClient;
+use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 use App\Utility\Validator\AdsAccountValidator;
 use App\Utility\Validator\ClickAmountValidator;
@@ -13,12 +13,12 @@ use App\Utility\Validator\ClickAmountValidator;
 class ColdWallet implements ConfiguratorCategory
 {
     public function __construct(
-        private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
+        private readonly DataCollector $dataCollector,
     ) {
     }
 
-    public function process(array $content): void
+    public function process(array $content): array
     {
         $fields = self::fields();
         $input = ArrayUtils::filterByKeys($content, $fields);
@@ -34,13 +34,11 @@ class ColdWallet implements ConfiguratorCategory
             $data = [
                 AdServerConfig::ColdWalletIsActive->name => false,
             ];
-            $this->adServerConfigurationClient->store($data);
-            $this->repository->insertOrUpdate(AdServerConfig::MODULE, $data);
-            return;
+            return $this->dataCollector->push($data);
         }
 
         if (
-            isset($input[AdServerConfig::ColdWalletAddress->name]) &&
+            array_key_exists(AdServerConfig::ColdWalletAddress->name, $input) &&
             !(new AdsAccountValidator())->valid($input[AdServerConfig::ColdWalletAddress->name])
         ) {
             throw new InvalidArgumentException(
@@ -48,25 +46,54 @@ class ColdWallet implements ConfiguratorCategory
             );
         }
 
-        self::assureClickAmountTypeForFields(
-            $input,
-            [
-                AdServerConfig::HotWalletMaxValue->name,
-                AdServerConfig::HotWalletMinValue->name,
-            ]
-        );
+        $hotWalletRangeFields = [
+            AdServerConfig::HotWalletMaxValue->name,
+            AdServerConfig::HotWalletMinValue->name,
+        ];
+        self::assureClickAmountTypeForFields($input, $hotWalletRangeFields);
 
         $data = array_merge(
-            $this->repository->fetchValuesByNames(AdServerConfig::MODULE, $fields),
+            $this->repository->fetchValuesByNames(AdServerConfig::MODULE, $hotWalletRangeFields),
             $input,
         );
 
-        foreach ($fields as $field) {
-            if (!isset($data[$field])) {
+        foreach ($hotWalletRangeFields as $field) {
+            if (!array_key_exists($field, $data)) {
                 throw new InvalidArgumentException(sprintf('Field `%s` is required', $field));
             }
         }
-        if ($data[AdServerConfig::HotWalletMaxValue->name] <= $data[AdServerConfig::HotWalletMinValue->name]) {
+
+        if (
+            isset($data[AdServerConfig::HotWalletMaxValue->name]) &&
+            !isset($data[AdServerConfig::HotWalletMinValue->name])
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Field `%s` cannot be restored without `%s`',
+                    AdServerConfig::HotWalletMinValue->name,
+                    AdServerConfig::HotWalletMaxValue->name,
+                )
+            );
+        }
+
+        if (
+            !isset($data[AdServerConfig::HotWalletMaxValue->name]) &&
+            isset($data[AdServerConfig::HotWalletMinValue->name])
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Field `%s` cannot be restored without `%s`',
+                    AdServerConfig::HotWalletMaxValue->name,
+                    AdServerConfig::HotWalletMinValue->name,
+                )
+            );
+        }
+
+        if (
+            isset($data[AdServerConfig::HotWalletMaxValue->name]) &&
+            isset($data[AdServerConfig::HotWalletMinValue->name]) &&
+            $data[AdServerConfig::HotWalletMaxValue->name] <= $data[AdServerConfig::HotWalletMinValue->name]
+        ) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Field `%s` must be greater than `%s`',
@@ -76,8 +103,7 @@ class ColdWallet implements ConfiguratorCategory
             );
         }
 
-        $this->adServerConfigurationClient->store($input);
-        $this->repository->insertOrUpdate(AdServerConfig::MODULE, $input);
+        return $this->dataCollector->push($input);
     }
 
     private static function fields(): array

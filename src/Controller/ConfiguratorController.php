@@ -89,12 +89,12 @@ class ConfiguratorController extends AbstractController
                 array_map(fn($enum) => $enum->name, $class::cases())
             );
         }
-        self::processInventory($data);
+        $data = self::processInventory($data);
 
         return $this->jsonOk($data);
     }
 
-    private static function processInventory(array &$data): void
+    private static function processInventory(array $data): array
     {
         $adServerData = $data[AdServerConfig::MODULE];
         if (
@@ -115,6 +115,8 @@ class ConfiguratorController extends AbstractController
         $privateInventory = 1 === count($whiteList) &&
             $whiteList[0] === $adServerData[AdServerConfig::WalletAddress->name];
         $data[AdServerConfig::MODULE][AdServerConfig::InventoryPrivate->name] = $privateInventory;
+
+        return $data;
     }
 
     #[Route('/config/license-data', name: 'fetch_config_license_data', methods: ['GET'])]
@@ -191,7 +193,7 @@ class ConfiguratorController extends AbstractController
 
         $content = json_decode($request->getContent(), true) ?? [];
         try {
-            $service->process($content);
+            $result = $service->process($content);
         } catch (InvalidArgumentException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage());
         } catch (ServiceNotPresent $exception) {
@@ -200,7 +202,10 @@ class ConfiguratorController extends AbstractController
             throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
         }
 
-        return $this->jsonOk();
+        if (Whitelist::class === $service::class) {
+            $result = self::processInventory($result);
+        }
+        return $this->jsonOk($result);
     }
 
     #[Route('/synchronize-config', name: 'synchronize_config', methods: ['GET'])]
