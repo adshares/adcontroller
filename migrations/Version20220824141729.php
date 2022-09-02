@@ -33,7 +33,6 @@ CREATE TABLE asset (
   content LONGBLOB NOT NULL,
   created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
-  deleted_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_NAME (module, name),
   PRIMARY KEY(id)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`;

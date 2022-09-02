@@ -21,12 +21,20 @@ enum PanelAssetConfig implements ConfigEnum
 
     public function file(): string
     {
+        $filepath = $this->filepath();
+        return substr($filepath, strrpos($filepath, '/') + 1);
+    }
+
+    public function filepath(): string
+    {
         return match ($this) {
-            self::Favicon16x16, self::Favicon32x32, self::Favicon48x48, self::Favicon96x96 =>
-                strtolower($this->name) . '.png',
-            self::LogoH30 => 'logo--white.png',
-            self::LogoH60 => 'logo--white@2x.png',
-            self::LogoH90 => 'logo--white@3x.png',
+            self::Favicon16x16 => '/favicon-16x16.png',
+            self::Favicon32x32 => '/favicon-32x32.png',
+            self::Favicon48x48 => '/favicon-48x48.png',
+            self::Favicon96x96 => '/favicon-96x96.png',
+            self::LogoH30 => '/assets/images/logo--white.png',
+            self::LogoH60 => '/assets/images/logo--white@2x.png',
+            self::LogoH90 => '/assets/images/logo--white@3x.png',
         };
     }
 }
