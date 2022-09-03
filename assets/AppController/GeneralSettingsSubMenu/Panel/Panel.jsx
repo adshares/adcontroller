@@ -50,7 +50,7 @@ const Placeholders = () => {
     const body = {};
     Object.keys(form.changedFields).forEach((field) => {
       if (form.changedFields[field]) {
-        body[field] = form.fields[field] || null;
+        body[field] = form.fields[field];
       }
     });
     try {
