@@ -130,13 +130,16 @@ const Placeholders = () => {
 const Rebranding = () => {
   const [uploadAssets, { isLoading }] = useUploadAssetsMutation();
   const [changedImages, setChangedImages] = useState({});
+  const [previews, setPreviews] = useState({});
   const { enqueueSnackbar } = useSnackbar();
   const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
-    if (changedImages.formData) {
+    const formData = new FormData();
+    Object.keys(changedImages).forEach((file) => formData.append(file, changedImages[file]));
+    if (Object.keys(changedImages).length > 0) {
       try {
-        await uploadAssets(changedImages.formData).unwrap();
+        await uploadAssets(formData).unwrap();
         setChangedImages({});
         createSuccessNotification();
       } catch (err) {
@@ -170,65 +173,63 @@ const Rebranding = () => {
       const width = image.width;
       const height = image.height;
 
-      const formData = new FormData();
-
       switch (name) {
-        case 'favicon16x16':
+        case 'Favicon16x16':
           if (width === 16 && height === 16 && isFileTypeIsPng) {
-            formData.append('Favicon16x16', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file }));
+            setPreviews((prevState) => ({ ...prevState, [name]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be png with size 16x16', { variant: 'error', persist: true });
           }
           break;
 
-        case 'favicon32x32':
+        case 'Favicon32x32':
           if (width === 32 && height === 32 && isFileTypeIsPng) {
-            formData.append('Favicon32x32', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file }));
+            setPreviews((prevState) => ({ ...prevState, [name]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be png with size 32x32', { variant: 'error' });
           }
           break;
 
-        case 'favicon48x48':
+        case 'Favicon48x48':
           if (width === 48 && height === 48 && isFileTypeIsPng) {
-            formData.append('Favicon48x48', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file }));
+            setPreviews((prevState) => ({ ...prevState, [name]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be png with size 48x48', { variant: 'error' });
           }
           break;
 
-        case 'favicon96x96':
+        case 'Favicon96x96':
           if (width === 96 && height === 96 && isFileTypeIsPng) {
-            formData.append('Favicon96x96', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file }));
+            setPreviews((prevState) => ({ ...prevState, [name]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be png with size 96x96', { variant: 'error' });
           }
           break;
 
-        case 'logoH30':
+        case 'LogoH30':
           if (height >= 30) {
-            formData.append('LogoH30', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file }));
+            setPreviews((prevState) => ({ ...prevState, [name]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
           break;
-        case 'logoH60':
+        case 'LogoH60':
           if (height >= 30) {
-            formData.append('LogoH60', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file }));
+            setPreviews((prevState) => ({ ...prevState, [name]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
           break;
-        case 'logoH90':
+        case 'LogoH90':
           if (height >= 30) {
-            formData.append('LogoH90', file);
-            setChangedImages((prevState) => ({ ...prevState, [name]: file, [`preview_${name}`]: URL.createObjectURL(file), formData }));
+            setChangedImages((prevState) => ({ ...prevState, [name]: file }));
+            setPreviews((prevState) => ({ ...prevState, [name]: URL.createObjectURL(file) }));
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
@@ -265,7 +266,7 @@ const Rebranding = () => {
                 <TableCell width="40%">
                   <Box
                     component="img"
-                    src={changedImages.preview_favicon16x16 || `${configuration.baseUrl}/assets/panel/Favicon16x16`}
+                    src={previews.Favicon16x16 || `${configuration.baseUrl}/assets/panel/Favicon16x16`}
                     height="16px"
                     width="16px"
                   />
@@ -276,7 +277,7 @@ const Rebranding = () => {
                 <TableCell align="center" width="40%">
                   <Button component="label" variant="contained">
                     Change
-                    <input hidden accept="image/*" type="file" name="favicon16x16" onChange={onInputChange} />
+                    <input hidden accept="image/*" type="file" name="Favicon16x16" onChange={onInputChange} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -285,7 +286,7 @@ const Rebranding = () => {
                 <TableCell width="40%">
                   <Box
                     component="img"
-                    src={changedImages.preview_favicon32x32 || `${configuration.baseUrl}/assets/panel/Favicon32x32`}
+                    src={previews.Favicon32x32 || `${configuration.baseUrl}/assets/panel/Favicon32x32`}
                     height="32px"
                     width="32px"
                   />
@@ -298,7 +299,7 @@ const Rebranding = () => {
                 <TableCell align="center" width="40%">
                   <Button component="label" variant="contained">
                     Change
-                    <input hidden accept="image/*" type="file" name="favicon32x32" onChange={onInputChange} />
+                    <input hidden accept="image/*" type="file" name="Favicon32x32" onChange={onInputChange} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -307,7 +308,7 @@ const Rebranding = () => {
                 <TableCell>
                   <Box
                     component="img"
-                    src={changedImages.preview_favicon48x48 || `${configuration.baseUrl}/assets/panel/Favicon48x48`}
+                    src={previews.Favicon48x48 || `${configuration.baseUrl}/assets/panel/Favicon48x48`}
                     height="48px"
                     width="48px"
                   />
@@ -320,7 +321,7 @@ const Rebranding = () => {
                 <TableCell align="center">
                   <Button component="label" variant="contained">
                     Change
-                    <input hidden accept="image/*" type="file" name="favicon48x48" onChange={onInputChange} />
+                    <input hidden accept="image/*" type="file" name="Favicon48x48" onChange={onInputChange} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -329,7 +330,7 @@ const Rebranding = () => {
                 <TableCell>
                   <Box
                     component="img"
-                    src={changedImages.preview_favicon96x96 || `${configuration.baseUrl}/assets/panel/Favicon96x96`}
+                    src={previews.Favicon96x96 || `${configuration.baseUrl}/assets/panel/Favicon96x96`}
                     height="96px"
                     width="96px"
                   />
@@ -342,7 +343,7 @@ const Rebranding = () => {
                 <TableCell align="center">
                   <Button component="label" variant="contained">
                     Change
-                    <input hidden accept="image/*" type="file" name="favicon96x96" onChange={onInputChange} />
+                    <input hidden accept="image/*" type="file" name="Favicon96x96" onChange={onInputChange} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -359,7 +360,7 @@ const Rebranding = () => {
                 <TableCell width="40%">
                   <Box
                     component="img"
-                    src={changedImages.preview_logoH30 || `${configuration.baseUrl}/assets/panel/LogoH30`}
+                    src={previews.LogoH30 || `${configuration.baseUrl}/assets/panel/LogoH30`}
                     height="30px"
                     maxWidth="100%"
                   />
@@ -372,7 +373,7 @@ const Rebranding = () => {
                 <TableCell align="center" width="40%">
                   <Button component="label" variant="contained" color="secondary">
                     Change
-                    <input hidden accept="image/*" type="file" name="logoH30" onChange={onInputChange} />
+                    <input hidden accept="image/*" type="file" name="LogoH30" onChange={onInputChange} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -381,7 +382,7 @@ const Rebranding = () => {
                 <TableCell>
                   <Box
                     component="img"
-                    src={changedImages.preview_logoH60 || `${configuration.baseUrl}/assets/panel/LogoH60`}
+                    src={previews.LogoH60 || `${configuration.baseUrl}/assets/panel/LogoH60`}
                     height="60px"
                     maxWidth="100%"
                   />
@@ -394,7 +395,7 @@ const Rebranding = () => {
                 <TableCell align="center">
                   <Button component="label" variant="contained" color="secondary">
                     Change
-                    <input hidden accept="image/*" type="file" name="logoH60" onChange={onInputChange} />
+                    <input hidden accept="image/*" type="file" name="LogoH60" onChange={onInputChange} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -403,7 +404,7 @@ const Rebranding = () => {
                 <TableCell>
                   <Box
                     component="img"
-                    src={changedImages.preview_logoH90 || `${configuration.baseUrl}/assets/panel/LogoH90`}
+                    src={previews.LogoH90 || `${configuration.baseUrl}/assets/panel/LogoH90`}
                     height="90px"
                     maxWidth="100%"
                   />
@@ -416,7 +417,7 @@ const Rebranding = () => {
                 <TableCell align="center">
                   <Button component="label" variant="contained" color="secondary">
                     Change
-                    <input hidden accept="image/*" type="file" name="logoH90" onChange={onInputChange} />
+                    <input hidden accept="image/*" type="file" name="LogoH90" onChange={onInputChange} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -426,7 +427,7 @@ const Rebranding = () => {
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={isLoading || !changedImages.formData} onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || Object.keys(changedImages).length === 0} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>
