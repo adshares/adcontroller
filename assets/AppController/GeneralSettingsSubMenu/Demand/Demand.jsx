@@ -7,12 +7,19 @@ import {
   CardContent,
   CardHeader,
   FormControl,
+  FormHelperText,
   InputAdornment,
   InputLabel,
   OutlinedInput,
 } from '@mui/material';
 import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
 import commonStyles from '../../common/commonStyles.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useCreateNotification, useForm } from '../../../hooks';
+import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../../utils/helpers';
+import { useSetCampaignSettingsConfigMutation } from '../../../redux/config/configApi';
+import { changeCampaignSettingsInformation } from '../../../redux/config/configSlice';
 
 export default function Demand() {
   return (
@@ -25,16 +32,38 @@ export default function Demand() {
 }
 
 const CampaignSettingsCard = () => {
-  const [campaignMinBudget, setCampaignMinBudget] = useState(0);
-  const [campaignMinCpa, setCampaignMinCpa] = useState(0);
-  const [campaignMinCpm, setCampaignMinCpm] = useState(0);
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setCampaignSettingsConfig, { isLoading }] = useSetCampaignSettingsConfigMutation();
+  const form = useForm({
+    initialFields: {
+      CampaignMinBudget: clicksToAds(appData.AdServer.CampaignMinBudget || 0).toString(),
+      CampaignMinCpa: clicksToAds(appData.AdServer.CampaignMinCpa || 0).toString(),
+      CampaignMinCpm: clicksToAds(appData.AdServer.CampaignMinCpm || 0).toString(),
+    },
+    validation: {
+      CampaignMinBudget: ['number'],
+      CampaignMinCpa: ['number'],
+      CampaignMinCpm: ['number'],
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log({
-      campaignMinBudget,
-      campaignMinCpa,
-      campaignMinCpm,
+  const onSaveClick = async () => {
+    const body = {};
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = adsToClicks(returnNumber(form.fields[field]));
+      }
     });
+
+    try {
+      const response = await setCampaignSettingsConfig(body).unwrap();
+      dispatch(changeCampaignSettingsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -42,52 +71,68 @@ const CampaignSettingsCard = () => {
       <CardHeader title="Campaign settings" subheader="lorem ipsum dolor sit amet" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="campaignMinBudget">Minimal campaign budget</InputLabel>
+        <Box
+          component="form"
+          onChange={form.onChange}
+          onFocus={form.setTouched}
+          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
+        >
+          <FormControl error={form.touchedFields.CampaignMinBudget && !form.errorObj.CampaignMinBudget.isValid} margin="dense">
+            <InputLabel htmlFor="CampaignMinBudget">Minimal campaign budget</InputLabel>
             <OutlinedInput
-              id="campaignMinBudget"
+              id="CampaignMinBudget"
+              name="CampaignMinBudget"
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="Minimal campaign budget"
-              value={Number(campaignMinBudget).toString()}
-              onChange={(e) => setCampaignMinBudget(Number(e.target.value).toFixed(2))}
+              value={setDecimalPlaces(form.fields.CampaignMinBudget, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="CampaignMinBudget">
+              {form.touchedFields.CampaignMinBudget && form.errorObj.CampaignMinBudget.helperText}
+            </FormHelperText>
           </FormControl>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="campaignMinCpa">Minimal campaign CPA</InputLabel>
+
+          <FormControl error={form.touchedFields.CampaignMinCpa && !form.errorObj.CampaignMinCpa.isValid} margin="dense">
+            <InputLabel htmlFor="CampaignMinCpa">Minimal campaign CPA</InputLabel>
             <OutlinedInput
-              id="campaignMinCpa"
+              id="CampaignMinCpa"
+              name="CampaignMinCpa"
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="Minimal campaign CPA"
-              value={Number(campaignMinCpa).toString()}
-              onChange={(e) => setCampaignMinCpa(Number(e.target.value).toFixed(2))}
+              value={setDecimalPlaces(form.fields.CampaignMinCpa, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="CampaignMinCpa">
+              {form.touchedFields.CampaignMinCpa && form.errorObj.CampaignMinCpa.helperText}
+            </FormHelperText>
           </FormControl>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="campaignMinCpm">Minimal campaign CPM</InputLabel>
+
+          <FormControl error={form.touchedFields.CampaignMinCpm && !form.errorObj.CampaignMinCpm.isValid} margin="dense">
+            <InputLabel htmlFor="CampaignMinCpm">Minimal campaign CPM</InputLabel>
             <OutlinedInput
-              id="campaignMinCpm"
+              id="CampaignMinCpm"
+              name="CampaignMinCpm"
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="Minimal campaign CPM"
-              value={Number(campaignMinCpm).toString()}
-              onChange={(e) => setCampaignMinCpm(Number(e.target.value).toFixed(2))}
+              value={setDecimalPlaces(form.fields.CampaignMinCpm, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="CampaignMinCpm">
+              {form.touchedFields.CampaignMinCpm && form.errorObj.CampaignMinCpm.helperText}
+            </FormHelperText>
           </FormControl>
         </Box>
       </CardContent>
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>

@@ -56,6 +56,9 @@ const initialState = {
       CrmMailAddressOnSiteAdded: null,
       CrmMailAddressOnUserRegistered: null,
       InventoryPrivate: null,
+      CampaignMinBudget: null,
+      CampaignMinCpa: null,
+      CampaignMinCpm: null,
     },
     AdUser: {
       InternalUrl: null,
@@ -89,6 +92,9 @@ const configSlice = createSlice({
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
     changeZoneOptionsInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
+    changeCampaignSettingsInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
   },
@@ -131,6 +137,11 @@ const configSlice = createSlice({
   },
 });
 
-export const { changeBaseInformation, changePlaceholdersInformation, changeSiteOptionsInformation, changeZoneOptionsInformation } =
-  configSlice.actions;
+export const {
+  changeBaseInformation,
+  changePlaceholdersInformation,
+  changeSiteOptionsInformation,
+  changeZoneOptionsInformation,
+  changeCampaignSettingsInformation,
+} = configSlice.actions;
 export default configSlice.reducer;
