@@ -104,6 +104,9 @@ const configSlice = createSlice({
     changeBannerSettingsInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
+    changeRejectedDomainsInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(configApi.endpoints.getAppConfig.matchFulfilled, (state, { payload }) => {
@@ -151,5 +154,6 @@ export const {
   changeZoneOptionsInformation,
   changeCampaignSettingsInformation,
   changeBannerSettingsInformation,
+  changeRejectedDomainsInformation,
 } = configSlice.actions;
 export default configSlice.reducer;

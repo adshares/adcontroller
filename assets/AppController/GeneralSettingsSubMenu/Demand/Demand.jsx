@@ -18,8 +18,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../../hooks';
 import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../../utils/helpers';
-import { useSetBannerSettingsConfigMutation, useSetCampaignSettingsConfigMutation } from '../../../redux/config/configApi';
-import { changeBannerSettingsInformation, changeCampaignSettingsInformation } from '../../../redux/config/configSlice';
+import {
+  useSetBannerSettingsConfigMutation,
+  useSetCampaignSettingsConfigMutation,
+  useSetRejectedDomainsSettingsConfigMutation,
+} from '../../../redux/config/configApi';
+import {
+  changeBannerSettingsInformation,
+  changeCampaignSettingsInformation,
+  changeRejectedDomainsInformation,
+} from '../../../redux/config/configSlice';
 
 export default function Demand() {
   return (
@@ -271,30 +279,51 @@ const BannerSettingsCard = () => {
 };
 
 const RejectedDomainsCard = () => {
-  const [rejectedDomains, setRejectedDomains] = useState([]);
-  const [isFieldsValid, setFieldsValid] = useState(true);
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setRejectedDomainsSettings, { isLoading }] = useSetRejectedDomainsSettingsConfigMutation();
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log(rejectedDomains);
-    //TODO: send data
+  const [RejectedDomains, setRejectedDomains] = useState([]);
+  const [isListValid, setListValid] = useState(true);
+  const [isListWasChanged, setListWasChanged] = useState(false);
+
+  const onSaveClick = async () => {
+    const body = {
+      ...(isListWasChanged ? { RejectedDomains: RejectedDomains } : {}),
+    };
+
+    try {
+      const response = await setRejectedDomainsSettings(body).unwrap();
+      dispatch(changeRejectedDomainsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
-  const fieldsHandler = (fields) => {
-    if (fields.length > 0) {
-      setRejectedDomains(fields.map((field) => field.field));
-      setFieldsValid(fields.some((field) => field.isValueValid));
-    }
+  const fieldsHandler = (event) => {
+    const { isValuesValid, isListWasChanged, createdList } = event;
+    setRejectedDomains(createdList);
+    setListValid(createdList.length > 0 ? isValuesValid : true);
+    setListWasChanged(isListWasChanged);
   };
 
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Rejected domains:" subheader="Here you can define domains. All subdomains will be rejected." />
       <CardContent>
-        <ListOfInputs initialList={rejectedDomains} fieldsHandler={fieldsHandler} type="domain" maxHeight="calc(100vh - 22rem)" />
+        <ListOfInputs
+          initialList={appData.AdServer.RejectedDomains}
+          fieldsHandler={fieldsHandler}
+          listName="RejectedDomains"
+          type="domain"
+          maxHeight="calc(100vh - 22rem)"
+        />
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={!isFieldsValid} type="button" variant="contained" onClick={onSaveClick}>
+          <Button disabled={isLoading || !isListWasChanged || !isListValid} type="button" variant="contained" onClick={onSaveClick}>
             Save
           </Button>
         </Box>

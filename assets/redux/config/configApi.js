@@ -120,6 +120,13 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setRejectedDomainsSettingsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/rejected-domains',
+        method: 'PATCH',
+        body,
+      }),
+    }),
     uploadAssets: builder.mutation({
       query: (body) => ({
         url: '/api/config/panel-assets',
@@ -145,5 +152,6 @@ export const {
   useSetPlaceholdersConfigMutation,
   useSetCampaignSettingsConfigMutation,
   useSetBannerSettingsConfigMutation,
+  useSetRejectedDomainsSettingsConfigMutation,
   useUploadAssetsMutation,
 } = configApi;
