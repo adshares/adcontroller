@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import commonStyles from '../common/commonStyles.scss';
+import { useSelector } from 'react-redux';
+import configSelectors from '../../redux/config/configSelectors';
 import {
   Box,
   Button,
@@ -17,8 +18,10 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
+import commonStyles from '../common/commonStyles.scss';
 
 export default function AdClassifier() {
+  const appData = useSelector(configSelectors.getAppData);
   const [url, setUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [apiSecret, setApiSecret] = useState('');
@@ -50,11 +53,11 @@ export default function AdClassifier() {
               <TableBody>
                 <TableRow>
                   <TableCell>URL</TableCell>
-                  <TableCell>{url}</TableCell>
+                  <TableCell>{appData.AdClassify.Url}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Api key</TableCell>
-                  <TableCell>{apiKey}</TableCell>
+                  <TableCell>{appData.AdClassify.ApiKeyName}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
