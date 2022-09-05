@@ -127,6 +127,13 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setRegistrationModeConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/registration',
+        method: 'PATCH',
+        body,
+      }),
+    }),
     uploadAssets: builder.mutation({
       query: (body) => ({
         url: '/api/config/panel-assets',
@@ -153,5 +160,6 @@ export const {
   useSetCampaignSettingsConfigMutation,
   useSetBannerSettingsConfigMutation,
   useSetRejectedDomainsSettingsConfigMutation,
+  useSetRegistrationModeConfigMutation,
   useUploadAssetsMutation,
 } = configApi;

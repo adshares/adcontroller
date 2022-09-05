@@ -18,6 +18,11 @@ import {
   Select,
   TextField,
 } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useCreateNotification, useForm } from '../../../hooks';
+import { useSetRegistrationModeConfigMutation } from '../../../redux/config/configApi';
+import { changeRegistrationModeInformation } from '../../../redux/config/configSlice';
 
 export default function Settings() {
   return (
@@ -31,26 +36,71 @@ export default function Settings() {
 }
 
 const RegistrationModeCard = () => {
-  const [registrationMode, setRegistrationMode] = useState('public');
-  const [emailVerificationRequired, setEmailVerificationRequired] = useState(false);
-  const [autoAccountConfirmation, setAutoAccountConfirmation] = useState(false);
-  const [autoRegistrationAllowed, setAutoRegistrationAllowed] = useState(false);
-  const [advertiserApplyFormUrl, setAdvertiserApplyFormUrl] = useState('');
-  const [publisherApplyFormUrl, setPublisherApplyFormUrl] = useState('');
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setRegistrationModeConfig, { isLoading }] = useSetRegistrationModeConfigMutation();
+  const [RegistrationMode, setRegistrationMode] = useState(appData.AdServer.RegistrationMode || 'public');
+  const [EmailVerificationRequired, setEmailVerificationRequired] = useState(
+    RegistrationMode === 'private' ? false : appData.AdServer.EmailVerificationRequired || false,
+  );
+  const [AutoConfirmationEnabled, setAutoConfirmationEnabled] = useState(
+    RegistrationMode === 'private' ? false : appData.AdServer.AutoConfirmationEnabled || false,
+  );
+  const [AutoRegistrationEnabled, setAutoRegistrationEnabled] = useState(
+    RegistrationMode === 'private' ? false : appData.AdServer.AutoRegistrationEnabled || false,
+  );
+  const form = useForm({
+    initialFields: {
+      AdvertiserApplyFormUrl: '',
+      PublisherApplyFormUrl: '',
+    },
+    validation: {
+      AdvertiserApplyFormUrl: ['url'],
+      PublisherApplyFormUrl: ['url'],
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
   const handleSelectChange = (event) => {
     setRegistrationMode(event.target.value);
   };
 
-  const onSaveClick = () => {
-    console.log({
-      registrationMode,
-      emailVerificationRequired,
-      autoAccountConfirmation,
-      autoRegistrationAllowed,
-      advertiserApplyFormUrl,
-      publisherApplyFormUrl,
-    });
+  const onSaveClick = async () => {
+    if (RegistrationMode === 'private') {
+      setEmailVerificationRequired(false);
+      setAutoRegistrationEnabled(false);
+      setAutoConfirmationEnabled(false);
+    }
+    const body = {
+      ...(RegistrationMode === 'public' && {
+        RegistrationMode,
+        EmailVerificationRequired,
+        AutoConfirmationEnabled,
+        AutoRegistrationEnabled,
+      }),
+      ...(RegistrationMode === 'restricted' && {
+        RegistrationMode,
+        EmailVerificationRequired,
+        AutoConfirmationEnabled,
+        AutoRegistrationEnabled,
+        AdvertiserApplyFormUrl: form.fields.AdvertiserApplyFormUrl,
+        PublisherApplyFormUrl: form.fields.PublisherApplyFormUrl,
+      }),
+      ...(RegistrationMode === 'private' && {
+        RegistrationMode,
+        EmailVerificationRequired: false,
+        AutoConfirmationEnabled: false,
+        AutoRegistrationEnabled: false,
+      }),
+    };
+
+    try {
+      const response = await setRegistrationModeConfig(body).unwrap();
+      dispatch(changeRegistrationModeInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -65,7 +115,7 @@ const RegistrationModeCard = () => {
               size="small"
               labelId="registrationModeLabel"
               id="registrationMode"
-              value={registrationMode}
+              value={RegistrationMode}
               label="Set registration mode"
               onChange={handleSelectChange}
             >
@@ -74,16 +124,18 @@ const RegistrationModeCard = () => {
               <MenuItem value="private">Private</MenuItem>
             </Select>
           </FormControl>
-          <Collapse in={registrationMode === 'restricted'} timeout="auto">
-            <FormControl fullWidth>
+          <Collapse in={RegistrationMode === 'restricted'} timeout="auto">
+            <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
               <TextField
                 fullWidth
                 variant="outlined"
                 size="small"
                 margin="dense"
                 label="Advertiser apply form URL"
-                value={advertiserApplyFormUrl}
-                onChange={(e) => setAdvertiserApplyFormUrl(e.target.value)}
+                name="AdvertiserApplyFormUrl"
+                error={form.touchedFields.AdvertiserApplyFormUrl && !form.errorObj.AdvertiserApplyFormUrl.isValid}
+                helperText={form.touchedFields.AdvertiserApplyFormUrl && form.errorObj.AdvertiserApplyFormUrl.helperText}
+                value={form.fields.AdvertiserApplyFormUrl}
                 inputProps={{ autoComplete: 'off' }}
               />
               <TextField
@@ -92,31 +144,33 @@ const RegistrationModeCard = () => {
                 size="small"
                 margin="dense"
                 label="Publisher apply form URL"
-                value={publisherApplyFormUrl}
-                onChange={(e) => setPublisherApplyFormUrl(e.target.value)}
+                name="PublisherApplyFormUrl"
+                error={form.touchedFields.PublisherApplyFormUrl && !form.errorObj.PublisherApplyFormUrl.isValid}
+                helperText={form.touchedFields.PublisherApplyFormUrl && form.errorObj.PublisherApplyFormUrl.helperText}
+                value={form.fields.PublisherApplyFormUrl}
                 inputProps={{ autoComplete: 'off' }}
               />
-            </FormControl>
+            </Box>
           </Collapse>
 
-          <Collapse in={registrationMode !== 'private'} timeout="auto">
+          <Collapse in={RegistrationMode !== 'private'} timeout="auto">
             <FormControl>
               <FormControlLabel
                 label="E-mail verification required"
                 control={
-                  <Checkbox checked={emailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
+                  <Checkbox checked={EmailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
                 }
               />
               <FormControlLabel
                 label="Auto account confirmation"
                 control={
-                  <Checkbox checked={autoAccountConfirmation} onChange={() => setAutoAccountConfirmation((prevState) => !prevState)} />
+                  <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
                 }
               />
               <FormControlLabel
                 label="Auto registration allowed"
                 control={
-                  <Checkbox checked={autoRegistrationAllowed} onChange={() => setAutoRegistrationAllowed((prevState) => !prevState)} />
+                  <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
                 }
               />
             </FormControl>
@@ -126,7 +180,18 @@ const RegistrationModeCard = () => {
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button
+            disabled={
+              isLoading ||
+              (appData.AdServer.RegistrationMode === RegistrationMode &&
+                appData.AdServer.EmailVerificationRequired === EmailVerificationRequired &&
+                appData.AdServer.AutoConfirmationEnabled === AutoConfirmationEnabled &&
+                appData.AdServer.AutoRegistrationEnabled === AutoRegistrationEnabled)
+            }
+            onClick={onSaveClick}
+            variant="contained"
+            type="button"
+          >
             Save
           </Button>
         </Box>

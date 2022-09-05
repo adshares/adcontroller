@@ -47,6 +47,7 @@ const initialState = {
       ReferralRefundEnabled: null,
       ReferralRefundCommission: null,
       RejectedDomains: null,
+      RegistrationMode: null,
       SiteClassifierLocalBanners: null,
       SiteAcceptBannersManually: null,
       Url: null,
@@ -107,6 +108,9 @@ const configSlice = createSlice({
     changeRejectedDomainsInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
+    changeRegistrationModeInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(configApi.endpoints.getAppConfig.matchFulfilled, (state, { payload }) => {
@@ -155,5 +159,6 @@ export const {
   changeCampaignSettingsInformation,
   changeBannerSettingsInformation,
   changeRejectedDomainsInformation,
+  changeRegistrationModeInformation,
 } = configSlice.actions;
 export default configSlice.reducer;
