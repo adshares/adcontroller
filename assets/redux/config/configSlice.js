@@ -59,6 +59,10 @@ const initialState = {
       CampaignMinBudget: null,
       CampaignMinCpa: null,
       CampaignMinCpm: null,
+      UploadLimitImage: null,
+      UploadLimitModel: null,
+      UploadLimitVideo: null,
+      UploadLimitZip: null,
     },
     AdUser: {
       InternalUrl: null,
@@ -95,6 +99,9 @@ const configSlice = createSlice({
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
     changeCampaignSettingsInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
+    changeBannerSettingsInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
   },
@@ -143,5 +150,6 @@ export const {
   changeSiteOptionsInformation,
   changeZoneOptionsInformation,
   changeCampaignSettingsInformation,
+  changeBannerSettingsInformation,
 } = configSlice.actions;
 export default configSlice.reducer;

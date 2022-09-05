@@ -18,8 +18,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../../hooks';
 import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../../utils/helpers';
-import { useSetCampaignSettingsConfigMutation } from '../../../redux/config/configApi';
-import { changeCampaignSettingsInformation } from '../../../redux/config/configSlice';
+import { useSetBannerSettingsConfigMutation, useSetCampaignSettingsConfigMutation } from '../../../redux/config/configApi';
+import { changeBannerSettingsInformation, changeCampaignSettingsInformation } from '../../../redux/config/configSlice';
 
 export default function Demand() {
   return (
@@ -142,18 +142,40 @@ const CampaignSettingsCard = () => {
 };
 
 const BannerSettingsCard = () => {
-  const [uploadLimitImage, setUploadLimitImage] = useState(0);
-  const [uploadLimitModel, setUploadLimitModel] = useState(0);
-  const [uploadLimitVideo, setUploadLimitVideo] = useState(0);
-  const [uploadLimitHtml, setUploadLimitHtml] = useState(0);
+  const appData = useSelector(configSelectors.getAppData);
+  const [setBannerSettingsConfig, { isLoading }] = useSetBannerSettingsConfigMutation();
+  const dispatch = useDispatch();
+  const form = useForm({
+    initialFields: {
+      UploadLimitImage: appData.AdServer.UploadLimitImage / 1024 || 0,
+      UploadLimitModel: appData.AdServer.UploadLimitModel / 1024 || 0,
+      UploadLimitVideo: appData.AdServer.UploadLimitVideo / 1024 || 0,
+      UploadLimitZip: appData.AdServer.UploadLimitZip / 1024 || 0,
+    },
+    validation: {
+      UploadLimitImage: ['number'],
+      UploadLimitModel: ['number'],
+      UploadLimitVideo: ['number'],
+      UploadLimitZip: ['number'],
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log({
-      uploadLimitImage,
-      uploadLimitModel,
-      uploadLimitVideo,
-      uploadLimitHtml,
+  const onSaveClick = async () => {
+    const body = {};
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = returnNumber(form.fields[field]) * 1024;
+      }
     });
+
+    try {
+      const response = await setBannerSettingsConfig(body).unwrap();
+      dispatch(changeBannerSettingsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -161,68 +183,85 @@ const BannerSettingsCard = () => {
       <CardHeader title="Banner settings" subheader="lorem ipsum dolor sit amet" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="uploadLimitImage">Image size limit</InputLabel>
+        <Box
+          component="form"
+          onChange={form.onChange}
+          onFocus={form.setTouched}
+          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
+        >
+          <FormControl error={form.touchedFields.UploadLimitImage && !form.errorObj.UploadLimitImage.isValid} margin="dense">
+            <InputLabel htmlFor="UploadLimitImage">Image size limit</InputLabel>
             <OutlinedInput
-              id="uploadLimitImage"
+              id="UploadLimitImage"
+              name="UploadLimitImage"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
               label="Image size limit"
-              value={Number(uploadLimitImage).toString()}
-              onChange={(e) => setUploadLimitImage(Number(e.target.value).toFixed(2))}
+              value={form.fields.UploadLimitImage}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="UploadLimitImage">
+              {form.touchedFields.UploadLimitImage && form.errorObj.UploadLimitImage.helperText}
+            </FormHelperText>
           </FormControl>
 
-          <FormControl margin="dense">
-            <InputLabel htmlFor="uploadLimitVideo">Video size limit</InputLabel>
+          <FormControl error={form.touchedFields.UploadLimitVideo && !form.errorObj.UploadLimitVideo.isValid} margin="dense">
+            <InputLabel htmlFor="UploadLimitVideo">Video size limit</InputLabel>
             <OutlinedInput
-              id="uploadLimitVideo"
+              id="UploadLimitVideo"
+              name="UploadLimitVideo"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
               label="Video size limit"
-              value={Number(uploadLimitVideo).toString()}
-              onChange={(e) => setUploadLimitVideo(Number(e.target.value).toFixed(2))}
+              value={form.fields.UploadLimitVideo}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="UploadLimitImage">
+              {form.touchedFields.UploadLimitVideo && form.errorObj.UploadLimitVideo.helperText}
+            </FormHelperText>
           </FormControl>
 
-          <FormControl margin="dense">
-            <InputLabel htmlFor="uploadLimitModel">Upload model limit</InputLabel>
+          <FormControl error={form.touchedFields.UploadLimitModel && !form.errorObj.UploadLimitModel.isValid} margin="dense">
+            <InputLabel htmlFor="UploadLimitModel">Upload model limit</InputLabel>
             <OutlinedInput
-              id="uploadLimitModel"
+              id="UploadLimitModel"
+              name="UploadLimitModel"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
               label="Upload model limit"
-              value={Number(uploadLimitModel).toString()}
-              onChange={(e) => setUploadLimitModel(Number(e.target.value).toFixed(2))}
+              value={form.fields.UploadLimitModel}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="UploadLimitImage">
+              {form.touchedFields.UploadLimitModel && form.errorObj.UploadLimitModel.helperText}
+            </FormHelperText>
           </FormControl>
 
           <FormControl margin="dense">
-            <InputLabel htmlFor="uploadLimitHtml">Upload HTML limit</InputLabel>
+            <InputLabel htmlFor="UploadLimitZip">Upload HTML limit</InputLabel>
             <OutlinedInput
-              id="uploadLimitHtml"
+              id="UploadLimitZip"
+              name="UploadLimitZip"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
               label="Upload model limit"
-              value={Number(uploadLimitHtml).toString()}
-              onChange={(e) => setUploadLimitHtml(Number(e.target.value).toFixed(2))}
+              value={form.fields.UploadLimitZip}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="UploadLimitZip">
+              {form.touchedFields.UploadLimitZip && form.errorObj.UploadLimitZip.helperText}
+            </FormHelperText>
           </FormControl>
         </Box>
       </CardContent>
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>

@@ -113,6 +113,13 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setBannerSettingsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/banner-settings',
+        method: 'PATCH',
+        body,
+      }),
+    }),
     uploadAssets: builder.mutation({
       query: (body) => ({
         url: '/api/config/panel-assets',
@@ -137,5 +144,6 @@ export const {
   useSetZoneOptionsConfigMutation,
   useSetPlaceholdersConfigMutation,
   useSetCampaignSettingsConfigMutation,
+  useSetBannerSettingsConfigMutation,
   useUploadAssetsMutation,
 } = configApi;
