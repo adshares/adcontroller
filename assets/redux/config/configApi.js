@@ -134,6 +134,20 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setAutoWithdrawalConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/auto-withdrawal',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setRegulationsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/regulations',
+        method: 'PATCH',
+        body,
+      }),
+    }),
     uploadAssets: builder.mutation({
       query: (body) => ({
         url: '/api/config/panel-assets',
@@ -161,5 +175,7 @@ export const {
   useSetBannerSettingsConfigMutation,
   useSetRejectedDomainsSettingsConfigMutation,
   useSetRegistrationModeConfigMutation,
+  useSetAutoWithdrawalConfigMutation,
+  useSetRegulationsConfigMutation,
   useUploadAssetsMutation,
 } = configApi;

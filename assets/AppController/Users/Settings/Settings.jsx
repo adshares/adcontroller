@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import commonStyles from '../../common/commonStyles.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useCreateNotification, useForm } from '../../../hooks';
+import {
+  useSetAutoWithdrawalConfigMutation,
+  useSetRegistrationModeConfigMutation,
+  useSetRegulationsConfigMutation,
+} from '../../../redux/config/configApi';
+import {
+  changeAutoWithdrawalConfigInformation,
+  changeRegistrationModeInformation,
+  changeRegulationsInformation,
+} from '../../../redux/config/configSlice';
+import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../../utils/helpers';
 import {
   Box,
   Button,
@@ -11,6 +24,7 @@ import {
   Collapse,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -18,11 +32,7 @@ import {
   Select,
   TextField,
 } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import configSelectors from '../../../redux/config/configSelectors';
-import { useCreateNotification, useForm } from '../../../hooks';
-import { useSetRegistrationModeConfigMutation } from '../../../redux/config/configApi';
-import { changeRegistrationModeInformation } from '../../../redux/config/configSlice';
+import commonStyles from '../../common/commonStyles.scss';
 
 export default function Settings() {
   return (
@@ -201,10 +211,36 @@ const RegistrationModeCard = () => {
 };
 
 const AutoWithdrawalCard = () => {
-  const [adsWithdrawal, setAdsWithdrawal] = useState(0);
-  const [bscWithdrawal, setBscWithdrawal] = useState(0);
-  const onSaveClick = () => {
-    console.log({ adsWithdrawal: Number(adsWithdrawal), bscWithdrawal: Number(bscWithdrawal) });
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setAutoWithdrawalConfig, { isLoading }] = useSetAutoWithdrawalConfigMutation();
+  const form = useForm({
+    initialFields: {
+      AutoWithdrawalLimitAds: clicksToAds(appData.AdServer.AutoWithdrawalLimitAds || 0).toString(),
+      AutoWithdrawalLimitBsc: clicksToAds(appData.AdServer.AutoWithdrawalLimitBsc || 0).toString(),
+    },
+    validation: {
+      AutoWithdrawalLimitAds: ['number'],
+      AutoWithdrawalLimitBsc: ['number'],
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+
+  const onSaveClick = async () => {
+    const body = {};
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = adsToClicks(returnNumber(form.fields[field]));
+      }
+    });
+
+    try {
+      const response = await setAutoWithdrawalConfig(body).unwrap();
+      dispatch(changeAutoWithdrawalConfigInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -212,39 +248,55 @@ const AutoWithdrawalCard = () => {
       <CardHeader title="Auto withdrawal" subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="adsWithdrawal">ADS minimum withdrawal</InputLabel>
+        <Box
+          component="form"
+          onChange={form.onChange}
+          onFocus={form.setTouched}
+          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
+        >
+          <FormControl error={form.touchedFields.AutoWithdrawalLimitAds && !form.errorObj.AutoWithdrawalLimitAds.isValid} margin="dense">
+            <InputLabel htmlFor="AutoWithdrawalLimitAds">ADS minimum withdrawal</InputLabel>
             <OutlinedInput
-              id="adsWithdrawal"
+              id="AutoWithdrawalLimitAds"
+              name="AutoWithdrawalLimitAds"
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="ADS minimum withdrawal"
-              value={Number(adsWithdrawal).toString()}
-              onChange={(e) => setAdsWithdrawal(Number(e.target.value).toFixed(2))}
+              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitAds, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="CampaignMinBudget">
+              {form.touchedFields.AutoWithdrawalLimitAds && form.errorObj.AutoWithdrawalLimitAds.helperText}
+            </FormHelperText>
           </FormControl>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="bscWithdrawal">BSC minimum withdrawal</InputLabel>
+          <FormControl error={form.touchedFields.AutoWithdrawalLimitBsc && !form.errorObj.AutoWithdrawalLimitBsc.isValid} margin="dense">
+            <InputLabel htmlFor="AutoWithdrawalLimitBsc">BSC minimum withdrawal</InputLabel>
             <OutlinedInput
-              id="bscWithdrawal"
+              id="AutoWithdrawalLimitBsc"
+              name="AutoWithdrawalLimitBsc"
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="BSC minimum withdrawal"
-              value={Number(bscWithdrawal).toString()}
-              onChange={(e) => setBscWithdrawal(Number(e.target.value).toFixed(2))}
+              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitBsc, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="CampaignMinBudget">
+              {form.touchedFields.AutoWithdrawalLimitBsc && form.errorObj.AutoWithdrawalLimitBsc.helperText}
+            </FormHelperText>
           </FormControl>
         </Box>
       </CardContent>
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button
+            disabled={isLoading || !form.isFormWasChanged || !form.isFormValid}
+            onClick={onSaveClick}
+            variant="contained"
+            type="button"
+          >
             Save
           </Button>
         </Box>
@@ -254,28 +306,41 @@ const AutoWithdrawalCard = () => {
 };
 
 const PrivacyCard = () => {
-  const [privacyTextField, setPrivacyTextField] = useState('');
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setRegulationsConfig, { isLoading }] = useSetRegulationsConfigMutation();
+  const form = useForm({
+    initialFields: {
+      PrivacyPolicy: appData.AdServer.PrivacyPolicy || '',
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log(privacyTextField);
+  const onSaveClick = async () => {
+    const body = {
+      ...(form.changedFields.PrivacyPolicy ? { PrivacyPolicy: form.fields.PrivacyPolicy } : {}),
+    };
+
+    try {
+      const response = await setRegulationsConfig(body).unwrap();
+      dispatch(changeRegulationsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Privacy" subheader="Here you can read and edit your privacy settings" />
       <CardContent>
-        <TextField
-          value={privacyTextField}
-          onChange={(e) => setPrivacyTextField(e.target.value)}
-          fullWidth
-          multiline
-          rows={8}
-          label="Privacy"
-        />
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+          <TextField value={form.fields.PrivacyPolicy} name="PrivacyPolicy" fullWidth multiline rows={8} label="Privacy" />
+        </Box>
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>
@@ -285,28 +350,41 @@ const PrivacyCard = () => {
 };
 
 const TermAndConditionCard = () => {
-  const [termsAndConditionTextField, setTermsAndConditionTextField] = useState('');
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setRegulationsConfig, { isLoading }] = useSetRegulationsConfigMutation();
+  const form = useForm({
+    initialFields: {
+      Terms: appData.AdServer.Terms || '',
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log(termsAndConditionTextField);
+  const onSaveClick = async () => {
+    const body = {
+      ...(form.changedFields.Terms ? { Terms: form.fields.Terms } : {}),
+    };
+
+    try {
+      const response = await setRegulationsConfig(body).unwrap();
+      dispatch(changeRegulationsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Terms and conditions" subheader="Here you can read and edit your terms and conditions" />
       <CardContent>
-        <TextField
-          value={termsAndConditionTextField}
-          onChange={(e) => setTermsAndConditionTextField(e.target.value)}
-          fullWidth
-          multiline
-          rows={8}
-          label="Terms and conditions"
-        />
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+          <TextField value={form.fields.Terms} name="Terms" fullWidth multiline rows={8} label="Terms and conditions" />
+        </Box>
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>

@@ -111,6 +111,12 @@ const configSlice = createSlice({
     changeRegistrationModeInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
+    changeAutoWithdrawalConfigInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
+    changeRegulationsInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(configApi.endpoints.getAppConfig.matchFulfilled, (state, { payload }) => {
@@ -160,5 +166,7 @@ export const {
   changeBannerSettingsInformation,
   changeRejectedDomainsInformation,
   changeRegistrationModeInformation,
+  changeAutoWithdrawalConfigInformation,
+  changeRegulationsInformation,
 } = configSlice.actions;
 export default configSlice.reducer;
