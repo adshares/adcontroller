@@ -1,19 +1,4 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  FormControl,
-  FormHelperText,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-} from '@mui/material';
-import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
-import commonStyles from '../../common/commonStyles.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../../hooks';
@@ -28,6 +13,21 @@ import {
   changeCampaignSettingsInformation,
   changeRejectedDomainsInformation,
 } from '../../../redux/config/configSlice';
+import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  FormControl,
+  FormHelperText,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+} from '@mui/material';
+import commonStyles from '../../common/commonStyles.scss';
 
 export default function Demand() {
   return (
