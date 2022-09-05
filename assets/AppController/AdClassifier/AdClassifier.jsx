@@ -40,8 +40,8 @@ export default function AdClassifier() {
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="AdClassifier" subheader="lorem ipsum dolor set amet" />
         <CardActions>
-          <IconButton type="button" onClick={() => setEditMode(!editMode)}>
-            {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
+          <IconButton disabled type="button" onClick={() => setEditMode(!editMode)}>
+            {editMode ? <CloseIcon color="error" /> : <EditIcon color="grey" /*<EditIcon color="primary"*/ />}
           </IconButton>
         </CardActions>
       </Box>
