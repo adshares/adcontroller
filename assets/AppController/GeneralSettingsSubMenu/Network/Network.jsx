@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
 import { useSetInventoryWhitelistConfigMutation } from '../../../redux/config/configApi';
+import { changeInventoryWhitelistInformation } from '../../../redux/config/configSlice';
 import { useCreateNotification } from '../../../hooks';
 import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Collapse, FormControlLabel } from '@mui/material';
@@ -9,6 +10,7 @@ import commonStyles from '../../common/commonStyles.scss';
 
 export default function Network() {
   const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
   const [setInventoryWhitelistConfig, { isLoading }] = useSetInventoryWhitelistConfigMutation();
   const [InventoryPrivate, setInventoryPrivate] = useState(appData.AdServer.InventoryPrivate);
   const [separateList, setSeparateList] = useState(
@@ -44,7 +46,8 @@ export default function Network() {
     };
 
     try {
-      await setInventoryWhitelistConfig(body).unwrap();
+      const response = await setInventoryWhitelistConfig(body).unwrap();
+      dispatch(changeInventoryWhitelistInformation(response.data));
       createSuccessNotification();
     } catch (err) {
       createErrorNotification(err);

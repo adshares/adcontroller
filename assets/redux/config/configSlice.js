@@ -90,6 +90,9 @@ const configSlice = createSlice({
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
       state.appData.General = { ...state.appData.General, ...payload.General };
     },
+    changeCrmNotificationsInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
     changePlaceholdersInformation: (state, { payload }) => {
       state.appData.AdPanel = { ...state.appData.AdPanel, ...payload.AdPanel };
     },
@@ -117,6 +120,18 @@ const configSlice = createSlice({
     changeRegulationsInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
+    changeInventoryWhitelistInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
+    changeCommissionsConfigInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
+    changeColdWalletConfigInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
+    changeWalletConfigInformation: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(configApi.endpoints.getAppConfig.matchFulfilled, (state, { payload }) => {
@@ -130,35 +145,12 @@ const configSlice = createSlice({
         General: { ...state.appData.General, ...payload.data.General },
       };
     });
-
-    builder.addMatcher(configApi.endpoints.setWalletConfig.matchFulfilled, (state, { meta }) => {
-      Object.entries(meta.arg.originalArgs).forEach((changedArg) => {
-        if (state.appData.AdServer[changedArg[0]]) {
-          state.appData.AdServer[changedArg[0]] = changedArg[1];
-        }
-      });
-    });
-
-    builder.addMatcher(configApi.endpoints.setCrmNotificationsConfig.matchFulfilled, (state, { meta }) => {
-      Object.entries(meta.arg.originalArgs).forEach((changedArg) => (state.appData.AdServer[changedArg[0]] = changedArg[1]));
-    });
-
-    builder.addMatcher(configApi.endpoints.setColdWalletConfig.matchFulfilled, (state, { meta }) => {
-      Object.entries(meta.arg.originalArgs).forEach((changedArg) => (state.appData.AdServer[changedArg[0]] = changedArg[1]));
-    });
-
-    builder.addMatcher(configApi.endpoints.setCommissionsConfig.matchFulfilled, (state, { meta }) => {
-      Object.entries(meta.arg.originalArgs).forEach((changedArg) => (state.appData.AdServer[changedArg[0]] = changedArg[1]));
-    });
-
-    builder.addMatcher(configApi.endpoints.setInventoryWhitelistConfig.matchFulfilled, (state, { meta }) => {
-      Object.entries(meta.arg.originalArgs).forEach((changedArg) => (state.appData.AdServer[changedArg[0]] = changedArg[1]));
-    });
   },
 });
 
 export const {
   changeBaseInformation,
+  changeCrmNotificationsInformation,
   changePlaceholdersInformation,
   changeSiteOptionsInformation,
   changeZoneOptionsInformation,
@@ -168,5 +160,9 @@ export const {
   changeRegistrationModeInformation,
   changeAutoWithdrawalConfigInformation,
   changeRegulationsInformation,
+  changeInventoryWhitelistInformation,
+  changeCommissionsConfigInformation,
+  changeColdWalletConfigInformation,
+  changeWalletConfigInformation,
 } = configSlice.actions;
 export default configSlice.reducer;

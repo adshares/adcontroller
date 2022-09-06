@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
 import { useSetCommissionsConfigMutation } from '../../../redux/config/configApi';
+import { changeCommissionsConfigInformation } from '../../../redux/config/configSlice';
 import { returnNumber, setDecimalPlaces } from '../../../utils/helpers';
 import { useCreateNotification, useForm } from '../../../hooks';
 import {
@@ -22,6 +23,7 @@ import commonStyles from '../../common/commonStyles.scss';
 
 function Commissions() {
   const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
   const [setCommissionsConfig, { isLoading }] = useSetCommissionsConfigMutation();
   const form = useForm({
     initialFields: {
@@ -47,7 +49,8 @@ function Commissions() {
     });
 
     try {
-      await setCommissionsConfig(body).unwrap();
+      const response = await setCommissionsConfig(body).unwrap();
+      dispatch(changeCommissionsConfigInformation(response.data));
       createSuccessNotification();
     } catch (err) {
       createErrorNotification(err);

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
 import { useSetWalletConfigMutation, useSetColdWalletConfigMutation } from '../../../redux/config/configApi';
+import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../../redux/config/configSlice';
 import apiService from '../../../utils/apiService';
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../../hooks';
 import { adsToClicks, clicksToAds, returnNumber } from '../../../utils/helpers';
@@ -29,6 +30,7 @@ import commonStyles from '../../common/commonStyles.scss';
 
 const WalletSettingsCard = () => {
   const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
   const [editMode, setEditMode] = useState(false);
   const [isHostVerification, setIsHostVerification] = useState(false);
   const [isKnownNode, setKnownNode] = useState(false);
@@ -90,7 +92,8 @@ const WalletSettingsCard = () => {
 
   const onSaveClick = async () => {
     try {
-      await setWalletConfig({ ...walletForm.fields, ...nodeForm.fields }).unwrap();
+      const response = await setWalletConfig({ ...walletForm.fields, ...nodeForm.fields }).unwrap();
+      dispatch(changeWalletConfigInformation(response.data));
       setEditMode((prevState) => !prevState);
       walletForm.resetForm();
       nodeForm.resetForm();
@@ -251,6 +254,7 @@ const WalletStatusCard = () => {
 
 const ColdWalletSettingsCard = () => {
   const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
   const [setColdWalletConfig, { isLoading }] = useSetColdWalletConfigMutation();
   const { createErrorNotification, createSuccessNotification } = useCreateNotification();
   const [ColdWalletIsActive, setColdWalletIsActive] = useState(appData.AdServer.ColdWalletIsActive || false);
@@ -269,7 +273,7 @@ const ColdWalletSettingsCard = () => {
 
   const onSaveClick = async () => {
     try {
-      await setColdWalletConfig(
+      const response = await setColdWalletConfig(
         ColdWalletIsActive
           ? {
               ColdWalletIsActive,
@@ -279,6 +283,7 @@ const ColdWalletSettingsCard = () => {
             }
           : { ColdWalletIsActive },
       ).unwrap();
+      dispatch(changeColdWalletConfigInformation(response.data));
       createSuccessNotification();
     } catch (err) {
       createErrorNotification(err);
