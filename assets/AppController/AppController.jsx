@@ -23,6 +23,7 @@ import Demand from './GeneralSettingsSubMenu/Demand/Demand';
 import Settings from './Users/Settings/Settings';
 import Panel from './GeneralSettingsSubMenu/Panel/Panel';
 import AdClassifier from './AdClassifier/AdClassifier';
+import Users from './Users/Users/Users';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -34,6 +35,7 @@ import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import commonStyles from './common/commonStyles.scss';
 
 const appModules = [
@@ -46,6 +48,12 @@ const appModules = [
         path: '/settings',
         component: Settings,
         icon: ManageAccountsIcon,
+      },
+      {
+        name: 'Users',
+        path: '/users',
+        component: Users,
+        icon: PeopleAltIcon,
       },
     ],
   },
