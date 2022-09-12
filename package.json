@@ -41,17 +41,12 @@
         "@mui/icons-material": "^5.8.4",
         "@mui/material": "^5.8.3",
         "@mui/styles": "^5.8.4",
-        "@mui/x-data-grid": "^5.17.1",
         "@reduxjs/toolkit": "^1.8.3",
-        "ag-grid-community": "^28.1.1",
-        "ag-grid-react": "^28.1.1",
-        "mui-datatables": "^4.2.2",
         "notistack": "^2.0.5",
         "prop-types": "^15.8.1",
         "react": "^18.1.0",
         "react-dom": "^18.1.0",
         "react-redux": "^8.0.2",
-        "react-router-dom": "^6.3.0",
-        "react-table": "^7.8.0"
+        "react-router-dom": "^6.3.0"
     }
 }
