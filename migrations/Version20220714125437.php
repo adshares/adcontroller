@@ -11,7 +11,7 @@ final class Version20220714125437 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create table configuration';
+        return 'Creates table `configuration`';
     }
 
     public function up(Schema $schema): void
@@ -26,7 +26,7 @@ CREATE TABLE configuration (
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_NAME (module, name),
   PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`;
 SQL
         );
     }

@@ -3,7 +3,7 @@ import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typograp
 import apiService from '../../../utils/apiService';
 import styles from './styles.scss';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
-import { useForm, useErrorHandler } from '../../../hooks';
+import { useForm, useCreateNotification } from '../../../hooks';
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +26,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   });
   const [isDataRequired, setIsDataRequired] = useState(true);
   const [editMode, setEditMode] = useState(isDataRequired);
-  const { createErrorNotification } = useErrorHandler();
+  const { createErrorNotification } = useCreateNotification();
   const [isEmptyPassword, setIsEmptyPassword] = useState(false);
   const [isPasswordWasTouched, setPasswordTouched] = useState(false);
 

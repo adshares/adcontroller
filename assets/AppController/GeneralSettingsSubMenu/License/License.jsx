@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import commonStyles from '../../common/commonStyles.scss';
+import { useGetLicenseDataQuery, useSetExistingLicenseMutation } from '../../../redux/config/configApi';
+import { useCreateNotification, useForm } from '../../../hooks';
+import Spinner from '../../../Components/Spinner/Spinner';
 import {
   Box,
   Button,
@@ -15,44 +17,49 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useForm } from '../../../hooks';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
+import commonStyles from '../../common/commonStyles.scss';
 
 function License() {
-  const [licenseInfo, setLicenseInfo] = useState({
-    owner: '',
-    type: '',
-    endDate: '',
-    fixedFee: '',
-    supplyFee: '',
-    demandFee: '',
-  });
+  const { data, error, isLoading, refetch } = useGetLicenseDataQuery();
+  const [setExistingLicense, { isLoading: setLicenseLoading }] = useSetExistingLicenseMutation();
+  const [LicenseData, setLicenseData] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const form = useForm({
     initialFields: {
-      licenseKey: '',
+      LicenseKey: '',
     },
     validation: {
-      licenseKey: ['licenseKey'],
+      LicenseKey: ['required', 'licenseKey'],
     },
   });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  //TODO: Add service to get license info
   useEffect(() => {
-    setLicenseInfo({
-      owner: 'Owner',
-      type: 'COM',
-      endDate: 'dd-mm-yyyy',
-      fixedFee: 0,
-      supplyFee: 1,
-      demandFee: 1,
-    });
-  }, []);
+    if (data?.data) {
+      setLicenseData(data.data.LicenseData);
+    }
+    if (error) {
+      createErrorNotification(error);
+    }
+  }, [data, error]);
 
-  //TODO: Add service to get license
-  const handleGetLicenseClick = () => {
-    console.log('handleGetLicenseClick');
+  const toggleEditMode = () => {
+    setEditMode((prevState) => !prevState);
+    form.resetForm();
+  };
+
+  const handleGetLicenseClick = async () => {
+    const body = { LicenseKey: form.fields.LicenseKey };
+    try {
+      await setExistingLicense(body).unwrap();
+      createSuccessNotification();
+      toggleEditMode();
+      refetch();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -61,49 +68,50 @@ function License() {
         <CardHeader
           title="License"
           subheaderTypographyProps={{ color: 'error' }}
-          //TODO: Add condition to display license error communicate
-          subheader={!editMode && 'No license. Configure an open-source license'}
+          subheader={!isLoading && error && 'No license. Configure an open-source license'}
         />
-        <IconButton type="button" onClick={() => setEditMode(!editMode)}>
+        <IconButton type="button" onClick={toggleEditMode}>
           {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
         </IconButton>
       </Box>
 
       <Collapse in={!editMode} timeout="auto">
         <CardContent sx={{ width: '50%', marginLeft: 'auto', marginRight: 'auto' }}>
-          <Table>
-            <TableBody>
-              <TableRow>
-                <TableCell align="left">License owner</TableCell>
+          {isLoading && <Spinner />}
+          {LicenseData && (
+            <Table>
+              <TableBody>
+                <TableRow>
+                  <TableCell align="left">License owner</TableCell>
 
-                <TableCell align="left">{licenseInfo.owner}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="left">License type</TableCell>
-                <TableCell align="left">{licenseInfo.type}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="left">License will expire</TableCell>
-                <TableCell align="left">
-                  {/*TODO: Add condition to change warning color*/}
-                  <Typography variant="body2" color="warning.light">
-                    {licenseInfo.endDate}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="left">Fixed fee</TableCell>
-                <TableCell align="left">{licenseInfo.fixedFee} ADS</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="left">Supply fee / Demand fee</TableCell>
+                  <TableCell align="left">{LicenseData.Owner}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="left">License type</TableCell>
+                  <TableCell align="left">{LicenseData.Type}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="left">License will expire</TableCell>
+                  <TableCell align="left">
+                    <Typography variant="body2" color="warning.light">
+                      {new Date(LicenseData.DateEnd).toLocaleDateString()}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="left">Fixed fee</TableCell>
+                  <TableCell align="left">{LicenseData.FixedFee} ADS</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="left">Supply fee / Demand fee</TableCell>
 
-                <TableCell align="left">
-                  {licenseInfo.supplyFee}% / {licenseInfo.demandFee}%
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+                  <TableCell align="left">
+                    {LicenseData.SupplyFee * 100}% / {LicenseData.DemandFee * 100}%
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Collapse>
 
@@ -117,30 +125,20 @@ function License() {
           >
             <Box sx={{ mr: 1 }} className={`${commonStyles.halfCard}`}>
               <TextField
-                error={form.touchedFields.licenseKey && !form.errorObj.licenseKey.isValid}
-                helperText={form.touchedFields.licenseKey && form.errorObj.licenseKey.helperText}
+                error={form.changedFields.LicenseKey && !form.errorObj.LicenseKey.isValid}
+                helperText={form.changedFields.LicenseKey && form.errorObj.LicenseKey.helperText}
                 placeholder="XXX-xxxxxx-xxxxx-xxxxx-xxxx-xxxx"
                 size="small"
-                name="licenseKey"
+                name="LicenseKey"
                 label="Your license key"
-                value={form.fields.licenseKey}
+                value={form.fields.LicenseKey}
                 type="text"
                 fullWidth
                 inputProps={{ autoComplete: 'off' }}
               />
             </Box>
-            <Button
-              disabled={!form.isFormValid || !form.fields.licenseKey}
-              type="button"
-              variant="contained"
-              onClick={handleGetLicenseClick}
-            >
+            <Button disabled={!form.isFormValid || setLicenseLoading} type="button" variant="contained" onClick={handleGetLicenseClick}>
               Get license
-            </Button>
-          </Box>
-          <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-            <Button variant="contained" type="button">
-              Save
             </Button>
           </Box>
         </CardContent>

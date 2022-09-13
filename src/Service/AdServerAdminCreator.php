@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class AdServerAdminCreator
 {
-    public function __construct(private readonly string $adserverHomeDirectory)
+    public function __construct(private readonly string $adServerHomeDirectory)
     {
     }
 
@@ -15,7 +15,7 @@ class AdServerAdminCreator
     {
         $process = new Process(
             ['php', 'artisan', 'ops:admin:create', '--password', $password],
-            $this->adserverHomeDirectory,
+            $this->adServerHomeDirectory,
             null,
             $email,
             5

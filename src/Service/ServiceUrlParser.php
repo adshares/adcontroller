@@ -2,9 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Enum\AdPanelConfig;
-use App\Entity\Enum\AdServerConfig;
-use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\GeneralConfig;
 
 class ServiceUrlParser

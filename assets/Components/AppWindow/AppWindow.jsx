@@ -10,6 +10,7 @@ const StyledSnackbarProvider = styled(SnackbarProvider)`
   &.SnackbarContent-root {
     display: flex;
     flex-wrap: nowrap;
+    justify-content: space-between;
     & .SnackbarItem-message {
       text-align: justify;
     }

@@ -1,11 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { returnNumber } from '../utils/helpers';
 import { validateAddress } from '@adshares/ads';
-import useSkipFirstRenderEffect from './useSkipFirstRenderEffect';
 
 const testRequired = (value) => ({
   isValid: !!value,
   helperText: !!value ? '' : 'Required field',
 });
+
+const testUrl = (value) => {
+  const isValid = new RegExp(
+    '^(https?:\\/\\/)' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))', // OR ip (v4) address
+    'i',
+  ).test(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Field must be valid URL',
+  };
+};
 
 const testDomain = (value) => {
   const isValid = new RegExp(
@@ -60,6 +73,14 @@ const testInteger = (value) => {
   };
 };
 
+const testNumber = (value) => {
+  const isValid = !isNaN(returnNumber(value));
+  return {
+    isValid: isValid,
+    helperText: isValid ? '' : 'Field must be valid number',
+  };
+};
+
 export default function useForm(options) {
   const [fields, setFields] = useState(options.initialFields);
   const [touchedFields, setTouchedFields] = useState(
@@ -68,9 +89,13 @@ export default function useForm(options) {
   const [errorObj, setErrorObj] = useState(
     Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: { isValid: true, helperText: '' } }), {}),
   );
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [changedFields, setChangedFields] = useState(
+    Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}),
+  );
+  const [isFormValid, setIsFormValid] = useState(true);
+  const [isFormWasChanged, setIsFormWasChanged] = useState(false);
 
-  useSkipFirstRenderEffect(() => {
+  useEffect(() => {
     let result = {};
     Object.keys(fields).forEach((name) => {
       result = { ...result, ...validate(name, fields[name]) };
@@ -78,9 +103,23 @@ export default function useForm(options) {
     setErrorObj(result);
   }, [fields, touchedFields]);
 
-  useSkipFirstRenderEffect(() => {
+  useEffect(() => {
     setIsFormValid(Object.keys(errorObj).every((field) => errorObj[field].isValid));
   }, [errorObj]);
+
+  useEffect(() => {
+    setIsFormWasChanged(
+      Object.keys(options.initialFields).some((field) => fields[field].toString() !== options.initialFields[field].toString()),
+    );
+  }, [options.initialFields]);
+
+  useEffect(() => {
+    let result = {};
+    Object.keys(options.initialFields).forEach((field) => {
+      result[field] = options.initialFields[field] !== fields[field];
+    });
+    setChangedFields(result);
+  }, [fields, isFormWasChanged]);
 
   const setTouched = (e) => {
     setTouchedFields((prevState) => ({ ...prevState, [e.target.name]: true }));
@@ -90,8 +129,13 @@ export default function useForm(options) {
     const { name, value } = e.target;
     setFields({
       ...fields,
-      [name]: value,
+      [name]: value.toString(),
     });
+  };
+
+  const resetForm = () => {
+    setFields(options.initialFields);
+    setTouchedFields(Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}));
   };
 
   const validate = (targetName, targetValue) => {
@@ -112,6 +156,9 @@ export default function useForm(options) {
         case 'domain':
           return value ? testDomain(value) : validValueResult;
 
+        case 'url':
+          return value ? testUrl(value) : validValueResult;
+
         case 'wallet':
           return value ? testWallet(value) : validValueResult;
 
@@ -123,6 +170,9 @@ export default function useForm(options) {
 
         case 'integer':
           return value ? testInteger(value) : validValueResult;
+
+        case 'number':
+          return value ? testNumber(value) : validValueResult;
 
         default:
           return validValueResult;
@@ -150,5 +200,8 @@ export default function useForm(options) {
     onChange,
     setTouched,
     touchedFields,
+    resetForm,
+    isFormWasChanged,
+    changedFields,
   };
 }

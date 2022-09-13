@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Exception\ServiceNotPresent;
@@ -16,6 +17,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AdServerConfigurationClient
 {
+    // Config
     public const ADPANEL_URL = 'adpanel-url';
     private const ADPAY_BID_STRATEGY_EXPORT_TIME = 'adpay-bid-strategy-export';
     private const ADPAY_CAMPAIGN_EXPORT_TIME = 'adpay-campaign-export';
@@ -38,21 +40,22 @@ class AdServerConfigurationClient
     private const ADUSER_INFO_URL = 'aduser-info-url';
     public const ADUSER_INTERNAL_URL = 'aduser-internal-url';
     private const ADUSER_SERVE_SUBDOMAIN = 'aduser-serve-subdomain';
-    private const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
-    private const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
-    private const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
-    private const AUTO_WITHDRAWAL_LIMIT_ADS = 'auto-withdrawal-limit-ads';
-    private const AUTO_WITHDRAWAL_LIMIT_BSC = 'auto-withdrawal-limit-bsc';
-    private const AUTO_WITHDRAWAL_LIMIT_BTC = 'auto-withdrawal-limit-btc';
-    private const AUTO_WITHDRAWAL_LIMIT_ETH = 'auto-withdrawal-limit-eth';
+    private const ADVERTISER_APPLY_FORM_URL = 'advertiser-apply-form-url';
+    public const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
+    public const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
+    public const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
+    public const AUTO_WITHDRAWAL_LIMIT_ADS = 'auto-withdrawal-limit-ads';
+    public const AUTO_WITHDRAWAL_LIMIT_BSC = 'auto-withdrawal-limit-bsc';
+    public const AUTO_WITHDRAWAL_LIMIT_BTC = 'auto-withdrawal-limit-btc';
+    public const AUTO_WITHDRAWAL_LIMIT_ETH = 'auto-withdrawal-limit-eth';
     private const BANNER_FORCE_HTTPS = 'banner-force-https';
     private const BTC_WITHDRAW = 'btc-withdraw';
     private const BTC_WITHDRAW_FEE = 'btc-withdraw-fee';
     private const BTC_WITHDRAW_MAX_AMOUNT = 'btc-withdraw-max-amount';
     private const BTC_WITHDRAW_MIN_AMOUNT = 'btc-withdraw-min-amount';
-    private const CAMPAIGN_MIN_BUDGET = 'campaign-min-budget';
-    private const CAMPAIGN_MIN_CPA = 'campaign-min-cpa';
-    private const CAMPAIGN_MIN_CPM = 'campaign-min-cpm';
+    public const CAMPAIGN_MIN_BUDGET = 'campaign-min-budget';
+    public const CAMPAIGN_MIN_CPA = 'campaign-min-cpa';
+    public const CAMPAIGN_MIN_CPM = 'campaign-min-cpm';
     private const CAMPAIGN_TARGETING_EXCLUDE = 'campaign-targeting-exclude';
     private const CAMPAIGN_TARGETING_REQUIRE = 'campaign-targeting-require';
     private const CDN_PROVIDER = 'cdn-provider';
@@ -62,23 +65,25 @@ class AdServerConfigurationClient
     public const CLASSIFIER_EXTERNAL_BASE_URL = 'classifier-external-base-url';
     private const CLASSIFIER_EXTERNAL_NAME = 'classifier-external-name';
     private const CLASSIFIER_EXTERNAL_PUBLIC_KEY = 'classifier-external-public-key';
-    private const COLD_WALLET_ADDRESS = 'cold-wallet-address';
-    private const COLD_WALLET_IS_ACTIVE = 'cold-wallet-is-active';
-    private const CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED = 'crm-mail-address-on-campaign-created';
-    private const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crm-mail-address-on-site-added';
-    private const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
-    private const EMAIL_VERIFICATION_REQUIRED = 'email-verification-required';
+    public const COLD_WALLET_ADDRESS = 'cold-wallet-address';
+    public const COLD_WALLET_IS_ACTIVE = 'cold-wallet-is-active';
+    public const CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED = 'crm-mail-address-on-campaign-created';
+    public const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crm-mail-address-on-site-added';
+    public const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
+    private const CURRENCY = 'currency';
+    private const DISPLAY_CURRENCY = 'display-currency';
+    public const EMAIL_VERIFICATION_REQUIRED = 'email-verification-required';
     private const EXCHANGE_API_KEY = 'exchange-api-key';
     private const EXCHANGE_API_SECRET = 'exchange-api-secret';
     private const EXCHANGE_API_URL = 'exchange-api-url';
     private const EXCHANGE_CURRENCIES = 'exchange-currencies';
     private const FIAT_DEPOSIT_MAX_AMOUNT = 'fiat-deposit-max-amount';
     private const FIAT_DEPOSIT_MIN_AMOUNT = 'fiat-deposit-min-amount';
-    private const HOT_WALLET_MAX_VALUE = 'hotwallet-max-value';
-    private const HOT_WALLET_MIN_VALUE = 'hotwallet-min-value';
-    private const INVENTORY_EXPORT_WHITELIST = 'inventory-export-whitelist';
-    private const INVENTORY_IMPORT_WHITELIST = 'inventory-import-whitelist';
-    private const INVENTORY_WHITELIST = 'inventory-whitelist';
+    public const HOT_WALLET_MAX_VALUE = 'hotwallet-max-value';
+    public const HOT_WALLET_MIN_VALUE = 'hotwallet-min-value';
+    public const INVENTORY_EXPORT_WHITELIST = 'inventory-export-whitelist';
+    public const INVENTORY_IMPORT_WHITELIST = 'inventory-import-whitelist';
+    public const INVENTORY_WHITELIST = 'inventory-whitelist';
     private const INVOICE_CURRENCIES = 'invoice-currencies';
     private const INVOICE_COMPANY_ADDRESS = 'invoice-company-address';
     private const INVOICE_COMPANY_BANK_ACCOUNTS = 'invoice-company-bank-accounts';
@@ -100,7 +105,7 @@ class AdServerConfigurationClient
     public const MAIL_SMTP_USERNAME = 'mail-smtp-username';
     private const MAIN_JS_BASE_URL = 'main-js-base-url';
     private const MAIN_JS_TLD = 'main-js-tld';
-    private const MAX_PAGE_ZONES = 'max-page-zones';
+    public const MAX_PAGE_ZONES = 'max-page-zones';
     private const NETWORK_DATA_CACHE_TTL = 'network_data_cache-ttl';
     private const NOW_PAYMENTS_API_KEY = 'now-payments-api-key';
     private const NOW_PAYMENTS_CURRENCY = 'now-payments-currency';
@@ -111,81 +116,143 @@ class AdServerConfigurationClient
     private const NOW_PAYMENTS_MIN_AMOUNT = 'now-payments-min-amount';
     private const PANEL_PLACEHOLDER_NOTIFICATION_TIME = 'panel-placeholder-notification-time';
     private const PANEL_PLACEHOLDER_UPDATE_TIME = 'panel-placeholder-update-time';
-    private const REFERRAL_REFUND_ENABLED = 'referral-refund-enabled';
-    private const REFERRAL_REFUND_COMMISSION = 'referral-refund-commission';
-    private const REGISTRATION_MODE = 'registration-mode';
-    private const OPERATOR_RX_FEE = 'payment-rx-fee';
-    private const OPERATOR_TX_FEE = 'payment-tx-fee';
+    private const PUBLISHER_APPLY_FORM_URL = 'publisher-apply-form-url';
+    public const REFERRAL_REFUND_COMMISSION = 'referral-refund-commission';
+    public const REFERRAL_REFUND_ENABLED = 'referral-refund-enabled';
+    public const REGISTRATION_MODE = 'registration-mode';
+    private const REGISTRATION_USER_TYPES = 'registration-user-types';
+    public const OPERATOR_RX_FEE = 'payment-rx-fee';
+    public const OPERATOR_TX_FEE = 'payment-tx-fee';
     private const OPERATOR_WALLET_EMAIL_LAST_TIME = 'operator-wallet-transfer-email-time';
     private const SERVE_BASE_URL = 'serve-base-url';
-    private const SITE_ACCEPT_BANNERS_MANUALLY = 'site-accept-banners-manually';
-    private const SITE_CLASSIFIER_LOCAL_BANNERS = 'site-classifier-local-banners';
+    public const SITE_ACCEPT_BANNERS_MANUALLY = 'site-accept-banners-manually';
+    public const SITE_CLASSIFIER_LOCAL_BANNERS = 'site-classifier-local-banners';
     private const SITE_FILTERING_EXCLUDE = 'site-filtering-exclude';
     private const SITE_FILTERING_REQUIRE = 'site-filtering-require';
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'site-verification-time-threshold';
+    public const SUPPORT_CHAT = 'support-chat';
     public const SUPPORT_EMAIL = 'support-email';
+    public const SUPPORT_TELEGRAM = 'support-telegram';
     private const SKYNET_API_KEY = 'skynet-api-key';
     private const SKYNET_API_URL = 'skynet-api-url';
     private const SKYNET_CDN_URL = 'skynet-cdn-url';
     public const TECHNICAL_EMAIL = 'technical-email';
-    private const UPLOAD_LIMIT_IMAGE = 'upload-limit-image';
-    private const UPLOAD_LIMIT_MODEL = 'upload-limit-model';
-    private const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
-    private const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
+    public const UPLOAD_LIMIT_IMAGE = 'upload-limit-image';
+    public const UPLOAD_LIMIT_MODEL = 'upload-limit-model';
+    public const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
+    public const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
     public const URL = 'url';
+    // PanelPlaceholder
+    public const PLACEHOLDER_INDEX_DESCRIPTION = 'index-description';
+    public const PLACEHOLDER_INDEX_KEYWORDS = 'index-keywords';
+    public const PLACEHOLDER_INDEX_META_TAGS = 'index-meta-tags';
+    public const PLACEHOLDER_INDEX_TITLE = 'index-title';
+    public const PLACEHOLDER_ROBOTS_TXT = 'robots-txt';
+    public const PLACEHOLDER_PRIVACY_POLICY = 'privacy-policy';
+    public const PLACEHOLDER_TERMS = 'terms';
+    // SiteRejectedDomain
+    public const REJECTED_DOMAINS = 'rejected-domains';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly string $adserverBaseUri
+        private readonly string $adServerBaseUri
     ) {
     }
 
     public function fetch(): array
     {
-        $response = $this->httpClient->request(
-            'GET',
-            $this->buildUri(),
-            [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getToken(),
-                ],
-            ]
-        );
-
-        $this->checkStatusCode($response);
-
-        return json_decode($response->getContent(), true);
+        return $this->getData($this->buildConfigUri());
     }
 
-    public function store(array $data): void
+    public function fetchMonitoringData(string $resource): array
     {
-        $mapped = $this->mapDataToAdServerFormat($data);
-        $this->sendData($mapped);
+        return $this->getData($this->buildMonitoringUri($resource));
     }
 
-    private function buildUri(): string
+    public function fetchPlaceholders(): array
     {
-        return sprintf('%s/api/config', $this->adserverBaseUri);
+        return $this->getData($this->buildPlaceholdersUri());
     }
 
-    private function getToken(): string
+    public function store(array $data): array
     {
-        return $this->tokenStorage->getToken()->getCredentials();
+        return $this->patchData($this->buildConfigUri(), self::mapDataToAdServerFormat($data));
     }
 
-    private function mapDataToAdServerFormat(array $data): array
+    public function storePlaceholders(array $data): array
+    {
+        return $this->patchData($this->buildPlaceholdersUri(), self::mapPlaceholderDataToAdServerFormat($data));
+    }
+
+    private function buildConfigUri(): string
+    {
+        return sprintf('%s/api/config', $this->adServerBaseUri);
+    }
+
+    private function buildMonitoringUri(string $resource): string
+    {
+        return sprintf('%s/api/monitoring/%s', $this->adServerBaseUri, $resource);
+    }
+
+    private function buildPlaceholdersUri(): string
+    {
+        return sprintf('%s/api/config/placeholders', $this->adServerBaseUri);
+    }
+
+    private function getAuthorizationHeader(): string
+    {
+        return 'Bearer ' . $this->tokenStorage->getToken()->getCredentials();
+    }
+
+    private static function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
+            AdServerConfig::AllowZoneInIframe->name => self::ALLOW_ZONE_IN_IFRAME,
+            AdServerConfig::AutoConfirmationEnabled->name => self::AUTO_CONFIRMATION_ENABLED,
+            AdServerConfig::AutoRegistrationEnabled->name => self::AUTO_REGISTRATION_ENABLED,
+            AdServerConfig::AutoWithdrawalLimitAds->name => self::AUTO_WITHDRAWAL_LIMIT_ADS,
+            AdServerConfig::AutoWithdrawalLimitBsc->name => self::AUTO_WITHDRAWAL_LIMIT_BSC,
+            AdServerConfig::AutoWithdrawalLimitBtc->name => self::AUTO_WITHDRAWAL_LIMIT_BTC,
+            AdServerConfig::AutoWithdrawalLimitEth->name => self::AUTO_WITHDRAWAL_LIMIT_ETH,
+            AdServerConfig::CampaignMinBudget->name => self::CAMPAIGN_MIN_BUDGET,
+            AdServerConfig::CampaignMinCpa->name => self::CAMPAIGN_MIN_CPA,
+            AdServerConfig::CampaignMinCpm->name => self::CAMPAIGN_MIN_CPM,
+            AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
+            AdServerConfig::ColdWalletIsActive->name => self::COLD_WALLET_IS_ACTIVE,
+            AdServerConfig::CrmMailAddressOnCampaignCreated->name => self::CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED,
+            AdServerConfig::CrmMailAddressOnSiteAdded->name => self::CRM_MAIL_ADDRESS_ON_SITE_ADDED,
+            AdServerConfig::CrmMailAddressOnUserRegistered->name => self::CRM_MAIL_ADDRESS_ON_USER_REGISTERED,
+            AdServerConfig::EmailVerificationRequired->name => self::EMAIL_VERIFICATION_REQUIRED,
+            AdServerConfig::HotWalletMaxValue->name => self::HOT_WALLET_MAX_VALUE,
+            AdServerConfig::HotWalletMinValue->name => self::HOT_WALLET_MIN_VALUE,
+            AdServerConfig::InventoryExportWhitelist->name => self::INVENTORY_EXPORT_WHITELIST,
+            AdServerConfig::InventoryImportWhitelist->name => self::INVENTORY_IMPORT_WHITELIST,
+            AdServerConfig::InventoryWhitelist->name => self::INVENTORY_WHITELIST,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
             AdServerConfig::Name->name => self::ADSERVER_NAME,
+            AdServerConfig::MaxPageZones->name => self::MAX_PAGE_ZONES,
+            AdServerConfig::OperatorRxFee->name => self::OPERATOR_RX_FEE,
+            AdServerConfig::OperatorTxFee->name => self::OPERATOR_TX_FEE,
+            AdServerConfig::ReferralRefundCommission->name => self::REFERRAL_REFUND_COMMISSION,
+            AdServerConfig::ReferralRefundEnabled->name => self::REFERRAL_REFUND_ENABLED,
+            AdServerConfig::RegistrationMode->name => self::REGISTRATION_MODE,
+            AdServerConfig::RejectedDomains->name => self::REJECTED_DOMAINS,
+            AdServerConfig::SiteAcceptBannersManually->name => self::SITE_ACCEPT_BANNERS_MANUALLY,
+            AdServerConfig::SiteClassifierLocalBanners->name => self::SITE_CLASSIFIER_LOCAL_BANNERS,
+            AdServerConfig::UploadLimitImage->name => self::UPLOAD_LIMIT_IMAGE,
+            AdServerConfig::UploadLimitModel->name => self::UPLOAD_LIMIT_MODEL,
+            AdServerConfig::UploadLimitVideo->name => self::UPLOAD_LIMIT_VIDEO,
+            AdServerConfig::UploadLimitZip->name => self::UPLOAD_LIMIT_ZIP,
             AdServerConfig::Url->name => self::URL,
             AdServerConfig::WalletAddress->name => self::ADSHARES_ADDRESS,
             AdServerConfig::WalletNodeHost->name => self::ADSHARES_NODE_HOST,
             AdServerConfig::WalletNodePort->name => self::ADSHARES_NODE_PORT,
             AdServerConfig::WalletSecretKey->name => self::ADSHARES_SECRET,
+            GeneralConfig::SupportChat->name => self::SUPPORT_CHAT,
             GeneralConfig::SupportEmail->name => self::SUPPORT_EMAIL,
+            GeneralConfig::SupportTelegram->name => self::SUPPORT_TELEGRAM,
             GeneralConfig::TechnicalEmail->name => self::TECHNICAL_EMAIL,
             GeneralConfig::SmtpHost->name => self::MAIL_SMTP_HOST,
             GeneralConfig::SmtpPassword->name => self::MAIL_SMTP_PASSWORD,
@@ -200,7 +267,33 @@ class AdServerConfigurationClient
                 if (is_bool($value)) {
                     $value = $value ? '1' : '0';
                 }
-                $mappedData[$keyMap[$key]] = (string)$value;
+                $mappedData[$keyMap[$key]] = null !== $value ? (string)$value : null;
+            }
+        }
+
+        if (!$mappedData) {
+            throw new InvalidArgumentException('No data to store');
+        }
+
+        return $mappedData;
+    }
+
+    private static function mapPlaceholderDataToAdServerFormat(array $data): array
+    {
+        $keyMap = [
+            AdPanelConfig::PlaceholderIndexDescription->name => self::PLACEHOLDER_INDEX_DESCRIPTION,
+            AdPanelConfig::PlaceholderIndexKeywords->name => self::PLACEHOLDER_INDEX_KEYWORDS,
+            AdPanelConfig::PlaceholderIndexMetaTags->name => self::PLACEHOLDER_INDEX_META_TAGS,
+            AdPanelConfig::PlaceholderIndexTitle->name => self::PLACEHOLDER_INDEX_TITLE,
+            AdPanelConfig::PlaceholderRobotsTxt->name => self::PLACEHOLDER_ROBOTS_TXT,
+            AdServerConfig::PrivacyPolicy->name => self::PLACEHOLDER_PRIVACY_POLICY,
+            AdServerConfig::Terms->name => self::PLACEHOLDER_TERMS,
+        ];
+
+        $mappedData = [];
+        foreach ($data as $key => $value) {
+            if (isset($keyMap[$key])) {
+                $mappedData[$keyMap[$key]] = null !== $value ? (string)$value : null;
             }
         }
 
@@ -233,7 +326,8 @@ class AdServerConfigurationClient
 
     public function setupAdClassify(string $adClassifyUrl, string $apiKeyName, string $apiKeySecret): void
     {
-        $this->sendData(
+        $this->patchData(
+            $this->buildConfigUri(),
             [
                 self::CLASSIFIER_EXTERNAL_API_KEY_NAME => $apiKeyName,
                 self::CLASSIFIER_EXTERNAL_API_KEY_SECRET => $apiKeySecret,
@@ -244,22 +338,23 @@ class AdServerConfigurationClient
 
     public function setupAdPanel(string $adPanelUrl): void
     {
-        $this->sendData([self::ADPANEL_URL => $adPanelUrl]);
+        $this->patchData($this->buildConfigUri(), [self::ADPANEL_URL => $adPanelUrl]);
     }
 
     public function setupAdPay(string $adPayUrl): void
     {
-        $this->sendData([self::ADPAY_URL => $adPayUrl]);
+        $this->patchData($this->buildConfigUri(), [self::ADPAY_URL => $adPayUrl]);
     }
 
     public function setupAdSelect(string $adSelectUrl): void
     {
-        $this->sendData([self::ADSELECT_URL => $adSelectUrl]);
+        $this->patchData($this->buildConfigUri(), [self::ADSELECT_URL => $adSelectUrl]);
     }
 
     public function setupAdUser(string $adUserUrl, string $adUserInternalUrl): void
     {
-        $this->sendData(
+        $this->patchData(
+            $this->buildConfigUri(),
             [
                 self::ADUSER_BASE_URL => $adUserUrl,
                 self::ADUSER_INTERNAL_URL => $adUserInternalUrl,
@@ -267,19 +362,36 @@ class AdServerConfigurationClient
         );
     }
 
-    private function sendData(array $data): void
+    private function getData(string $url): mixed
+    {
+        $response = $this->httpClient->request(
+            'GET',
+            $url,
+            [
+                'headers' => [
+                    'Authorization' => $this->getAuthorizationHeader(),
+                ],
+            ]
+        );
+        $this->checkStatusCode($response);
+
+        return json_decode($response->getContent(), true);
+    }
+
+    private function patchData(string $url, array $data): array
     {
         $response = $this->httpClient->request(
             'PATCH',
-            $this->buildUri(),
+            $url,
             [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getToken(),
+                    'Authorization' => $this->getAuthorizationHeader(),
                 ],
                 'json' => $data
             ]
         );
-
         $this->checkStatusCode($response);
+
+        return json_decode($response->getContent(), true);
     }
 }

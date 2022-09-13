@@ -17,7 +17,8 @@ class EnvEditorFactory
 
     public function createEnvEditor(Module $module): EnvEditor
     {
-        $envReloader = match($module) {
+        $envReloader = match ($module) {
+            Module::AdPanel => new DummyEnvReloader(),
             Module::AdServer => new LaravelEnvReloader($this->servicePresenceChecker->getHomeDirectory($module)),
             default => throw new RuntimeException('Unsupported module'),
         };

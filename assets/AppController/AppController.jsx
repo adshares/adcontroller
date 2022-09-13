@@ -4,6 +4,8 @@ import { Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAppAuth } from '../redux/auth/authSlice';
 import authSelectors from '../redux/auth/authSelectors';
+import { useGetAppConfigQuery } from '../redux/config/configApi';
+import { skipToken } from '@reduxjs/toolkit/query';
 import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
 import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
@@ -149,6 +151,7 @@ function AppController() {
   const [isLoading, setIsLoading] = useState(true);
   const [showSideMenu, toggleSideMenu] = useState(true);
   const pages = getAppPages(appModules, isLoggedIn);
+  const { isLoading: isAppDataLoading } = useGetAppConfigQuery(token ?? skipToken);
 
   useEffect(() => {
     dispatch(checkAppAuth());
@@ -156,7 +159,8 @@ function AppController() {
   }, [token]);
 
   return (
-    !isLoading && (
+    !isLoading &&
+    !isAppDataLoading && (
       <>
         <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
         <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
@@ -166,7 +170,7 @@ function AppController() {
               <Route
                 path="login"
                 element={
-                  <PublicRoute restricted isLoggedIn={isLoggedIn} redirectTo="/">
+                  <PublicRoute restricted isLoggedIn={isLoggedIn} redirectTo="/base">
                     <Login />
                   </PublicRoute>
                 }
@@ -175,7 +179,7 @@ function AppController() {
               {pages}
 
               <Route path="*" element={<NotFoundView />} />
-              <Route path="/steps/*" element={<Navigate to="/" />} />
+              <Route path="/steps/*" element={<Navigate to="/base" />} />
             </Routes>
           </AppWindow>
         </Box>
