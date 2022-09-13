@@ -1,4 +1,19 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import configSelectors from '../../../redux/config/configSelectors';
+import { useCreateNotification, useForm } from '../../../hooks';
+import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../../utils/helpers';
+import {
+  useSetBannerSettingsConfigMutation,
+  useSetCampaignSettingsConfigMutation,
+  useSetRejectedDomainsSettingsConfigMutation,
+} from '../../../redux/config/configApi';
+import {
+  changeBannerSettingsInformation,
+  changeCampaignSettingsInformation,
+  changeRejectedDomainsInformation,
+} from '../../../redux/config/configSlice';
+import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
 import {
   Box,
   Button,
@@ -7,11 +22,11 @@ import {
   CardContent,
   CardHeader,
   FormControl,
+  FormHelperText,
   InputAdornment,
   InputLabel,
   OutlinedInput,
 } from '@mui/material';
-import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
 import commonStyles from '../../common/commonStyles.scss';
 
 export default function Demand() {
@@ -25,16 +40,38 @@ export default function Demand() {
 }
 
 const CampaignSettingsCard = () => {
-  const [campaignMinBudget, setCampaignMinBudget] = useState(0);
-  const [campaignMinCpa, setCampaignMinCpa] = useState(0);
-  const [campaignMinCpm, setCampaignMinCpm] = useState(0);
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setCampaignSettingsConfig, { isLoading }] = useSetCampaignSettingsConfigMutation();
+  const form = useForm({
+    initialFields: {
+      CampaignMinBudget: clicksToAds(appData.AdServer.CampaignMinBudget || 0).toString(),
+      CampaignMinCpa: clicksToAds(appData.AdServer.CampaignMinCpa || 0).toString(),
+      CampaignMinCpm: clicksToAds(appData.AdServer.CampaignMinCpm || 0).toString(),
+    },
+    validation: {
+      CampaignMinBudget: ['number'],
+      CampaignMinCpa: ['number'],
+      CampaignMinCpm: ['number'],
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log({
-      campaignMinBudget,
-      campaignMinCpa,
-      campaignMinCpm,
+  const onSaveClick = async () => {
+    const body = {};
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = adsToClicks(returnNumber(form.fields[field]));
+      }
     });
+
+    try {
+      const response = await setCampaignSettingsConfig(body).unwrap();
+      dispatch(changeCampaignSettingsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -42,52 +79,68 @@ const CampaignSettingsCard = () => {
       <CardHeader title="Campaign settings" subheader="lorem ipsum dolor sit amet" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="campaignMinBudget">Minimal campaign budget</InputLabel>
+        <Box
+          component="form"
+          onChange={form.onChange}
+          onFocus={form.setTouched}
+          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
+        >
+          <FormControl error={form.touchedFields.CampaignMinBudget && !form.errorObj.CampaignMinBudget.isValid} margin="dense">
+            <InputLabel htmlFor="CampaignMinBudget">Minimal campaign budget</InputLabel>
             <OutlinedInput
-              id="campaignMinBudget"
+              id="CampaignMinBudget"
+              name="CampaignMinBudget"
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="Minimal campaign budget"
-              value={Number(campaignMinBudget).toString()}
-              onChange={(e) => setCampaignMinBudget(Number(e.target.value).toFixed(2))}
+              value={setDecimalPlaces(form.fields.CampaignMinBudget, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="CampaignMinBudget">
+              {form.touchedFields.CampaignMinBudget && form.errorObj.CampaignMinBudget.helperText}
+            </FormHelperText>
           </FormControl>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="campaignMinCpa">Minimal campaign CPA</InputLabel>
+
+          <FormControl error={form.touchedFields.CampaignMinCpa && !form.errorObj.CampaignMinCpa.isValid} margin="dense">
+            <InputLabel htmlFor="CampaignMinCpa">Minimal campaign CPA</InputLabel>
             <OutlinedInput
-              id="campaignMinCpa"
+              id="CampaignMinCpa"
+              name="CampaignMinCpa"
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="Minimal campaign CPA"
-              value={Number(campaignMinCpa).toString()}
-              onChange={(e) => setCampaignMinCpa(Number(e.target.value).toFixed(2))}
+              value={setDecimalPlaces(form.fields.CampaignMinCpa, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="CampaignMinCpa">
+              {form.touchedFields.CampaignMinCpa && form.errorObj.CampaignMinCpa.helperText}
+            </FormHelperText>
           </FormControl>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="campaignMinCpm">Minimal campaign CPM</InputLabel>
+
+          <FormControl error={form.touchedFields.CampaignMinCpm && !form.errorObj.CampaignMinCpm.isValid} margin="dense">
+            <InputLabel htmlFor="CampaignMinCpm">Minimal campaign CPM</InputLabel>
             <OutlinedInput
-              id="campaignMinCpm"
+              id="CampaignMinCpm"
+              name="CampaignMinCpm"
               size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="Minimal campaign CPM"
-              value={Number(campaignMinCpm).toString()}
-              onChange={(e) => setCampaignMinCpm(Number(e.target.value).toFixed(2))}
+              value={setDecimalPlaces(form.fields.CampaignMinCpm, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="CampaignMinCpm">
+              {form.touchedFields.CampaignMinCpm && form.errorObj.CampaignMinCpm.helperText}
+            </FormHelperText>
           </FormControl>
         </Box>
       </CardContent>
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>
@@ -97,18 +150,40 @@ const CampaignSettingsCard = () => {
 };
 
 const BannerSettingsCard = () => {
-  const [uploadLimitImage, setUploadLimitImage] = useState(0);
-  const [uploadLimitModel, setUploadLimitModel] = useState(0);
-  const [uploadLimitVideo, setUploadLimitVideo] = useState(0);
-  const [uploadLimitHtml, setUploadLimitHtml] = useState(0);
+  const appData = useSelector(configSelectors.getAppData);
+  const [setBannerSettingsConfig, { isLoading }] = useSetBannerSettingsConfigMutation();
+  const dispatch = useDispatch();
+  const form = useForm({
+    initialFields: {
+      UploadLimitImage: appData.AdServer.UploadLimitImage / 1024 || 0,
+      UploadLimitModel: appData.AdServer.UploadLimitModel / 1024 || 0,
+      UploadLimitVideo: appData.AdServer.UploadLimitVideo / 1024 || 0,
+      UploadLimitZip: appData.AdServer.UploadLimitZip / 1024 || 0,
+    },
+    validation: {
+      UploadLimitImage: ['number'],
+      UploadLimitModel: ['number'],
+      UploadLimitVideo: ['number'],
+      UploadLimitZip: ['number'],
+    },
+  });
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log({
-      uploadLimitImage,
-      uploadLimitModel,
-      uploadLimitVideo,
-      uploadLimitHtml,
+  const onSaveClick = async () => {
+    const body = {};
+    Object.keys(form.changedFields).forEach((field) => {
+      if (form.changedFields[field]) {
+        body[field] = returnNumber(form.fields[field]) * 1024;
+      }
     });
+
+    try {
+      const response = await setBannerSettingsConfig(body).unwrap();
+      dispatch(changeBannerSettingsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
   return (
@@ -116,68 +191,85 @@ const BannerSettingsCard = () => {
       <CardHeader title="Banner settings" subheader="lorem ipsum dolor sit amet" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <FormControl margin="dense">
-            <InputLabel htmlFor="uploadLimitImage">Image size limit</InputLabel>
+        <Box
+          component="form"
+          onChange={form.onChange}
+          onFocus={form.setTouched}
+          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
+        >
+          <FormControl error={form.touchedFields.UploadLimitImage && !form.errorObj.UploadLimitImage.isValid} margin="dense">
+            <InputLabel htmlFor="UploadLimitImage">Image size limit</InputLabel>
             <OutlinedInput
-              id="uploadLimitImage"
+              id="UploadLimitImage"
+              name="UploadLimitImage"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
               label="Image size limit"
-              value={Number(uploadLimitImage).toString()}
-              onChange={(e) => setUploadLimitImage(Number(e.target.value).toFixed(2))}
+              value={form.fields.UploadLimitImage}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="UploadLimitImage">
+              {form.touchedFields.UploadLimitImage && form.errorObj.UploadLimitImage.helperText}
+            </FormHelperText>
           </FormControl>
 
-          <FormControl margin="dense">
-            <InputLabel htmlFor="uploadLimitVideo">Video size limit</InputLabel>
+          <FormControl error={form.touchedFields.UploadLimitVideo && !form.errorObj.UploadLimitVideo.isValid} margin="dense">
+            <InputLabel htmlFor="UploadLimitVideo">Video size limit</InputLabel>
             <OutlinedInput
-              id="uploadLimitVideo"
+              id="UploadLimitVideo"
+              name="UploadLimitVideo"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
               label="Video size limit"
-              value={Number(uploadLimitVideo).toString()}
-              onChange={(e) => setUploadLimitVideo(Number(e.target.value).toFixed(2))}
+              value={form.fields.UploadLimitVideo}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="UploadLimitImage">
+              {form.touchedFields.UploadLimitVideo && form.errorObj.UploadLimitVideo.helperText}
+            </FormHelperText>
           </FormControl>
 
-          <FormControl margin="dense">
-            <InputLabel htmlFor="uploadLimitModel">Upload model limit</InputLabel>
+          <FormControl error={form.touchedFields.UploadLimitModel && !form.errorObj.UploadLimitModel.isValid} margin="dense">
+            <InputLabel htmlFor="UploadLimitModel">Upload model limit</InputLabel>
             <OutlinedInput
-              id="uploadLimitModel"
+              id="UploadLimitModel"
+              name="UploadLimitModel"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
               label="Upload model limit"
-              value={Number(uploadLimitModel).toString()}
-              onChange={(e) => setUploadLimitModel(Number(e.target.value).toFixed(2))}
+              value={form.fields.UploadLimitModel}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="UploadLimitImage">
+              {form.touchedFields.UploadLimitModel && form.errorObj.UploadLimitModel.helperText}
+            </FormHelperText>
           </FormControl>
 
           <FormControl margin="dense">
-            <InputLabel htmlFor="uploadLimitHtml">Upload HTML limit</InputLabel>
+            <InputLabel htmlFor="UploadLimitZip">Upload HTML limit</InputLabel>
             <OutlinedInput
-              id="uploadLimitHtml"
+              id="UploadLimitZip"
+              name="UploadLimitZip"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
               label="Upload model limit"
-              value={Number(uploadLimitHtml).toString()}
-              onChange={(e) => setUploadLimitHtml(Number(e.target.value).toFixed(2))}
+              value={form.fields.UploadLimitZip}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
+            <FormHelperText id="UploadLimitZip">
+              {form.touchedFields.UploadLimitZip && form.errorObj.UploadLimitZip.helperText}
+            </FormHelperText>
           </FormControl>
         </Box>
       </CardContent>
 
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button onClick={onSaveClick} variant="contained" type="button">
+          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
             Save
           </Button>
         </Box>
@@ -187,30 +279,51 @@ const BannerSettingsCard = () => {
 };
 
 const RejectedDomainsCard = () => {
-  const [rejectedDomains, setRejectedDomains] = useState([]);
-  const [isFieldsValid, setFieldsValid] = useState(true);
+  const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
+  const [setRejectedDomainsSettings, { isLoading }] = useSetRejectedDomainsSettingsConfigMutation();
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
 
-  const onSaveClick = () => {
-    console.log(rejectedDomains);
-    //TODO: send data
+  const [RejectedDomains, setRejectedDomains] = useState([]);
+  const [isListValid, setListValid] = useState(true);
+  const [isListWasChanged, setListWasChanged] = useState(false);
+
+  const onSaveClick = async () => {
+    const body = {
+      ...(isListWasChanged ? { RejectedDomains: RejectedDomains } : {}),
+    };
+
+    try {
+      const response = await setRejectedDomainsSettings(body).unwrap();
+      dispatch(changeRejectedDomainsInformation(response.data));
+      createSuccessNotification();
+    } catch (err) {
+      createErrorNotification(err);
+    }
   };
 
-  const fieldsHandler = (fields) => {
-    if (fields.length > 0) {
-      setRejectedDomains(fields.map((field) => field.field));
-      setFieldsValid(fields.some((field) => field.isValueValid));
-    }
+  const fieldsHandler = (event) => {
+    const { isValuesValid, isListWasChanged, createdList } = event;
+    setRejectedDomains(createdList);
+    setListValid(createdList.length > 0 ? isValuesValid : true);
+    setListWasChanged(isListWasChanged);
   };
 
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Rejected domains:" subheader="Here you can define domains. All subdomains will be rejected." />
       <CardContent>
-        <ListOfInputs initialList={rejectedDomains} fieldsHandler={fieldsHandler} type="domain" maxHeight="calc(100vh - 22rem)" />
+        <ListOfInputs
+          initialList={appData.AdServer.RejectedDomains}
+          fieldsHandler={fieldsHandler}
+          listName="RejectedDomains"
+          type="domain"
+          maxHeight="calc(100vh - 22rem)"
+        />
       </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={!isFieldsValid} type="button" variant="contained" onClick={onSaveClick}>
+          <Button disabled={isLoading || !isListWasChanged || !isListValid} type="button" variant="contained" onClick={onSaveClick}>
             Save
           </Button>
         </Box>

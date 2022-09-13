@@ -40,7 +40,10 @@ function License() {
     if (data?.data) {
       setLicenseData(data.data.LicenseData);
     }
-  }, [data]);
+    if (error) {
+      createErrorNotification(error);
+    }
+  }, [data, error]);
 
   const toggleEditMode = () => {
     setEditMode((prevState) => !prevState);
@@ -65,7 +68,7 @@ function License() {
         <CardHeader
           title="License"
           subheaderTypographyProps={{ color: 'error' }}
-          subheader={!isLoading && error?.status === 404 && 'No license. Configure an open-source license'}
+          subheader={!isLoading && error && 'No license. Configure an open-source license'}
         />
         <IconButton type="button" onClick={toggleEditMode}>
           {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}

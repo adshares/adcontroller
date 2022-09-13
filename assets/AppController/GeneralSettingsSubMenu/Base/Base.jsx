@@ -1,7 +1,8 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../../redux/config/configSelectors';
 import { useSetBaseInformationMutation, useSetCrmNotificationsConfigMutation } from '../../../redux/config/configApi';
+import { changeBaseInformation, changeCrmNotificationsInformation } from '../../../redux/config/configSlice';
 import { useCreateNotification, useForm } from '../../../hooks';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
 import commonStyles from '../../common/commonStyles.scss';
@@ -17,6 +18,7 @@ export default function Base() {
 
 const BaseInformationCard = () => {
   const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
   const [setBaseInformation, { isLoading }] = useSetBaseInformationMutation();
   const form = useForm({
     initialFields: {
@@ -34,17 +36,19 @@ const BaseInformationCard = () => {
     },
   });
   const { createErrorNotification, createSuccessNotification } = useCreateNotification();
-
   const onSaveClick = async () => {
     const body = {};
     Object.keys(form.changedFields).forEach((field) => {
       if (form.changedFields[field]) {
-        body[field] = form.fields[field];
+        body[field] = form.fields[field] || null;
       }
     });
 
     try {
-      await setBaseInformation(body).unwrap();
+      const response = await setBaseInformation(body).unwrap();
+      if (response.code === 200) {
+        dispatch(changeBaseInformation(response.data));
+      }
       createSuccessNotification();
     } catch (err) {
       createErrorNotification(err);
@@ -148,6 +152,7 @@ const BaseInformationCard = () => {
 
 const CRMNotificationsCard = () => {
   const appData = useSelector(configSelectors.getAppData);
+  const dispatch = useDispatch();
   const form = useForm({
     initialFields: {
       CrmMailAddressOnCampaignCreated: appData.AdServer.CrmMailAddressOnCampaignCreated || '',
@@ -172,9 +177,11 @@ const CRMNotificationsCard = () => {
     });
 
     try {
-      await setCrmNotificationsConfig(body).unwrap();
+      const response = await setCrmNotificationsConfig(body).unwrap();
+      dispatch(changeCrmNotificationsInformation(response.data));
       createSuccessNotification();
     } catch (err) {
+      console.log(err);
       createErrorNotification(err);
     }
   };

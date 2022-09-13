@@ -85,6 +85,76 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setSiteOptionsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/site-options',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setZoneOptionsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/zone-options',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setPlaceholdersConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/panel-placeholders',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setCampaignSettingsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/campaign-settings',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setBannerSettingsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/banner-settings',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setRejectedDomainsSettingsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/rejected-domains',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setRegistrationModeConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/registration',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setAutoWithdrawalConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/auto-withdrawal',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    setRegulationsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/regulations',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    uploadAssets: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/panel-assets',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -98,4 +168,14 @@ export const {
   useSetColdWalletConfigMutation,
   useSetCommissionsConfigMutation,
   useSetInventoryWhitelistConfigMutation,
+  useSetSiteOptionsConfigMutation,
+  useSetZoneOptionsConfigMutation,
+  useSetPlaceholdersConfigMutation,
+  useSetCampaignSettingsConfigMutation,
+  useSetBannerSettingsConfigMutation,
+  useSetRejectedDomainsSettingsConfigMutation,
+  useSetRegistrationModeConfigMutation,
+  useSetAutoWithdrawalConfigMutation,
+  useSetRegulationsConfigMutation,
+  useUploadAssetsMutation,
 } = configApi;

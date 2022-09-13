@@ -4,6 +4,8 @@ import { Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAppAuth } from '../redux/auth/authSlice';
 import authSelectors from '../redux/auth/authSelectors';
+import { useGetAppConfigQuery } from '../redux/config/configApi';
+import { skipToken } from '@reduxjs/toolkit/query';
 import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
 import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
@@ -33,8 +35,6 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import commonStyles from './common/commonStyles.scss';
-import { useGetAppConfigQuery } from '../redux/config/configApi';
-import { skipToken } from '@reduxjs/toolkit/query';
 
 const appModules = [
   {
@@ -170,7 +170,7 @@ function AppController() {
               <Route
                 path="login"
                 element={
-                  <PublicRoute restricted isLoggedIn={isLoggedIn} redirectTo="/">
+                  <PublicRoute restricted isLoggedIn={isLoggedIn} redirectTo="/base">
                     <Login />
                   </PublicRoute>
                 }
@@ -179,7 +179,7 @@ function AppController() {
               {pages}
 
               <Route path="*" element={<NotFoundView />} />
-              <Route path="/steps/*" element={<Navigate to="/" />} />
+              <Route path="/steps/*" element={<Navigate to="/base" />} />
             </Routes>
           </AppWindow>
         </Box>
