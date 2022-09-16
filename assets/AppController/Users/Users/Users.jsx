@@ -1,14 +1,24 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@mui/material';
-
-import commonStyles from '../../common/commonStyles.scss';
 import TableData from '../../common/TableData/TableData';
+import { Button, Card, CardContent, CardHeader, Icon, IconButton, Menu, MenuItem } from '@mui/material';
+import commonStyles from '../../common/commonStyles.scss';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Users() {
   return (
-    <>
-      <UsersCard />
-    </>
+    <Card
+      className={`${commonStyles.card}`}
+      sx={{
+        height: 'calc(100vh - 8rem)',
+        maxWidth: 'calc(100vw - 21rem)',
+        // overflow: 'auto',
+      }}
+    >
+      <CardHeader title="Users" />
+      <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
+        <UsersTab />
+      </CardContent>
+    </Card>
   );
 }
 
@@ -705,45 +715,117 @@ const data = [
   },
 ];
 
-const UsersCard = () => {
-  const headCells = [
-    {
-      id: 'username',
-      label: 'Username',
-      cellWidth: '33',
-      sort: true,
-    },
-    {
-      id: 'email',
-      label: 'Email',
-      cellWidth: '33%',
-      sort: true,
-    },
-    {
-      id: 'company',
-      label: 'Company',
-      cellWidth: '33%',
-      // sort: true,
-    },
-  ];
-
+const UsersTab = () => {
   const handleTableChanges = (event) => {
     // console.log(event);
   };
 
+  const headCells = [
+    {
+      id: 'username',
+      label: 'Username',
+      cellWidth: '10rem',
+      filterable: true,
+      sortable: true,
+    },
+    {
+      id: 'name',
+      label: 'Name',
+      cellWidth: '11rem',
+      pinnedToLeft: true,
+      filterable: true,
+      sortable: true,
+    },
+    {
+      id: 'email',
+      label: 'Email',
+      cellWidth: '15rem',
+      filterable: true,
+      sortable: true,
+      pinnedToLeft: true,
+    },
+    {
+      id: 'company',
+      label: 'Company',
+      cellWidth: '15rem',
+    },
+    {
+      id: 'phone',
+      label: 'Phone',
+      cellWidth: '15rem',
+    },
+    {
+      id: 'website',
+      label: 'Website',
+      cellWidth: '10rem',
+    },
+    {
+      id: 'actions',
+      label: 'Actions',
+      cellWidth: '1rem',
+      pinToRight: true,
+      disableCellSubmenu: true,
+    },
+  ];
+
   const rows = data.map((el) => ({
     id: el.id,
+    name: el.name,
     username: el.username,
     email: el.email,
+    phone: el.phone,
+    website: el.website,
     company: el.company.name,
+    actions: <PositionedMenu id={el.id} />,
   }));
 
   return (
-    <Card className={`${commonStyles.card}`}>
-      <CardHeader title="Users" />
-      <CardContent>
-        <TableData tableTitle="Users" headCells={headCells} rows={rows} onTableChange={handleTableChanges} isDataLoading={false} />
-      </CardContent>
-    </Card>
+    <TableData
+      headCells={headCells} // array of objects {id, label, ...additional params}
+      rows={rows} // array of objects { id: (uniq, required), key: (must be same of cell id), value }
+      onTableChange={handleTableChanges}
+      isDataLoading={false}
+      defaultSortBy="name" //(must be same of cell id)
+    />
+  );
+};
+
+const PositionedMenu = ({ id }) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const onMenuClick = () => {
+    console.log(id);
+  };
+
+  return (
+    <>
+      <IconButton onClick={handleClick}>
+        <MoreVertIcon />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem onClick={onMenuClick}>Profile</MenuItem>
+        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <MenuItem onClick={handleClose}>Logout</MenuItem>
+      </Menu>
+    </>
   );
 };
