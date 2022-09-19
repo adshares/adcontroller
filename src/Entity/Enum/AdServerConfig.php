@@ -22,6 +22,7 @@ enum AdServerConfig implements ConfigEnum
     case CrmMailAddressOnCampaignCreated;
     case CrmMailAddressOnSiteAdded;
     case CrmMailAddressOnUserRegistered;
+    case DefaultUserRoles;
     case EmailVerificationRequired;
     case HotWalletMaxValue;
     case HotWalletMinValue;

@@ -58,6 +58,7 @@ class DataCollector
         AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_SITE_ADDED => AdServerConfig::CrmMailAddressOnSiteAdded,
         AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_USER_REGISTERED =>
             AdServerConfig::CrmMailAddressOnUserRegistered,
+        AdServerConfigurationClient::DEFAULT_USER_ROLES => AdServerConfig::DefaultUserRoles,
         AdServerConfigurationClient::EMAIL_VERIFICATION_REQUIRED => AdServerConfig::EmailVerificationRequired,
         AdServerConfigurationClient::HOT_WALLET_MAX_VALUE => AdServerConfig::HotWalletMaxValue,
         AdServerConfigurationClient::HOT_WALLET_MIN_VALUE => AdServerConfig::HotWalletMinValue,
