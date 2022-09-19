@@ -39,6 +39,20 @@ class Registration implements ConfiguratorCategory
             ArrayUtils::assureBoolTypeForField($input, $field);
         }
 
+        foreach (
+            [
+                AdServerConfig::AdvertiserApplyFormUrl->name,
+                AdServerConfig::PublisherApplyFormUrl->name,
+            ] as $field
+        ) {
+            if (
+                isset($input[$field]) &&
+                false === filter_var($input[$field], FILTER_VALIDATE_URL)
+            ) {
+                throw new InvalidArgumentException(sprintf('Field `%s` must be an url', $field));
+            }
+        }
+
         if (
             array_key_exists(AdServerConfig::RegistrationMode->name, $input) &&
             !in_array($input[AdServerConfig::RegistrationMode->name], self::ALLOWED_REGISTRATION_MODE, true)
@@ -78,9 +92,11 @@ class Registration implements ConfiguratorCategory
     private static function fields(): array
     {
         return [
+            AdServerConfig::AdvertiserApplyFormUrl->name,
             AdServerConfig::AutoConfirmationEnabled->name,
             AdServerConfig::AutoRegistrationEnabled->name,
             AdServerConfig::EmailVerificationRequired->name,
+            AdServerConfig::PublisherApplyFormUrl->name,
             AdServerConfig::RegistrationMode->name,
         ];
     }
