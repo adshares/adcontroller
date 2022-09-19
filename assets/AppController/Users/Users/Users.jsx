@@ -717,16 +717,24 @@ const data = [
 
 const UsersTab = () => {
   const handleTableChanges = (event) => {
-    // console.log(event);
+    console.log(event);
   };
 
   const headCells = [
     {
+      id: 'id',
+      label: 'ID',
+      cellWidth: '6rem',
+      pinnedToLeft: true,
+      sortable: true,
+      filterableBy: ['text', 'range', 'select'],
+    },
+    {
       id: 'username',
       label: 'Username',
       cellWidth: '10rem',
-      filterable: true,
       sortable: true,
+      filterableBy: ['text'],
     },
     {
       id: 'name',
@@ -740,7 +748,6 @@ const UsersTab = () => {
       id: 'email',
       label: 'Email',
       cellWidth: '15rem',
-      filterable: true,
       sortable: true,
       pinnedToLeft: true,
     },
@@ -758,6 +765,7 @@ const UsersTab = () => {
       id: 'website',
       label: 'Website',
       cellWidth: '10rem',
+      filterableBy: ['text', 'range', 'select'],
     },
     {
       id: 'actions',

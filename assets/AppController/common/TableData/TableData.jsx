@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import { useSkipFirstRenderEffect } from '../../../hooks';
 import {
   Chip,
@@ -22,14 +22,20 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Popover,
+  FormControl,
+  InputLabel,
+  Select,
+  Checkbox,
 } from '@mui/material';
 import commonStyles from '../commonStyles.scss';
-import styles from './styles.scss';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
+import NumbersIcon from '@mui/icons-material/Numbers';
+import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 
 const descendingOrderComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -45,9 +51,9 @@ const getOrderComparator = (order, orderBy) => {
   return order === 'desc' ? (a, b) => descendingOrderComparator(a, b, orderBy) : (a, b) => -descendingOrderComparator(a, b, orderBy);
 };
 
-const sortByModel = (model) => (a, b) => {
-  let ai = model.indexOf(a.id);
-  let bi = model.indexOf(b.id);
+const sortByModel = (model, property) => (a, b) => {
+  let ai = model.indexOf(a[property]);
+  let bi = model.indexOf(b[property]);
   if (ai === -1) ai = 999;
   if (bi === -1) bi = 999;
   return ai - bi;
@@ -81,35 +87,120 @@ const renderSkeletons = (columns, rowsPerPage) => {
   return rows;
 };
 
-const FilteringInformationBox = ({ headCells, filterBy, setFilterBy, onRequestFilter }) => {
+const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, onRequestFilterByRange, onRequestFilterBySelect }) => {
   const [showFilters, setShowFilters] = useState(false);
 
-  const handleDelete = (property) => {
-    setFilterBy((prevState) => {
-      const filtersPhrases = {
-        ...prevState,
-      };
-      delete filtersPhrases[property];
-      return filtersPhrases;
-    });
+  const handleDelete = (opt, property) => {
+    const { name, prop, el } = property;
+    switch (opt) {
+      case 'byText':
+        const byTextEventSlice = {
+          target: {
+            value: null,
+          },
+        };
+        onRequestFilterByText(byTextEventSlice, prop);
+        break;
+
+      case 'byRange':
+        const byRangeEventSlice = {
+          target: {
+            value: null,
+            name: name,
+          },
+        };
+        onRequestFilterByRange(byRangeEventSlice, prop);
+        break;
+
+      case 'bySelect':
+        const bySelectEventSlice = {
+          target: {
+            value: filterBy.select ? filterBy.select[prop].filter((val) => val !== el) : [],
+          },
+        };
+        onRequestFilterBySelect(bySelectEventSlice, prop);
+        break;
+
+      default:
+        break;
+    }
   };
 
   const createFilterHandler = (event) => {
-    onRequestFilter(event, 'all');
+    onRequestFilterByText(event, 'all');
   };
 
-  const chips = Object.keys(filterBy)
-    .map((filterName) => {
-      const head = headCells.find((el) => el.id === filterName);
-      return (
-        head && (
-          <ListItem sx={{ display: 'inline' }} key={filterName}>
-            <Chip onDelete={() => handleDelete(filterName)} label={`${head.label}: ${filterBy[filterName]}`} />
-          </ListItem>
-        )
-      );
-    })
-    .filter(Boolean);
+  const chipsByText = filterBy.text
+    ? Object.keys(filterBy.text)
+        .map((filterName) => {
+          const head = headCells.find((el) => el.id === filterName);
+          return (
+            head && (
+              <ListItem disableGutters disablePadding sx={{ display: 'inline' }} key={filterName}>
+                <Chip
+                  sx={{ margin: 0.5 }}
+                  size="small"
+                  onDelete={() => handleDelete('byText', { prop: filterName })}
+                  label={`${head.label}: ${filterBy.text[filterName]}`}
+                />
+              </ListItem>
+            )
+          );
+        })
+        .filter(Boolean)
+    : [];
+
+  const chipsByRange = filterBy.range
+    ? Object.keys(filterBy.range)
+        .map((filterName) => {
+          const head = headCells.find((el) => el.id === filterName);
+          return (
+            head && (
+              <ListItem disableGutters disablePadding sx={{ display: 'inline' }} key={filterName}>
+                {filterBy.range[filterName]?.min && (
+                  <Chip
+                    sx={{ margin: 0.5 }}
+                    size="small"
+                    onDelete={() => handleDelete('byRange', { prop: filterName, name: 'min' })}
+                    label={`${head.label} min: ${filterBy.range[filterName]?.min}`}
+                  />
+                )}
+                {filterBy.range[filterName]?.max && (
+                  <Chip
+                    sx={{ margin: 0.5 }}
+                    size="small"
+                    onDelete={() => handleDelete('byRange', { prop: filterName, name: 'max' })}
+                    label={`${head.label} max: ${filterBy.range[filterName]?.max}`}
+                  />
+                )}
+              </ListItem>
+            )
+          );
+        })
+        .filter(Boolean)
+    : [];
+
+  const chipsBySelect = filterBy.select
+    ? Object.keys(filterBy.select)
+        .map((filterName) => {
+          const head = headCells.find((el) => el.id === filterName);
+          return (
+            head &&
+            filterBy.select[filterName].length &&
+            filterBy.select[filterName].map((el) => (
+              <ListItem disableGutters disablePadding sx={{ display: 'inline' }} dense key={filterName + el}>
+                <Chip
+                  sx={{ margin: 0.5 }}
+                  size="small"
+                  onDelete={() => handleDelete('bySelect', { prop: filterName, el })}
+                  label={`${head.label}: ${el}`}
+                />
+              </ListItem>
+            ))
+          );
+        })
+        .filter(Boolean)
+    : [];
 
   return (
     <Box>
@@ -140,9 +231,30 @@ const FilteringInformationBox = ({ headCells, filterBy, setFilterBy, onRequestFi
           />
         </Collapse>
       </Box>
-      <Collapse in={chips.length > 0} timeout="auto">
-        <List>{chips}</List>
-      </Collapse>
+      {!!chipsByText.length && (
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+            By text:
+          </Typography>
+          <List>{chipsByText}</List>
+        </Box>
+      )}
+      {!!chipsByRange.length && (
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+            By range:
+          </Typography>
+          <List>{chipsByRange}</List>
+        </Box>
+      )}
+      {!!chipsBySelect.length && (
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+            By select:
+          </Typography>
+          <List>{chipsBySelect}</List>
+        </Box>
+      )}
     </Box>
   );
 };
@@ -175,16 +287,34 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
           horizontal: 'right',
         }}
       >
-        {cellOptions.filterable && (
-          <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilter', handleClose)}>
+        {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('text') && (
+          <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByText', handleClose)}>
             <FilterListIcon />
             <Typography sx={{ pl: 1 }} variant="body1">
-              Filter column
+              Filter by text
             </Typography>
           </MenuItem>
         )}
 
-        <Divider />
+        {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('range') && (
+          <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByRange', handleClose)}>
+            <NumbersIcon />
+            <Typography sx={{ pl: 1 }} variant="body1">
+              Filter by range
+            </Typography>
+          </MenuItem>
+        )}
+
+        {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('select') && (
+          <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterBySelect', handleClose)}>
+            <LibraryAddCheckIcon />
+            <Typography sx={{ pl: 1 }} variant="body1">
+              Filter by select
+            </Typography>
+          </MenuItem>
+        )}
+        {cellOptions.filterableBy?.length && <Divider />}
+
         {columnsPinnedToLeft.includes(cellOptions.id) ? (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'unpin', handleClose)}>
             <PushPinOutlinedIcon />
@@ -206,36 +336,74 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 };
 
 const EnhancedTableHead = ({
+  headCells,
+  cellsWithFilterableBySelectValues,
   order,
   orderBy,
   onRequestSort,
   filterBy,
-  onRequestFilter,
-  headCells,
+  pinnedToLeft,
+  onRequestFilterByText,
+  onRequestFilterByRange,
+  onRequestFilterBySelect,
   onPinToLeftColumnRequest,
   onUnpinColumnRequest,
-  pinnedToLeft,
 }) => {
   const { columnsPinnedToLeftIds, columnsPinnedToLeftWidth } = pinnedToLeft;
-  const [showFilteredField, setShowFilteredField] = useState(headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}));
+  const [showFilterByTextInput, setShowFilterByTextInput] = useState(headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}));
+  const [showFilterByRangeInput, setShowFilterByRangeInput] = useState(headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}));
+  const [showFilterBySelectInput, setShowFilterBySelectInput] = useState(
+    headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}),
+  );
   const [showColumnSubmenu, setShowColumnSubmenu] = useState(null);
+  const headCellsRefs = useRef([]);
+
+  useEffect(() => {
+    headCellsRefs.current = headCells.map((cell, i) => headCellsRefs.current[i] ?? createRef());
+  }, []);
 
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
-  const createFilterHandler = (property) => (event) => {
-    onRequestFilter(event, property);
+  const createFilterByTextHandler = (property) => (event) => {
+    onRequestFilterByText(event, property);
   };
 
-  const toggleShowFiltered = (prop) => {
-    setShowFilteredField((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
+  const createFilterByRangeHandler = (property) => (event) => {
+    onRequestFilterByRange(event, property);
+  };
+
+  const createFilterBySelectHandler = (property) => (event) => {
+    onRequestFilterBySelect(event, property);
+  };
+
+  const toggleShowFilterByText = (prop) => {
+    setShowFilterByTextInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
+  };
+
+  const toggleShowFilterByRange = (prop) => {
+    setShowFilterByRangeInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
+  };
+
+  const toggleShowFilterBySelect = (prop) => {
+    setShowFilterBySelectInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
   };
 
   const handleMenuItemClick = (column, option, closeSubmenu) => {
     switch (option) {
-      case 'columnFilter':
-        toggleShowFiltered(column);
+      case 'columnFilterByText':
+        toggleShowFilterByText(column);
+        closeSubmenu();
+        break;
+
+      case 'columnFilterByRange':
+        toggleShowFilterByRange(column);
+        closeSubmenu();
+        break;
+
+      case 'columnFilterBySelect':
+        toggleShowFilterBySelect(column);
         closeSubmenu();
         break;
 
@@ -255,38 +423,39 @@ const EnhancedTableHead = ({
   };
 
   return (
-    <TableHead>
-      <TableRow>
-        {headCells.map((headCell, index) => {
-          return (
-            <TableCell
-              sx={{
-                ...(columnsPinnedToLeftIds.includes(headCell.id)
-                  ? {
-                      position: 'sticky',
-                      left: columnsPinnedToLeftWidth[headCell.id] + 'rem' || 0,
-                      borderRight: '1px solid rgba(224, 224, 224, 1)',
-                      zIndex: 10,
-                    }
-                  : {}),
-                ...(index === headCells.length - 1 && headCell.pinToRight
-                  ? { position: 'sticky', right: 0, zIndex: 10, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
-                  : {}),
-                minWidth: headCell.cellWidth,
-                pl: 1,
-                pr: 1,
-                pb: 0.5,
-                pt: 0.5,
-                backgroundColor: 'background.paper',
-              }}
-              size="small"
-              key={headCell.id}
-              id={headCell.id}
-              onMouseEnter={() => setShowColumnSubmenu(headCell.id)}
-              onMouseLeave={() => setShowColumnSubmenu(null)}
-              sortDirection={headCell.sortable ? (orderBy === headCell.id ? order : false) : undefined}
-            >
-              <Collapse in={!showFilteredField[headCell.id]}>
+    <>
+      <TableHead>
+        <TableRow>
+          {headCells.map((headCell, index) => {
+            return (
+              <TableCell
+                ref={headCellsRefs.current[index]}
+                sx={{
+                  ...(columnsPinnedToLeftIds.includes(headCell.id)
+                    ? {
+                        position: 'sticky',
+                        left: columnsPinnedToLeftWidth[headCell.id] + 'rem' || 0,
+                        borderRight: '1px solid rgba(224, 224, 224, 1)',
+                        zIndex: 10,
+                      }
+                    : {}),
+                  ...(index === headCells.length - 1 && headCell.pinToRight
+                    ? { position: 'sticky', right: 0, zIndex: 10, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
+                    : {}),
+                  minWidth: headCell.cellWidth,
+                  pl: 1,
+                  pr: 1,
+                  pb: 0.5,
+                  pt: 0.5,
+                  backgroundColor: 'background.paper',
+                }}
+                size="small"
+                key={headCell.id}
+                id={headCell.id}
+                onMouseEnter={() => setShowColumnSubmenu(headCell.id)}
+                onMouseLeave={() => setShowColumnSubmenu(null)}
+                sortDirection={headCell.sortable ? (orderBy === headCell.id ? order : false) : undefined}
+              >
                 <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
                   {!headCell.disableCellSubmenu && (
                     <ColumnSubMenu
@@ -309,50 +478,136 @@ const EnhancedTableHead = ({
                     headCell.label
                   )}
                 </Box>
-              </Collapse>
-
-              <Collapse
-                addEndListener={(node) => {
-                  if (showFilteredField[headCell.id]) {
-                    node.querySelector('input').focus();
-                  }
-                }}
-                in={showFilteredField[headCell.id]}
-              >
-                <TextField
-                  inputRef={(input) => {
-                    if (input && !filterBy[headCell.id]) {
-                      input.value = '';
-                    }
+                <Popover
+                  anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
+                  open={showFilterByTextInput[headCell.id]}
+                  onClose={() => toggleShowFilterByText(headCell.id)}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
                   }}
-                  name={headCell.id}
-                  fullWidth
-                  variant="standard"
-                  size="small"
-                  margin="none"
-                  onChange={createFilterHandler(headCell.id)}
-                  onBlur={() => toggleShowFiltered(headCell.id)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <FilterListIcon />
-                      </InputAdornment>
-                    ),
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
                   }}
-                  inputProps={{ autoComplete: 'off' }}
-                />
-              </Collapse>
-            </TableCell>
-          );
-        })}
-      </TableRow>
-    </TableHead>
+                >
+                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                    <Typography variant="body1">Filter {headCell.label} by text</Typography>
+                    <TextField
+                      autoFocus
+                      value={(filterBy.text && filterBy.text[headCell.id]) || ''}
+                      name={headCell.id}
+                      fullWidth
+                      variant="standard"
+                      size="small"
+                      margin="none"
+                      onChange={createFilterByTextHandler(headCell.id)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <FilterListIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                      inputProps={{ autoComplete: 'off' }}
+                    />
+                  </Box>
+                </Popover>
+                <Popover
+                  anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
+                  open={showFilterByRangeInput[headCell.id]}
+                  onClose={() => toggleShowFilterByRange(headCell.id)}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                >
+                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                    <Typography variant="body1">Filter {headCell.label} by range</Typography>
+                    <Box className={`${commonStyles.flex}`}>
+                      <TextField
+                        sx={{ mr: 1 }}
+                        autoFocus
+                        value={(filterBy.range && filterBy.range[headCell.id]?.min) || ''}
+                        name="min"
+                        variant="standard"
+                        size="small"
+                        margin="none"
+                        onChange={createFilterByRangeHandler(headCell.id)}
+                        type="number"
+                        InputProps={{
+                          startAdornment: <InputAdornment position="start">min</InputAdornment>,
+                        }}
+                        inputProps={{ autoComplete: 'off', min: 0 }}
+                      />
+                      <TextField
+                        name="max"
+                        value={(filterBy.range && filterBy.range[headCell.id]?.max) || ''}
+                        variant="standard"
+                        size="small"
+                        margin="none"
+                        onChange={createFilterByRangeHandler(headCell.id)}
+                        type="number"
+                        InputProps={{
+                          startAdornment: <InputAdornment position="start">max</InputAdornment>,
+                        }}
+                        inputProps={{ autoComplete: 'off', min: 0 }}
+                      />
+                    </Box>
+                  </Box>
+                </Popover>
+                <Popover
+                  anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
+                  open={showFilterBySelectInput[headCell.id]}
+                  onClose={() => toggleShowFilterBySelect(headCell.id)}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                >
+                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                    <FormControl size="small" fullWidth>
+                      <InputLabel id={headCell.id}>{`Filter ${headCell.label} by select`}</InputLabel>
+                      <Select
+                        MenuProps={{ sx: { maxHeight: '500px' } }}
+                        labelId={headCell.id}
+                        multiple
+                        label={`Filter ${headCell.label} by select`}
+                        value={filterBy.select ? filterBy.select[headCell.id] || [] : []}
+                        onChange={createFilterBySelectHandler(headCell.id)}
+                        renderValue={(selected) => selected.join(', ')}
+                        onClose={() => toggleShowFilterBySelect(headCell.id)}
+                      >
+                        {cellsWithFilterableBySelectValues[headCell.id]?.map((value) => (
+                          <MenuItem key={headCell.id + value} value={value}>
+                            <Checkbox checked={filterBy.select ? filterBy.select[headCell.id]?.indexOf(value) > -1 : false} />
+                            {value}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </Popover>
+              </TableCell>
+            );
+          })}
+        </TableRow>
+      </TableHead>
+    </>
   );
 };
 
 export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading }) {
+  const initColumnPosition = headCells.map((cell) => cell.id);
   const [columns] = useState([...headCells]);
-  const firstColumnPosition = headCells.map((cell) => cell.id);
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
@@ -369,6 +624,29 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 
   const filteredRows = useMemo(() => multiFilterFn(rows, filterBy), [filterBy]);
 
+  const columnsPinnedToLeftWidth = useMemo(
+    () =>
+      columnsPinnedToLeftIds.reduce((acc, val, idx) => {
+        const prevCellWidth = parseFloat(columns.find((cell) => cell.id === columnsPinnedToLeftIds[idx - 1])?.cellWidth || 0);
+        return { ...acc, [val]: prevCellWidth + acc[columnsPinnedToLeftIds[idx - 1]] || 0 };
+      }, {}),
+    [columnsPinnedToLeftIds],
+  );
+
+  const cellsWithFilterableBySelectValues = useMemo(
+    () =>
+      headCells
+        .filter((headCell) => headCell.filterableBy?.includes('select'))
+        .reduce(
+          (acc, val) => ({
+            ...acc,
+            [val.id]: rows.map((row) => row[val.id]).filter((value, index, self) => self.indexOf(value) === index),
+          }),
+          {},
+        ),
+    [headCells, rows],
+  );
+
   useSkipFirstRenderEffect(() => {
     onTableChange({
       order,
@@ -380,31 +658,74 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
     });
   }, [order, orderBy, page, filterBy, rowsPerPage]);
 
-  const columnsPinnedToLeftWidth = useMemo(
-    () =>
-      columnsPinnedToLeftIds.reduce((acc, val, idx) => {
-        const prevCellWidth = parseFloat(columns.find((cell) => cell.id === columnsPinnedToLeftIds[idx - 1])?.cellWidth || 0);
-        return { ...acc, [val]: prevCellWidth + acc[columnsPinnedToLeftIds[idx - 1]] || 0 };
-      }, {}),
-    [columnsPinnedToLeftIds],
-  );
-
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  const handleRequestFilter = (event, property) => {
+  const handleRequestFilterByText = (event, property) => {
     setFilterBy((prevState) => {
-      const filtersPhrases = {
+      const filterQueries = {
         ...prevState,
-        [property]: event.target.value,
+        text: {
+          ...(prevState.text || {}),
+          [property]: event.target.value,
+        },
       };
-      if (event.target.value === '') {
-        delete filtersPhrases[property];
+      if (event.target.value === '' || event.target.value === null) {
+        delete filterQueries.text[property];
       }
-      return filtersPhrases;
+
+      if (!Object.keys(filterQueries.text).length) {
+        delete filterQueries.text;
+      }
+      return filterQueries;
+    });
+  };
+
+  const handleRequestFilterByRange = (event, property) => {
+    setFilterBy((prevState) => {
+      const filterQueries = {
+        ...prevState,
+        range: {
+          ...(prevState.range || {}),
+          [property]: { ...(prevState.range ? prevState.range[property] : {}), [event.target.name]: event.target.value },
+        },
+      };
+
+      if (event.target.value === '' || event.target.value === null) {
+        delete filterQueries.range[property][event.target.name];
+      }
+
+      if (!Object.keys(filterQueries.range[property]).length) {
+        delete filterQueries.range[property];
+      }
+
+      if (!Object.keys(filterQueries.range).length) {
+        delete filterQueries.range;
+      }
+      return filterQueries;
+    });
+  };
+
+  const handleRequestFilterBySelect = (event, property) => {
+    setFilterBy((prevState) => {
+      const filterQueries = {
+        ...prevState,
+        select: {
+          ...(prevState.select || {}),
+          [property]: event.target.value || [],
+        },
+      };
+      if (!Object.keys(filterQueries.select[property]).length) {
+        delete filterQueries.select[property];
+      }
+
+      if (!Object.keys(filterQueries.select).length) {
+        delete filterQueries.select;
+      }
+      return filterQueries;
     });
   };
 
@@ -427,16 +748,26 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 
   return (
     <Box sx={{ height: '100%' }} className={`${commonStyles.flex} ${commonStyles.flexColumn}`}>
-      <FilteringInformationBox onRequestFilter={handleRequestFilter} headCells={columns} filterBy={filterBy} setFilterBy={setFilterBy} />
+      <FilteringInformationBox
+        onRequestFilterByText={handleRequestFilterByText}
+        onRequestFilterByRange={handleRequestFilterByRange}
+        onRequestFilterBySelect={handleRequestFilterBySelect}
+        headCells={columns}
+        filterBy={filterBy}
+        setFilterBy={setFilterBy}
+      />
       <TableContainer>
         <Table stickyHeader padding="none">
           <EnhancedTableHead
             headCells={columns}
+            cellsWithFilterableBySelectValues={cellsWithFilterableBySelectValues}
             order={order}
             orderBy={orderBy}
             filterBy={filterBy}
             onRequestSort={handleRequestSort}
-            onRequestFilter={handleRequestFilter}
+            onRequestFilterByText={handleRequestFilterByText}
+            onRequestFilterByRange={handleRequestFilterByRange}
+            onRequestFilterBySelect={handleRequestFilterBySelect}
             onPinToLeftColumnRequest={handlePinToLeft}
             onUnpinColumnRequest={handleUnpinColumn}
             pinnedToLeft={{ columnsPinnedToLeftIds, columnsPinnedToLeftWidth }}
@@ -449,8 +780,8 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                   .map((row) => (
                     <TableRow hover tabIndex={-1} key={row.id}>
                       {columns
-                        .sort(sortByModel(firstColumnPosition))
-                        .sort(sortByModel(columnsPinnedToLeftIds))
+                        .sort(sortByModel(initColumnPosition, 'id'))
+                        .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
                         .map((cell, index) => (
                           <TableCell
                             sx={{
