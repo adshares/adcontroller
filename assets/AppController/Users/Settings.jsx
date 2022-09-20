@@ -2,16 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../hooks';
-import {
-  useSetAutoWithdrawalConfigMutation,
-  useSetRegistrationModeConfigMutation,
-  useSetRegulationsConfigMutation,
-} from '../../redux/config/configApi';
-import {
-  changeAutoWithdrawalConfigInformation,
-  changeRegistrationModeInformation,
-  changeRegulationsInformation,
-} from '../../../redux/config/configSlice';
+import { useSetAutoWithdrawalConfigMutation, useSetRegistrationModeConfigMutation } from '../../redux/config/configApi';
+import { changeAutoWithdrawalConfigInformation, changeRegistrationModeInformation } from '../../redux/config/configSlice';
 import { adsToClicks, clicksToAds, compareArrays, returnNumber, setDecimalPlaces } from '../../utils/helpers';
 import {
   Alert,
