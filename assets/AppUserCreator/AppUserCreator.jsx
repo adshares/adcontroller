@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
 import AppWindow from '../Components/AppWindow/AppWindow';
 import styles from './styles.scss';
-import commonStyles from '../AppController/common/commonStyles.scss';
+import commonStyles from '../styles/commonStyles.scss';
 
 export default function AppUserCreator() {
   const [email, setEmail] = useState('');

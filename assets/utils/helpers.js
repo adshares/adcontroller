@@ -53,7 +53,6 @@ function formatMoney(value, precision = 11, trim = false, decimal = '.', thousan
   return s + (j ? a.substr(0, j) + t : '') + a.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + t) + d + b;
 }
 
-export { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces, formatMoney };
 function compareArrays(array1, array2) {
   if (!array1 || !array2) return false;
 
@@ -69,4 +68,4 @@ function compareArrays(array1, array2) {
   return true;
 }
 
-export { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces, compareArrays };
+export { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces, formatMoney, compareArrays };

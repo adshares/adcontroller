@@ -13,7 +13,7 @@ import {
   changeCampaignSettingsInformation,
   changeRejectedDomainsInformation,
 } from '../../redux/config/configSlice';
-import ListOfInputs from '../common/ListOfInputs/ListOfInputs';
+import ListOfInputs from '../../Components/ListOfInputs/ListOfInputs';
 import {
   Box,
   Button,
@@ -27,7 +27,7 @@ import {
   InputLabel,
   OutlinedInput,
 } from '@mui/material';
-import commonStyles from '../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
   return (

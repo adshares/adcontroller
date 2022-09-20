@@ -5,7 +5,7 @@ import { useCreateNotification, useForm } from '../../hooks';
 import { useSetRegulationsConfigMutation } from '../../redux/config/configApi';
 import { changeRegulationsInformation } from '../../redux/config/configSlice';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
-import commonStyles from '../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Terms() {
   return (

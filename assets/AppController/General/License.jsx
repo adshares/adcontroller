@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useGetLicenseDataQuery, useSetExistingLicenseMutation } from '../../../redux/config/configApi';
-import { useCreateNotification, useForm } from '../../../hooks';
-import Spinner from '../../../Components/Spinner/Spinner';
+import { useGetLicenseDataQuery, useSetExistingLicenseMutation } from '../../redux/config/configApi';
+import { useCreateNotification, useForm } from '../../hooks';
+import Spinner from '../../Components/Spinner/Spinner';
 import {
   Box,
   Button,
@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
-import commonStyles from '../../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 function License() {
   const { data, error, isLoading, refetch } = useGetLicenseDataQuery();

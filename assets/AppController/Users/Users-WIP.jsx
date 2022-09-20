@@ -1,7 +1,7 @@
 import React from 'react';
-import TableData from '../../common/TableData/TableData';
+import TableData from '../../Components/TableData/TableData';
 import { Card, CardContent, CardHeader, IconButton, Menu, MenuItem } from '@mui/material';
-import commonStyles from '../../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Users() {

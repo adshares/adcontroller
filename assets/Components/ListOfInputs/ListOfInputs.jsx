@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { validateAddress } from '@adshares/ads';
 import { Box, Button, Collapse, IconButton, InputAdornment, List, ListItem, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import commonStyles from '../commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 const formatValue = (value, type) => {
   const sliceDomain = (value) => {

@@ -1,5 +1,5 @@
 import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
-import { useSkipFirstRenderEffect } from '../../../hooks';
+import { useSkipFirstRenderEffect } from '../../hooks';
 import {
   Chip,
   Collapse,
@@ -28,7 +28,7 @@ import {
   Select,
   Checkbox,
 } from '@mui/material';
-import commonStyles from '../commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
