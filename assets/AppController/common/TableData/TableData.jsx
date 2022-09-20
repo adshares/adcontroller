@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import { useSkipFirstRenderEffect } from '../../../hooks';
 import {
   Chip,
@@ -30,7 +30,6 @@ import {
 } from '@mui/material';
 import commonStyles from '../commonStyles.scss';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import CloseIcon from '@mui/icons-material/Close';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
@@ -218,15 +217,6 @@ const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, o
             size="small"
             margin="none"
             onChange={createFilterHandler}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton type="button" onClick={() => console.log('X click')}>
-                    <CloseIcon color="error" />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
             inputProps={{ autoComplete: 'off' }}
           />
         </Collapse>

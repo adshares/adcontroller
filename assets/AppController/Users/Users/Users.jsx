@@ -1,6 +1,6 @@
 import React from 'react';
 import TableData from '../../common/TableData/TableData';
-import { Button, Card, CardContent, CardHeader, Icon, IconButton, Menu, MenuItem } from '@mui/material';
+import { Card, CardContent, CardHeader, IconButton, Menu, MenuItem } from '@mui/material';
 import commonStyles from '../../common/commonStyles.scss';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
@@ -11,7 +11,6 @@ export default function Users() {
       sx={{
         height: 'calc(100vh - 8rem)',
         maxWidth: 'calc(100vw - 21rem)',
-        // overflow: 'auto',
       }}
     >
       <CardHeader title="Users" />
