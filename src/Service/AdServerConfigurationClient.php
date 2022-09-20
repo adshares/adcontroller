@@ -40,7 +40,7 @@ class AdServerConfigurationClient
     private const ADUSER_INFO_URL = 'aduser-info-url';
     public const ADUSER_INTERNAL_URL = 'aduser-internal-url';
     private const ADUSER_SERVE_SUBDOMAIN = 'aduser-serve-subdomain';
-    private const ADVERTISER_APPLY_FORM_URL = 'advertiser-apply-form-url';
+    public const ADVERTISER_APPLY_FORM_URL = 'advertiser-apply-form-url';
     public const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
     public const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
     public const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
@@ -71,6 +71,7 @@ class AdServerConfigurationClient
     public const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crm-mail-address-on-site-added';
     public const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
     private const CURRENCY = 'currency';
+    public const DEFAULT_USER_ROLES = 'default-user-roles';
     private const DISPLAY_CURRENCY = 'display-currency';
     public const EMAIL_VERIFICATION_REQUIRED = 'email-verification-required';
     private const EXCHANGE_API_KEY = 'exchange-api-key';
@@ -116,11 +117,10 @@ class AdServerConfigurationClient
     private const NOW_PAYMENTS_MIN_AMOUNT = 'now-payments-min-amount';
     private const PANEL_PLACEHOLDER_NOTIFICATION_TIME = 'panel-placeholder-notification-time';
     private const PANEL_PLACEHOLDER_UPDATE_TIME = 'panel-placeholder-update-time';
-    private const PUBLISHER_APPLY_FORM_URL = 'publisher-apply-form-url';
+    public const PUBLISHER_APPLY_FORM_URL = 'publisher-apply-form-url';
     public const REFERRAL_REFUND_COMMISSION = 'referral-refund-commission';
     public const REFERRAL_REFUND_ENABLED = 'referral-refund-enabled';
     public const REGISTRATION_MODE = 'registration-mode';
-    private const REGISTRATION_USER_TYPES = 'registration-user-types';
     public const OPERATOR_RX_FEE = 'payment-rx-fee';
     public const OPERATOR_TX_FEE = 'payment-tx-fee';
     private const OPERATOR_WALLET_EMAIL_LAST_TIME = 'operator-wallet-transfer-email-time';
@@ -209,6 +209,7 @@ class AdServerConfigurationClient
     private static function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
+            AdServerConfig::AdvertiserApplyFormUrl->name => self::ADVERTISER_APPLY_FORM_URL,
             AdServerConfig::AllowZoneInIframe->name => self::ALLOW_ZONE_IN_IFRAME,
             AdServerConfig::AutoConfirmationEnabled->name => self::AUTO_CONFIRMATION_ENABLED,
             AdServerConfig::AutoRegistrationEnabled->name => self::AUTO_REGISTRATION_ENABLED,
@@ -224,6 +225,7 @@ class AdServerConfigurationClient
             AdServerConfig::CrmMailAddressOnCampaignCreated->name => self::CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED,
             AdServerConfig::CrmMailAddressOnSiteAdded->name => self::CRM_MAIL_ADDRESS_ON_SITE_ADDED,
             AdServerConfig::CrmMailAddressOnUserRegistered->name => self::CRM_MAIL_ADDRESS_ON_USER_REGISTERED,
+            AdServerConfig::DefaultUserRoles->name => self::DEFAULT_USER_ROLES,
             AdServerConfig::EmailVerificationRequired->name => self::EMAIL_VERIFICATION_REQUIRED,
             AdServerConfig::HotWalletMaxValue->name => self::HOT_WALLET_MAX_VALUE,
             AdServerConfig::HotWalletMinValue->name => self::HOT_WALLET_MIN_VALUE,
@@ -235,6 +237,7 @@ class AdServerConfigurationClient
             AdServerConfig::MaxPageZones->name => self::MAX_PAGE_ZONES,
             AdServerConfig::OperatorRxFee->name => self::OPERATOR_RX_FEE,
             AdServerConfig::OperatorTxFee->name => self::OPERATOR_TX_FEE,
+            AdServerConfig::PublisherApplyFormUrl->name => self::PUBLISHER_APPLY_FORM_URL,
             AdServerConfig::ReferralRefundCommission->name => self::REFERRAL_REFUND_COMMISSION,
             AdServerConfig::ReferralRefundEnabled->name => self::REFERRAL_REFUND_ENABLED,
             AdServerConfig::RegistrationMode->name => self::REGISTRATION_MODE,

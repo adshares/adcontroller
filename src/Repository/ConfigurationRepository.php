@@ -173,6 +173,7 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::CampaignMinCpa->name => ConfigType::Integer,
             AdServerConfig::CampaignMinCpm->name => ConfigType::Integer,
             AdServerConfig::ColdWalletIsActive->name => ConfigType::Bool,
+            AdServerConfig::DefaultUserRoles->name => ConfigType::Array,
             AdServerConfig::EmailVerificationRequired->name => ConfigType::Bool,
             AdServerConfig::HotWalletMaxValue->name => ConfigType::Integer,
             AdServerConfig::HotWalletMinValue->name => ConfigType::Integer,
@@ -209,7 +210,6 @@ class ConfigurationRepository extends ServiceEntityRepository
 //            self::NOW_PAYMENTS_FEE => ConfigType::Float,
 //            self::NOW_PAYMENTS_MAX_AMOUNT => ConfigType::Integer,
 //            self::NOW_PAYMENTS_MIN_AMOUNT => ConfigType::Integer,
-//            self::REGISTRATION_USER_TYPES => ConfigType::Array,
         ];
     }
 

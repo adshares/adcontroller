@@ -40,6 +40,7 @@ class DataCollector
         AdServerConfigurationClient::ADSHARES_NODE_HOST => AdServerConfig::WalletNodeHost,
         AdServerConfigurationClient::ADSHARES_NODE_PORT => AdServerConfig::WalletNodePort,
         AdServerConfigurationClient::ADSHARES_SECRET => AdServerConfig::WalletSecretKey,
+        AdServerConfigurationClient::ADVERTISER_APPLY_FORM_URL => AdServerConfig::AdvertiserApplyFormUrl,
         AdServerConfigurationClient::ALLOW_ZONE_IN_IFRAME => AdServerConfig::AllowZoneInIframe,
         AdServerConfigurationClient::AUTO_CONFIRMATION_ENABLED => AdServerConfig::AutoConfirmationEnabled,
         AdServerConfigurationClient::AUTO_REGISTRATION_ENABLED => AdServerConfig::AutoRegistrationEnabled,
@@ -57,6 +58,7 @@ class DataCollector
         AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_SITE_ADDED => AdServerConfig::CrmMailAddressOnSiteAdded,
         AdServerConfigurationClient::CRM_MAIL_ADDRESS_ON_USER_REGISTERED =>
             AdServerConfig::CrmMailAddressOnUserRegistered,
+        AdServerConfigurationClient::DEFAULT_USER_ROLES => AdServerConfig::DefaultUserRoles,
         AdServerConfigurationClient::EMAIL_VERIFICATION_REQUIRED => AdServerConfig::EmailVerificationRequired,
         AdServerConfigurationClient::HOT_WALLET_MAX_VALUE => AdServerConfig::HotWalletMaxValue,
         AdServerConfigurationClient::HOT_WALLET_MIN_VALUE => AdServerConfig::HotWalletMinValue,
@@ -66,6 +68,7 @@ class DataCollector
         AdServerConfigurationClient::MAX_PAGE_ZONES => AdServerConfig::MaxPageZones,
         AdServerConfigurationClient::OPERATOR_RX_FEE => AdServerConfig::OperatorRxFee,
         AdServerConfigurationClient::OPERATOR_TX_FEE => AdServerConfig::OperatorTxFee,
+        AdServerConfigurationClient::PUBLISHER_APPLY_FORM_URL => AdServerConfig::PublisherApplyFormUrl,
         AdServerConfigurationClient::REFERRAL_REFUND_ENABLED => AdServerConfig::ReferralRefundEnabled,
         AdServerConfigurationClient::REFERRAL_REFUND_COMMISSION => AdServerConfig::ReferralRefundCommission,
         AdServerConfigurationClient::REJECTED_DOMAINS => AdServerConfig::RejectedDomains,
