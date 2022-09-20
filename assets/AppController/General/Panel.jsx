@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import configSelectors from '../../../redux/config/configSelectors';
-import { useSetPlaceholdersConfigMutation, useUploadAssetsMutation } from '../../../redux/config/configApi';
-import { changePlaceholdersInformation } from '../../../redux/config/configSlice';
-import { useCreateNotification, useForm } from '../../../hooks';
-import configuration from '../../../controllerConfig/configuration';
+import configSelectors from '../../redux/config/configSelectors';
+import { useSetPlaceholdersConfigMutation, useUploadAssetsMutation } from '../../redux/config/configApi';
+import { changePlaceholdersInformation } from '../../redux/config/configSlice';
+import { useCreateNotification, useForm } from '../../hooks';
+import configuration from '../../controllerConfig/configuration';
 import {
   Box,
   Button,
@@ -20,7 +20,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import commonStyles from '../../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Panel() {
   return (

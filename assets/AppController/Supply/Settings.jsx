@@ -23,7 +23,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import HelpIcon from '@mui/icons-material/Help';
-import commonStyles from '../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
   return (

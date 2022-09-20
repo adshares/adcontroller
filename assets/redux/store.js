@@ -3,6 +3,8 @@ import authSlice from './auth/authSlice';
 import { authApi } from './auth/authApi';
 import { configApi } from './config/configApi';
 import configSlice from './config/configSlice';
+import { monitoringApi } from './monitoring/monitoringApi';
+import monitoringSlice from './monitoring/monitoringSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +13,11 @@ export const store = configureStore({
 
     [configApi.reducerPath]: configApi.reducer,
     configSlice: configSlice,
+
+    [monitoringApi.reducerPath]: monitoringApi.reducer,
+    monitoringSlice: monitoringSlice,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(authApi.middleware, configApi.middleware),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat(authApi.middleware, configApi.middleware, monitoringApi.middleware),
   devTools: process.env.NODE_ENV === 'development',
 });

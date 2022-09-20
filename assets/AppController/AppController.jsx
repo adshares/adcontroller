@@ -13,15 +13,15 @@ import AppWindow from '../Components/AppWindow/AppWindow';
 import Login from '../Components/Login/Login';
 import NotFoundView from '../Components/NotFound/NotFoundView';
 import SideMenu from '../Components/SideMenu/SideMenu';
-import Wallet from './Finance/Wallet/Wallet';
-import Commissions from './Finance/Commissions/Commissions';
-import Base from './General/Base/Base';
-import License from './General/License/License';
+import Wallet from './Finance/Wallet';
+import Commissions from './Finance/Commissions';
+import Base from './General/Base';
+import License from './General/License';
 import NetworkSettings from './Network/Settings';
 import SupplySettings from './Supply/Settings';
 import DemandSettings from './Demand/Settings';
 import UsersSettings from './Users/Settings';
-import Panel from './General/Panel/Panel';
+import Panel from './General/Panel';
 import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -36,7 +36,7 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import PeopleIcon from '@mui/icons-material/People';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
-import commonStyles from './common/commonStyles.scss';
+import commonStyles from '../styles/commonStyles.scss';
 
 const appModules = [
   {

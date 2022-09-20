@@ -17,7 +17,7 @@ import SMTP from './InstallerSteps/SMTP/SMTP';
 import Status from './InstallerSteps/Status/Status';
 import InstallerStepWrapper from '../Components/InstallerStepWrapper/InstallerStepWrapper';
 import Spinner from '../Components/Spinner/Spinner';
-import commonStyles from '../AppController/common/commonStyles.scss';
+import commonStyles from '../styles/commonStyles.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import authSelectors from '../redux/auth/authSelectors';
 import { checkAppAuth } from '../redux/auth/authSlice';

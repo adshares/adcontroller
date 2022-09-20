@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
-import commonStyles from '../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function AdClassifier() {
   const appData = useSelector(configSelectors.getAppData);

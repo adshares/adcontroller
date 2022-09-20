@@ -28,7 +28,7 @@ import {
   Select,
   TextField,
 } from '@mui/material';
-import commonStyles from '../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
   return (

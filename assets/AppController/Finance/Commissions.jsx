@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import configSelectors from '../../../redux/config/configSelectors';
-import { useSetCommissionsConfigMutation } from '../../../redux/config/configApi';
-import { changeCommissionsConfigInformation } from '../../../redux/config/configSlice';
-import { returnNumber, setDecimalPlaces } from '../../../utils/helpers';
-import { useCreateNotification, useForm } from '../../../hooks';
+import configSelectors from '../../redux/config/configSelectors';
+import { useSetCommissionsConfigMutation } from '../../redux/config/configApi';
+import { changeCommissionsConfigInformation } from '../../redux/config/configSlice';
+import { returnNumber, setDecimalPlaces } from '../../utils/helpers';
+import { useCreateNotification, useForm } from '../../hooks';
 import {
   Alert,
   Box,
@@ -19,7 +19,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import commonStyles from '../../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 function Commissions() {
   const appData = useSelector(configSelectors.getAppData);

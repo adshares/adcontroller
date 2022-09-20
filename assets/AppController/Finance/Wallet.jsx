@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import configSelectors from '../../../redux/config/configSelectors';
-import { useSetWalletConfigMutation, useSetColdWalletConfigMutation } from '../../../redux/config/configApi';
-import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../../redux/config/configSlice';
-import apiService from '../../../utils/apiService';
-import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../../hooks';
-import { adsToClicks, clicksToAds, returnNumber } from '../../../utils/helpers';
+import configSelectors from '../../redux/config/configSelectors';
+import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
+import { useSetWalletConfigMutation, useSetColdWalletConfigMutation } from '../../redux/config/configApi';
+import { useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
+import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../redux/config/configSlice';
+import apiService from '../../utils/apiService';
+import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
+import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
-import Spinner from '../../../Components/Spinner/Spinner';
+import Spinner from '../../Components/Spinner/Spinner';
 import {
   Box,
   Button,
@@ -26,7 +28,7 @@ import {
 import HelpIcon from '@mui/icons-material/Help';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
-import commonStyles from '../../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 const WalletSettingsCard = () => {
   const appData = useSelector(configSelectors.getAppData);
@@ -220,6 +222,11 @@ const WalletSettingsCard = () => {
 };
 
 const WalletStatusCard = () => {
+  const monitoringData = useSelector(monitoringSelectors.getMonitoringData);
+  useGetWalletMonitoringQuery([], {
+    pollingInterval: 3000,
+  });
+
   return (
     <Card className={commonStyles.card}>
       <CardHeader title="Wallet status" />
@@ -227,8 +234,7 @@ const WalletStatusCard = () => {
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Total balance:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
-            {/*TODO: Add service for read wallet balance*/}
-            999,999 ADS
+            {formatMoney(monitoringData.wallet.balance, 5)} ADS
           </Typography>
         </Box>
         <Typography variant="body2">
@@ -240,8 +246,7 @@ const WalletStatusCard = () => {
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Unused bonuses:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
-            {/*TODO: Add service for read wallet balance*/}
-            1,000 ADS
+            {formatMoney(monitoringData.wallet.unusedBonuses, 5)} ADS
           </Typography>
         </Box>
         <Typography variant="body2">

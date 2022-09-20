@@ -4,9 +4,9 @@ import configSelectors from '../../redux/config/configSelectors';
 import { useSetInventoryWhitelistConfigMutation } from '../../redux/config/configApi';
 import { changeInventoryWhitelistInformation } from '../../redux/config/configSlice';
 import { useCreateNotification } from '../../hooks';
-import ListOfInputs from '../common/ListOfInputs/ListOfInputs';
+import ListOfInputs from '../../Components/ListOfInputs/ListOfInputs';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Collapse, FormControlLabel } from '@mui/material';
-import commonStyles from '../common/commonStyles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
   const appData = useSelector(configSelectors.getAppData);
