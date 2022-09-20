@@ -13,59 +13,108 @@ import AppWindow from '../Components/AppWindow/AppWindow';
 import Login from '../Components/Login/Login';
 import NotFoundView from '../Components/NotFound/NotFoundView';
 import SideMenu from '../Components/SideMenu/SideMenu';
-import Wallet from './FinanceSettingsSubMenu/Wallet/Wallet';
-import Commissions from './FinanceSettingsSubMenu/Commissions/Commissions';
-import Base from './GeneralSettingsSubMenu/Base/Base';
-import License from './GeneralSettingsSubMenu/License/License';
-import Network from './GeneralSettingsSubMenu/Network/Network';
-import Supply from './GeneralSettingsSubMenu/Supply/Supply';
-import Demand from './GeneralSettingsSubMenu/Demand/Demand';
-import Settings from './Users/Settings/Settings';
-import Panel from './GeneralSettingsSubMenu/Panel/Panel';
+import Wallet from './Finance/Wallet/Wallet';
+import Commissions from './Finance/Commissions/Commissions';
+import Base from './General/Base/Base';
+import License from './General/License/License';
+import NetworkSettings from './Network/Settings';
+import SupplySettings from './Supply/Settings';
+import DemandSettings from './Demand/Settings';
+import UsersSettings from './Users/Settings';
+import Panel from './General/Panel/Panel';
+import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
-import Users from './Users/Users/Users';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import PercentIcon from '@mui/icons-material/Percent';
 import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import InfoIcon from '@mui/icons-material/Info';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import PeopleIcon from '@mui/icons-material/People';
+import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import commonStyles from './common/commonStyles.scss';
 
 const appModules = [
   {
     name: 'Users',
-    icon: ManageAccountsIcon,
+    icon: PeopleIcon,
     children: [
       {
         name: 'Settings',
-        path: '/settings',
-        component: Settings,
-        icon: ManageAccountsIcon,
-      },
-      {
-        name: 'Users',
-        path: '/users',
-        component: Users,
-        icon: PeopleAltIcon,
+        path: '/users/settings',
+        component: UsersSettings,
+        icon: SettingsIcon,
       },
     ],
   },
   {
-    name: 'General settings',
+    name: 'Demand',
+    icon: TrendingFlatIcon,
+    children: [
+      {
+        name: 'Settings',
+        path: '/demand/settings',
+        component: DemandSettings,
+        icon: SettingsIcon,
+      },
+    ],
+  },
+  {
+    name: 'Supply',
+    icon: TrendingFlatIcon,
+    rotateIcon: '180deg',
+    children: [
+      {
+        name: 'Settings',
+        path: '/supply/settings',
+        component: SupplySettings,
+        icon: SettingsIcon,
+      },
+    ],
+  },
+  {
+    name: 'Network',
+    icon: SyncAltIcon,
+    children: [
+      {
+        name: 'Settings',
+        path: '/network/settings',
+        component: NetworkSettings,
+        icon: SettingsIcon,
+      },
+    ],
+  },
+  {
+    name: 'Finance',
+    icon: AccountBalanceIcon,
+    children: [
+      {
+        name: 'Wallet',
+        path: '/finance/wallet',
+        component: Wallet,
+        icon: AccountBalanceWalletIcon,
+      },
+      {
+        name: 'Commissions',
+        path: '/finance/commissions',
+        component: Commissions,
+        icon: PercentIcon,
+      },
+    ],
+  },
+  {
+    name: 'General',
     icon: SettingsIcon,
     children: [
       {
         name: 'Base',
         path: '/base',
         component: Base,
-        icon: AlternateEmailIcon,
+        icon: InfoIcon,
       },
       {
         name: 'License',
@@ -74,47 +123,16 @@ const appModules = [
         icon: VpnKeyIcon,
       },
       {
-        name: 'Network',
-        path: '/network',
-        component: Network,
-        icon: SyncAltIcon,
-      },
-      {
-        name: 'Demand',
-        path: '/demand',
-        component: Demand,
-        icon: TrendingFlatIcon,
-      },
-      {
-        name: 'Supply',
-        path: '/supply',
-        component: Supply,
-        icon: TrendingFlatIcon,
-        rotateIcon: '180deg',
-      },
-      {
         name: 'Panel',
         path: '/panel',
         component: Panel,
         icon: DisplaySettingsIcon,
       },
-    ],
-  },
-  {
-    name: 'Finance settings',
-    icon: AccountBalanceIcon,
-    children: [
       {
-        name: 'Wallet',
-        path: '/wallet',
-        component: Wallet,
-        icon: AccountBalanceWalletIcon,
-      },
-      {
-        name: 'Commissions',
-        path: '/commissions',
-        component: Commissions,
-        icon: PercentIcon,
+        name: 'Privacy & Terms',
+        path: '/terms',
+        component: Terms,
+        icon: PrivacyTipIcon,
       },
     ],
   },

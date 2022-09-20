@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import configSelectors from '../../../redux/config/configSelectors';
+import configSelectors from '../../redux/config/configSelectors';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSetSiteOptionsConfigMutation, useSetZoneOptionsConfigMutation } from '../../../redux/config/configApi';
-import { changeSiteOptionsInformation, changeZoneOptionsInformation } from '../../../redux/config/configSlice';
-import { useCreateNotification, useForm } from '../../../hooks';
-import { returnNumber } from '../../../utils/helpers';
+import { useSetSiteOptionsConfigMutation, useSetZoneOptionsConfigMutation } from '../../redux/config/configApi';
+import { changeSiteOptionsInformation, changeZoneOptionsInformation } from '../../redux/config/configSlice';
+import { useCreateNotification, useForm } from '../../hooks';
+import { returnNumber } from '../../utils/helpers';
 import {
   Box,
   Button,
@@ -23,9 +23,9 @@ import {
   Tooltip,
 } from '@mui/material';
 import HelpIcon from '@mui/icons-material/Help';
-import commonStyles from '../../common/commonStyles.scss';
+import commonStyles from '../common/commonStyles.scss';
 
-export default function Supply() {
+export default function Settings() {
   return (
     <>
       <SiteOptions />

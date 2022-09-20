@@ -61,8 +61,8 @@ class SmtpStep implements InstallerStep
         ini_set('default_socket_timeout', 10);
         try {
             $mailer->send($message);
-        } catch (TransportExceptionInterface) {
-            throw new UnprocessableEntityHttpException('Invalid configuration');
+        } catch (TransportExceptionInterface $exception) {
+            throw new UnprocessableEntityHttpException(sprintf('Invalid configuration: %s', $exception->getMessage()));
         } finally {
             ini_set('default_socket_timeout', $timeout);
         }
