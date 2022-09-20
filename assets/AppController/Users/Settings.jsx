@@ -222,7 +222,10 @@ const RegistrationModeCard = () => {
               <FormControlLabel value="both" control={<Radio />} label="Both" />
             </RadioGroup>
           </FormControl>
-          <Collapse in={AutoRegistrationEnabled && !DefaultUserRoles.includes('publisher')} timeout="auto">
+          <Collapse
+            in={RegistrationMode !== 'private' && AutoRegistrationEnabled && !DefaultUserRoles.includes('publisher')}
+            timeout="auto"
+          >
             <Alert severity="warning">No publisher role while auto registration is allowed.</Alert>
           </Collapse>
         </Box>
