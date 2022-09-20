@@ -11,9 +11,10 @@ import {
   changeAutoWithdrawalConfigInformation,
   changeRegistrationModeInformation,
   changeRegulationsInformation,
-} from '../../redux/config/configSlice';
-import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../utils/helpers';
+} from '../../../redux/config/configSlice';
+import { adsToClicks, clicksToAds, compareArrays, returnNumber, setDecimalPlaces } from '../../utils/helpers';
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -25,10 +26,13 @@ import {
   FormControl,
   FormControlLabel,
   FormHelperText,
+  FormLabel,
   InputAdornment,
   InputLabel,
   MenuItem,
   OutlinedInput,
+  Radio,
+  RadioGroup,
   Select,
   TextField,
 } from '@mui/material';
@@ -57,10 +61,11 @@ const RegistrationModeCard = () => {
   const [AutoRegistrationEnabled, setAutoRegistrationEnabled] = useState(
     RegistrationMode === 'private' ? false : appData.AdServer.AutoRegistrationEnabled || false,
   );
+  const [DefaultUserRoles, setDefaultUserRoles] = useState(appData.AdServer.DefaultUserRoles || []);
   const form = useForm({
     initialFields: {
-      AdvertiserApplyFormUrl: '',
-      PublisherApplyFormUrl: '',
+      AdvertiserApplyFormUrl: appData.AdServer.AdvertiserApplyFormUrl || '',
+      PublisherApplyFormUrl: appData.AdServer.PublisherApplyFormUrl || '',
     },
     validation: {
       AdvertiserApplyFormUrl: ['url'],
@@ -73,6 +78,20 @@ const RegistrationModeCard = () => {
     setRegistrationMode(event.target.value);
   };
 
+  const handleRolesChange = (e) => {
+    setDefaultUserRoles(() => {
+      if (e.target.value === 'advertiser') {
+        return ['advertiser'];
+      }
+      if (e.target.value === 'publisher') {
+        return ['publisher'];
+      }
+      if (e.target.value === 'both') {
+        return ['advertiser', 'publisher'];
+      }
+    });
+  };
+
   const onSaveClick = async () => {
     if (RegistrationMode === 'private') {
       setEmailVerificationRequired(false);
@@ -80,6 +99,7 @@ const RegistrationModeCard = () => {
       setAutoConfirmationEnabled(false);
     }
     const body = {
+      DefaultUserRoles: DefaultUserRoles.length ? DefaultUserRoles : null,
       ...(RegistrationMode === 'public' && {
         RegistrationMode,
         EmailVerificationRequired,
@@ -91,8 +111,8 @@ const RegistrationModeCard = () => {
         EmailVerificationRequired,
         AutoConfirmationEnabled,
         AutoRegistrationEnabled,
-        AdvertiserApplyFormUrl: form.fields.AdvertiserApplyFormUrl,
-        PublisherApplyFormUrl: form.fields.PublisherApplyFormUrl,
+        AdvertiserApplyFormUrl: form.fields.AdvertiserApplyFormUrl || null,
+        PublisherApplyFormUrl: form.fields.PublisherApplyFormUrl || null,
       }),
       ...(RegistrationMode === 'private' && {
         RegistrationMode,
@@ -183,6 +203,28 @@ const RegistrationModeCard = () => {
               />
             </FormControl>
           </Collapse>
+          <FormControl sx={{ mt: 1 }}>
+            <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
+              Default users role:
+            </FormLabel>
+            <RadioGroup
+              row
+              value={(() => {
+                if (DefaultUserRoles.length === 2) {
+                  return 'both';
+                }
+                return DefaultUserRoles[0];
+              })()}
+              onChange={handleRolesChange}
+            >
+              <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
+              <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
+              <FormControlLabel value="both" control={<Radio />} label="Both" />
+            </RadioGroup>
+          </FormControl>
+          <Collapse in={AutoRegistrationEnabled && !DefaultUserRoles.includes('publisher')} timeout="auto">
+            <Alert severity="warning">No publisher role while auto registration is allowed.</Alert>
+          </Collapse>
         </Box>
       </CardContent>
 
@@ -194,7 +236,9 @@ const RegistrationModeCard = () => {
               (appData.AdServer.RegistrationMode === RegistrationMode &&
                 appData.AdServer.EmailVerificationRequired === EmailVerificationRequired &&
                 appData.AdServer.AutoConfirmationEnabled === AutoConfirmationEnabled &&
-                appData.AdServer.AutoRegistrationEnabled === AutoRegistrationEnabled)
+                appData.AdServer.AutoRegistrationEnabled === AutoRegistrationEnabled &&
+                compareArrays(appData.AdServer.DefaultUserRoles, DefaultUserRoles) &&
+                (RegistrationMode === 'restricted' ? !form.isFormValid || !form.isFormWasChanged : true))
             }
             onClick={onSaveClick}
             variant="contained"

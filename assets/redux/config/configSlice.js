@@ -64,6 +64,9 @@ const initialState = {
       UploadLimitModel: null,
       UploadLimitVideo: null,
       UploadLimitZip: null,
+      AdvertiserApplyFormUrl: null,
+      PublisherApplyFormUrl: null,
+      DefaultUserRoles: null,
     },
     AdUser: {
       InternalUrl: null,
