@@ -117,7 +117,7 @@ const getMappedMenuItems = (items) => {
         <ListItem key={item.name} disablePadding>
           <Accordion expanded={expanded.includes(item.name)} onChange={handleChange(item.name)} disableGutters square>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <ListItemIcon>{<item.icon />}</ListItemIcon>
+              <ListItemIcon>{<item.icon sx={item.rotateIcon && { transform: `rotate(${item.rotateIcon})` }} />}</ListItemIcon>
               <Typography>{item.name}</Typography>
             </AccordionSummary>
             <AccordionDetails>

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import configSelectors from '../../../redux/config/configSelectors';
-import { useCreateNotification, useForm } from '../../../hooks';
-import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../../utils/helpers';
+import configSelectors from '../../redux/config/configSelectors';
+import { useCreateNotification, useForm } from '../../hooks';
+import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../utils/helpers';
 import {
   useSetBannerSettingsConfigMutation,
   useSetCampaignSettingsConfigMutation,
   useSetRejectedDomainsSettingsConfigMutation,
-} from '../../../redux/config/configApi';
+} from '../../redux/config/configApi';
 import {
   changeBannerSettingsInformation,
   changeCampaignSettingsInformation,
   changeRejectedDomainsInformation,
-} from '../../../redux/config/configSlice';
-import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
+} from '../../redux/config/configSlice';
+import ListOfInputs from '../common/ListOfInputs/ListOfInputs';
 import {
   Box,
   Button,
@@ -27,9 +27,9 @@ import {
   InputLabel,
   OutlinedInput,
 } from '@mui/material';
-import commonStyles from '../../common/commonStyles.scss';
+import commonStyles from '../common/commonStyles.scss';
 
-export default function Demand() {
+export default function Settings() {
   return (
     <>
       <CampaignSettingsCard />
@@ -76,7 +76,7 @@ const CampaignSettingsCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Campaign settings" subheader="lorem ipsum dolor sit amet" />
+      <CardHeader title="Campaign options" subheader="lorem ipsum dolor sit amet" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box
@@ -188,7 +188,7 @@ const BannerSettingsCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Banner settings" subheader="lorem ipsum dolor sit amet" />
+      <CardHeader title="Banner options" subheader="lorem ipsum dolor sit amet" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box

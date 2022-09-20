@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import configSelectors from '../../../redux/config/configSelectors';
-import { useSetInventoryWhitelistConfigMutation } from '../../../redux/config/configApi';
-import { changeInventoryWhitelistInformation } from '../../../redux/config/configSlice';
-import { useCreateNotification } from '../../../hooks';
-import ListOfInputs from '../../common/ListOfInputs/ListOfInputs';
+import configSelectors from '../../redux/config/configSelectors';
+import { useSetInventoryWhitelistConfigMutation } from '../../redux/config/configApi';
+import { changeInventoryWhitelistInformation } from '../../redux/config/configSlice';
+import { useCreateNotification } from '../../hooks';
+import ListOfInputs from '../common/ListOfInputs/ListOfInputs';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Collapse, FormControlLabel } from '@mui/material';
-import commonStyles from '../../common/commonStyles.scss';
+import commonStyles from '../common/commonStyles.scss';
 
-export default function Network() {
+export default function Settings() {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setInventoryWhitelistConfig, { isLoading }] = useSetInventoryWhitelistConfigMutation();
