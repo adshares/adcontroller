@@ -76,7 +76,7 @@ const CampaignSettingsCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Campaign options" subheader="lorem ipsum dolor sit amet" />
+      <CardHeader title="Campaign options" subheader="Set minimum campaign spend." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box
@@ -188,7 +188,7 @@ const BannerSettingsCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Banner options" subheader="lorem ipsum dolor sit amet" />
+      <CardHeader title="Banner options" subheader="Set a banner file size limit." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box
@@ -198,14 +198,14 @@ const BannerSettingsCard = () => {
           className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
         >
           <FormControl error={form.touchedFields.UploadLimitImage && !form.errorObj.UploadLimitImage.isValid} margin="dense">
-            <InputLabel htmlFor="UploadLimitImage">Image size limit</InputLabel>
+            <InputLabel htmlFor="UploadLimitImage">Image file size limit</InputLabel>
             <OutlinedInput
               id="UploadLimitImage"
               name="UploadLimitImage"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="Image size limit"
+              label="Image file size limit"
               value={form.fields.UploadLimitImage}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -215,14 +215,14 @@ const BannerSettingsCard = () => {
           </FormControl>
 
           <FormControl error={form.touchedFields.UploadLimitVideo && !form.errorObj.UploadLimitVideo.isValid} margin="dense">
-            <InputLabel htmlFor="UploadLimitVideo">Video size limit</InputLabel>
+            <InputLabel htmlFor="UploadLimitVideo">Video file size limit</InputLabel>
             <OutlinedInput
               id="UploadLimitVideo"
               name="UploadLimitVideo"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="Video size limit"
+              label="Video file size limit"
               value={form.fields.UploadLimitVideo}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -232,14 +232,14 @@ const BannerSettingsCard = () => {
           </FormControl>
 
           <FormControl error={form.touchedFields.UploadLimitModel && !form.errorObj.UploadLimitModel.isValid} margin="dense">
-            <InputLabel htmlFor="UploadLimitModel">Upload model limit</InputLabel>
+            <InputLabel htmlFor="UploadLimitModel">3D model file size limit</InputLabel>
             <OutlinedInput
               id="UploadLimitModel"
               name="UploadLimitModel"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="Upload model limit"
+              label="3D model file size limit"
               value={form.fields.UploadLimitModel}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -249,14 +249,14 @@ const BannerSettingsCard = () => {
           </FormControl>
 
           <FormControl margin="dense">
-            <InputLabel htmlFor="UploadLimitZip">Upload HTML limit</InputLabel>
+            <InputLabel htmlFor="UploadLimitZip">HTML file size limit</InputLabel>
             <OutlinedInput
               id="UploadLimitZip"
               name="UploadLimitZip"
               size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="Upload model limit"
+              label="HTML file size limit"
               value={form.fields.UploadLimitZip}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -311,7 +311,10 @@ const RejectedDomainsCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Rejected domains:" subheader="Here you can define domains. All subdomains will be rejected." />
+      <CardHeader
+        title="Rejected domains"
+        subheader="Set domains on which campaigns will not be displayed. All subdomains will be rejected."
+      />
       <CardContent>
         <ListOfInputs
           initialList={appData.AdServer.RejectedDomains}
