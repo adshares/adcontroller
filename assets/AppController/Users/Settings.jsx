@@ -125,12 +125,14 @@ const RegistrationModeCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Registration mode" subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit." />
-
+      <CardHeader
+        title="Registration mode"
+        subheader="Set whether registration is to be available to the public, by invitation or only by a moderator."
+      />
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={commonStyles.halfCard}>
           <FormControl fullWidth>
-            <InputLabel id="registrationModeLabel">Set registration mode</InputLabel>
+            <InputLabel id="registrationModeLabel">Registration mode</InputLabel>
             <Select
               size="small"
               labelId="registrationModeLabel"
@@ -195,30 +197,34 @@ const RegistrationModeCard = () => {
               />
             </FormControl>
           </Collapse>
-          <FormControl sx={{ mt: 1 }}>
-            <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
-              Default users role:
-            </FormLabel>
-            <RadioGroup
-              row
-              value={(() => {
-                if (DefaultUserRoles.length === 2) {
-                  return 'both';
-                }
-                return DefaultUserRoles[0];
-              })()}
-              onChange={handleRolesChange}
-            >
-              <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
-              <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
-              <FormControlLabel value="both" control={<Radio />} label="Both" />
-            </RadioGroup>
-          </FormControl>
+
+          <Collapse in={RegistrationMode !== 'private'} timeout="auto">
+            <FormControl sx={{ mt: 1 }}>
+              <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
+                Default user's role:
+              </FormLabel>
+              <RadioGroup
+                row
+                value={(() => {
+                  if (DefaultUserRoles.length === 2) {
+                    return 'both';
+                  }
+                  return DefaultUserRoles[0];
+                })()}
+                onChange={handleRolesChange}
+              >
+                <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
+                <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
+                <FormControlLabel value="both" control={<Radio />} label="Advertiser & Publisher" />
+              </RadioGroup>
+            </FormControl>
+          </Collapse>
+
           <Collapse
             in={RegistrationMode !== 'private' && AutoRegistrationEnabled && !DefaultUserRoles.includes('publisher')}
             timeout="auto"
           >
-            <Alert severity="warning">No publisher role while auto registration is allowed.</Alert>
+            <Alert severity="warning">Automatic registration requires the publisher role.</Alert>
           </Collapse>
         </Box>
       </CardContent>
@@ -282,7 +288,7 @@ const AutoWithdrawalCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Auto withdrawal" subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit." />
+      <CardHeader title="Auto withdrawal" subheader="Set minimum thresholds for automatic withdrawals." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box
@@ -300,7 +306,7 @@ const AutoWithdrawalCard = () => {
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="ADS minimum withdrawal"
-              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitAds, 2)}
+              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitAds, 4)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
             <FormHelperText id="CampaignMinBudget">
@@ -316,7 +322,7 @@ const AutoWithdrawalCard = () => {
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="BSC minimum withdrawal"
-              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitBsc, 2)}
+              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitBsc, 4)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
             <FormHelperText id="CampaignMinBudget">
