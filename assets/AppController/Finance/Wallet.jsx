@@ -116,7 +116,7 @@ const WalletSettingsCard = () => {
   return (
     <Card className={commonStyles.card}>
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
-        <CardHeader title="Wallet settings" />
+        <CardHeader title="Hot wallet" />
         <IconButton type="button" onClick={toggleEditMode}>
           {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
         </IconButton>
@@ -125,7 +125,7 @@ const WalletSettingsCard = () => {
         <>
           <Collapse in={!editMode} timeout="auto">
             <Box className={`${commonStyles.flex}`}>
-              <Typography variant="h6">You wallet address:</Typography>
+              <Typography variant="h6">Wallet address:</Typography>
               <Typography variant="h6" sx={{ ml: 1 }}>
                 {appData.AdServer.WalletAddress}
               </Typography>
@@ -229,7 +229,7 @@ const WalletStatusCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Wallet status" />
+      <CardHeader title="Ad server balance" />
       <CardContent>
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Total balance:</Typography>
@@ -238,8 +238,8 @@ const WalletStatusCard = () => {
           </Typography>
         </Box>
         <Typography variant="body2">
-          It is the total balance of all users accounts. It is an amount that should be at least equal to the sum funds stored on hot and
-          cold ADS wallets. The amount exceeding this value is operator's profit
+          Total balance of all user accounts. This amount should be at least equal to the sum of funds accumulated in hot and cold wallets.
+          <strong>The amount exceeding this value is the operator's profit</strong>.
         </Typography>
       </CardContent>
       <CardContent>
@@ -250,7 +250,7 @@ const WalletStatusCard = () => {
           </Typography>
         </Box>
         <Typography variant="body2">
-          It is the total amount of all bonuses that were added to users' accounts but have not been used so far.
+          The total amount of all bonuses that have been added to user accounts but have not yet been used up.
         </Typography>
       </CardContent>
     </Card>
@@ -297,7 +297,7 @@ const ColdWalletSettingsCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Cold wallet settings" />
+      <CardHeader title="Cold wallet" />
       <FormControlLabel
         sx={{ pl: 2 }}
         label="Enable cold wallet"
@@ -330,7 +330,7 @@ const ColdWalletSettingsCard = () => {
                 <Tooltip
                   title={
                     // eslint-disable-next-line max-len
-                    'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail'
+                    'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail.'
                   }
                 >
                   <HelpIcon color="primary" />
@@ -375,11 +375,6 @@ const ColdWalletSettingsCard = () => {
                 type="text"
                 inputProps={{ autoComplete: 'off' }}
               />
-              <Box sx={{ height: '40px', ml: 0.5 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-                <Tooltip title="Enter your ADS account address">
-                  <HelpIcon color="primary" />
-                </Tooltip>
-              </Box>
             </Box>
           </Box>
         </CardContent>
@@ -405,8 +400,8 @@ const ColdWalletSettingsCard = () => {
 function Wallet() {
   return (
     <>
-      <WalletSettingsCard />
       <WalletStatusCard />
+      <WalletSettingsCard />
       <ColdWalletSettingsCard />
     </>
   );

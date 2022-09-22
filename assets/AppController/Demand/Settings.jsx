@@ -188,7 +188,7 @@ const BannerSettingsCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Banner options" subheader="Set a banner file size limit." />
+      <CardHeader title="Ad options" subheader="Set an ad file size limit." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box

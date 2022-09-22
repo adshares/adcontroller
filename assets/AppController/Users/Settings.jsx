@@ -18,7 +18,7 @@ import {
   FormControl,
   FormControlLabel,
   FormHelperText,
-  FormLabel,
+  FormLabel, Icon,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -26,9 +26,10 @@ import {
   Radio,
   RadioGroup,
   Select,
-  TextField,
-} from '@mui/material';
+  TextField, Tooltip,
+} from '@mui/material'
 import commonStyles from '../../styles/commonStyles.scss';
+import HelpIcon from '@mui/icons-material/Help'
 
 export default function Settings() {
   return (
@@ -183,19 +184,37 @@ const RegistrationModeCard = () => {
                   <Checkbox checked={EmailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
                 }
               />
-              <FormControlLabel
-                label="Auto account confirmation"
-                control={
-                  <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
-                }
-              />
-              <FormControlLabel
-                label="Auto registration allowed"
-                control={
-                  <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
-                }
-              />
             </FormControl>
+            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+              <FormControl margin="none">
+                <FormControlLabel
+                  label="Auto account confirmation"
+                  control={
+                    <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
+                  }
+                />
+              </FormControl>
+              <Tooltip title="Accounts will not require confirmation by a moderator.">
+                <Icon>
+                  <HelpIcon color="primary" />
+                </Icon>
+              </Tooltip>
+            </Box>
+            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+              <FormControl margin="none">
+                <FormControlLabel
+                  label="Auto registration allowed"
+                  control={
+                    <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
+                  }
+                />
+              </FormControl>
+              <Tooltip title="Accounts will be set up the first time the banner is displayed, without prior registration.">
+                <Icon>
+                  <HelpIcon color="primary" />
+                </Icon>
+              </Tooltip>
+            </Box>
           </Collapse>
 
           <Collapse in={RegistrationMode !== 'private'} timeout="auto">

@@ -64,7 +64,7 @@ const Placeholders = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Panel placeholders" subheader="Here you can read and edit placeholders for index.html and robots.txt" />
+      <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <TextField
@@ -80,7 +80,7 @@ const Placeholders = () => {
             name="PlaceholderIndexDescription"
             label="Description"
             multiline
-            rows={8}
+            rows={2}
             margin="dense"
             fullWidth
             size="small"
@@ -96,7 +96,7 @@ const Placeholders = () => {
           <TextField
             value={form.fields.PlaceholderIndexMetaTags}
             name="PlaceholderIndexMetaTags"
-            label="Custom HEAD meta-tags"
+            label="Custom meta tags"
             multiline
             rows={8}
             margin="dense"
@@ -243,23 +243,11 @@ const Rebranding = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Rebranding" subheader={'lorem ipsum dolor sit amet'} />
-      <CardContent>
-        <div>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad aliquid consectetur corporis, dolores ducimus eaque eligendi, esse
-          fugiat inventore officia perspiciatis provident quo ratione reprehenderit sunt unde vel voluptatem voluptatum.
-        </div>
-        <div>
-          Iste, natus, voluptates! Amet blanditiis facilis iusto labore modi nulla, officiis quaerat quam quia. Amet architecto deserunt
-          dolores expedita fugiat labore odio quibusdam quo repellat repellendus sit temporibus, totam vero.
-        </div>
-      </CardContent>
-
-      <CardHeader title="Assets" subheader={'lorem ipsum dolor sit amet'} />
+      <CardHeader title="Rebranding" subheader={'Customize the ad server panel.'} />
       <CardContent>
         <Box className={commonStyles.card}>
           <Typography variant="h6">Favicons</Typography>
-          <Typography variant="body2">You can add favicons with only svg extension and sizes 16x16, 32x32, 48x48, 96x96</Typography>
+          <Typography variant="body2">You can add png files with sizes 16x16, 32x32, 48x48 and 96x96</Typography>
           <Table>
             <TableBody>
               <TableRow>
@@ -353,7 +341,7 @@ const Rebranding = () => {
 
         <Box className={commonStyles.card}>
           <Typography variant="h6">Logos</Typography>
-          <Typography variant="body2">You can add logo with height 30 and optional @2x and @3x</Typography>
+          <Typography variant="body2">You can add png files with minimal height 30 px and optional @2x and @3x</Typography>
           <Table sx={{ backgroundColor: 'primary.main', mt: 1 }}>
             <TableBody>
               <TableRow>
