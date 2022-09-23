@@ -101,7 +101,7 @@ const getMappedMenuItems = (items) => {
         });
       }
     });
-  }, []);
+  }, [location]);
 
   const handleChange = (itemName) => (event, isExpanded) => {
     if (isExpanded) {
