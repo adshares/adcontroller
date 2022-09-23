@@ -121,7 +121,7 @@ class DataCollector
 
     public function synchronize(): array
     {
-        return [AdServerConfig::MODULE => $this->synchronizeAdServer()];
+        return array_filter([AdServerConfig::MODULE => $this->synchronizeAdServer()]);
     }
 
     private function synchronizeAdServer(): array

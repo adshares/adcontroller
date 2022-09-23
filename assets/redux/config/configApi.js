@@ -159,7 +159,7 @@ export const configApi = createApi({
 });
 
 export const {
-  useGetAppConfigQuery,
+  useLazyGetAppConfigQuery,
   useGetLicenseDataQuery,
   useSetExistingLicenseMutation,
   useSetBaseInformationMutation,
