@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { closeNotification } from '../../redux/globalNotifications/globalNotificationsSlice';
+import { styled } from '@mui/material';
 import { Box, IconButton } from '@mui/material';
-
+import { SnackbarProvider } from 'notistack';
 import styles from './styles.scss';
 import CloseIcon from '@mui/icons-material/Close';
-import { SnackbarProvider } from 'notistack';
-import { styled } from '@mui/material';
 
 const StyledSnackbarProvider = styled(SnackbarProvider)`
   &.SnackbarContent-root {
@@ -23,8 +24,13 @@ const StyledSnackbarProvider = styled(SnackbarProvider)`
 
 export default function AppWindow({ children }) {
   const snackBarRef = useRef(null);
+  const dispatch = useDispatch();
+  const handleClose = () => {
+    dispatch(closeNotification());
+  };
   return (
     <StyledSnackbarProvider
+      onClose={handleClose}
       ref={snackBarRef}
       maxSnack={3}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}

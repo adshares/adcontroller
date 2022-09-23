@@ -1,11 +1,9 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import configuration from '../../controllerConfig/configuration';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithGlobalErrorHandler } from '../apiBaseQuery';
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: configuration.baseUrl,
-  }),
+  baseQuery: baseQueryWithGlobalErrorHandler,
   endpoints: (builder) => ({
     loginUser: builder.mutation({
       query: (userData) => ({

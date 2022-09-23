@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import globalNotificationsSlice from './globalNotifications/globalNotificationsSlice';
 import authSlice from './auth/authSlice';
 import { authApi } from './auth/authApi';
 import { configApi } from './config/configApi';
@@ -18,6 +19,8 @@ const authPersistConfig = {
 
 export const store = configureStore({
   reducer: {
+    globalNotificationsSlice: globalNotificationsSlice,
+
     [authApi.reducerPath]: authApi.reducer,
     authSlice: persistReducer(authPersistConfig, authSlice),
 
