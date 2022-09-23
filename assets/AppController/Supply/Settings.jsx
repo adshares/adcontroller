@@ -57,7 +57,7 @@ const SiteOptions = () => {
   };
   return (
     <Card className={`${commonStyles.card}`}>
-      <CardHeader title="Site options" subheader="Site banners classifications settings." />
+      <CardHeader title="Site options" subheader="Set banner availability and classification." />
       <CardContent>
         <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceEvenly} ${commonStyles.alignStart}`}>
           <FormControlLabel
@@ -68,7 +68,7 @@ const SiteOptions = () => {
           />
 
           <FormControl>
-            <FormLabel focused={false}>Classification of banners from the server</FormLabel>
+            <FormLabel focused={false}>Visibility of banners for classification</FormLabel>
             <RadioGroup value={SiteClassifierLocalBanners} onChange={(e) => setSiteClassifierLocalBanners(e.target.value)}>
               <FormControlLabel value="all-by-default" control={<Radio />} label="Default from all servers" />
               <FormControlLabel value="local-by-default" control={<Radio />} label="Default from local server" />
@@ -127,24 +127,10 @@ const ZoneOptions = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Zone options" subheader="lorem ipsum dolor sit amet" />
+      <CardHeader title="Banner options" subheader="Set banner limitations" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-            <FormControl margin="dense">
-              <FormControlLabel
-                label="Allow zone in IFRAME"
-                control={<Checkbox checked={AllowZoneInIframe} onChange={() => setAllowZoneInIframe((prevState) => !prevState)} />}
-              />
-            </FormControl>
-            <Tooltip title="lorem ipsum dolor set amet">
-              <Icon>
-                <HelpIcon color="primary" />
-              </Icon>
-            </Tooltip>
-          </Box>
-
           <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
             <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
               <TextField
@@ -152,7 +138,7 @@ const ZoneOptions = () => {
                 name="MaxPageZones"
                 size="small"
                 type="number"
-                label="Maximum zones per page"
+                label="Maximum banners per page"
                 margin="dense"
                 fullWidth
                 value={form.fields.MaxPageZones}
@@ -161,11 +147,14 @@ const ZoneOptions = () => {
                 inputProps={{ autoComplete: 'off', min: 0 }}
               />
             </Box>
-            <Tooltip title="lorem ipsum dolor set amet" sx={{ ml: 1 }}>
-              <Icon>
-                <HelpIcon color="primary" />
-              </Icon>
-            </Tooltip>
+          </Box>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <FormControl margin="dense">
+              <FormControlLabel
+                label="Allow banners in the iframe"
+                control={<Checkbox checked={AllowZoneInIframe} onChange={() => setAllowZoneInIframe((prevState) => !prevState)} />}
+              />
+            </FormControl>
           </Box>
         </Box>
       </CardContent>

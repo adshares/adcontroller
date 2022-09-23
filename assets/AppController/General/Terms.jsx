@@ -43,7 +43,7 @@ const PrivacyCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Privacy" subheader="Here you can read and edit your privacy settings" />
+      <CardHeader title="Privacy policy" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <TextField value={form.fields.PrivacyPolicy} name="PrivacyPolicy" fullWidth multiline rows={8} label="Privacy" />
@@ -87,7 +87,7 @@ const TermAndConditionCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Terms and conditions" subheader="Here you can read and edit your terms and conditions" />
+      <CardHeader title="Terms and conditions" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <TextField value={form.fields.Terms} name="Terms" fullWidth multiline rows={8} label="Terms and conditions" />

@@ -188,7 +188,10 @@ const CRMNotificationsCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="CRM notifications" subheader="lorem ipsum dolor set amet" />
+      <CardHeader
+        title="CRM notifications"
+        subheader="Set up email addresses for sending notifications. The message will be sent each time the event occurs."
+      />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box
@@ -202,7 +205,7 @@ const CRMNotificationsCard = () => {
             margin="dense"
             variant="outlined"
             size="small"
-            label="CRM mail address on campaign created"
+            label="Email address on campaign created"
             name="CrmMailAddressOnCampaignCreated"
             error={form.changedFields.CrmMailAddressOnCampaignCreated && !form.errorObj.CrmMailAddressOnCampaignCreated.isValid}
             helperText={form.changedFields.CrmMailAddressOnCampaignCreated && form.errorObj.CrmMailAddressOnCampaignCreated.helperText}
@@ -214,7 +217,7 @@ const CRMNotificationsCard = () => {
             margin="dense"
             variant="outlined"
             size="small"
-            label="CRM mail address on site added"
+            label="Email address on site added"
             name="CrmMailAddressOnSiteAdded"
             error={form.changedFields.CrmMailAddressOnSiteAdded && !form.errorObj.CrmMailAddressOnSiteAdded.isValid}
             helperText={form.changedFields.CrmMailAddressOnSiteAdded && form.errorObj.CrmMailAddressOnSiteAdded.helperText}
@@ -226,7 +229,7 @@ const CRMNotificationsCard = () => {
             margin="dense"
             variant="outlined"
             size="small"
-            label="CRM mail address on user registered"
+            label="Email address on user registered"
             name="CrmMailAddressOnUserRegistered"
             error={form.changedFields.CrmMailAddressOnUserRegistered && !form.errorObj.CrmMailAddressOnUserRegistered.isValid}
             helperText={form.changedFields.CrmMailAddressOnUserRegistered && form.errorObj.CrmMailAddressOnUserRegistered.helperText}

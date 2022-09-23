@@ -18,7 +18,7 @@ import {
   FormControl,
   FormControlLabel,
   FormHelperText,
-  FormLabel,
+  FormLabel, Icon,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -26,9 +26,10 @@ import {
   Radio,
   RadioGroup,
   Select,
-  TextField,
-} from '@mui/material';
+  TextField, Tooltip,
+} from '@mui/material'
 import commonStyles from '../../styles/commonStyles.scss';
+import HelpIcon from '@mui/icons-material/Help'
 
 export default function Settings() {
   return (
@@ -125,12 +126,14 @@ const RegistrationModeCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Registration mode" subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit." />
-
+      <CardHeader
+        title="Registration mode"
+        subheader="Set whether registration is to be available to the public, by invitation or only by a moderator."
+      />
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={commonStyles.halfCard}>
           <FormControl fullWidth>
-            <InputLabel id="registrationModeLabel">Set registration mode</InputLabel>
+            <InputLabel id="registrationModeLabel">Registration mode</InputLabel>
             <Select
               size="small"
               labelId="registrationModeLabel"
@@ -181,44 +184,66 @@ const RegistrationModeCard = () => {
                   <Checkbox checked={EmailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
                 }
               />
-              <FormControlLabel
-                label="Auto account confirmation"
-                control={
-                  <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
-                }
-              />
-              <FormControlLabel
-                label="Auto registration allowed"
-                control={
-                  <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
-                }
-              />
+            </FormControl>
+            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+              <FormControl margin="none">
+                <FormControlLabel
+                  label="Auto account confirmation"
+                  control={
+                    <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
+                  }
+                />
+              </FormControl>
+              <Tooltip title="Accounts will not require confirmation by a moderator.">
+                <Icon>
+                  <HelpIcon color="primary" />
+                </Icon>
+              </Tooltip>
+            </Box>
+            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+              <FormControl margin="none">
+                <FormControlLabel
+                  label="Auto registration allowed"
+                  control={
+                    <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
+                  }
+                />
+              </FormControl>
+              <Tooltip title="Accounts will be set up the first time the banner is displayed, without prior registration.">
+                <Icon>
+                  <HelpIcon color="primary" />
+                </Icon>
+              </Tooltip>
+            </Box>
+          </Collapse>
+
+          <Collapse in={RegistrationMode !== 'private'} timeout="auto">
+            <FormControl sx={{ mt: 1 }}>
+              <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
+                Default user's role:
+              </FormLabel>
+              <RadioGroup
+                row
+                value={(() => {
+                  if (DefaultUserRoles.length === 2) {
+                    return 'both';
+                  }
+                  return DefaultUserRoles[0];
+                })()}
+                onChange={handleRolesChange}
+              >
+                <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
+                <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
+                <FormControlLabel value="both" control={<Radio />} label="Advertiser & Publisher" />
+              </RadioGroup>
             </FormControl>
           </Collapse>
-          <FormControl sx={{ mt: 1 }}>
-            <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
-              Default users role:
-            </FormLabel>
-            <RadioGroup
-              row
-              value={(() => {
-                if (DefaultUserRoles.length === 2) {
-                  return 'both';
-                }
-                return DefaultUserRoles[0];
-              })()}
-              onChange={handleRolesChange}
-            >
-              <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
-              <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
-              <FormControlLabel value="both" control={<Radio />} label="Both" />
-            </RadioGroup>
-          </FormControl>
+
           <Collapse
             in={RegistrationMode !== 'private' && AutoRegistrationEnabled && !DefaultUserRoles.includes('publisher')}
             timeout="auto"
           >
-            <Alert severity="warning">No publisher role while auto registration is allowed.</Alert>
+            <Alert severity="warning">Automatic registration requires the publisher role.</Alert>
           </Collapse>
         </Box>
       </CardContent>
@@ -282,7 +307,7 @@ const AutoWithdrawalCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Auto withdrawal" subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit." />
+      <CardHeader title="Auto withdrawal" subheader="Set minimum thresholds for automatic withdrawals." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box
@@ -300,7 +325,7 @@ const AutoWithdrawalCard = () => {
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="ADS minimum withdrawal"
-              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitAds, 2)}
+              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitAds, 4)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
             <FormHelperText id="CampaignMinBudget">
@@ -316,7 +341,7 @@ const AutoWithdrawalCard = () => {
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               label="BSC minimum withdrawal"
-              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitBsc, 2)}
+              value={setDecimalPlaces(form.fields.AutoWithdrawalLimitBsc, 4)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
             <FormHelperText id="CampaignMinBudget">

@@ -5,8 +5,22 @@ import { useSetInventoryWhitelistConfigMutation } from '../../redux/config/confi
 import { changeInventoryWhitelistInformation } from '../../redux/config/configSlice';
 import { useCreateNotification } from '../../hooks';
 import ListOfInputs from '../../Components/ListOfInputs/ListOfInputs';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Collapse, FormControlLabel } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  Collapse,
+  FormControl,
+  FormControlLabel,
+  Icon,
+  Tooltip,
+} from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
+import HelpIcon from '@mui/icons-material/Help';
 
 export default function Settings() {
   const appData = useSelector(configSelectors.getAppData);
@@ -105,30 +119,39 @@ export default function Settings() {
       <CardHeader
         title="AdServer's whitelist"
         // eslint-disable-next-line max-len
-        subheader="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, ea incidunt modi porro sequi veniam voluptate!"
+        subheader="Set which ad servers your ad server can sync with. By default, it syncs with all available ad servers."
       />
-      <FormControlLabel
-        label="Private AdServer"
-        sx={{ pl: 2, whiteSpace: 'nowrap' }}
-        control={<Checkbox checked={InventoryPrivate} onChange={() => setInventoryPrivate((prevState) => !prevState)} />}
-      />
+      <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+        <FormControl margin="dense">
+          <FormControlLabel
+            label="Private ad server"
+            sx={{ pl: 2, whiteSpace: 'nowrap' }}
+            control={<Checkbox checked={InventoryPrivate} onChange={() => setInventoryPrivate((prevState) => !prevState)} />}
+          />
+        </FormControl>
+        <Tooltip title="The ad server will not synchronize with any other ad server.">
+          <Icon>
+            <HelpIcon color="primary" />
+          </Icon>
+        </Tooltip>
+      </Box>
 
       <Collapse in={!InventoryPrivate} timeout="auto" sx={{ overflow: 'auto' }}>
         <CardContent>
-          <CardActions sx={{ padding: 0 }}>
+          <CardActions sx={{ paddingX: 0 }}>
             <FormControlLabel
               control={<Checkbox checked={separateList} onChange={() => setSeparateList((prevState) => !prevState)} />}
-              label="Separate list"
+              label="Separate lists for inventory import and export"
             />
           </CardActions>
           <Collapse in={!separateList} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader
-                  title="Address list:"
+                  title="Ad server addresses"
                   subheader={
                     // eslint-disable-next-line max-len
-                    'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt,'
+                    'Synchronization will be limited to the following ad servers only.'
                   }
                 />
                 <CardContent>
@@ -148,10 +171,10 @@ export default function Settings() {
             <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader
-                  title="Supply address list:"
+                  title="Demand ad server addresses"
                   subheader={
                     // eslint-disable-next-line max-len
-                    'Lorem ipsum dolor sit amet, consectetur adipisicing elit. '
+                    'Inventory import will be limited to the following ad servers only.'
                   }
                 />
                 <CardContent>
@@ -167,10 +190,10 @@ export default function Settings() {
 
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader
-                  title="Demand address list:"
+                  title="Supply ad servers addresses"
                   subheader={
                     // eslint-disable-next-line max-len
-                    'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt, consectetur adipisicing elit. Aspernatur assumenda blanditiis deserunt,'
+                    'Inventory export will be limited to the following ad servers only.'
                   }
                 />
                 <CardContent>
