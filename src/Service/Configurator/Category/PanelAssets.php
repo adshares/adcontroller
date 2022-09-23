@@ -2,10 +2,10 @@
 
 namespace App\Service\Configurator\Category;
 
-use App\Entity\Asset;
 use App\Entity\Enum\PanelAssetConfig;
+use App\Entity\PanelAsset;
 use App\Exception\InvalidArgumentException;
-use App\Repository\AssetRepository;
+use App\Repository\PanelAssetRepository;
 use App\Service\Env\AdPanelEnvVar;
 use App\Service\Env\EnvEditorFactory;
 use App\Utility\DirUtils;
@@ -19,7 +19,7 @@ class PanelAssets implements ConfiguratorCategory
     private const MAXIMAL_FILE_SIZE = 512 * 1024;
 
     public function __construct(
-        private readonly AssetRepository $assetRepository,
+        private readonly PanelAssetRepository $assetRepository,
         private readonly EnvEditorFactory $envEditorFactory,
         private readonly string $appDirectory,
     ) {
@@ -99,17 +99,33 @@ class PanelAssets implements ConfiguratorCategory
 
     private function store(array $content): void
     {
+        $assetDirectory = $this->getAssetDirectory();
+        if (!file_exists($assetDirectory)) {
+            mkdir($assetDirectory, 0777, true);
+        }
+
         $assets = [];
         /**
-         * @var string $filename
+         * @var string $fileId
          * @var UploadedFile $file
          */
-        foreach ($content as $filename => $file) {
-            $asset = new Asset();
-            $asset->setModule(PanelAssetConfig::MODULE);
-            $asset->setName($filename);
+        foreach ($content as $fileId => $file) {
+            /** @var PanelAssetConfig $enum */
+            $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
+            $filePath = str_starts_with($enum->filepath(), '/') ? substr($enum->filepath(), 1) : $enum->filepath();
+            if (false !== ($index = strrpos($filePath, '/'))) {
+                $directory = $assetDirectory . substr($filePath, 0, $index + 1);
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0777, true);
+                }
+            }
+
+            file_put_contents($assetDirectory . $filePath, $file->getContent());
+
+            $asset = new PanelAsset();
+            $asset->setFileId($fileId);
+            $asset->setFileName($filePath);
             $asset->setMimeType($file->getMimeType());
-            $asset->setContent($file->getContent());
             $assets[] = $asset;
         }
         $this->assetRepository->upsert($assets);
@@ -117,36 +133,28 @@ class PanelAssets implements ConfiguratorCategory
 
     public function remove(): void
     {
-        $assets = $this->assetRepository->findBy(['module' => PanelAssetConfig::MODULE]);
+        $assets = $this->assetRepository->findAll();
         $this->assetRepository->remove($assets);
+
+        (new Filesystem())->remove($this->getAssetDirectory());
         $this->undeploy();
     }
 
     private function deploy(): void
     {
-        $directory = DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
-        if (!file_exists($directory)) {
-            mkdir($directory, 0777, true);
-        }
-
-        $assets = $this->assetRepository->findBy(['module' => PanelAssetConfig::MODULE]);
-        foreach ($assets as $asset) {
-            /** @var PanelAssetConfig $enum */
-            $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $asset->getName()));
-            file_put_contents($directory . $enum->file(), $asset->getContent());
-        }
-
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
-        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $directory);
+        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $this->getAssetDirectory());
     }
 
     private function undeploy(): void
     {
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
         $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, '');
+    }
 
-        $directory = DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
-        (new Filesystem())->remove($directory);
+    public function getAssetDirectory(): string
+    {
+        return DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
     }
 
     private static function fields(): array

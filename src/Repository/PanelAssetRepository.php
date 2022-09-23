@@ -2,38 +2,36 @@
 
 namespace App\Repository;
 
-use App\Entity\Asset;
+use App\Entity\PanelAsset;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Asset>
+ * @extends ServiceEntityRepository<PanelAsset>
  *
- * @method Asset|null find($id, $lockMode = null, $lockVersion = null)
- * @method Asset|null findOneBy(array $criteria, array $orderBy = null)
- * @method Asset[]    findAll()
- * @method Asset[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method PanelAsset|null find($id, $lockMode = null, $lockVersion = null)
+ * @method PanelAsset|null findOneBy(array $criteria, array $orderBy = null)
+ * @method PanelAsset[]    findAll()
+ * @method PanelAsset[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AssetRepository extends ServiceEntityRepository
+class PanelAssetRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Asset::class);
+        parent::__construct($registry, PanelAsset::class);
     }
 
     /**
-     * @param Asset[] $entities
+     * @param PanelAsset[] $entities
      * @param bool $flush
      * @return void
      */
     public function upsert(array $entities, bool $flush = true): void
     {
         foreach ($entities as $entity) {
-            $dbEntity = $this->findOneBy(['module' => $entity->getModule(), 'name' => $entity->getName()]);
+            $dbEntity = $this->findOneBy(['fileId' => $entity->getFileId()]);
             if (null === $dbEntity) {
                 $dbEntity = $entity;
-            } else {
-                $dbEntity->setContent($entity->getContent());
             }
 
             $this->getEntityManager()->persist($dbEntity);
@@ -45,7 +43,7 @@ class AssetRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param Asset[] $entities
+     * @param PanelAsset[] $entities
      * @param bool $flush
      * @return void
      */

@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\PanelAssetConfig;
-use App\Repository\AssetRepository;
 use App\Repository\ConfigurationRepository;
+use App\Repository\PanelAssetRepository;
 use App\Service\Configurator\Category\PanelAssets;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,14 +22,14 @@ class AssetsController extends AbstractController
     #[Route('/panel/{fileId}', name: 'fetch_panel', methods: ['GET'])]
     public function fetchPanelAssets(
         string $fileId,
-        AssetRepository $assetRepository,
+        PanelAssetRepository $assetRepository,
         ConfigurationRepository $configurationRepository,
         HttpClientInterface $httpClient,
         LoggerInterface $logger,
         PanelAssets $panelAssets
     ): Response {
         $panelAssets->validateFileId($fileId);
-        $entity = $assetRepository->findOneBy(['module' => PanelAssetConfig::MODULE, 'name' => $fileId]);
+        $entity = $assetRepository->findOneBy(['fileId' => $fileId]);
 
         if (null === $entity) {
             $baseUrl = $configurationRepository->fetchValueByEnum(AdPanelConfig::Url);
@@ -51,7 +51,7 @@ class AssetsController extends AbstractController
             $content = $response->getContent();
             $mimeType = $response->getHeaders()['content-type'][0];
         } else {
-            $content = stream_get_contents($entity->getContent());
+            $content = file_get_contents($panelAssets->getAssetDirectory() . $entity->getFileName());
             $mimeType = $entity->getMimeType();
         }
 

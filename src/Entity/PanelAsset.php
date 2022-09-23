@@ -2,32 +2,28 @@
 
 namespace App\Entity;
 
-use App\Repository\AssetRepository;
+use App\Repository\PanelAssetRepository;
 use DateTimeImmutable;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-#[ORM\Entity(repositoryClass: AssetRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQUE_NAME', columns: ['module', 'name'])]
-class Asset
+#[ORM\Entity(repositoryClass: PanelAssetRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQUE_FILE_ID', columns: ['file_id'])]
+class PanelAsset
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 31)]
-    private ?string $module = null;
+    #[ORM\Column(name: 'file_id', length: 255)]
+    private ?string $fileId = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\Column(name: 'file_name', length: 255)]
+    private ?string $fileName = null;
 
     #[ORM\Column(name: 'mime_type', length: 127)]
     private ?string $mimeType = null;
-
-    #[ORM\Column(type: Types::BLOB)]
-    private $content = null;
 
     #[ORM\Column(name: 'created_at')]
     #[Gedmo\Timestampable(on: 'create')]
@@ -42,25 +38,25 @@ class Asset
         return $this->id;
     }
 
-    public function getModule(): ?string
+    public function getFileId(): ?string
     {
-        return $this->module;
+        return $this->fileId;
     }
 
-    public function setModule(string $module): self
+    public function setFileId(string $fileId): self
     {
-        $this->module = $module;
+        $this->fileId = $fileId;
         return $this;
     }
 
-    public function getName(): ?string
+    public function getFileName(): ?string
     {
-        return $this->name;
+        return $this->fileName;
     }
 
-    public function setName(string $name): self
+    public function setFileName(string $fileName): self
     {
-        $this->name = $name;
+        $this->fileName = $fileName;
         return $this;
     }
 
@@ -72,17 +68,6 @@ class Asset
     public function setMimeType(string $mimeType): self
     {
         $this->mimeType = $mimeType;
-        return $this;
-    }
-
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    public function setContent($content): self
-    {
-        $this->content = $content;
         return $this;
     }
 
