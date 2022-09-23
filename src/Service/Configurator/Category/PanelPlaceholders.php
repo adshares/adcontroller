@@ -13,6 +13,7 @@ class PanelPlaceholders extends PlaceholdersConfigurator
             AdPanelConfig::PlaceholderIndexKeywords->name,
             AdPanelConfig::PlaceholderIndexMetaTags->name,
             AdPanelConfig::PlaceholderIndexTitle->name,
+            AdPanelConfig::PlaceholderLoginInfo->name,
             AdPanelConfig::PlaceholderRobotsTxt->name,
         ];
     }

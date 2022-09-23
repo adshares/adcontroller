@@ -147,6 +147,7 @@ class AdServerConfigurationClient
     public const PLACEHOLDER_INDEX_KEYWORDS = 'index-keywords';
     public const PLACEHOLDER_INDEX_META_TAGS = 'index-meta-tags';
     public const PLACEHOLDER_INDEX_TITLE = 'index-title';
+    public const PLACEHOLDER_LOGIN_INFO = 'login-info';
     public const PLACEHOLDER_ROBOTS_TXT = 'robots-txt';
     public const PLACEHOLDER_PRIVACY_POLICY = 'privacy-policy';
     public const PLACEHOLDER_TERMS = 'terms';
@@ -288,6 +289,7 @@ class AdServerConfigurationClient
             AdPanelConfig::PlaceholderIndexKeywords->name => self::PLACEHOLDER_INDEX_KEYWORDS,
             AdPanelConfig::PlaceholderIndexMetaTags->name => self::PLACEHOLDER_INDEX_META_TAGS,
             AdPanelConfig::PlaceholderIndexTitle->name => self::PLACEHOLDER_INDEX_TITLE,
+            AdPanelConfig::PlaceholderLoginInfo->name => self::PLACEHOLDER_LOGIN_INFO,
             AdPanelConfig::PlaceholderRobotsTxt->name => self::PLACEHOLDER_ROBOTS_TXT,
             AdServerConfig::PrivacyPolicy->name => self::PLACEHOLDER_PRIVACY_POLICY,
             AdServerConfig::Terms->name => self::PLACEHOLDER_TERMS,

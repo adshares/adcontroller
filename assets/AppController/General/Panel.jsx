@@ -41,6 +41,7 @@ const Placeholders = () => {
       PlaceholderIndexKeywords: appData.AdPanel.PlaceholderIndexKeywords || '',
       PlaceholderIndexMetaTags: appData.AdPanel.PlaceholderIndexMetaTags || '',
       PlaceholderIndexTitle: appData.AdPanel.PlaceholderIndexTitle || '',
+      PlaceholderLoginInfo: appData.AdPanel.PlaceholderLoginInfo || '',
       PlaceholderRobotsTxt: appData.AdPanel.PlaceholderRobotsTxt || '',
     },
   });
@@ -107,6 +108,16 @@ const Placeholders = () => {
             value={form.fields.PlaceholderRobotsTxt}
             name="PlaceholderRobotsTxt"
             label="robots.txt"
+            multiline
+            rows={8}
+            margin="dense"
+            fullWidth
+            size="small"
+          />
+          <TextField
+            value={form.fields.PlaceholderLoginInfo}
+            name="PlaceholderLoginInfo"
+            label="Login Page HTML"
             multiline
             rows={8}
             margin="dense"

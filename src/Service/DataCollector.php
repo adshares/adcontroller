@@ -99,6 +99,7 @@ class DataCollector
         AdServerConfigurationClient::PLACEHOLDER_INDEX_KEYWORDS => AdPanelConfig::PlaceholderIndexKeywords,
         AdServerConfigurationClient::PLACEHOLDER_INDEX_META_TAGS => AdPanelConfig::PlaceholderIndexMetaTags,
         AdServerConfigurationClient::PLACEHOLDER_INDEX_TITLE => AdPanelConfig::PlaceholderIndexTitle,
+        AdServerConfigurationClient::PLACEHOLDER_LOGIN_INFO => AdPanelConfig::PlaceholderLoginInfo,
         AdServerConfigurationClient::PLACEHOLDER_ROBOTS_TXT => AdPanelConfig::PlaceholderRobotsTxt,
         AdServerConfigurationClient::PLACEHOLDER_PRIVACY_POLICY => AdServerConfig::PrivacyPolicy,
         AdServerConfigurationClient::PLACEHOLDER_TERMS => AdServerConfig::Terms,

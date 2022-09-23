@@ -10,6 +10,7 @@ enum AdPanelConfig implements ConfigEnum
     case PlaceholderIndexKeywords;
     case PlaceholderIndexMetaTags;
     case PlaceholderIndexTitle;
+    case PlaceholderLoginInfo;
     case PlaceholderRobotsTxt;
     case Url;
 
