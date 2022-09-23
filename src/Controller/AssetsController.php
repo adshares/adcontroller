@@ -28,10 +28,13 @@ class AssetsController extends AbstractController
         LoggerInterface $logger,
         PanelAssets $panelAssets
     ): Response {
-        $panelAssets->validateFileId($fileId);
         $entity = $assetRepository->findOneBy(['fileId' => $fileId]);
 
         if (null === $entity) {
+            if (!$panelAssets->isAdPanelFileId($fileId)) {
+                throw new NotFoundHttpException(sprintf('File `%s` not found', $fileId));
+            }
+
             $baseUrl = $configurationRepository->fetchValueByEnum(AdPanelConfig::Url);
             /** @var PanelAssetConfig $enum */
             $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));

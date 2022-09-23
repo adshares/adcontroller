@@ -34,11 +34,9 @@ class PanelAssets implements ConfiguratorCategory
         return [];
     }
 
-    public function validateFileId(string $fileId): void
+    public function isAdPanelFileId(string $fileId): bool
     {
-        if (!in_array($fileId, self::fields())) {
-            throw new InvalidArgumentException(sprintf('File id `%s` is not supported', $fileId));
-        }
+        return in_array($fileId, self::fields());
     }
 
     private function validate(array $content): void
