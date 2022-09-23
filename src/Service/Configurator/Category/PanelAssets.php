@@ -44,15 +44,11 @@ class PanelAssets implements ConfiguratorCategory
         if (empty($content)) {
             throw new InvalidArgumentException('At least one file is required');
         }
-        $fields = self::fields();
         /**
          * @var string $fileId
          * @var UploadedFile $file
          */
         foreach ($content as $fileId => $file) {
-            if (!in_array($fileId, $fields)) {
-                throw new InvalidArgumentException(sprintf('File id `%s` is not supported', $fileId));
-            }
             $size = $file->getSize();
             if (false === $size || $size > self::MAXIMAL_FILE_SIZE) {
                 throw new InvalidArgumentException(
@@ -60,16 +56,16 @@ class PanelAssets implements ConfiguratorCategory
                 );
             }
             $mimeType = $file->getMimeType();
-            if (false === $mimeType || !str_starts_with($mimeType, 'image/')) {
-                throw new InvalidArgumentException(sprintf('File `%s` must be an image', $fileId));
-            }
-            if (in_array($fileId, self::fieldsFavicon()) && 'image/png' !== $mimeType) {
-                throw new InvalidArgumentException(sprintf('File `%s` must be a PNG', $fileId));
+            if (false === $mimeType) {
+                throw new InvalidArgumentException(sprintf('File `%s` must have a known MIME type', $fileId));
             }
 
-            $fileInfo = getimagesize($file->getPathname());
-            [$width, $height] = $fileInfo;
             if (in_array($fileId, self::fieldsFavicon())) {
+                if ('image/png' !== $mimeType) {
+                    throw new InvalidArgumentException(sprintf('File `%s` must be a PNG', $fileId));
+                }
+                $fileInfo = getimagesize($file->getPathname());
+                [$width, $height] = $fileInfo;
                 [$expectedWidth, $expectedHeight] = array_map(
                     fn($item) => (int)$item,
                     explode('x', substr($fileId, strlen('Favicon')))
@@ -85,11 +81,20 @@ class PanelAssets implements ConfiguratorCategory
                     );
                 }
             } elseif (in_array($fileId, self::fieldsLogo())) {
+                if (!str_starts_with($mimeType, 'image/')) {
+                    throw new InvalidArgumentException(sprintf('File `%s` must be an image', $fileId));
+                }
+                $fileInfo = getimagesize($file->getPathname());
+                $height = $fileInfo[1];
                 $expectedMinimalHeight = (int)substr($fileId, strlen('LogoH'));
                 if ($height < $expectedMinimalHeight) {
                     throw new InvalidArgumentException(
                         sprintf('File `%s` must be at least %d pixels high', $fileId, $expectedMinimalHeight)
                     );
+                }
+            } else {
+                if (!str_starts_with($mimeType, 'image/') && 'text/plain' !== $mimeType) {
+                    throw new InvalidArgumentException(sprintf('File `%s` must be an image or text', $fileId));
                 }
             }
         }
@@ -108,9 +113,20 @@ class PanelAssets implements ConfiguratorCategory
          * @var UploadedFile $file
          */
         foreach ($content as $fileId => $file) {
-            /** @var PanelAssetConfig $enum */
-            $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
-            $filePath = str_starts_with($enum->filepath(), '/') ? substr($enum->filepath(), 1) : $enum->filepath();
+            if ($this->isAdPanelFileId($fileId)) {
+                /** @var PanelAssetConfig $enum */
+                $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
+                $filePath = str_starts_with($enum->filepath(), '/') ? substr($enum->filepath(), 1) : $enum->filepath();
+            } else {
+                $extension = $file->getClientOriginalExtension();
+                if (str_ends_with($fileId, '_' . $extension)) {
+                    $fileId = substr($fileId, 0, -strlen('_' . $extension)) . '.' . $extension;
+                    $filePath = $fileId;
+                } else {
+                    //TODO
+                    throw new \RuntimeException();
+                }
+            }
             if (false !== ($index = strrpos($filePath, '/'))) {
                 $directory = $assetDirectory . substr($filePath, 0, $index + 1);
                 if (!file_exists($directory)) {
