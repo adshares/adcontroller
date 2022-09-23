@@ -239,6 +239,7 @@ function AppController() {
               />
               {pages}
               <Route path="*" element={<NotFoundView />} />
+              <Route path="/" element={<Navigate to="/base" />} />
               <Route path="/steps/*" element={<Navigate to="/base" />} />
             </Routes>
           )}
