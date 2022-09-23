@@ -7,6 +7,8 @@ import authSelectors from '../redux/auth/authSelectors';
 import synchronizationSelectors from '../redux/synchronization/synchronizationSelectors';
 import { useLazySynchronizeConfigQuery } from '../redux/synchronization/synchronizationApi';
 import { useLazyGetAppConfigQuery } from '../redux/config/configApi';
+import Spinner from '../Components/Spinner/Spinner';
+import GlobalNotifications from '../Components/GlobalNotifications/GlobalNotifications';
 import SynchronizationDialog from '../Components/SynchronizationDialog/SynchronizationDialog';
 import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
@@ -40,7 +42,6 @@ import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import PeopleIcon from '@mui/icons-material/People';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import commonStyles from '../styles/commonStyles.scss';
-import Spinner from '../Components/Spinner/Spinner';
 
 const appModules = [
   {
@@ -207,9 +208,11 @@ function AppController() {
   return (
     <>
       <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
-      <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
+      <Box component="main" className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
         <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
         <AppWindow>
+          <GlobalNotifications />
+
           <SynchronizationDialog
             isSyncInProgress={isSyncInProgress}
             isSynchronizationRequired={isSynchronizationRequired}
