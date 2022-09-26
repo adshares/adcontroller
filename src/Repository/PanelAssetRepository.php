@@ -60,4 +60,17 @@ class PanelAssetRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+     * @param array|string[] $fileIds
+     * @return PanelAsset[]
+     */
+    public function findByFileIds(array $fileIds): array
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.fileId IN (:fileIds)')
+            ->setParameter('fileIds', $fileIds)
+            ->getQuery()
+            ->getResult();
+    }
 }

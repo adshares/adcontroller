@@ -121,20 +121,40 @@ class ConfiguratorController extends AbstractController
         }
 
         try {
-            $panelAssets->process($content);
+            $storedFileIds = $panelAssets->process($content);
         } catch (InvalidArgumentException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage());
         }
 
-        return $this->jsonOk();
+        return $this->jsonOk(['fileIds' => $storedFileIds]);
+    }
+
+    #[Route('/config/panel-assets', name: 'fetch_panel_assets', methods: ['GET'])]
+    public function fetchPanelAssets(PanelAssets $panelAssets): JsonResponse
+    {
+        $result = $panelAssets->list();
+
+        return $this->jsonOk(['assets' => $result]);
     }
 
     #[Route('/config/panel-assets', name: 'remove_panel_assets', methods: ['DELETE'])]
-    public function removePanelAssets(PanelAssets $panelAssets): JsonResponse
+    public function removePanelAssets(Request $request, PanelAssets $panelAssets): JsonResponse
     {
-        $panelAssets->remove();
+        $content = json_decode($request->getContent(), true) ?? [];
+        $fileIds = $content['fileIds'] ?? null;
+        if (null !== $fileIds) {
+            if (!is_array($fileIds)) {
+                throw new InvalidArgumentException('Field `fileIds` must be an array');
+            }
+            foreach ($fileIds as $fileId) {
+                if (!is_string($fileId)) {
+                    throw new InvalidArgumentException('Field `fileIds.*` must be a string');
+                }
+            }
+        }
+        $removedFileIds = $panelAssets->remove($fileIds);
 
-        return $this->jsonOk();
+        return $this->jsonOk(['fileIds' => $removedFileIds]);
     }
 
     #[Route('/config/{category}', name: 'store_config', methods: ['PATCH'])]

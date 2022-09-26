@@ -10,6 +10,7 @@ use App\Service\Env\AdPanelEnvVar;
 use App\Service\Env\EnvEditorFactory;
 use App\Utility\DirUtils;
 use App\ValueObject\Module;
+use DateTimeInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -28,10 +29,10 @@ class PanelAssets implements ConfiguratorCategory
     public function process(array $content): array
     {
         $this->validate($content);
-        $this->store($content);
+        $storedFileIds = $this->store($content);
         $this->deploy();
 
-        return [];
+        return $storedFileIds;
     }
 
     public function isAdPanelFileId(string $fileId): bool
@@ -104,14 +105,15 @@ class PanelAssets implements ConfiguratorCategory
         }
     }
 
-    private function store(array $content): void
+    private function store(array $content): array
     {
+        $assets = [];
+        $storedFileIds = [];
         $assetDirectory = $this->getAssetDirectory();
         if (!file_exists($assetDirectory)) {
             mkdir($assetDirectory, 0777, true);
         }
 
-        $assets = [];
         /**
          * @var string $fileId
          * @var UploadedFile $file
@@ -140,17 +142,54 @@ class PanelAssets implements ConfiguratorCategory
             $asset->setFileName($filePath);
             $asset->setMimeType($file->getMimeType());
             $assets[] = $asset;
+            $storedFileIds[] = $fileId;
         }
         $this->assetRepository->upsert($assets);
+
+        return $storedFileIds;
     }
 
-    public function remove(): void
+    public function list(): array
     {
-        $assets = $this->assetRepository->findAll();
-        $this->assetRepository->remove($assets);
+        $result = [];
+        foreach ($this->assetRepository->findAll() as $asset) {
+            $result[] = [
+                'fileId' => $asset->getFileId(),
+                'createdAt' => $asset->getCreatedAt()->format(DateTimeInterface::ATOM),
+                'updatedAt' => $asset->getUpdatedAt()->format(DateTimeInterface::ATOM),
+            ];
+        }
+        return $result;
+    }
 
-        (new Filesystem())->remove($this->getAssetDirectory());
-        $this->undeploy();
+    public function remove(?array $fileIds): array
+    {
+        $removedFileIds = [];
+        $assetDirectory = $this->getAssetDirectory();
+        $filesystem = new Filesystem();
+        if (null === $fileIds) {
+            $assets = $this->assetRepository->findAll();
+            $this->assetRepository->remove($assets);
+
+            foreach ($assets as $asset) {
+                $removedFileIds[] = $asset->getFileId();
+            }
+        } else {
+            $assets = $this->assetRepository->findByFileIds($fileIds);
+            $this->assetRepository->remove($assets);
+
+            foreach ($assets as $asset) {
+                $removedFileIds[] = $asset->getFileId();
+                $filesystem->remove($assetDirectory . $asset->getFileId());
+            }
+        }
+
+        if (0 === $this->assetRepository->count([])) {
+            $filesystem->remove($assetDirectory);
+            $this->undeploy();
+        }
+
+        return $removedFileIds;
     }
 
     private function deploy(): void
