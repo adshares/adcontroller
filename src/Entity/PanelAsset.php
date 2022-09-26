@@ -9,6 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: PanelAssetRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQUE_FILE_ID', columns: ['file_id'])]
+#[Gedmo\Loggable]
 class PanelAsset
 {
     #[ORM\Id]
@@ -17,6 +18,7 @@ class PanelAsset
     private ?int $id = null;
 
     #[ORM\Column(name: 'file_id', length: 255)]
+    #[Gedmo\Versioned]
     private ?string $fileId = null;
 
     #[ORM\Column(name: 'file_name', length: 255)]
@@ -31,6 +33,7 @@ class PanelAsset
 
     #[ORM\Column(name: 'updated_at')]
     #[Gedmo\Timestampable]
+    #[Gedmo\Versioned]
     private ?DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int

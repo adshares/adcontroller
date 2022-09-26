@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PanelAsset;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,6 +33,8 @@ class PanelAssetRepository extends ServiceEntityRepository
             $dbEntity = $this->findOneBy(['fileId' => $entity->getFileId()]);
             if (null === $dbEntity) {
                 $dbEntity = $entity;
+            } else {
+                $dbEntity->setUpdatedAt(new DateTimeImmutable());
             }
 
             $this->getEntityManager()->persist($dbEntity);
