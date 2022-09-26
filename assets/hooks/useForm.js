@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { returnNumber } from '../utils/helpers';
 import { validateAddress } from '@adshares/ads';
 
@@ -81,45 +81,83 @@ const testNumber = (value) => {
   };
 };
 
+const validate = (targetName, targetValue, validationOptions) => {
+  const validValueResult = {
+    isValid: true,
+    helperText: '',
+  };
+  const validationResult = {};
+
+  const validateValue = (option, value) => {
+    switch (option) {
+      case 'required':
+        return testRequired(value);
+
+      case 'email':
+        return value ? testEmail(value) : validValueResult;
+
+      case 'domain':
+        return value ? testDomain(value) : validValueResult;
+
+      case 'url':
+        return value ? testUrl(value) : validValueResult;
+
+      case 'wallet':
+        return value ? testWallet(value) : validValueResult;
+
+      case 'walletSecret':
+        return value ? testWalletSecret(value) : validValueResult;
+
+      case 'licenseKey':
+        return value ? testLicenseKey(value) : validValueResult;
+
+      case 'integer':
+        return value ? testInteger(value) : validValueResult;
+
+      case 'number':
+        return value ? testNumber(value) : validValueResult;
+
+      default:
+        return validValueResult;
+    }
+  };
+
+  if (validationOptions && Object.keys(validationOptions).includes(targetName)) {
+    for (let validation of validationOptions[targetName]) {
+      validationResult[targetName] = validateValue(validation, targetValue);
+      if (!validationResult[targetName].isValid) {
+        break;
+      }
+    }
+  } else {
+    validationResult[targetName] = validValueResult;
+  }
+  return validationResult;
+};
+
 export default function useForm(options) {
   const [fields, setFields] = useState(options.initialFields);
   const [touchedFields, setTouchedFields] = useState(
     Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}),
   );
-  const [errorObj, setErrorObj] = useState(
-    Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: { isValid: true, helperText: '' } }), {}),
+
+  const errorObj = useMemo(
+    () => Object.keys(fields).reduce((acc, fieldName) => ({ ...acc, ...validate(fieldName, fields[fieldName], options.validation) }), {}),
+    [fields, touchedFields],
   );
-  const [changedFields, setChangedFields] = useState(
-    Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}),
+  const isFormValid = useMemo(() => Object.keys(errorObj).every((field) => errorObj[field].isValid), [errorObj]);
+  const isFormWasChanged = useMemo(
+    () => Object.keys(options.initialFields).some((field) => fields[field].toString() !== options.initialFields[field].toString()),
+    [options.initialFields],
   );
-  const [isFormValid, setIsFormValid] = useState(true);
-  const [isFormWasChanged, setIsFormWasChanged] = useState(false);
-
-  useEffect(() => {
-    let result = {};
-    Object.keys(fields).forEach((name) => {
-      result = { ...result, ...validate(name, fields[name]) };
-    });
-    setErrorObj(result);
-  }, [fields, touchedFields]);
-
-  useEffect(() => {
-    setIsFormValid(Object.keys(errorObj).every((field) => errorObj[field].isValid));
-  }, [errorObj]);
-
-  useEffect(() => {
-    setIsFormWasChanged(
-      Object.keys(options.initialFields).some((field) => fields[field].toString() !== options.initialFields[field].toString()),
-    );
-  }, [options.initialFields]);
-
-  useEffect(() => {
-    let result = {};
-    Object.keys(options.initialFields).forEach((field) => {
-      result[field] = options.initialFields[field] !== fields[field];
-    });
-    setChangedFields(result);
-  }, [fields, isFormWasChanged]);
+  const changedFields = useMemo(
+    () =>
+      Object.keys(options.initialFields).reduce(
+        (acc, fieldName) => ({ ...acc, [fieldName]: options.initialFields[fieldName] !== fields[fieldName] }),
+        {},
+      ),
+    [fields, touchedFields],
+  );
 
   const setTouched = (e) => {
     setTouchedFields((prevState) => ({ ...prevState, [e.target.name]: true }));
@@ -136,60 +174,6 @@ export default function useForm(options) {
   const resetForm = () => {
     setFields(options.initialFields);
     setTouchedFields(Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}));
-  };
-
-  const validate = (targetName, targetValue) => {
-    const validValueResult = {
-      isValid: true,
-      helperText: '',
-    };
-    const validationResult = {};
-
-    const validateValue = (option, value) => {
-      switch (option) {
-        case 'required':
-          return testRequired(value);
-
-        case 'email':
-          return value ? testEmail(value) : validValueResult;
-
-        case 'domain':
-          return value ? testDomain(value) : validValueResult;
-
-        case 'url':
-          return value ? testUrl(value) : validValueResult;
-
-        case 'wallet':
-          return value ? testWallet(value) : validValueResult;
-
-        case 'walletSecret':
-          return value ? testWalletSecret(value) : validValueResult;
-
-        case 'licenseKey':
-          return value ? testLicenseKey(value) : validValueResult;
-
-        case 'integer':
-          return value ? testInteger(value) : validValueResult;
-
-        case 'number':
-          return value ? testNumber(value) : validValueResult;
-
-        default:
-          return validValueResult;
-      }
-    };
-
-    if (options.validation && Object.keys(options.validation).includes(targetName)) {
-      for (let validation of options.validation[targetName]) {
-        validationResult[targetName] = validateValue(validation, targetValue);
-        if (!validationResult[targetName].isValid) {
-          break;
-        }
-      }
-    } else {
-      validationResult[targetName] = validValueResult;
-    }
-    return validationResult;
   };
 
   return {
