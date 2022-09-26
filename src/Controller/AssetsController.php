@@ -19,7 +19,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[Route('/assets', name: 'assets_')]
 class AssetsController extends AbstractController
 {
-    #[Route('/panel/{fileId}', name: 'fetch_panel', methods: ['GET'])]
+    #[Route('/panel/{fileId}', name: 'fetch_panel', requirements: ['fileId' => '.+'], methods: ['GET'])]
     public function fetchPanelAssets(
         string $fileId,
         PanelAssetRepository $assetRepository,

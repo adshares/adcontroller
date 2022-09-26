@@ -96,6 +96,10 @@ class PanelAssets implements ConfiguratorCategory
                 if (!str_starts_with($mimeType, 'image/') && 'text/plain' !== $mimeType) {
                     throw new InvalidArgumentException(sprintf('File `%s` must be an image or text', $fileId));
                 }
+                $encodedName = str_replace('.', '_', $file->getClientOriginalName());
+                if (!str_ends_with($fileId, $encodedName)) {
+                    throw new InvalidArgumentException(sprintf('File id `%s` must match uploaded file', $fileId));
+                }
             }
         }
     }
@@ -118,14 +122,9 @@ class PanelAssets implements ConfiguratorCategory
                 $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
                 $filePath = str_starts_with($enum->filepath(), '/') ? substr($enum->filepath(), 1) : $enum->filepath();
             } else {
-                $extension = $file->getClientOriginalExtension();
-                if (str_ends_with($fileId, '_' . $extension)) {
-                    $fileId = substr($fileId, 0, -strlen('_' . $extension)) . '.' . $extension;
-                    $filePath = $fileId;
-                } else {
-                    //TODO
-                    throw new \RuntimeException();
-                }
+                $fileName = $file->getClientOriginalName();
+                $fileId = substr($fileId, 0, -strlen($fileName)) . $fileName;
+                $filePath = $fileId;
             }
             if (false !== ($index = strrpos($filePath, '/'))) {
                 $directory = $assetDirectory . substr($filePath, 0, $index + 1);
