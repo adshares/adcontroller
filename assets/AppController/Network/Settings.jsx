@@ -16,8 +16,11 @@ import {
   Collapse,
   FormControl,
   FormControlLabel,
-  Icon,
+  FormLabel,
+  Radio,
+  RadioGroup,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
 import HelpIcon from '@mui/icons-material/Help';
@@ -26,13 +29,34 @@ export default function Settings() {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setInventoryWhitelistConfig, { isLoading }] = useSetInventoryWhitelistConfigMutation();
-  const [InventoryPrivate, setInventoryPrivate] = useState(appData.AdServer.InventoryPrivate);
   const [separateList, setSeparateList] = useState(
-    !!appData.AdServer.InventoryExportWhitelist?.length || !!appData.AdServer.InventoryImportWhitelist?.length,
+    appData.AdServer.InventoryImportWhitelist?.length > 0 || appData.AdServer.InventoryExportWhitelist?.length > 0,
   );
   const [InventoryWhitelist, setInventoryWhitelist] = useState([]);
   const [InventoryImportWhitelist, setInventoryImportWhitelist] = useState([]);
   const [InventoryExportWhitelist, setInventoryExportWhitelist] = useState([]);
+  const [serverType, setServerType] = useState(() => {
+    if (appData.AdServer.InventoryPrivate) {
+      return 'private';
+    }
+    if (
+      !appData.AdServer.InventoryPrivate &&
+      appData.AdServer.InventoryWhitelist?.length === 0 &&
+      appData.AdServer.InventoryImportWhitelist?.length === 0 &&
+      appData.AdServer.InventoryExportWhitelist?.length === 0
+    ) {
+      return 'public';
+    }
+    if (
+      !appData.AdServer.InventoryPrivate &&
+      (appData.AdServer.InventoryWhitelist?.length > 0 ||
+        appData.AdServer.InventoryImportWhitelist?.length > 0 ||
+        appData.AdServer.InventoryExportWhitelist?.length > 0)
+    ) {
+      return 'restricted';
+    }
+  });
+
   const [isListValid, setIsListValid] = useState({
     InventoryWhitelist: true,
     InventoryImportWhitelist: true,
@@ -43,40 +67,50 @@ export default function Settings() {
     InventoryImportWhitelist: false,
     InventoryExportWhitelist: false,
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
+
+  const handleServerTypeChange = (e) => {
+    setServerType(e.target.value);
+  };
 
   const onSaveClick = async () => {
     const body = {
-      ...(InventoryPrivate && appData.AdServer.InventoryPrivate !== InventoryPrivate
+      ...(serverType === 'private' ? { InventoryPrivate: true, InventoryWhitelist: [appData.AdServer.WalletAddress] } : {}),
+      ...(serverType === 'public'
         ? {
-            InventoryPrivate,
+            InventoryPrivate: false,
             InventoryWhitelist: [],
             InventoryImportWhitelist: [],
             InventoryExportWhitelist: [],
           }
-        : { InventoryPrivate }),
-      ...(!InventoryPrivate && !separateList && { InventoryWhitelist }),
-      ...(!InventoryPrivate && separateList && { InventoryImportWhitelist, InventoryExportWhitelist }),
+        : {}),
+      ...(serverType === 'restricted'
+        ? separateList
+          ? {
+              InventoryPrivate: false,
+              InventoryImportWhitelist,
+              InventoryExportWhitelist,
+            }
+          : { InventoryPrivate: false, InventoryWhitelist }
+        : {}),
     };
+    const response = await setInventoryWhitelistConfig(body);
 
-    try {
-      const response = await setInventoryWhitelistConfig(body).unwrap();
-      dispatch(changeInventoryWhitelistInformation(response.data));
+    if (response.data.message === 'OK') {
+      dispatch(changeInventoryWhitelistInformation(body));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
   const fieldsHandler = (event) => {
-    const { listName, isValuesValid, isListWasChanged, createdList } = event;
+    const { listName, isValuesValid, isListWasChanged, list } = event;
 
     switch (listName) {
       case 'InventoryWhitelist':
-        setInventoryWhitelist(createdList);
+        setInventoryWhitelist(list);
         setIsListValid((prevState) => ({
           ...prevState,
-          [listName]: createdList.length > 0 ? isValuesValid : true,
+          [listName]: list.length > 0 ? isValuesValid : true,
         }));
         setIsListWasChanged((prevState) => ({
           ...prevState,
@@ -85,10 +119,10 @@ export default function Settings() {
         break;
 
       case 'InventoryImportWhitelist':
-        setInventoryImportWhitelist(createdList);
+        setInventoryImportWhitelist(list);
         setIsListValid((prevState) => ({
           ...prevState,
-          [listName]: createdList.length > 0 ? isValuesValid : true,
+          [listName]: list.length > 0 ? isValuesValid : true,
         }));
         setIsListWasChanged((prevState) => ({
           ...prevState,
@@ -97,10 +131,10 @@ export default function Settings() {
         break;
 
       case 'InventoryExportWhitelist':
-        setInventoryExportWhitelist(createdList);
+        setInventoryExportWhitelist(list);
         setIsListValid((prevState) => ({
           ...prevState,
-          [listName]: createdList.length > 0 ? isValuesValid : true,
+          [listName]: list.length > 0 ? isValuesValid : true,
         }));
         setIsListWasChanged((prevState) => ({
           ...prevState,
@@ -114,29 +148,80 @@ export default function Settings() {
     }
   };
 
+  const checkIsButtonDisabled = () => {
+    if (serverType === 'private') {
+      return appData.AdServer.InventoryPrivate === true;
+    }
+    if (serverType === 'public') {
+      return !(
+        appData.AdServer.InventoryWhitelist.length > 0 ||
+        appData.AdServer.InventoryImportWhitelist.length > 0 ||
+        appData.AdServer.InventoryExportWhitelist.length > 0
+      );
+    }
+    if (serverType === 'restricted') {
+      return separateList
+        ? (InventoryImportWhitelist.length === 0 || !isListValid.InventoryImportWhitelist || !isListWasChanged.InventoryImportWhitelist) &&
+            (InventoryExportWhitelist.length === 0 || !isListValid.InventoryExportWhitelist || !isListWasChanged.InventoryExportWhitelist)
+        : InventoryWhitelist.length === 0 || !isListValid.InventoryWhitelist || !isListWasChanged.InventoryWhitelist;
+    }
+  };
+
   return (
     <Card className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
       <CardHeader
         title="AdServer's whitelist"
-        // eslint-disable-next-line max-len
         subheader="Set which ad servers your ad server can sync with. By default, it syncs with all available ad servers."
       />
       <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-        <FormControl margin="dense">
-          <FormControlLabel
-            label="Private ad server"
-            sx={{ pl: 2, whiteSpace: 'nowrap' }}
-            control={<Checkbox checked={InventoryPrivate} onChange={() => setInventoryPrivate((prevState) => !prevState)} />}
-          />
-        </FormControl>
-        <Tooltip title="The ad server will not synchronize with any other ad server.">
-          <Icon>
-            <HelpIcon color="primary" />
-          </Icon>
-        </Tooltip>
+        <CardContent sx={{ pt: 0, pb: 0 }}>
+          <FormControl>
+            <FormLabel focused={false}>Ad server type</FormLabel>
+            <RadioGroup row value={serverType} onChange={handleServerTypeChange}>
+              <Box>
+                <FormControlLabel
+                  value="private"
+                  control={<Radio />}
+                  label={
+                    <Box className={`${commonStyles.flex}`}>
+                      <Typography variant="body1">Private</Typography>
+                      <Tooltip sx={{ ml: 0.5 }} title="The ad server will not synchronize with any other ad server.">
+                        <HelpIcon color="primary" />
+                      </Tooltip>
+                    </Box>
+                  }
+                />
+              </Box>
+              <FormControlLabel
+                value="public"
+                control={<Radio />}
+                label={
+                  <Box className={`${commonStyles.flex}`}>
+                    <Typography variant="body1">Public</Typography>
+                    <Tooltip sx={{ ml: 0.5 }} title="The ad server will not synchronize with any other ad server.">
+                      <HelpIcon color="primary" />
+                    </Tooltip>
+                  </Box>
+                }
+              />
+              <FormControlLabel
+                value="restricted"
+                control={<Radio />}
+                label={
+                  <Box className={`${commonStyles.flex}`}>
+                    <Typography variant="body1">Restricted</Typography>
+                    <Tooltip sx={{ ml: 0.5 }} title="The ad server will not synchronize with any other ad server.">
+                      <HelpIcon color="primary" />
+                    </Tooltip>
+                  </Box>
+                }
+              />
+            </RadioGroup>
+          </FormControl>
+        </CardContent>
       </Box>
 
-      <Collapse in={!InventoryPrivate} timeout="auto" sx={{ overflow: 'auto' }}>
+      <Collapse in={serverType === 'restricted'} timeout="auto" sx={{ overflow: 'auto' }}>
         <CardContent>
           <CardActions sx={{ paddingX: 0 }}>
             <FormControlLabel
@@ -147,20 +232,14 @@ export default function Settings() {
           <Collapse in={!separateList} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
               <Card className={`${commonStyles.halfCard}`} raised>
-                <CardHeader
-                  title="Ad server addresses"
-                  subheader={
-                    // eslint-disable-next-line max-len
-                    'Synchronization will be limited to the following ad servers only.'
-                  }
-                />
+                <CardHeader title="Ad server addresses" subheader={'Synchronization will be limited to the following ad servers only.'} />
                 <CardContent>
                   <ListOfInputs
                     initialList={appData.AdServer.InventoryWhitelist}
                     fieldsHandler={fieldsHandler}
                     listName="InventoryWhitelist"
                     type="wallet"
-                    maxHeight="calc(100vh - 38rem)"
+                    maxHeight="calc(100vh - 40rem)"
                   />
                 </CardContent>
               </Card>
@@ -172,10 +251,7 @@ export default function Settings() {
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader
                   title="Demand ad server addresses"
-                  subheader={
-                    // eslint-disable-next-line max-len
-                    'Inventory import will be limited to the following ad servers only.'
-                  }
+                  subheader={'Inventory import will be limited to the following ad servers only.'}
                 />
                 <CardContent>
                   <ListOfInputs
@@ -183,7 +259,7 @@ export default function Settings() {
                     fieldsHandler={fieldsHandler}
                     listName="InventoryImportWhitelist"
                     type="wallet"
-                    maxHeight="calc(100vh - 38rem)"
+                    maxHeight="calc(100vh - 40rem)"
                   />
                 </CardContent>
               </Card>
@@ -191,10 +267,7 @@ export default function Settings() {
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader
                   title="Supply ad servers addresses"
-                  subheader={
-                    // eslint-disable-next-line max-len
-                    'Inventory export will be limited to the following ad servers only.'
-                  }
+                  subheader={'Inventory export will be limited to the following ad servers only.'}
                 />
                 <CardContent>
                   <ListOfInputs
@@ -202,7 +275,7 @@ export default function Settings() {
                     fieldsHandler={fieldsHandler}
                     listName="InventoryExportWhitelist"
                     type="wallet"
-                    maxHeight="calc(100vh - 38rem)"
+                    maxHeight="calc(100vh - 40rem)"
                   />
                 </CardContent>
               </Card>
@@ -212,23 +285,7 @@ export default function Settings() {
       </Collapse>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button
-            disabled={
-              (appData.AdServer.InventoryPrivate === InventoryPrivate &&
-                (separateList
-                  ? (InventoryImportWhitelist.length === 0 ||
-                      !isListValid.InventoryImportWhitelist ||
-                      !isListWasChanged.InventoryImportWhitelist) &&
-                    (InventoryExportWhitelist.length === 0 ||
-                      !isListValid.InventoryExportWhitelist ||
-                      !isListWasChanged.InventoryExportWhitelist)
-                  : InventoryWhitelist.length === 0 || !isListValid.InventoryWhitelist || !isListWasChanged.InventoryWhitelist)) ||
-              isLoading
-            }
-            type="button"
-            variant="contained"
-            onClick={onSaveClick}
-          >
+          <Button disabled={isLoading || checkIsButtonDisabled()} type="button" variant="contained" onClick={onSaveClick}>
             Save
           </Button>
         </Box>
