@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { validateAddress } from '@adshares/ads';
 import { Box, Button, Collapse, IconButton, InputAdornment, List, ListItem, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -97,9 +97,6 @@ const useCreateFields = (initialList, type) => {
     }
   }, [initialList]);
 
-  const inputs = [];
-  const fields = [];
-
   const handleChange = (e, idx) => {
     setList((prevState) => {
       const newList = [...prevState];
@@ -129,49 +126,57 @@ const useCreateFields = (initialList, type) => {
     });
   };
 
-  for (let index = 0; index <= list.length; index++) {
-    const validationResult = list.length !== index && validateValue(list, list[index], type);
-    const isValidationError = list.length !== index && !validationResult.isValueValid;
+  const { inputs, fields } = useMemo(() => {
+    const inputs = [];
+    const fields = [];
 
-    if (validationResult) {
-      fields.push({ field: list[index], ...validationResult });
+    for (let index = 0; index <= list.length; index++) {
+      const validationResult = list.length !== index && validateValue(list, list[index], type);
+      const isValidationError = list.length !== index && !validationResult.isValueValid;
+
+      if (validationResult) {
+        fields.push({ field: list[index], ...validationResult });
+      }
+
+      inputs.push(
+        <ListItem disableGutters disablePadding key={index}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            size="small"
+            margin="dense"
+            error={isValidationError}
+            helperText={validationResult.helperText}
+            name={`${index}`}
+            value={list[index] || ''}
+            onChange={(e) => handleChange(e, index)}
+            onBlur={(e) => formatValueOnBlur(e, index)}
+            InputProps={
+              index === list.length
+                ? undefined
+                : {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton type="button" onClick={() => onRemoveClick(index)}>
+                          <CloseIcon color="error" />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }
+            }
+            inputProps={{ autoComplete: 'off' }}
+          />
+        </ListItem>,
+      );
     }
 
-    inputs.push(
-      <ListItem disableGutters disablePadding key={index}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          size="small"
-          margin="dense"
-          error={isValidationError}
-          helperText={validationResult.helperText}
-          name={`${index}`}
-          value={list[index] || ''}
-          onChange={(e) => handleChange(e, index)}
-          onBlur={(e) => formatValueOnBlur(e, index)}
-          InputProps={
-            index === list.length
-              ? undefined
-              : {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton type="button" onClick={() => onRemoveClick(index)}>
-                        <CloseIcon color="error" />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }
-          }
-          inputProps={{ autoComplete: 'off' }}
-        />
-      </ListItem>,
-    );
-  }
+    return { inputs, fields };
+  }, [list, initialList]);
+
   return { inputs, fields, list, setList };
 };
 
-export default function ListOfInputs({ initialList = null, fieldsHandler, listName = undefined, type = 'text', maxHeight = undefined }) {
+function ListOfInputs({ initialList = null, fieldsHandler, listName = undefined, type = 'text', maxHeight = undefined }) {
   const { inputs, fields, list, setList } = useCreateFields(initialList, type);
   const [bulkAdding, setBulkAdding] = useState(false);
   const [textareaValue, setTextareaValue] = useState('');
@@ -228,3 +233,5 @@ export default function ListOfInputs({ initialList = null, fieldsHandler, listNa
     </Box>
   );
 }
+
+export default memo(ListOfInputs);
