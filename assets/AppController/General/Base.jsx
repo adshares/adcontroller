@@ -160,9 +160,9 @@ const CRMNotificationsCard = () => {
       CrmMailAddressOnUserRegistered: appData.AdServer.CrmMailAddressOnUserRegistered || '',
     },
     validation: {
-      CrmMailAddressOnCampaignCreated: ['required', 'email'],
-      CrmMailAddressOnSiteAdded: ['required', 'email'],
-      CrmMailAddressOnUserRegistered: ['required', 'email'],
+      CrmMailAddressOnCampaignCreated: ['email'],
+      CrmMailAddressOnSiteAdded: ['email'],
+      CrmMailAddressOnUserRegistered: ['email'],
     },
   });
   const [setCrmNotificationsConfig, { isLoading }] = useSetCrmNotificationsConfigMutation();
@@ -172,7 +172,7 @@ const CRMNotificationsCard = () => {
     const body = {};
     Object.keys(form.changedFields).forEach((field) => {
       if (form.changedFields[field]) {
-        body[field] = form.fields[field];
+        body[field] = form.fields[field] || null;
       }
     });
 
@@ -181,7 +181,6 @@ const CRMNotificationsCard = () => {
       dispatch(changeCrmNotificationsInformation(response.data));
       createSuccessNotification();
     } catch (err) {
-      console.log(err);
       createErrorNotification(err);
     }
   };

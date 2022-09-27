@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
-import { useSetWalletConfigMutation, useSetColdWalletConfigMutation } from '../../redux/config/configApi';
+import { useSetWalletConfigMutation, useSetColdWalletConfigMutation, useGetWalletNodeMutation } from '../../redux/config/configApi';
 import { useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
 import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../redux/config/configSlice';
-import apiService from '../../utils/apiService';
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
@@ -33,8 +32,8 @@ import commonStyles from '../../styles/commonStyles.scss';
 const WalletSettingsCard = () => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
+  const [getWalletNode, { isFetching: isNodeVerification }] = useGetWalletNodeMutation();
   const [editMode, setEditMode] = useState(false);
-  const [isHostVerification, setIsHostVerification] = useState(false);
   const [isKnownNode, setKnownNode] = useState(false);
   const { createErrorNotification, createSuccessNotification } = useCreateNotification();
   const walletForm = useForm({
@@ -57,7 +56,7 @@ const WalletSettingsCard = () => {
     if (walletForm.errorObj.WalletAddress.isValid) {
       getWalletNodes();
     }
-  }, [walletForm.errorObj.WalletAddress.isValid]);
+  }, [walletForm.fields.WalletAddress]);
 
   useEffect(() => {
     checkIsKnownNode(walletForm.fields.WalletAddress);
@@ -65,8 +64,7 @@ const WalletSettingsCard = () => {
 
   const getWalletNodes = async () => {
     try {
-      setIsHostVerification(true);
-      const response = await apiService.getWalletNodeHost({ WalletAddress: walletForm.fields.WalletAddress });
+      const response = await getWalletNode({ WalletAddress: walletForm.fields.WalletAddress }).unwrap();
       nodeForm.setFields({ ...response });
     } catch (err) {
       nodeForm.setFields({
@@ -74,8 +72,6 @@ const WalletSettingsCard = () => {
         WalletNodePort: '',
       });
       createErrorNotification(err);
-    } finally {
-      setIsHostVerification(false);
     }
   };
 
@@ -168,7 +164,7 @@ const WalletSettingsCard = () => {
               timeout="auto"
               unmountOnExit
             >
-              {isHostVerification ? (
+              {isNodeVerification ? (
                 <Spinner />
               ) : (
                 <Box
@@ -207,7 +203,7 @@ const WalletSettingsCard = () => {
             <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
               <Button
                 onClick={onSaveClick}
-                disabled={isLoading || !walletForm.isFormValid || !nodeForm.isFormValid || isHostVerification}
+                disabled={isLoading || !walletForm.isFormValid || !nodeForm.isFormValid || isNodeVerification}
                 variant="contained"
                 type="button"
               >
