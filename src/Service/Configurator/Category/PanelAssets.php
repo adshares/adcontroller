@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class PanelAssets implements ConfiguratorCategory
 {
     private const ASSETS_DIRECTORY = 'var/panel-assets/';
+    private const FILE_CONTENT_HASH_LENGTH = 16;
+    private const MAXIMAL_FILE_ID_LENGTH = 255 - self::FILE_CONTENT_HASH_LENGTH;
     private const MAXIMAL_FILE_SIZE = 512 * 1024;
 
     public function __construct(
@@ -100,6 +102,20 @@ class PanelAssets implements ConfiguratorCategory
                 if (!str_starts_with($mimeType, 'image/') && 'text/plain' !== $mimeType) {
                     throw new InvalidArgumentException(sprintf('File `%s` must be an image or text', $fileId));
                 }
+                if (strlen($fileId) > self::MAXIMAL_FILE_ID_LENGTH) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'File id `%s` must have at most %d characters',
+                            $fileId,
+                            self::MAXIMAL_FILE_ID_LENGTH
+                        )
+                    );
+                }
+                if (1 !== substr_count($file->getClientOriginalName(), '.')) {
+                    throw new InvalidArgumentException(
+                        sprintf('File name `%s` must have exactly one dot', $file->getClientOriginalName())
+                    );
+                }
                 $encodedName = str_replace('.', '_', $file->getClientOriginalName());
                 if (!str_ends_with($fileId, $encodedName)) {
                     throw new InvalidArgumentException(sprintf('File id `%s` must match uploaded file', $fileId));
@@ -122,14 +138,18 @@ class PanelAssets implements ConfiguratorCategory
          * @var UploadedFile $file
          */
         foreach ($content as $fileId => $file) {
+            $fileContent = $file->getContent();
             if ($this->isAdPanelFileId($fileId)) {
                 /** @var PanelAssetConfig $enum */
                 $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
                 $filePath = $enum->filePath();
             } else {
-                $fileName = $file->getClientOriginalName();
-                $fileId = substr($fileId, 0, -strlen($fileName)) . $fileName;
-                $filePath = $fileId;
+                $originalFileName = $file->getClientOriginalName();
+                $hash = substr(sha1($fileContent), 0, self::FILE_CONTENT_HASH_LENGTH);
+                $fileName = join(sprintf('.%s.', $hash), explode('.', $originalFileName));
+                $path = substr($fileId, 0, -strlen($originalFileName));
+                $fileId = $path . $originalFileName;
+                $filePath = $path . $fileName;
             }
             if (str_starts_with($filePath, '/')) {
                 $filePath = substr($filePath, 1);
@@ -141,7 +161,7 @@ class PanelAssets implements ConfiguratorCategory
                 }
             }
 
-            file_put_contents($assetDirectory . $filePath, $file->getContent());
+            file_put_contents($assetDirectory . $filePath, $fileContent);
 
             $asset = new PanelAsset();
             $asset->setFileId($fileId);

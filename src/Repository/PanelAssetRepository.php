@@ -34,7 +34,7 @@ class PanelAssetRepository extends ServiceEntityRepository
             if (null === $dbEntity) {
                 $dbEntity = $entity;
             } else {
-                $dbEntity->setUpdatedAt(new DateTimeImmutable());
+                $dbEntity->setFilePath($entity->getFilePath());
             }
 
             $this->getEntityManager()->persist($dbEntity);

@@ -18,10 +18,10 @@ class PanelAsset
     private ?int $id = null;
 
     #[ORM\Column(name: 'file_id', length: 255)]
-    #[Gedmo\Versioned]
     private ?string $fileId = null;
 
     #[ORM\Column(name: 'file_path', length: 255)]
+    #[Gedmo\Versioned]
     private ?string $filePath = null;
 
     #[ORM\Column(name: 'mime_type', length: 127)]
@@ -33,7 +33,6 @@ class PanelAsset
 
     #[ORM\Column(name: 'updated_at')]
     #[Gedmo\Timestampable]
-    #[Gedmo\Versioned]
     private ?DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
