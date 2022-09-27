@@ -34,10 +34,10 @@ class PanelAssets implements ConfiguratorCategory
     public function process(array $content): array
     {
         $this->validate($content);
-        $storedFileIds = $this->store($content);
+        $storedAssets = $this->store($content);
         $this->deploy();
 
-        return $storedFileIds;
+        return $storedAssets;
     }
 
     public function isAdPanelFileId(string $fileId): bool
@@ -172,13 +172,18 @@ class PanelAssets implements ConfiguratorCategory
         }
         $this->assetRepository->upsert($assets);
 
-        return $storedFileIds;
+        return $this->mapAssetsToArray($this->assetRepository->findByFileIds($storedFileIds));
     }
 
     public function list(): array
     {
+        return $this->mapAssetsToArray($this->assetRepository->findAll());
+    }
+
+    private function mapAssetsToArray(array $assets): array
+    {
         $result = [];
-        foreach ($this->assetRepository->findAll() as $asset) {
+        foreach ($assets as $asset) {
             $result[] = [
                 'fileId' => $asset->getFileId(),
                 'fileName' => $asset->getFileName(),
@@ -187,6 +192,7 @@ class PanelAssets implements ConfiguratorCategory
                 'updatedAt' => $asset->getUpdatedAt()->format(DateTimeInterface::ATOM),
             ];
         }
+
         return $result;
     }
 

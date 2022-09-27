@@ -121,12 +121,12 @@ class ConfiguratorController extends AbstractController
         }
 
         try {
-            $storedFileIds = $panelAssets->process($content);
+            $storedAssets = $panelAssets->process($content);
         } catch (InvalidArgumentException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage());
         }
 
-        return $this->jsonOk(['fileIds' => $storedFileIds]);
+        return $this->jsonOk(['assets' => $storedAssets]);
     }
 
     #[Route('/config/panel-assets', name: 'fetch_panel_assets', methods: ['GET'])]
