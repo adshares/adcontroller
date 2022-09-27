@@ -21,8 +21,8 @@ class PanelAsset
     #[Gedmo\Versioned]
     private ?string $fileId = null;
 
-    #[ORM\Column(name: 'file_name', length: 255)]
-    private ?string $fileName = null;
+    #[ORM\Column(name: 'file_path', length: 255)]
+    private ?string $filePath = null;
 
     #[ORM\Column(name: 'mime_type', length: 127)]
     private ?string $mimeType = null;
@@ -54,12 +54,23 @@ class PanelAsset
 
     public function getFileName(): ?string
     {
-        return $this->fileName;
+        if (null === $this->filePath) {
+            return null;
+        }
+        if (false !== ($index = strrpos($this->filePath, '/'))) {
+            return substr($this->filePath, $index + 1);
+        }
+        return $this->filePath;
     }
 
-    public function setFileName(string $fileName): self
+    public function getFilePath(): ?string
     {
-        $this->fileName = $fileName;
+        return $this->filePath;
+    }
+
+    public function setFilePath(string $filePath): self
+    {
+        $this->filePath = $filePath;
         return $this;
     }
 

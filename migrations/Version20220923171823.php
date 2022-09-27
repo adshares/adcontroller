@@ -21,7 +21,7 @@ final class Version20220923171823 extends AbstractMigration
 CREATE TABLE panel_asset (
   id INT AUTO_INCREMENT NOT NULL,
   file_id VARCHAR(255) NOT NULL,
-  file_name VARCHAR(255) NOT NULL,
+  file_path VARCHAR(255) NOT NULL,
   mime_type VARCHAR(127) NOT NULL,
   created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',

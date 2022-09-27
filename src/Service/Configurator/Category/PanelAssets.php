@@ -2,9 +2,11 @@
 
 namespace App\Service\Configurator\Category;
 
+use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\PanelAssetConfig;
 use App\Entity\PanelAsset;
 use App\Exception\InvalidArgumentException;
+use App\Repository\ConfigurationRepository;
 use App\Repository\PanelAssetRepository;
 use App\Service\Env\AdPanelEnvVar;
 use App\Service\Env\EnvEditorFactory;
@@ -21,6 +23,7 @@ class PanelAssets implements ConfiguratorCategory
 
     public function __construct(
         private readonly PanelAssetRepository $assetRepository,
+        private readonly ConfigurationRepository $configurationRepository,
         private readonly EnvEditorFactory $envEditorFactory,
         private readonly string $appDirectory,
     ) {
@@ -122,11 +125,14 @@ class PanelAssets implements ConfiguratorCategory
             if ($this->isAdPanelFileId($fileId)) {
                 /** @var PanelAssetConfig $enum */
                 $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
-                $filePath = str_starts_with($enum->filepath(), '/') ? substr($enum->filepath(), 1) : $enum->filepath();
+                $filePath = $enum->filePath();
             } else {
                 $fileName = $file->getClientOriginalName();
                 $fileId = substr($fileId, 0, -strlen($fileName)) . $fileName;
                 $filePath = $fileId;
+            }
+            if (str_starts_with($filePath, '/')) {
+                $filePath = substr($filePath, 1);
             }
             if (false !== ($index = strrpos($filePath, '/'))) {
                 $directory = $assetDirectory . substr($filePath, 0, $index + 1);
@@ -139,7 +145,7 @@ class PanelAssets implements ConfiguratorCategory
 
             $asset = new PanelAsset();
             $asset->setFileId($fileId);
-            $asset->setFileName($filePath);
+            $asset->setFilePath($filePath);
             $asset->setMimeType($file->getMimeType());
             $assets[] = $asset;
             $storedFileIds[] = $fileId;
@@ -155,6 +161,8 @@ class PanelAssets implements ConfiguratorCategory
         foreach ($this->assetRepository->findAll() as $asset) {
             $result[] = [
                 'fileId' => $asset->getFileId(),
+                'fileName' => $asset->getFileName(),
+                'url' => $this->buildUrl($asset->getFilePath()),
                 'createdAt' => $asset->getCreatedAt()->format(DateTimeInterface::ATOM),
                 'updatedAt' => $asset->getUpdatedAt()->format(DateTimeInterface::ATOM),
             ];
@@ -202,6 +210,18 @@ class PanelAssets implements ConfiguratorCategory
     {
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
         $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, '');
+    }
+
+    public function buildUrl(string $filePath): string
+    {
+        $baseUrl = $this->configurationRepository->fetchValueByEnum(AdPanelConfig::Url);
+        if (str_ends_with($baseUrl, '/')) {
+            $baseUrl = substr($baseUrl, 0, strlen($baseUrl) - 1);
+        }
+        if (str_starts_with($filePath, '/')) {
+            $filePath = substr($filePath, 1);
+        }
+        return sprintf('%s/%s', $baseUrl, $filePath);
     }
 
     public function getAssetDirectory(): string

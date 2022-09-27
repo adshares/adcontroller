@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\PanelAssetConfig;
-use App\Repository\ConfigurationRepository;
 use App\Repository\PanelAssetRepository;
 use App\Service\Configurator\Category\PanelAssets;
 use Psr\Log\LoggerInterface;
@@ -23,10 +21,9 @@ class AssetsController extends AbstractController
     public function fetchPanelAssets(
         string $fileId,
         PanelAssetRepository $assetRepository,
-        ConfigurationRepository $configurationRepository,
         HttpClientInterface $httpClient,
         LoggerInterface $logger,
-        PanelAssets $panelAssets
+        PanelAssets $panelAssets,
     ): Response {
         $entity = $assetRepository->findOneBy(['fileId' => $fileId]);
 
@@ -35,10 +32,9 @@ class AssetsController extends AbstractController
                 throw new NotFoundHttpException(sprintf('File `%s` not found', $fileId));
             }
 
-            $baseUrl = $configurationRepository->fetchValueByEnum(AdPanelConfig::Url);
             /** @var PanelAssetConfig $enum */
             $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
-            $url = self::buildUrl($baseUrl, $enum->filepath());
+            $url = $panelAssets->buildUrl($enum->filePath());
 
             try {
                 $response = $httpClient->request('GET', $url);
@@ -54,7 +50,7 @@ class AssetsController extends AbstractController
             $content = $response->getContent();
             $mimeType = $response->getHeaders()['content-type'][0];
         } else {
-            $content = file_get_contents($panelAssets->getAssetDirectory() . $entity->getFileName());
+            $content = file_get_contents($panelAssets->getAssetDirectory() . $entity->getFilePath());
             $mimeType = $entity->getMimeType();
         }
 
@@ -64,13 +60,5 @@ class AssetsController extends AbstractController
         $response->headers->set('Content-Type', $mimeType);
 
         return $response;
-    }
-
-    private static function buildUrl(string $baseUrl, string $filepath): string
-    {
-        if (str_ends_with($baseUrl, '/')) {
-            $baseUrl = substr($baseUrl, 0, strlen($baseUrl) - 1);
-        }
-        return $baseUrl . $filepath;
     }
 }
