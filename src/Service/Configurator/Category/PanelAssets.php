@@ -177,20 +177,17 @@ class PanelAssets implements ConfiguratorCategory
         $filesystem = new Filesystem();
         if (null === $fileIds) {
             $assets = $this->assetRepository->findAll();
-            $this->assetRepository->remove($assets);
-
             foreach ($assets as $asset) {
                 $removedFileIds[] = $asset->getFileId();
             }
         } else {
             $assets = $this->assetRepository->findByFileIds($fileIds);
-            $this->assetRepository->remove($assets);
-
             foreach ($assets as $asset) {
                 $removedFileIds[] = $asset->getFileId();
-                $filesystem->remove($assetDirectory . $asset->getFileId());
+                $filesystem->remove($assetDirectory . $asset->getFilePath());
             }
         }
+        $this->assetRepository->remove($assets);
 
         if (0 === $this->assetRepository->count([])) {
             $filesystem->remove($assetDirectory);
