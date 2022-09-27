@@ -17,6 +17,13 @@ export const configApi = createApi({
         method: 'GET',
       }),
     }),
+    getWalletNode: builder.mutation({
+      query: (body) => ({
+        url: '/api/node_host',
+        method: 'POST',
+        body,
+      }),
+    }),
     setExistingLicense: builder.mutation({
       query: (body) => ({
         url: '/api/license_key',
@@ -143,6 +150,7 @@ export const {
   useLazyGetAppConfigQuery,
   useGetLicenseDataQuery,
   useSetExistingLicenseMutation,
+  useGetWalletNodeMutation,
   useSetBaseInformationMutation,
   useSetCrmNotificationsConfigMutation,
   useSetWalletConfigMutation,
