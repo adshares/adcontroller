@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setAppLogout } from '../../redux/auth/authSlice';
 import { AppBar, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
-import apiService from '../../utils/apiService';
 
-export default function MenuAppBar({ showProtectedOptions, setToken, showSideMenu, toggleSideMenu, showSideMenuIcon = false }) {
+export default function MenuAppBar({ showProtectedOptions, showSideMenu, toggleSideMenu, showSideMenuIcon = false }) {
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleMenu = (event) => {
@@ -16,9 +18,8 @@ export default function MenuAppBar({ showProtectedOptions, setToken, showSideMen
   };
 
   const handleLogout = () => {
-    apiService.logout();
+    dispatch(setAppLogout());
     handleMenuClose();
-    setToken(localStorage.getItem('authToken'));
   };
 
   return (

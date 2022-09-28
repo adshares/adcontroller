@@ -9,8 +9,14 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 }
 
 // Update environmental variable with .env* files
-dotenv.config({override: true, path: './.env'}).parsed;
-dotenv.config({override: true, path: './.env.local'}).parsed;
+dotenv.config({
+  override: true,
+  path: './.env',
+}).parsed;
+dotenv.config({
+  override: true,
+  path: './.env.local',
+}).parsed;
 
 const path = process.env.PUBLIC_URL || '';
 const prefix = path.startsWith('/') ? path.substr(1) : path;

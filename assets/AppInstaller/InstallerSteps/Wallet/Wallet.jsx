@@ -5,66 +5,60 @@ import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/Insta
 import styles from './styles.scss';
 import { useForm, useSkipFirstRenderEffect } from '../../../hooks';
 import Spinner from '../../../Components/Spinner/Spinner';
+import { validateAddress } from '@adshares/ads';
+import useCreateNotification from '../../../hooks/useCreateNotification';
 
 function Wallet({ handleNextStep, handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isHostVerification, setIsHostVerification] = useState(false);
-  const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
-    WalletAddress: '',
-    WalletSecretKey: '',
+  const walletForm = useForm({
+    initialFields: { WalletAddress: '', WalletSecretKey: '' },
+    validation: {
+      WalletAddress: ['required', 'wallet'],
+      WalletSecretKey: ['required', 'walletSecret'],
+    },
   });
-  const {
-    fields: nodeHost,
-    setFields: setNodeHost,
-    errorObj: nodeHostError,
-    isFormValid: isNodeHostValid,
-    onFormChange: onNodeHostChange,
-  } = useForm({
-    WalletNodeHost: '',
-    WalletNodePort: '',
+  const nodeForm = useForm({
+    initialFields: { WalletNodeHost: '', WalletNodePort: '' },
+    validation: {
+      WalletNodeHost: ['required', 'domain'],
+      WalletNodePort: ['required', 'integer'],
+    },
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
-  const [alert, setAlert] = useState({
-    type: '',
-    message: '',
-    title: '',
-  });
   const [isKnownNode, setKnownNode] = useState(false);
+  const { createErrorNotification } = useCreateNotification();
 
   useEffect(() => {
     getStepData();
   }, []);
 
   useSkipFirstRenderEffect(() => {
-    if (!errorObj.WalletAddress) {
+    if (walletForm.errorObj.WalletAddress.isValid) {
       getWalletNodes();
     }
-  }, [errorObj.WalletAddress, fields.WalletAddress]);
+  }, [walletForm.errorObj.WalletAddress.isValid]);
 
   useEffect(() => {
-    checkIsKnownNode(fields.WalletAddress);
-  }, [fields.WalletAddress]);
+    checkIsKnownNode(walletForm.fields.WalletAddress);
+  }, [walletForm.fields.WalletAddress]);
 
   const getStepData = async () => {
     try {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
-      setFields({ ...fields, ...response });
+      walletForm.setFields({ ...walletForm.fields, ...response });
       setEditMode(response.DataRequired);
       setDataRequired(response.DataRequired);
       if (response.WalletNodeHost) {
-        setNodeHost({
+        nodeForm.setFields({
           WalletNodeHost: response.WalletNodeHost,
           WalletNodePort: response.WalletNodePort,
         });
       }
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -73,26 +67,22 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   const getWalletNodes = async () => {
     try {
       setIsHostVerification(true);
-      const response = await apiService.getWalletNodeHost({ WalletAddress: fields.WalletAddress });
-      setNodeHost({ ...response });
+      const response = await apiService.getWalletNodeHost({ WalletAddress: walletForm.fields.WalletAddress });
+      nodeForm.setFields({ ...response });
     } catch (err) {
-      setNodeHost({
+      nodeForm.setFields({
         WalletNodeHost: '',
         WalletNodePort: '',
       });
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsHostVerification(false);
     }
   };
 
   const checkIsKnownNode = (walletAddress) => {
-    const walletAddressRegEx = /^[0-9A-F]{4}-[0-9A-F]{8}-([0-9A-F]{4})$/g;
-    if (!walletAddressRegEx.test(walletAddress)) {
+    const isValidWalletAddress = validateAddress(walletAddress);
+    if (!isValidWalletAddress) {
       return;
     }
     const expression = walletAddress.slice(0, 4);
@@ -111,19 +101,15 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
         return;
       }
       const body = {
-        WalletAddress: fields.WalletAddress,
-        WalletSecretKey: fields.WalletSecretKey,
-        WalletNodeHost: nodeHost.WalletNodeHost,
-        WalletNodePort: Number(nodeHost.WalletNodePort),
+        WalletAddress: walletForm.fields.WalletAddress,
+        WalletSecretKey: walletForm.fields.WalletSecretKey,
+        WalletNodeHost: nodeForm.fields.WalletNodeHost,
+        WalletNodePort: Number(nodeForm.fields.WalletNodePort),
       };
       await apiService.sendStepData(step.path, body);
       handleNextStep(step);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -131,17 +117,21 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
 
   return (
     <InstallerStepWrapper
-      alert={alert}
       dataLoading={isLoading}
       title="Wallet information"
       onNextClick={handleSubmit}
-      disabledNext={editMode ? !isFormValid || !isNodeHostValid || isHostVerification || nodeHost.code === 422 : isLoading}
+      disabledNext={
+        editMode ? !walletForm.isFormValid || !nodeForm.isFormValid || isHostVerification || nodeForm.fields.code === 422 : isLoading
+      }
       onBackClick={() => handlePrevStep(step)}
     >
       <Typography variant="body1" paragraph align="center">
-        The wallet is used to store users' deposits and earnings.
-        The total profit of the adserver will be deposited in this account.
-        To create a new wallet <a href="https://adshares.net/wallet" target="_blank">follow the instructions</a>.
+        The wallet is used to store users' deposits and earnings. The total profit of the adserver will be deposited in this account. To
+        create a new wallet{' '}
+        <a href="https://adshares.net/wallet" target="_blank">
+          follow the instructions
+        </a>
+        .
       </Typography>
       <Box className={styles.editButtonThumb}>
         <Button className={dataRequired ? styles.hidden : styles.visible} onClick={() => setEditMode(!editMode)} type="button">
@@ -153,15 +143,15 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
           <Box
             component="form"
             className={styles.formBlock}
-            onChange={onFormChange}
-            onBlur={(e) => validate(e.target)}
+            onChange={walletForm.onChange}
+            onFocus={walletForm.setTouched}
             onSubmit={(e) => e.preventDefault()}
           >
             <TextField
               className={styles.textField}
-              error={!!errorObj.WalletAddress}
-              helperText={errorObj.WalletAddress || ' '}
-              value={fields.WalletAddress}
+              error={walletForm.touchedFields.WalletAddress && !walletForm.errorObj.WalletAddress.isValid}
+              helperText={walletForm.touchedFields.WalletAddress && walletForm.errorObj.WalletAddress.helperText}
+              value={walletForm.fields.WalletAddress}
               margin="dense"
               size="small"
               name="WalletAddress"
@@ -171,9 +161,9 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
               required
             />
             <TextField
-              error={!!errorObj.WalletSecretKey}
-              helperText={errorObj.WalletSecretKey || ' '}
-              value={fields.WalletSecretKey}
+              error={walletForm.touchedFields.WalletSecretKey && !walletForm.errorObj.WalletSecretKey.isValid}
+              helperText={walletForm.touchedFields.WalletSecretKey && walletForm.errorObj.WalletSecretKey.helperText}
+              value={walletForm.fields.WalletSecretKey}
               margin="dense"
               size="small"
               name="WalletSecretKey"
@@ -183,46 +173,53 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
               required
             />
           </Box>
-          <Collapse
-            className={styles.formBlock}
+
+          <Box
             component="form"
-            in={Object.values(nodeHost).some((el) => !!el) && !isKnownNode && !errorObj.WalletAddress}
-            timeout="auto"
-            unmountOnExit
-            onChange={onNodeHostChange}
+            className={styles.formBlock}
+            onFocus={nodeForm.setTouched}
+            onChange={nodeForm.onChange}
             onSubmit={(e) => e.preventDefault()}
           >
-            {isHostVerification ? (
-              <Spinner />
-            ) : (
-              <>
-                <TextField
-                  error={!!nodeHostError.WalletNodeHost}
-                  helperText={nodeHostError.WalletNodeHost || ' '}
-                  value={nodeHost.WalletNodeHost}
-                  disabled={!!nodeHost.code}
-                  margin="dense"
-                  size="small"
-                  name="WalletNodeHost"
-                  label="Wallet node host"
-                  fullWidth
-                  inputProps={{ autoComplete: 'off' }}
-                />
-                <TextField
-                  error={!!nodeHostError.WalletNodePort}
-                  helperText={nodeHostError.WalletNodePort || ' '}
-                  value={nodeHost.WalletNodePort}
-                  disabled={!!nodeHost.code}
-                  margin="dense"
-                  size="small"
-                  name="WalletNodePort"
-                  label="Wallet node port"
-                  fullWidth
-                  inputProps={{ autoComplete: 'off' }}
-                />
-              </>
-            )}
-          </Collapse>
+            <Collapse
+              in={Object.values(nodeForm.fields).some((el) => !!el) && !isKnownNode && walletForm.errorObj.WalletAddress.isValid}
+              timeout="auto"
+              unmountOnExit
+            >
+              {isHostVerification ? (
+                <Spinner />
+              ) : (
+                <>
+                  <TextField
+                    className={styles.textField}
+                    error={nodeForm.touchedFields.WalletNodeHost && !nodeForm.errorObj.WalletNodeHost.isValid}
+                    helperText={nodeForm.touchedFields.WalletNodeHost && nodeForm.errorObj.WalletNodeHost.helperText}
+                    value={nodeForm.fields.WalletNodeHost}
+                    disabled={!!nodeForm.fields.code}
+                    margin="dense"
+                    size="small"
+                    name="WalletNodeHost"
+                    label="Wallet node host"
+                    fullWidth
+                    inputProps={{ autoComplete: 'off' }}
+                  />
+                  <TextField
+                    className={styles.textField}
+                    error={nodeForm.touchedFields.WalletNodePort && !nodeForm.errorObj.WalletNodePort.isValid}
+                    helperText={nodeForm.touchedFields.WalletNodePort && nodeForm.errorObj.WalletNodePort.helperText}
+                    value={nodeForm.fields.WalletNodePort}
+                    disabled={!!nodeForm.fields.code}
+                    margin="dense"
+                    size="small"
+                    name="WalletNodePort"
+                    label="Wallet node port"
+                    fullWidth
+                    inputProps={{ autoComplete: 'off' }}
+                  />
+                </>
+              )}
+            </Collapse>
+          </Box>
         </Box>
       )}
 
@@ -231,7 +228,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
           <TableBody>
             <TableRow>
               <TableCell align="center">ADS account address</TableCell>
-              <TableCell align="center">{fields.WalletAddress}</TableCell>
+              <TableCell align="center">{walletForm.fields.WalletAddress}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

@@ -1,6 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
+  align-items: center;
   height: 100%;
 }
 
@@ -9,8 +10,15 @@
   justify-content: end;
 }
 
-.formThumb {
+.formBlock {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  width: 50%;
+  &:not(:first-child){
+    margin-top: 2rem;
+  }
+}
+
+.textField {
+  min-height: 4rem;
 }

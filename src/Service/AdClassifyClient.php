@@ -14,7 +14,7 @@ class AdClassifyClient
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
-        private readonly string $adclassifyBaseUri
+        private readonly string $adClassifyBaseUri,
     ) {
     }
 
@@ -25,7 +25,7 @@ class AdClassifyClient
     {
         $response = $this->httpClient->request(
             'POST',
-            $this->adclassifyBaseUri . self::CREATE_URI,
+            $this->adClassifyBaseUri . self::CREATE_URI,
             [
                 'json' => ['email' => $email, 'name' => $adserverName]
             ]
@@ -56,7 +56,7 @@ class AdClassifyClient
     {
         $response = $this->httpClient->request(
             'GET',
-            $this->adclassifyBaseUri . self::TAXONOMY_URI,
+            $this->adClassifyBaseUri . self::TAXONOMY_URI,
             [
                 'headers' => self::buildHeaders($apiKeyName, $apiKeySecret),
             ]

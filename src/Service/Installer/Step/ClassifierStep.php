@@ -25,11 +25,11 @@ class ClassifierStep implements InstallerStep
     private const TRIMMED_BASE64_PATTERN = '#^[0-9A-Z+/]+$#i';
 
     public function __construct(
-        private readonly string $adclassifyBaseUri,
+        private readonly string $adClassifyBaseUri,
         private readonly AdClassifyClient $adClassifyClient,
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -47,7 +47,7 @@ class ClassifierStep implements InstallerStep
         }
 
         $this->adServerConfigurationClient->setupAdClassify(
-            $this->adclassifyBaseUri,
+            $this->adClassifyBaseUri,
             $apiKey['name'],
             $apiKey['secret']
         );
@@ -138,9 +138,16 @@ class ClassifierStep implements InstallerStep
             throw new UnprocessableEntityHttpException('Base step must be completed');
         }
 
-        return [
-            Configuration::COMMON_DATA_REQUIRED => $isDataRequired,
-        ];
+        $configuration = $this->repository->fetchValuesByNames(
+            AdClassifyConfig::MODULE,
+            [
+                AdClassifyConfig::ApiKeyName->name,
+                AdClassifyConfig::Url->name,
+            ]
+        );
+        $configuration[Configuration::COMMON_DATA_REQUIRED] = $isDataRequired;
+
+        return $configuration;
     }
 
     public function isDataRequired(): bool
@@ -149,7 +156,7 @@ class ClassifierStep implements InstallerStep
             AdClassifyConfig::ApiKeyName->name,
             AdClassifyConfig::ApiKeySecret->name,
         ];
-        $configuration = $this->repository->fetchValuesByNames(AdClassifyConfig::MODULE, $requiredKeys);
+        $configuration = $this->repository->fetchValuesByNames(AdClassifyConfig::MODULE, $requiredKeys, true);
 
         foreach ($requiredKeys as $requiredKey) {
             if (!isset($configuration[$requiredKey])) {

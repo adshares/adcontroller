@@ -5,8 +5,11 @@ namespace App\Entity;
 use App\Repository\ConfigurationRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: ConfigurationRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQUE_NAME', columns: ['module', 'name'])]
+#[Gedmo\Loggable]
 class Configuration
 {
     public const COMMON_DATA_REQUIRED = 'DataRequired';
@@ -14,39 +17,30 @@ class Configuration
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Column]
+    private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255, unique: true)]
-    private $name;
+    #[ORM\Column(length: 31)]
+    private ?string $module = null;
 
-    #[ORM\Column(type: 'string', length: 31)]
-    private $module;
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private $value;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $value = null;
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    private $created_at;
+    #[ORM\Column(name: 'created_at')]
+    #[Gedmo\Timestampable(on: 'create')]
+    private ?DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    private $updated_at;
+    #[ORM\Column(name: 'updated_at')]
+    #[Gedmo\Timestampable]
+    private ?DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getModule(): ?string
@@ -57,7 +51,17 @@ class Configuration
     public function setModule(string $module): self
     {
         $this->module = $module;
+        return $this;
+    }
 
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
         return $this;
     }
 
@@ -66,34 +70,31 @@ class Configuration
         return $this->value;
     }
 
-    public function setValue(string $value): self
+    public function setValue(?string $value): self
     {
         $this->value = $value;
-
         return $this;
     }
 
     public function getCreatedAt(): ?DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeImmutable $created_at): self
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
-        $this->created_at = $created_at;
-
+        $this->createdAt = $createdAt;
         return $this;
     }
 
     public function getUpdatedAt(): ?DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(DateTimeImmutable $updatedAt): self
     {
-        $this->updated_at = $updated_at;
-
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 }

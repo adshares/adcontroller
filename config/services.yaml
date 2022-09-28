@@ -10,12 +10,14 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             string $buildDirectory: '%kernel.build_dir%'
-            string $adclassifyBaseUri: '%env(ADCLASSIFY_BASE_URI)%'
+            string $adClassifyBaseUri: '%env(ADCLASSIFY_BASE_URI)%'
+            string $adPanelHomeDirectory: '%env(ADPANEL_HOME_DIRECTORY)%'
+            string $adServerBaseUri: '%env(ADSERVER_BASE_URI)%'
+            string $adServerHomeDirectory: '%env(ADSERVER_HOME_DIRECTORY)%'
+            string $appDirectory: '%kernel.project_dir%'
             string $appName: '%env(APP_NAME)%'
             string $appSecret: '%env(APP_SECRET)%'
             string $appVersion: '%env(APP_VERSION)%'
-            string $adserverBaseUri: '%env(ADSERVER_BASE_URI)%'
-            string $adserverHomeDirectory: '%env(ADSERVER_HOME_DIRECTORY)%'
             string $licenseServerBaseUri: '%env(LICENSE_SERVER_BASE_URI)%'
 
     # makes classes in src/ available to be used as services

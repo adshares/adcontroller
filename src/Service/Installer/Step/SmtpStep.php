@@ -61,8 +61,8 @@ class SmtpStep implements InstallerStep
         ini_set('default_socket_timeout', 10);
         try {
             $mailer->send($message);
-        } catch (TransportExceptionInterface) {
-            throw new UnprocessableEntityHttpException('Invalid configuration');
+        } catch (TransportExceptionInterface $exception) {
+            throw new UnprocessableEntityHttpException(sprintf('Invalid configuration: %s', $exception->getMessage()));
         } finally {
             ini_set('default_socket_timeout', $timeout);
         }
@@ -142,13 +142,14 @@ class SmtpStep implements InstallerStep
             GeneralConfig::MODULE,
             [
                 GeneralConfig::SmtpHost->name,
+                GeneralConfig::SmtpPassword->name,
                 GeneralConfig::SmtpPort->name,
                 GeneralConfig::SmtpSender->name,
                 GeneralConfig::SmtpUsername->name,
                 GeneralConfig::SupportEmail->name,
                 GeneralConfig::TechnicalEmail->name,
-                GeneralConfig::SmtpPassword->name,
-            ]
+            ],
+            true
         );
 
         if (
@@ -198,7 +199,7 @@ class SmtpStep implements InstallerStep
             GeneralConfig::SmtpHost->name,
             GeneralConfig::SmtpPassword->name,
         ];
-        $configuration = $this->repository->fetchValuesByNames(GeneralConfig::MODULE, $requiredKeys);
+        $configuration = $this->repository->fetchValuesByNames(GeneralConfig::MODULE, $requiredKeys, true);
 
         foreach ($requiredKeys as $requiredKey) {
             if (!isset($configuration[$requiredKey])) {

@@ -8,7 +8,7 @@ use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\ConfigEnum;
 use App\Entity\Enum\GeneralConfig;
 use App\Service\Crypt;
-use DateTimeImmutable;
+use App\ValueObject\ConfigType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
@@ -43,26 +43,22 @@ class ConfigurationRepository extends ServiceEntityRepository
 
     public function insertOrUpdate(string $module, array $data, bool $flush = true): void
     {
-        $now = new DateTimeImmutable();
-
         $entities = $this->findByNames($module, array_keys($data));
         $names = array_map(fn($entity) => $entity->getName(), $entities);
         $entities = array_combine($names, $entities);
 
         foreach ($data as $name => $value) {
-            if (!isset($entities[$name])) {
+            if (isset($entities[$name])) {
+                $entity = $entities[$name];
+            } else {
                 $entity = new Configuration();
                 $entity->setModule($module);
                 $entity->setName($name);
-                $entity->setCreatedAt($now);
-            } else {
-                $entity = $entities[$name];
             }
-            if ($this->isSecretEntity($entity)) {
+            if (null !== $value && $this->isSecretEntity($entity)) {
                 $value = $this->crypt->encrypt($value);
             }
             $entity->setValue($value);
-            $entity->setUpdatedAt($now);
 
             $this->getEntityManager()->persist($entity);
         }
@@ -84,35 +80,42 @@ class ConfigurationRepository extends ServiceEntityRepository
         }
     }
 
-    public function fetchValueByEnum(ConfigEnum $enum): ?string
+    public function fetchValueByEnum(ConfigEnum $enum): string|array|int|null|float|bool
     {
         if (null === ($configuration = $this->findOneByEnum($enum))) {
             return null;
         }
 
         $value = $configuration->getValue();
-        if (in_array($enum, self::SECRETS_ENUM)) {
+        if (null !== $value && in_array($enum, self::SECRETS_ENUM)) {
             $value = $this->crypt->decrypt($value);
         }
 
-        return $value;
+        return self::mapValueType($enum->name, $value);
     }
 
     /**
      * @param string $module
      * @param array $names
-     * @return array<string, string>
+     * @param bool $withSecrets
+     * @return array<string, string|array|int|null|float|bool>
      */
-    public function fetchValuesByNames(string $module, array $names): array
+    public function fetchValuesByNames(string $module, array $names, bool $withSecrets = false): array
     {
         $entities = $this->findByNames($module, $names);
         $data = [];
         foreach ($entities as $entity) {
             $value = $entity->getValue();
             if ($this->isSecretEntity($entity)) {
-                $value = $this->crypt->decrypt($value);
+                if (!$withSecrets) {
+                    continue;
+                }
+                if (null !== $value) {
+                    $value = $this->crypt->decrypt($value);
+                }
             }
-            $data[$entity->getName()] = $value;
+            $name = $entity->getName();
+            $data[$name] = self::mapValueType($name, $value);
         }
         return $data;
     }
@@ -154,5 +157,74 @@ class ConfigurationRepository extends ServiceEntityRepository
             )
             ->getQuery()
             ->getResult();
+    }
+
+    private static function typeConversion(): array
+    {
+        return [
+            AdServerConfig::AllowZoneInIframe->name => ConfigType::Bool,
+            AdServerConfig::AutoConfirmationEnabled->name => ConfigType::Bool,
+            AdServerConfig::AutoRegistrationEnabled->name => ConfigType::Bool,
+            AdServerConfig::AutoWithdrawalLimitAds->name => ConfigType::Integer,
+            AdServerConfig::AutoWithdrawalLimitBsc->name => ConfigType::Integer,
+            AdServerConfig::AutoWithdrawalLimitBtc->name => ConfigType::Integer,
+            AdServerConfig::AutoWithdrawalLimitEth->name => ConfigType::Integer,
+            AdServerConfig::CampaignMinBudget->name => ConfigType::Integer,
+            AdServerConfig::CampaignMinCpa->name => ConfigType::Integer,
+            AdServerConfig::CampaignMinCpm->name => ConfigType::Integer,
+            AdServerConfig::ColdWalletIsActive->name => ConfigType::Bool,
+            AdServerConfig::DefaultUserRoles->name => ConfigType::Array,
+            AdServerConfig::EmailVerificationRequired->name => ConfigType::Bool,
+            AdServerConfig::HotWalletMaxValue->name => ConfigType::Integer,
+            AdServerConfig::HotWalletMinValue->name => ConfigType::Integer,
+            AdServerConfig::InventoryExportWhitelist->name => ConfigType::Array,
+            AdServerConfig::InventoryImportWhitelist->name => ConfigType::Array,
+            AdServerConfig::InventoryWhitelist->name => ConfigType::Array,
+            AdServerConfig::MaxPageZones->name => ConfigType::Integer,
+            AdServerConfig::OperatorRxFee->name => ConfigType::Float,
+            AdServerConfig::OperatorTxFee->name => ConfigType::Float,
+            AdServerConfig::ReferralRefundCommission->name => ConfigType::Float,
+            AdServerConfig::ReferralRefundEnabled->name => ConfigType::Bool,
+            AdServerConfig::RejectedDomains->name => ConfigType::Array,
+            AdServerConfig::SiteAcceptBannersManually->name => ConfigType::Bool,
+            AdServerConfig::WalletNodePort->name => ConfigType::Integer,
+            AdServerConfig::UploadLimitImage->name => ConfigType::Integer,
+            AdServerConfig::UploadLimitModel->name => ConfigType::Integer,
+            AdServerConfig::UploadLimitVideo->name => ConfigType::Integer,
+            AdServerConfig::UploadLimitZip->name => ConfigType::Integer,
+            GeneralConfig::SmtpPort->name => ConfigType::Integer,
+
+//            self::BANNER_FORCE_HTTPS => ConfigType::Bool,
+//            self::BTC_WITHDRAW => ConfigType::Bool,
+//            self::BTC_WITHDRAW_FEE => ConfigType::Float,
+//            self::BTC_WITHDRAW_MAX_AMOUNT => ConfigType::Integer,
+//            self::BTC_WITHDRAW_MIN_AMOUNT => ConfigType::Integer,
+//            self::CHECK_ZONE_DOMAIN => ConfigType::Bool,
+//            self::EXCHANGE_CURRENCIES => ConfigType::Array,
+//            self::FIAT_DEPOSIT_MAX_AMOUNT => ConfigType::Integer,
+//            self::FIAT_DEPOSIT_MIN_AMOUNT => ConfigType::Integer,
+//            self::INVOICE_CURRENCIES => ConfigType::Array,
+//            self::INVOICE_ENABLED => ConfigType::Bool,
+//            self::NETWORK_DATA_CACHE_TTL => ConfigType::Integer,
+//            self::NOW_PAYMENTS_EXCHANGE => ConfigType::Bool,
+//            self::NOW_PAYMENTS_FEE => ConfigType::Float,
+//            self::NOW_PAYMENTS_MAX_AMOUNT => ConfigType::Integer,
+//            self::NOW_PAYMENTS_MIN_AMOUNT => ConfigType::Integer,
+        ];
+    }
+
+    private static function mapValueType(string $key, ?string $value): string|array|int|null|float|bool
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return match (self::typeConversion()[$key] ?? ConfigType::String) {
+            ConfigType::Array => array_filter(explode(',', $value)),
+            ConfigType::Bool => '1' === $value,
+            ConfigType::Float => (float)$value,
+            ConfigType::Integer => (int)$value,
+            default => $value,
+        };
     }
 }

@@ -1,20 +1,24 @@
 import './styles/app.scss';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Alert, CssBaseline, Link, ThemeProvider } from '@mui/material';
+import { persistor, store } from './redux/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider } from 'react-redux';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import theme from './utils/theme';
-import AppWindow from './Components/AppWindow/AppWindow';
-import configuration from './controllerConfig/configuration';
+import { BrowserRouter } from 'react-router-dom';
+import AppController from './AppController/AppController';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <AppWindow>
-      <Alert severity="success">AdServer was successfully installed</Alert>
-      <Link sx={{ mt: 2 }} variant="button" href={configuration.baseUrl} underline="hover">
-        Go back
-      </Link>
-    </AppWindow>
-  </ThemeProvider>,
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <AppController />
+        </ThemeProvider>
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>,
 );

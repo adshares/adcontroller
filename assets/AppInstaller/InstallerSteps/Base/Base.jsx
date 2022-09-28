@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
-import { useForm } from '../../../hooks';
+import { useForm, useCreateNotification } from '../../../hooks';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import styles from './styles.scss';
 
 function Base({ handleNextStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
-  const { fields, errorObj, setFields, isFormValid, onFormChange, validate } = useForm({
-    Domain: '',
-    Name: '',
-    SupportEmail: '',
-    TechnicalEmail: '',
+  const form = useForm({
+    initialFields: {
+      Domain: '',
+      Name: '',
+      SupportEmail: '',
+      TechnicalEmail: '',
+    },
+    validation: {
+      Domain: ['required', 'domain'],
+      Name: ['required'],
+      SupportEmail: ['required', 'email'],
+      TechnicalEmail: ['required', 'email'],
+    },
   });
   const [editMode, setEditMode] = useState(false);
   const [dataRequired, setDataRequired] = useState(false);
-  const [alert, setAlert] = useState({
-    type: '',
-    message: '',
-    title: '',
-  });
-  const [isFormWasTouched, setFormTouched] = useState(false);
-
+  const { createErrorNotification } = useCreateNotification();
   useEffect(() => {
     getStepData();
   }, []);
@@ -31,8 +33,8 @@ function Base({ handleNextStep, step }) {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
       const { Domain, Name, SupportEmail, TechnicalEmail, DataRequired } = response;
-      setFields({
-        ...fields,
+      form.setFields({
+        ...form.fields,
         ...{
           Domain: Domain || '',
           Name: Name || '',
@@ -43,11 +45,7 @@ function Base({ handleNextStep, step }) {
       setEditMode(DataRequired);
       setDataRequired(DataRequired);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -60,18 +58,14 @@ function Base({ handleNextStep, step }) {
         handleNextStep(step);
         return;
       }
-      if (isFormWasTouched) {
+      if (dataRequired || Object.keys(form.touchedFields).some((field) => form.touchedFields[field])) {
         await apiService.sendStepData(step.path, {
-          ...fields,
+          ...form.fields,
         });
       }
       handleNextStep(step);
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err.data.message,
-        title: err.message,
-      });
+      createErrorNotification(err);
     } finally {
       setIsLoading(false);
     }
@@ -79,11 +73,10 @@ function Base({ handleNextStep, step }) {
 
   return (
     <InstallerStepWrapper
-      alert={alert}
       dataLoading={isLoading}
       title="Base information"
       onNextClick={handleSubmit}
-      disabledNext={!isFormValid}
+      disabledNext={!form.isFormValid}
       hideBackButton
     >
       <Box className={styles.editButtonThumb}>
@@ -97,32 +90,31 @@ function Base({ handleNextStep, step }) {
           <Box
             className={styles.formBase}
             component="form"
-            onChange={onFormChange}
-            onBlur={(e) => validate(e.target)}
-            onClick={() => setFormTouched(true)}
+            onChange={form.onChange}
+            onFocus={form.setTouched}
             onSubmit={(e) => e.preventDefault()}
           >
             <Box className={styles.formBlock}>
               <TextField
                 className={styles.textField}
-                error={!!errorObj.Name}
-                helperText={errorObj.Name}
+                error={form.touchedFields.Name && !form.errorObj.Name.isValid}
+                helperText={form.touchedFields.Name && form.errorObj.Name.helperText}
                 size="small"
                 name="Name"
                 label="Adserver's name"
-                value={fields.Name}
+                value={form.fields.Name}
                 type="text"
                 required
                 inputProps={{ autoComplete: 'off' }}
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.Domain}
-                helperText={errorObj.Domain}
+                error={form.touchedFields.Domain && !form.errorObj.Domain.isValid}
+                helperText={form.touchedFields.Domain && form.errorObj.Domain.helperText}
                 size="small"
                 name="Domain"
                 label="Adserver's domain"
-                value={fields.Domain}
+                value={form.fields.Domain}
                 type="text"
                 required
                 inputProps={{ autoComplete: 'off' }}
@@ -131,12 +123,12 @@ function Base({ handleNextStep, step }) {
             <Box className={styles.formBlock}>
               <TextField
                 className={styles.textField}
-                error={!!errorObj.SupportEmail}
-                helperText={errorObj.SupportEmail}
+                error={form.touchedFields.SupportEmail && !form.errorObj.SupportEmail.isValid}
+                helperText={form.touchedFields.SupportEmail && form.errorObj.SupportEmail.helperText}
                 size="small"
                 name="SupportEmail"
                 label="Support email"
-                value={fields.SupportEmail}
+                value={form.fields.SupportEmail}
                 type="email"
                 placeholder="support@domain.xyz"
                 required
@@ -144,12 +136,12 @@ function Base({ handleNextStep, step }) {
               />
               <TextField
                 className={styles.textField}
-                error={!!errorObj.TechnicalEmail}
-                helperText={errorObj.TechnicalEmail}
+                error={form.touchedFields.TechnicalEmail && !form.errorObj.TechnicalEmail.isValid}
+                helperText={form.touchedFields.TechnicalEmail && form.errorObj.TechnicalEmail.helperText}
                 size="small"
                 name="TechnicalEmail"
                 label="Technical email"
-                value={fields.TechnicalEmail}
+                value={form.fields.TechnicalEmail}
                 type="email"
                 placeholder="tech@domain.xyz"
                 required
@@ -163,7 +155,7 @@ function Base({ handleNextStep, step }) {
       {!editMode && (
         <InfoTable
           stepData={{
-            ...fields,
+            ...form.fields,
           }}
         />
       )}
