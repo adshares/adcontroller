@@ -13,13 +13,16 @@ class AdsCredentialsChecker
 {
     private const REQUIRED_BALANCE = 1e11;
 
-    public function __construct(private readonly LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly string $buildDirectory,
+        private readonly LoggerInterface $logger
+    ) {
     }
 
     public function check(string $address, string $secret, string $host, int $port): void
     {
         $driver = new CliDriver($address, $secret, $host, $port, $this->logger);
+        $driver->setWorkingDir($this->buildDirectory . DIRECTORY_SEPARATOR . 'wallet');
         $adsClient = new AdsClient($driver, $this->logger);
 
         try {
