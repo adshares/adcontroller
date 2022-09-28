@@ -9,6 +9,7 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
+            string $buildDirectory: '%kernel.build_dir%'
             string $adClassifyBaseUri: '%env(ADCLASSIFY_BASE_URI)%'
             string $adPanelHomeDirectory: '%env(ADPANEL_HOME_DIRECTORY)%'
             string $adServerBaseUri: '%env(ADSERVER_BASE_URI)%'

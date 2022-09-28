@@ -56,7 +56,7 @@ class BaseStep implements InstallerStep
         $adServerUrl = $protocol . $adServerHost;
         $adPanelUrl = $protocol . $adPanelHost;
         $adUserUrl = $protocol . $adUserHost;
-        $adUserInternalUrl = 'http://' . $adUserHost;
+        $adUserInternalUrl = $adUserUrl;
 
         $this->adServerConfigurationClient->store(
             [
