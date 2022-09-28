@@ -38,9 +38,9 @@ const initialState = {
       EmailVerificationRequired: null,
       HotWalletMaxValue: null,
       HotWalletMinValue: null,
-      InventoryWhitelist: null,
-      InventoryImportWhiteList: null,
-      InventoryExportWhiteList: null,
+      InventoryWhitelist: [],
+      InventoryImportWhitelist: [],
+      InventoryExportWhitelist: [],
       MaxPageZones: null,
       OperatorRxFee: null,
       OperatorTxFee: null,
@@ -124,7 +124,7 @@ const configSlice = createSlice({
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
     changeInventoryWhitelistInformation: (state, { payload }) => {
-      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload };
     },
     changeCommissionsConfigInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };

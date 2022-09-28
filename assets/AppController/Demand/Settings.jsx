@@ -303,9 +303,9 @@ const RejectedDomainsCard = () => {
   };
 
   const fieldsHandler = (event) => {
-    const { isValuesValid, isListWasChanged, createdList } = event;
-    setRejectedDomains(createdList);
-    setListValid(createdList.length > 0 ? isValuesValid : true);
+    const { isValuesValid, isListWasChanged, list } = event;
+    setRejectedDomains(list);
+    setListValid(list.length > 0 ? isValuesValid : true);
     setListWasChanged(isListWasChanged);
   };
 
@@ -321,7 +321,7 @@ const RejectedDomainsCard = () => {
           fieldsHandler={fieldsHandler}
           listName="RejectedDomains"
           type="domain"
-          maxHeight="calc(100vh - 22rem)"
+          // maxHeight="calc(100vh - 22rem)"
         />
       </CardContent>
       <CardActions>
