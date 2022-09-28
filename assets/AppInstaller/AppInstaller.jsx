@@ -64,8 +64,8 @@ export default function AppInstaller() {
   const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
 
   useEffect(() => {
-    dispatch(checkAppAuth());
     if (token) {
+      dispatch(checkAppAuth());
       getCurrentStep();
     }
     setIsLoading(false);
