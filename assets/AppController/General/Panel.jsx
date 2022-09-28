@@ -117,7 +117,7 @@ const Placeholders = () => {
           <TextField
             value={form.fields.PlaceholderLoginInfo}
             name="PlaceholderLoginInfo"
-            label="Login Page HTML"
+            label="Login page info (HTML)"
             multiline
             rows={8}
             margin="dense"
