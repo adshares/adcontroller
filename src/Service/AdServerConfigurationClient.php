@@ -362,7 +362,7 @@ class AdServerConfigurationClient
             $this->buildConfigUri(),
             [
                 self::ADUSER_BASE_URL => $adUserUrl,
-                self::ADUSER_INTERNAL_URL => $adUserInternalUrl,
+                self::ADUSER_INTERNAL_URL => $adUserInternalUrl === $adUserUrl ? null : $adUserInternalUrl,
             ]
         );
     }
