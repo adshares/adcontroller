@@ -95,8 +95,7 @@ export default function Settings() {
         : {}),
     };
     const response = await setInventoryWhitelistConfig(body);
-
-    if (response.data.message === 'OK') {
+    if (response.data && response.data.message === 'OK') {
       dispatch(changeInventoryWhitelistInformation(body));
       createSuccessNotification();
     }
@@ -170,35 +169,21 @@ export default function Settings() {
   return (
     <Card className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
       <CardHeader
-        title="AdServer's whitelist"
+        title="AdServer's inventory"
         subheader="Set which ad servers your ad server can sync with. By default, it syncs with all available ad servers."
       />
       <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
         <CardContent sx={{ pt: 0, pb: 0 }}>
           <FormControl>
-            <FormLabel focused={false}>Ad server type</FormLabel>
+            <FormLabel focused={false}>Ad server's inventory visibility</FormLabel>
             <RadioGroup row value={serverType} onChange={handleServerTypeChange}>
-              <Box>
-                <FormControlLabel
-                  value="private"
-                  control={<Radio />}
-                  label={
-                    <Box className={`${commonStyles.flex}`}>
-                      <Typography variant="body1">Private</Typography>
-                      <Tooltip sx={{ ml: 0.5 }} title="The ad server will not synchronize with any other ad server.">
-                        <HelpIcon color="primary" />
-                      </Tooltip>
-                    </Box>
-                  }
-                />
-              </Box>
               <FormControlLabel
                 value="public"
                 control={<Radio />}
                 label={
                   <Box className={`${commonStyles.flex}`}>
                     <Typography variant="body1">Public</Typography>
-                    <Tooltip sx={{ ml: 0.5 }} title="The ad server will not synchronize with any other ad server.">
+                    <Tooltip sx={{ ml: 0.5 }} title="The ad server will synchronize with all other ad servers.">
                       <HelpIcon color="primary" />
                     </Tooltip>
                   </Box>
@@ -210,6 +195,18 @@ export default function Settings() {
                 label={
                   <Box className={`${commonStyles.flex}`}>
                     <Typography variant="body1">Restricted</Typography>
+                    <Tooltip sx={{ ml: 0.5 }} title="The ad server will only synchronize with listed as servers.">
+                      <HelpIcon color="primary" />
+                    </Tooltip>
+                  </Box>
+                }
+              />
+              <FormControlLabel
+                value="private"
+                control={<Radio />}
+                label={
+                  <Box className={`${commonStyles.flex}`}>
+                    <Typography variant="body1">Private</Typography>
                     <Tooltip sx={{ ml: 0.5 }} title="The ad server will not synchronize with any other ad server.">
                       <HelpIcon color="primary" />
                     </Tooltip>
