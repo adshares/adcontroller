@@ -5,13 +5,14 @@ import { setAppLogout } from '../redux/auth/authSlice';
 
 const request = async (url, method, withAuthorization = true, _body) => {
   try {
+    const token = store.getState().authSlice.token;
     const result = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
         ...(withAuthorization
           ? {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              Authorization: `Bearer ${token}`,
             }
           : {}),
       },
