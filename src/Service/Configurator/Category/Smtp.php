@@ -75,7 +75,8 @@ class Smtp implements ConfiguratorCategory
         }
     }
 
-    private function sendTestEmailMessage(Mailer $mailer, Email $message): void {
+    private function sendTestEmailMessage(Mailer $mailer, Email $message): void
+    {
         $timeout = ini_get('default_socket_timeout');
         ini_set('default_socket_timeout', 10);
         try {

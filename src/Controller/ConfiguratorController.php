@@ -174,7 +174,7 @@ class ConfiguratorController extends AbstractController
             if (isset($content[GeneralConfig::SmtpPassword->name])) {
                 $result = self::appendSmtpPassword($result, $content[GeneralConfig::SmtpPassword->name]);
             }
-        } else if (Whitelist::class === $service::class) {
+        } elseif (Whitelist::class === $service::class) {
             $result[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name] =
                 $repository->fetchValueByEnum(AdServerConfig::WalletAddress);
             $result = self::processInventory($result);
