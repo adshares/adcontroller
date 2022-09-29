@@ -26,6 +26,7 @@ use App\Service\Configurator\Category\Registration;
 use App\Service\Configurator\Category\Regulations;
 use App\Service\Configurator\Category\RejectedDomains;
 use App\Service\Configurator\Category\SiteOptions;
+use App\Service\Configurator\Category\Smtp;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
@@ -56,6 +57,7 @@ class ConfiguratorController extends AbstractController
         'registration-config' => Registration::class,
         'regulations-config' => Regulations::class,
         'rejected-domains-config' => RejectedDomains::class,
+        'smtp-config' => Smtp::class,
         'site-options-config' => SiteOptions::class,
         'wallet-config' => Wallet::class,
         'whitelist-config' => Whitelist::class,
@@ -82,9 +84,20 @@ class ConfiguratorController extends AbstractController
                 array_map(fn($enum) => $enum->name, $class::cases())
             );
         }
+        $data = self::appendSmtpPassword($data, $repository->fetchValueByEnum(GeneralConfig::SmtpPassword));
         $data = self::processInventory($data);
 
         return $this->jsonOk($data);
+    }
+
+    private static function appendSmtpPassword(array $data, ?string $smtpPassword): array
+    {
+        if (null !== $smtpPassword && strlen($smtpPassword) > 0) {
+            $data[GeneralConfig::MODULE][GeneralConfig::SmtpPassword->name] = '********';
+        } else {
+            $data[GeneralConfig::MODULE][GeneralConfig::SmtpPassword->name] = '';
+        }
+        return $data;
     }
 
     private static function processInventory(array $data): array
@@ -157,7 +170,11 @@ class ConfiguratorController extends AbstractController
             throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
         }
 
-        if (Whitelist::class === $service::class) {
+        if (Smtp::class === $service::class) {
+            if (isset($content[GeneralConfig::SmtpPassword->name])) {
+                $result = self::appendSmtpPassword($result, $content[GeneralConfig::SmtpPassword->name]);
+            }
+        } else if (Whitelist::class === $service::class) {
             $result[AdServerConfig::MODULE][AdServerConfig::WalletAddress->name] =
                 $repository->fetchValueByEnum(AdServerConfig::WalletAddress);
             $result = self::processInventory($result);
