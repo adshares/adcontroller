@@ -5,6 +5,7 @@ namespace App\Service\Configurator\Category;
 use App\Entity\Enum\AdServerConfig;
 use App\Exception\InvalidArgumentException;
 use App\Exception\UnexpectedResponseException;
+use App\Repository\ConfigurationRepository;
 use App\Service\AdsCredentialsChecker;
 use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
@@ -19,6 +20,7 @@ class Wallet implements ConfiguratorCategory
 
     public function __construct(
         private readonly AdsCredentialsChecker $adsCredentialsChecker,
+        private readonly ConfigurationRepository $repository,
         private readonly DataCollector $dataCollector,
         private readonly HttpClientInterface $httpClient,
     ) {
@@ -51,6 +53,11 @@ class Wallet implements ConfiguratorCategory
         } catch (UnexpectedResponseException $exception) {
             throw new InvalidArgumentException($exception->getMessage());
         }
+
+        $this->repository->insertOrUpdateOne(
+            AdServerConfig::WalletSecretKey,
+            $input[AdServerConfig::WalletSecretKey->name]
+        );
 
         return $this->dataCollector->push($input);
     }

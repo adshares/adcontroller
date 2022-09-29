@@ -64,11 +64,7 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       if (!smtpForm.isFormValid) {
         return;
       }
-      if (
-        isDataRequired ||
-        Object.keys(smtpForm.touchedFields).some((field) => smtpForm.touchedFields[field]) ||
-        passwordForm.touchedFields.SmtpPassword
-      ) {
+      if (isDataRequired || isPasswordWasTouched || Object.keys(smtpForm.touchedFields).some((field) => smtpForm.touchedFields[field])) {
         const sendPassword = isDataRequired || isPasswordWasTouched;
         await apiService.sendStepData(step.path, { ...smtpForm.fields, ...(sendPassword ? passwordForm.fields : {}) });
       }
