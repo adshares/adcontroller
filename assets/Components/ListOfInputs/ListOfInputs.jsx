@@ -5,28 +5,18 @@ import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
 import { compareArrays } from '../../utils/helpers';
 
-const sliceDomain = (value) => {
-  const isValidUrl = (() => {
-    try {
-      new URL(value);
-    } catch {
-      sliceDomain('https://' + value);
-      return false;
-    }
-    return true;
-  })();
-
-  if (isValidUrl) {
-    const url = new URL(value);
-    return url.hostname;
+const sliceDomain = (value, addProtocol = false) => {
+  try {
+    return new URL(addProtocol ? 'https://' + value : value).hostname;
+  } catch {
+    return addProtocol ? null : sliceDomain(value, true);
   }
-  return value;
 };
 
 const formatValue = (value, type) => {
   switch (type) {
     case 'domain':
-      return sliceDomain(value);
+      return sliceDomain(value) ?? value;
 
     default:
       return value;
@@ -43,12 +33,7 @@ const validateValue = (list, value, type) => {
   }
 
   const validateDomain = (list, value) => {
-    const isValidUrl = new RegExp(
-      '^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))', // OR ip (v4) address
-      'i',
-    ).test(value);
+    const isValidUrl = null !== sliceDomain(value);
     const isValueValid = !isDuplicated && isValidUrl;
 
     if (!isValidUrl) {
