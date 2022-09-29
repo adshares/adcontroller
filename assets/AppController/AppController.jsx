@@ -8,7 +8,6 @@ import synchronizationSelectors from '../redux/synchronization/synchronizationSe
 import { useLazySynchronizeConfigQuery } from '../redux/synchronization/synchronizationApi';
 import { useLazyGetAppConfigQuery } from '../redux/config/configApi';
 import Spinner from '../Components/Spinner/Spinner';
-import GlobalNotifications from '../Components/GlobalNotifications/GlobalNotifications';
 import SynchronizationDialog from '../Components/SynchronizationDialog/SynchronizationDialog';
 import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
@@ -211,8 +210,6 @@ function AppController() {
       <Box component="main" className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
         <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
         <AppWindow>
-          <GlobalNotifications />
-
           <SynchronizationDialog
             isSyncInProgress={isSyncInProgress}
             isSynchronizationRequired={isSynchronizationRequired}
