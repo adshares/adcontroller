@@ -29,9 +29,10 @@ export default function Settings() {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setInventoryWhitelistConfig, { isLoading }] = useSetInventoryWhitelistConfigMutation();
-  const [separateList, setSeparateList] = useState(
-    appData.AdServer.InventoryImportWhitelist?.length > 0 || appData.AdServer.InventoryExportWhitelist?.length > 0,
-  );
+  const [separateList, setSeparateList] = useState({
+    current: appData.AdServer.InventoryImportWhitelist?.length > 0 || appData.AdServer.InventoryExportWhitelist?.length > 0,
+    prev: appData.AdServer.InventoryImportWhitelist?.length > 0 || appData.AdServer.InventoryExportWhitelist?.length > 0,
+  });
   const [InventoryWhitelist, setInventoryWhitelist] = useState([]);
   const [InventoryImportWhitelist, setInventoryImportWhitelist] = useState([]);
   const [InventoryExportWhitelist, setInventoryExportWhitelist] = useState([]);
@@ -47,14 +48,8 @@ export default function Settings() {
     ) {
       return 'public';
     }
-    if (
-      !appData.AdServer.InventoryPrivate &&
-      (appData.AdServer.InventoryWhitelist?.length > 0 ||
-        appData.AdServer.InventoryImportWhitelist?.length > 0 ||
-        appData.AdServer.InventoryExportWhitelist?.length > 0)
-    ) {
-      return 'restricted';
-    }
+
+    return 'restricted';
   });
 
   const [isListValid, setIsListValid] = useState({
@@ -71,34 +66,6 @@ export default function Settings() {
 
   const handleServerTypeChange = (e) => {
     setServerType(e.target.value);
-  };
-
-  const onSaveClick = async () => {
-    const body = {
-      ...(serverType === 'private' ? { InventoryPrivate: true, InventoryWhitelist: [appData.AdServer.WalletAddress] } : {}),
-      ...(serverType === 'public'
-        ? {
-            InventoryPrivate: false,
-            InventoryWhitelist: [],
-            InventoryImportWhitelist: [],
-            InventoryExportWhitelist: [],
-          }
-        : {}),
-      ...(serverType === 'restricted'
-        ? separateList
-          ? {
-              InventoryPrivate: false,
-              InventoryImportWhitelist,
-              InventoryExportWhitelist,
-            }
-          : { InventoryPrivate: false, InventoryWhitelist }
-        : {}),
-    };
-    const response = await setInventoryWhitelistConfig(body);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(changeInventoryWhitelistInformation(body));
-      createSuccessNotification();
-    }
   };
 
   const fieldsHandler = (event) => {
@@ -159,10 +126,46 @@ export default function Settings() {
       );
     }
     if (serverType === 'restricted') {
-      return separateList
-        ? (InventoryImportWhitelist.length === 0 || !isListValid.InventoryImportWhitelist || !isListWasChanged.InventoryImportWhitelist) &&
-            (InventoryExportWhitelist.length === 0 || !isListValid.InventoryExportWhitelist || !isListWasChanged.InventoryExportWhitelist)
-        : InventoryWhitelist.length === 0 || !isListValid.InventoryWhitelist || !isListWasChanged.InventoryWhitelist;
+      return separateList.current
+        ? (InventoryImportWhitelist.length === 0 && InventoryExportWhitelist.length === 0) ||
+            (!isListWasChanged.InventoryImportWhitelist && !isListWasChanged.InventoryExportWhitelist) ||
+            !isListValid.InventoryImportWhitelist ||
+            !isListValid.InventoryExportWhitelist
+        : InventoryWhitelist.length === 0 ||
+            !isListValid.InventoryWhitelist ||
+            (separateList.current === separateList.prev && !isListWasChanged.InventoryWhitelist);
+    }
+  };
+
+  const onSaveClick = async () => {
+    const body = {
+      ...(serverType === 'private' ? { InventoryPrivate: true, InventoryWhitelist: [appData.AdServer.WalletAddress] } : {}),
+      ...(serverType === 'public'
+        ? {
+            InventoryPrivate: false,
+            InventoryWhitelist: [],
+            InventoryImportWhitelist: [],
+            InventoryExportWhitelist: [],
+          }
+        : {}),
+      ...(serverType === 'restricted'
+        ? separateList.current
+          ? {
+              InventoryPrivate: false,
+              InventoryImportWhitelist,
+              InventoryExportWhitelist,
+            }
+          : { InventoryPrivate: false, InventoryWhitelist, InventoryImportWhitelist: [], InventoryExportWhitelist: [] }
+        : {}),
+    };
+    const response = await setInventoryWhitelistConfig(body);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeInventoryWhitelistInformation(body));
+      setSeparateList((prevState) => ({
+        ...prevState,
+        prev: prevState.current !== prevState.prev ? !prevState.prev : prevState.prev,
+      }));
+      createSuccessNotification();
     }
   };
 
@@ -222,11 +225,16 @@ export default function Settings() {
         <CardContent>
           <CardActions sx={{ paddingX: 0 }}>
             <FormControlLabel
-              control={<Checkbox checked={separateList} onChange={() => setSeparateList((prevState) => !prevState)} />}
+              control={
+                <Checkbox
+                  checked={separateList.current}
+                  onChange={() => setSeparateList((prevState) => ({ ...prevState, current: !prevState.current }))}
+                />
+              }
               label="Separate lists for inventory import and export"
             />
           </CardActions>
-          <Collapse in={!separateList} timeout="auto">
+          <Collapse in={!separateList.current} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader title="Ad server addresses" subheader={'Synchronization will be limited to the following ad servers only.'} />
@@ -243,7 +251,7 @@ export default function Settings() {
             </Box>
           </Collapse>
 
-          <Collapse in={separateList} timeout="auto">
+          <Collapse in={separateList.current} timeout="auto">
             <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
               <Card className={`${commonStyles.halfCard}`} raised>
                 <CardHeader
