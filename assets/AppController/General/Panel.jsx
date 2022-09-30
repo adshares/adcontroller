@@ -45,7 +45,7 @@ const Placeholders = () => {
       PlaceholderRobotsTxt: appData.AdPanel.PlaceholderRobotsTxt || '',
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const body = {};
@@ -54,12 +54,11 @@ const Placeholders = () => {
         body[field] = form.fields[field];
       }
     });
-    try {
-      const response = await setPlaceholdersConfig(body).unwrap();
-      dispatch(changePlaceholdersInformation(response.data));
+    const response = await setPlaceholdersConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changePlaceholdersInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
@@ -143,18 +142,17 @@ const Rebranding = () => {
   const [changedImages, setChangedImages] = useState({});
   const [previews, setPreviews] = useState({});
   const { enqueueSnackbar } = useSnackbar();
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const formData = new FormData();
     Object.keys(changedImages).forEach((file) => formData.append(file, changedImages[file]));
     if (Object.keys(changedImages).length > 0) {
-      try {
-        await uploadAssets(formData).unwrap();
+      const response = await uploadAssets(formData);
+
+      if (response.data && response.data.message === 'OK') {
         setChangedImages({});
         createSuccessNotification();
-      } catch (err) {
-        createErrorNotification(err);
       }
     }
   };
