@@ -5,6 +5,7 @@ import { useSetPlaceholdersConfigMutation, useUploadAssetsMutation } from '../..
 import { changePlaceholdersInformation } from '../../redux/config/configSlice';
 import { useCreateNotification, useForm } from '../../hooks';
 import configuration from '../../controllerConfig/configuration';
+import CollapsibleTextarea from '../../Components/CollapsibleTextarea/CollapsibleTextarea';
 import {
   Box,
   Button,
@@ -67,7 +68,7 @@ const Placeholders = () => {
     <Card className={commonStyles.card}>
       <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
       <CardContent>
-        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+        <Box component="form" onChange={(e) => form.onChange(e)} onFocus={(e) => form.setTouched(e)}>
           <TextField
             value={form.fields.PlaceholderIndexTitle}
             name="PlaceholderIndexTitle"
@@ -76,7 +77,8 @@ const Placeholders = () => {
             margin="dense"
             fullWidth
           />
-          <TextField
+          <CollapsibleTextarea
+            collapsible
             value={form.fields.PlaceholderIndexDescription}
             name="PlaceholderIndexDescription"
             label="Description"
@@ -94,8 +96,9 @@ const Placeholders = () => {
             margin="dense"
             fullWidth
           />
-          <TextField
-            value={form.fields.PlaceholderIndexMetaTags}
+          <CollapsibleTextarea
+            collapsible
+            defaultValue={form.fields.PlaceholderIndexMetaTags}
             name="PlaceholderIndexMetaTags"
             label="Custom meta tags"
             multiline
@@ -104,7 +107,8 @@ const Placeholders = () => {
             fullWidth
             size="small"
           />
-          <TextField
+          <CollapsibleTextarea
+            collapsible
             value={form.fields.PlaceholderRobotsTxt}
             name="PlaceholderRobotsTxt"
             label="robots.txt"
@@ -114,7 +118,8 @@ const Placeholders = () => {
             fullWidth
             size="small"
           />
-          <TextField
+          <CollapsibleTextarea
+            collapsible
             value={form.fields.PlaceholderLoginInfo}
             name="PlaceholderLoginInfo"
             label="Login page info (HTML)"
