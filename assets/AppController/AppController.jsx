@@ -20,6 +20,7 @@ import SideMenu from '../Components/SideMenu/SideMenu';
 import Wallet from './Finance/Wallet';
 import Commissions from './Finance/Commissions';
 import Base from './General/Base';
+import SMTP from './General/SMTP';
 import License from './General/License';
 import NetworkSettings from './Network/Settings';
 import SupplySettings from './Supply/Settings';
@@ -41,6 +42,7 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import PeopleIcon from '@mui/icons-material/People';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
+import EmailIcon from '@mui/icons-material/Email';
 import commonStyles from '../styles/commonStyles.scss';
 
 const appModules = [
@@ -120,6 +122,12 @@ const appModules = [
         path: '/base',
         component: Base,
         icon: InfoIcon,
+      },
+      {
+        name: 'SMTP',
+        path: '/smtp',
+        component: SMTP,
+        icon: EmailIcon,
       },
       {
         name: 'License',

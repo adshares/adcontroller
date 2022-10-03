@@ -160,7 +160,9 @@ export default function useForm(options) {
   );
 
   const setTouched = (e) => {
-    setTouchedFields((prevState) => ({ ...prevState, [e.target.name]: true }));
+    if (!touchedFields[e.target.name]) {
+      setTouchedFields((prevState) => ({ ...prevState, [e.target.name]: true }));
+    }
   };
 
   const onChange = (e) => {
