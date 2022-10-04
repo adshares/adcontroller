@@ -16,13 +16,10 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Icon,
   Radio,
   RadioGroup,
   TextField,
-  Tooltip,
 } from '@mui/material';
-import HelpIcon from '@mui/icons-material/Help';
 import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
@@ -38,7 +35,7 @@ const SiteOptions = () => {
   const appData = useSelector(configSelectors.getAppData);
   const [setSiteOptionsConfig, { isLoading }] = useSetSiteOptionsConfigMutation();
   const dispatch = useDispatch();
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
   const [SiteAcceptBannersManually, setSiteAcceptBannersManually] = useState(appData.AdServer.SiteAcceptBannersManually);
   const [SiteClassifierLocalBanners, setSiteClassifierLocalBanners] = useState(appData.AdServer.SiteClassifierLocalBanners);
 
@@ -47,12 +44,11 @@ const SiteOptions = () => {
       ...(appData.AdServer.SiteAcceptBannersManually === SiteAcceptBannersManually ? {} : { SiteAcceptBannersManually }),
       ...(appData.AdServer.SiteClassifierLocalBanners === SiteClassifierLocalBanners ? {} : { SiteClassifierLocalBanners }),
     };
-    try {
-      const response = await setSiteOptionsConfig(body).unwrap();
-      dispatch(changeSiteOptionsInformation(response.data));
+
+    const response = await setSiteOptionsConfig(body);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeSiteOptionsInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
   return (
@@ -102,7 +98,7 @@ const ZoneOptions = () => {
   const appData = useSelector(configSelectors.getAppData);
   const [setZoneOptionsConfig, { isLoading }] = useSetZoneOptionsConfigMutation();
   const dispatch = useDispatch();
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
   const [AllowZoneInIframe, setAllowZoneInIframe] = useState(appData.AdServer.AllowZoneInIframe);
   const form = useForm({
     initialFields: { MaxPageZones: appData.AdServer.MaxPageZones.toString() },
@@ -116,12 +112,11 @@ const ZoneOptions = () => {
       ...(appData.AdServer.AllowZoneInIframe !== AllowZoneInIframe && { AllowZoneInIframe }),
       ...(form.changedFields.MaxPageZones ? { MaxPageZones: returnNumber(form.fields.MaxPageZones) } : {}),
     };
-    try {
-      const response = await setZoneOptionsConfig(body).unwrap();
-      dispatch(changeZoneOptionsInformation(response.data));
+
+    const response = await setZoneOptionsConfig(body);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeZoneOptionsInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 

@@ -34,14 +34,11 @@ function License() {
       LicenseKey: ['required', 'licenseKey'],
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   useEffect(() => {
     if (data?.data) {
       setLicenseData(data.data.LicenseData);
-    }
-    if (error) {
-      createErrorNotification(error);
     }
   }, [data, error]);
 
@@ -52,13 +49,12 @@ function License() {
 
   const handleGetLicenseClick = async () => {
     const body = { LicenseKey: form.fields.LicenseKey };
-    try {
-      await setExistingLicense(body).unwrap();
+    const response = await setExistingLicense(body);
+
+    if (response.data && response.data.message === 'OK') {
       createSuccessNotification();
       toggleEditMode();
       refetch();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
