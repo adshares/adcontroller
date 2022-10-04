@@ -137,9 +137,19 @@ const RegistrationModeCard = () => {
               Default user's role:
             </FormLabel>
             <RadioGroup row value={RegistrationMode} onChange={handleSelectChange}>
-              <FormControlLabelWithTooltip value="public" control={<Radio />} label="Public" tooltip="lorem ipsum dolor emet" />
-              <FormControlLabelWithTooltip value="restricted" control={<Radio />} label="Restricted" tooltip="lorem ipsum dolor emet" />
-              <FormControlLabelWithTooltip value="private" control={<Radio />} label="Private" tooltip="lorem ipsum dolor emet" />
+              <FormControlLabelWithTooltip value="public" control={<Radio />} label="Public" tooltip="Anyone can register." />
+              <FormControlLabelWithTooltip
+                value="restricted"
+                control={<Radio />}
+                label="Restricted"
+                tooltip="Registration requires an invitation link."
+              />
+              <FormControlLabelWithTooltip
+                value="private"
+                control={<Radio />}
+                label="Private"
+                tooltip="Only the moderator can add new users."
+              />
             </RadioGroup>
           </FormControl>
           <Collapse in={RegistrationMode === 'restricted'} timeout="auto">
