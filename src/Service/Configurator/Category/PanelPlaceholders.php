@@ -3,9 +3,57 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdPanelConfig;
+use App\Exception\InvalidArgumentException;
+use App\Repository\ConfigurationRepository;
+use App\Service\DataCollector;
+use App\Utility\ArrayUtils;
 
-class PanelPlaceholders extends PlaceholdersConfigurator
+class PanelPlaceholders implements ConfiguratorCategory
 {
+    private const MAXIMUM_CONTENT_LENGTH = 16777210;
+
+    public function __construct(
+        private readonly ConfigurationRepository $configurationRepository,
+        private readonly DataCollector $dataCollector,
+    ) {
+    }
+
+    public function process(array $content): array
+    {
+        $fields = $this->fields();
+        $input = ArrayUtils::filterByKeys($content, $fields);
+        if (empty($input)) {
+            throw new InvalidArgumentException('Data is required');
+        }
+
+        $result = [];
+        if (array_key_exists(AdPanelConfig::PlaceholderStyleCss->name, $input)) {
+            $styleCss = $input[AdPanelConfig::PlaceholderStyleCss->name];
+            //TODO handle style - save to disc
+            if ($styleCss) {
+            } else {
+            }
+
+            $this->configurationRepository->insertOrUpdateOne(AdPanelConfig::PlaceholderStyleCss, $styleCss);
+            $result = [
+                AdPanelConfig::MODULE => [
+                    AdPanelConfig::PlaceholderStyleCss->name => $styleCss,
+                ]
+            ];
+            unset($input[AdPanelConfig::PlaceholderStyleCss->name]);
+        }
+
+        foreach ($fields as $field) {
+            if (
+                isset($input[$field]) &&
+                (!is_string($input[$field]) || strlen($input[$field]) > self::MAXIMUM_CONTENT_LENGTH)
+            ) {
+                throw new InvalidArgumentException(sprintf('Field `%s` must be a string', $field));
+            }
+        }
+        return array_merge_recursive($result, $this->dataCollector->pushPlaceholders($input));
+    }
+
     protected function fields(): array
     {
         return [
@@ -15,6 +63,7 @@ class PanelPlaceholders extends PlaceholdersConfigurator
             AdPanelConfig::PlaceholderIndexTitle->name,
             AdPanelConfig::PlaceholderLoginInfo->name,
             AdPanelConfig::PlaceholderRobotsTxt->name,
+            AdPanelConfig::PlaceholderStyleCss->name,
         ];
     }
 }

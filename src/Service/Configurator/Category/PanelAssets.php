@@ -99,8 +99,8 @@ class PanelAssets implements ConfiguratorCategory
                     );
                 }
             } else {
-                if (!str_starts_with($mimeType, 'image/') && 'text/plain' !== $mimeType) {
-                    throw new InvalidArgumentException(sprintf('File `%s` must be an image or text', $fileId));
+                if (!str_starts_with($mimeType, 'image/')) {
+                    throw new InvalidArgumentException(sprintf('File `%s` must be an image', $fileId));
                 }
                 if (strlen($fileId) > self::MAXIMAL_FILE_ID_LENGTH) {
                     throw new InvalidArgumentException(
@@ -217,7 +217,6 @@ class PanelAssets implements ConfiguratorCategory
 
         if (0 === $this->assetRepository->count([])) {
             $filesystem->remove($assetDirectory);
-            $this->undeploy();
         }
 
         return $removedFileIds;
@@ -227,12 +226,6 @@ class PanelAssets implements ConfiguratorCategory
     {
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
         $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $this->getAssetDirectory());
-    }
-
-    private function undeploy(): void
-    {
-        $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
-        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, '');
     }
 
     public function buildUrl(string $filePath): string

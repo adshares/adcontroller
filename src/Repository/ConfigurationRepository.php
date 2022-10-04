@@ -36,7 +36,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         parent::__construct($registry, Configuration::class);
     }
 
-    public function insertOrUpdateOne(ConfigEnum $enum, string $value, bool $flush = true): void
+    public function insertOrUpdateOne(ConfigEnum $enum, ?string $value, bool $flush = true): void
     {
         $this->insertOrUpdate($enum->getModule(), [$enum->name => $value], $flush);
     }
