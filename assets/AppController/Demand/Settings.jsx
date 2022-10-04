@@ -55,7 +55,7 @@ const CampaignSettingsCard = () => {
       CampaignMinCpm: ['number'],
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const body = {};
@@ -65,12 +65,11 @@ const CampaignSettingsCard = () => {
       }
     });
 
-    try {
-      const response = await setCampaignSettingsConfig(body).unwrap();
-      dispatch(changeCampaignSettingsInformation(response.data));
+    const response = await setCampaignSettingsConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeCampaignSettingsInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
@@ -167,7 +166,7 @@ const BannerSettingsCard = () => {
       UploadLimitZip: ['number'],
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const body = {};
@@ -177,12 +176,11 @@ const BannerSettingsCard = () => {
       }
     });
 
-    try {
-      const response = await setBannerSettingsConfig(body).unwrap();
-      dispatch(changeBannerSettingsInformation(response.data));
+    const response = await setBannerSettingsConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeBannerSettingsInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
@@ -282,7 +280,7 @@ const RejectedDomainsCard = () => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setRejectedDomainsSettings, { isLoading }] = useSetRejectedDomainsSettingsConfigMutation();
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const [RejectedDomains, setRejectedDomains] = useState([]);
   const [isListValid, setListValid] = useState(true);
@@ -293,12 +291,11 @@ const RejectedDomainsCard = () => {
       ...(isListWasChanged ? { RejectedDomains: RejectedDomains } : {}),
     };
 
-    try {
-      const response = await setRejectedDomainsSettings(body).unwrap();
-      dispatch(changeRejectedDomainsInformation(response.data));
+    const response = await setRejectedDomainsSettings(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeRejectedDomainsInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
@@ -321,7 +318,6 @@ const RejectedDomainsCard = () => {
           fieldsHandler={fieldsHandler}
           listName="RejectedDomains"
           type="domain"
-          // maxHeight="calc(100vh - 22rem)"
         />
       </CardContent>
       <CardActions>
