@@ -8,7 +8,6 @@ import synchronizationSelectors from '../redux/synchronization/synchronizationSe
 import { useLazySynchronizeConfigQuery } from '../redux/synchronization/synchronizationApi';
 import { useLazyGetAppConfigQuery } from '../redux/config/configApi';
 import Spinner from '../Components/Spinner/Spinner';
-import GlobalNotifications from '../Components/GlobalNotifications/GlobalNotifications';
 import SynchronizationDialog from '../Components/SynchronizationDialog/SynchronizationDialog';
 import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
@@ -20,6 +19,7 @@ import SideMenu from '../Components/SideMenu/SideMenu';
 import Wallet from './Finance/Wallet';
 import Commissions from './Finance/Commissions';
 import Base from './General/Base';
+import SMTP from './General/SMTP';
 import License from './General/License';
 import NetworkSettings from './Network/Settings';
 import SupplySettings from './Supply/Settings';
@@ -41,6 +41,7 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import PeopleIcon from '@mui/icons-material/People';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
+import EmailIcon from '@mui/icons-material/Email';
 import commonStyles from '../styles/commonStyles.scss';
 
 const appModules = [
@@ -120,6 +121,12 @@ const appModules = [
         path: '/base',
         component: Base,
         icon: InfoIcon,
+      },
+      {
+        name: 'SMTP',
+        path: '/smtp',
+        component: SMTP,
+        icon: EmailIcon,
       },
       {
         name: 'License',
@@ -211,8 +218,6 @@ function AppController() {
       <Box component="main" className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
         <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
         <AppWindow>
-          <GlobalNotifications />
-
           <SynchronizationDialog
             isSyncInProgress={isSyncInProgress}
             isSynchronizationRequired={isSynchronizationRequired}

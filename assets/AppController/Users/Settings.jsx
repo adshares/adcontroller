@@ -18,18 +18,19 @@ import {
   FormControl,
   FormControlLabel,
   FormHelperText,
-  FormLabel, Icon,
+  FormLabel,
+  Icon,
   InputAdornment,
   InputLabel,
-  MenuItem,
   OutlinedInput,
   Radio,
   RadioGroup,
-  Select,
-  TextField, Tooltip,
-} from '@mui/material'
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
-import HelpIcon from '@mui/icons-material/Help'
+import HelpIcon from '@mui/icons-material/Help';
+import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTooltip/FormControlLabelWithTooltip';
 
 export default function Settings() {
   return (
@@ -65,7 +66,7 @@ const RegistrationModeCard = () => {
       PublisherApplyFormUrl: ['url'],
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const handleSelectChange = (event) => {
     setRegistrationMode(event.target.value);
@@ -115,12 +116,11 @@ const RegistrationModeCard = () => {
       }),
     };
 
-    try {
-      const response = await setRegistrationModeConfig(body).unwrap();
-      dispatch(changeRegistrationModeInformation(response.data));
+    const response = await setRegistrationModeConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeRegistrationModeInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
@@ -132,20 +132,15 @@ const RegistrationModeCard = () => {
       />
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Box className={commonStyles.halfCard}>
-          <FormControl fullWidth>
-            <InputLabel id="registrationModeLabel">Registration mode</InputLabel>
-            <Select
-              size="small"
-              labelId="registrationModeLabel"
-              id="registrationMode"
-              value={RegistrationMode}
-              label="Set registration mode"
-              onChange={handleSelectChange}
-            >
-              <MenuItem value="public">Public</MenuItem>
-              <MenuItem value="restricted">Restricted</MenuItem>
-              <MenuItem value="private">Private</MenuItem>
-            </Select>
+          <FormControl sx={{ mt: 1 }}>
+            <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
+              Default user's role:
+            </FormLabel>
+            <RadioGroup row value={RegistrationMode} onChange={handleSelectChange}>
+              <FormControlLabelWithTooltip value="public" control={<Radio />} label="Public" tooltip="lorem ipsum dolor emet" />
+              <FormControlLabelWithTooltip value="restricted" control={<Radio />} label="Restricted" tooltip="lorem ipsum dolor emet" />
+              <FormControlLabelWithTooltip value="private" control={<Radio />} label="Private" tooltip="lorem ipsum dolor emet" />
+            </RadioGroup>
           </FormControl>
           <Collapse in={RegistrationMode === 'restricted'} timeout="auto">
             <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
@@ -286,7 +281,7 @@ const AutoWithdrawalCard = () => {
       AutoWithdrawalLimitBsc: ['number'],
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const body = {};
@@ -296,12 +291,10 @@ const AutoWithdrawalCard = () => {
       }
     });
 
-    try {
-      const response = await setAutoWithdrawalConfig(body).unwrap();
-      dispatch(changeAutoWithdrawalConfigInformation(response.data));
+    const response = await setAutoWithdrawalConfig(body);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeAutoWithdrawalConfigInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
