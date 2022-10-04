@@ -1,11 +1,12 @@
-import React, { useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { closeNotification } from '../../redux/globalNotifications/globalNotificationsSlice';
 import { styled } from '@mui/material';
 import { Box, IconButton } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 import styles from './styles.scss';
 import CloseIcon from '@mui/icons-material/Close';
+import globalNotificationsSelectors from '../../redux/globalNotifications/globalNotificationsSelectors';
 
 const StyledSnackbarProvider = styled(SnackbarProvider)`
   &.SnackbarContent-root {
@@ -22,7 +23,26 @@ const StyledSnackbarProvider = styled(SnackbarProvider)`
   }
 `;
 
+import { useSnackbar } from 'notistack';
+
+function GlobalNotificationsWrapper() {
+  const { showNotification, notificationType, notificationTitle, notificationMessage } = useSelector(
+    globalNotificationsSelectors.getGlobalNotificationState,
+  );
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    if (showNotification) {
+      enqueueSnackbar(`${notificationTitle}: ${notificationMessage}`, { variant: notificationType, persist: true });
+    }
+  }, [showNotification]);
+
+  return <></>;
+}
+
 export default function AppWindow({ children }) {
+  const { notificationType } = useSelector(globalNotificationsSelectors.getGlobalNotificationState);
   const snackBarRef = useRef(null);
   const dispatch = useDispatch();
   const handleClose = () => {
@@ -34,6 +54,7 @@ export default function AppWindow({ children }) {
       ref={snackBarRef}
       maxSnack={3}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      autoHideDuration={notificationType === 'error' ? null : 3000}
       action={(id) => (
         <IconButton color="inherit" onClick={() => snackBarRef.current.closeSnackbar(id)}>
           <CloseIcon />
@@ -41,7 +62,10 @@ export default function AppWindow({ children }) {
       )}
     >
       <Box className={styles.wrapper}>
-        <Box className={styles.container}>{children}</Box>
+        <Box className={styles.container}>
+          {children}
+          <GlobalNotificationsWrapper />
+        </Box>
       </Box>
     </StyledSnackbarProvider>
   );

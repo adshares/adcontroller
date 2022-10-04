@@ -136,6 +136,13 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setSmtpConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/smtp',
+        method: 'PATCH',
+        body,
+      }),
+    }),
     uploadAssets: builder.mutation({
       query: (body) => ({
         url: '/api/config/panel-assets',
@@ -166,5 +173,6 @@ export const {
   useSetRegistrationModeConfigMutation,
   useSetAutoWithdrawalConfigMutation,
   useSetRegulationsConfigMutation,
+  useSetSmtpConfigMutation,
   useUploadAssetsMutation,
 } = configApi;
