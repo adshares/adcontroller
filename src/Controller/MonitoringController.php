@@ -68,7 +68,7 @@ class MonitoringController extends AbstractController
         return $this->jsonOk($data);
     }
 
-    #[Route('/hosts/{hostId}/connection-error', name: 'fetch_by_key', methods: ['PUT'])]
+    #[Route('/hosts/{hostId}/reset', name: 'reset_host_connection_error', methods: ['PATCH'])]
     public function resetHostConnectionError(int $hostId, AdServerConfigurationClient $adServerConfigurationClient): JsonResponse
     {
         try {

@@ -190,8 +190,8 @@ class AdServerConfigurationClient
 
     public function resetHostConnectionError(int $hostId): array
     {
-        $uri = sprintf('%s/%d/connection-error', $this->buildMonitoringUri('hosts'), $hostId);
-        return $this->putData($uri, []);
+        $uri = sprintf('%s/%d/reset', $this->buildMonitoringUri('hosts'), $hostId);
+        return $this->patchData($uri, []);
     }
 
     private function buildConfigUri(): string
@@ -394,23 +394,6 @@ class AdServerConfigurationClient
     {
         $response = $this->httpClient->request(
             'PATCH',
-            $url,
-            [
-                'headers' => [
-                    'Authorization' => $this->getAuthorizationHeader(),
-                ],
-                'json' => $data
-            ]
-        );
-        $this->checkStatusCode($response);
-
-        return json_decode($response->getContent(), true);
-    }
-
-    private function putData(string $url, array $data): array
-    {
-        $response = $this->httpClient->request(
-            'PUT',
             $url,
             [
                 'headers' => [
