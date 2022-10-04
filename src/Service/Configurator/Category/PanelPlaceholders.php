@@ -7,14 +7,17 @@ use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
+use Symfony\Component\Filesystem\Filesystem;
 
 class PanelPlaceholders implements ConfiguratorCategory
 {
     private const MAXIMUM_CONTENT_LENGTH = 16777210;
+    private const STYLE_FILENAME = 'custom.css';
 
     public function __construct(
         private readonly ConfigurationRepository $configurationRepository,
         private readonly DataCollector $dataCollector,
+        private readonly PanelAssets $panelAssets,
     ) {
     }
 
@@ -28,16 +31,24 @@ class PanelPlaceholders implements ConfiguratorCategory
 
         $result = [];
         if (array_key_exists(AdPanelConfig::PlaceholderStyleCss->name, $input)) {
-            $styleCss = $input[AdPanelConfig::PlaceholderStyleCss->name];
-            //TODO handle style - save to disc
-            if ($styleCss) {
+            $styleCssContent = $input[AdPanelConfig::PlaceholderStyleCss->name];
+            $styleCssFilename = $this->panelAssets->getAssetDirectory() . self::STYLE_FILENAME;
+            if ($styleCssContent) {
+                file_put_contents($styleCssFilename, $styleCssContent);
+                $styleCssTmpFilename = $this->panelAssets->getAssetTmpDirectory()
+                    . $this->panelAssets->appendHashToFileName(self::STYLE_FILENAME, $styleCssContent);
+                file_put_contents($styleCssTmpFilename, $styleCssContent);
             } else {
+                $filesystem = new Filesystem();
+                if ($filesystem->exists($styleCssFilename)) {
+                    $filesystem->remove($styleCssFilename);
+                }
             }
 
-            $this->configurationRepository->insertOrUpdateOne(AdPanelConfig::PlaceholderStyleCss, $styleCss);
+            $this->configurationRepository->insertOrUpdateOne(AdPanelConfig::PlaceholderStyleCss, $styleCssContent);
             $result = [
                 AdPanelConfig::MODULE => [
-                    AdPanelConfig::PlaceholderStyleCss->name => $styleCss,
+                    AdPanelConfig::PlaceholderStyleCss->name => $styleCssContent,
                 ]
             ];
             unset($input[AdPanelConfig::PlaceholderStyleCss->name]);

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class PanelAssets implements ConfiguratorCategory
 {
     private const ASSETS_DIRECTORY = 'var/panel-assets/';
+    private const ASSETS_TMP_DIRECTORY = 'var/panel-assets-tmp/';
     private const FILE_CONTENT_HASH_LENGTH = 16;
     private const MAXIMAL_FILE_ID_LENGTH = 255 - self::FILE_CONTENT_HASH_LENGTH;
     private const MAXIMAL_FILE_SIZE = 512 * 1024;
@@ -145,8 +146,7 @@ class PanelAssets implements ConfiguratorCategory
                 $filePath = $enum->filePath();
             } else {
                 $originalFileName = $file->getClientOriginalName();
-                $hash = substr(sha1($fileContent), 0, self::FILE_CONTENT_HASH_LENGTH);
-                $fileName = join(sprintf('.%s.', $hash), explode('.', $originalFileName));
+                $fileName = $this->appendHashToFileName($originalFileName, $fileContent);
                 $path = substr($fileId, 0, -strlen($originalFileName));
                 $fileId = $path . $originalFileName;
                 $filePath = $path . $fileName;
@@ -240,9 +240,20 @@ class PanelAssets implements ConfiguratorCategory
         return sprintf('%s/%s', $baseUrl, $filePath);
     }
 
+    public function appendHashToFileName(string $fileName, string $fileContent): string
+    {
+        $hash = substr(sha1($fileContent), 0, self::FILE_CONTENT_HASH_LENGTH);
+        return join(sprintf('.%s.', $hash), explode('.', $fileName));
+    }
+
     public function getAssetDirectory(): string
     {
         return DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
+    }
+
+    public function getAssetTmpDirectory(): string
+    {
+        return DirUtils::canonicalize($this->appDirectory) . self::ASSETS_TMP_DIRECTORY;
     }
 
     private static function fields(): array
