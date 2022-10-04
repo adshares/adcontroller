@@ -77,6 +77,7 @@ const initialState = {
       SmtpPort: null,
       SmtpSender: null,
       SmtpUsername: null,
+      SmtpPassword: null,
       Domain: null,
       SupportEmail: null,
       TechnicalEmail: null,
@@ -135,6 +136,9 @@ const configSlice = createSlice({
     changeWalletConfigInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
+    changeSmtpConfigInformation: (state, { payload }) => {
+      state.appData.General = { ...state.appData.General, ...payload.General };
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(configApi.endpoints.getAppConfig.matchFulfilled, (state, { payload }) => {
@@ -167,5 +171,6 @@ export const {
   changeCommissionsConfigInformation,
   changeColdWalletConfigInformation,
   changeWalletConfigInformation,
+  changeSmtpConfigInformation,
 } = configSlice.actions;
 export default configSlice.reducer;
