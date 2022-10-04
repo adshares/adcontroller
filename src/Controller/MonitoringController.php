@@ -22,6 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class MonitoringController extends AbstractController
 {
     private const ALLOWED_KEYS = [
+        'hosts',
         'wallet',
     ];
 
@@ -58,6 +59,20 @@ class MonitoringController extends AbstractController
 
         try {
             $data = $adServerConfigurationClient->fetchMonitoringData($key);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+        }
+
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/hosts/{hostId}/connection-error', name: 'fetch_by_key', methods: ['PUT'])]
+    public function resetHostConnectionError(int $hostId, AdServerConfigurationClient $adServerConfigurationClient): JsonResponse
+    {
+        try {
+            $data = $adServerConfigurationClient->resetHostConnectionError($hostId);
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
