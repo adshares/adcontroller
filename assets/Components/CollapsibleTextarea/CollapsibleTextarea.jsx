@@ -12,8 +12,9 @@ const CollapsibleStyledTextarea = styled(MuiTextField, {
   ({ theme, collapsible = false, rows, focused }) =>
     collapsible && {
       '& textarea': {
+        cursor: 'auto',
         height: '23px !important',
-        overflow: 'hidden',
+        // overflow: 'hidden',
         transition: theme.transitions.create('height', {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.leavingScreen,
