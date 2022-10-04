@@ -129,6 +129,17 @@ const Placeholders = () => {
             fullWidth
             size="small"
           />
+          <CollapsibleTextarea
+            collapsible
+            value={form.fields.PlaceholderLoginInfo}
+            name="PlaceholderLoginInfo"
+            label="Login page info (CSS)"
+            multiline
+            rows={8}
+            margin="dense"
+            fullWidth
+            size="small"
+          />
         </Box>
       </CardContent>
 
