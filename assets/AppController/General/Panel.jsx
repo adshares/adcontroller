@@ -62,6 +62,7 @@ const Placeholders = () => {
     } catch (err) {
       createErrorNotification(err);
     }
+    console.log(body);
   };
 
   return (
@@ -83,7 +84,7 @@ const Placeholders = () => {
             name="PlaceholderIndexDescription"
             label="Description"
             multiline
-            rows={2}
+            rows={8}
             margin="dense"
             fullWidth
             size="small"
@@ -124,7 +125,7 @@ const Placeholders = () => {
             name="PlaceholderLoginInfo"
             label="Login page info (HTML)"
             multiline
-            rows={8}
+            rows={20}
             margin="dense"
             fullWidth
             size="small"
@@ -135,7 +136,7 @@ const Placeholders = () => {
             name="PlaceholderLoginInfo"
             label="Login page info (CSS)"
             multiline
-            rows={8}
+            rows={20}
             margin="dense"
             fullWidth
             size="small"
@@ -439,7 +440,13 @@ const Rebranding = () => {
             </TableBody>
           </Table>
         </Box>
+
+        <Box className={commonStyles.card}>
+          <Typography variant="h6">Logos</Typography>
+          <Typography variant="body2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. At consectetur </Typography>
+        </Box>
       </CardContent>
+
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
           <Button disabled={isLoading || Object.keys(changedImages).length === 0} onClick={onSaveClick} variant="contained" type="button">
