@@ -19,11 +19,9 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
-  Tooltip,
-  Typography,
 } from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
-import HelpIcon from '@mui/icons-material/Help';
+import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTooltip/FormControlLabelWithTooltip';
 
 export default function Settings() {
   const appData = useSelector(configSelectors.getAppData);
@@ -180,41 +178,23 @@ export default function Settings() {
           <FormControl>
             <FormLabel focused={false}>Ad server's inventory visibility</FormLabel>
             <RadioGroup row value={serverType} onChange={handleServerTypeChange}>
-              <FormControlLabel
+              <FormControlLabelWithTooltip
                 value="public"
                 control={<Radio />}
-                label={
-                  <Box className={`${commonStyles.flex}`}>
-                    <Typography variant="body1">Public</Typography>
-                    <Tooltip sx={{ ml: 0.5 }} title="The ad server will synchronize with all other ad servers.">
-                      <HelpIcon color="primary" />
-                    </Tooltip>
-                  </Box>
-                }
+                label="Public"
+                tooltip="The ad server will synchronize with all other ad servers."
               />
-              <FormControlLabel
+              <FormControlLabelWithTooltip
                 value="restricted"
                 control={<Radio />}
-                label={
-                  <Box className={`${commonStyles.flex}`}>
-                    <Typography variant="body1">Restricted</Typography>
-                    <Tooltip sx={{ ml: 0.5 }} title="The ad server will only synchronize with listed as servers.">
-                      <HelpIcon color="primary" />
-                    </Tooltip>
-                  </Box>
-                }
+                label="Restricted"
+                tooltip="The ad server will only synchronize with listed as servers."
               />
-              <FormControlLabel
+              <FormControlLabelWithTooltip
                 value="private"
                 control={<Radio />}
-                label={
-                  <Box className={`${commonStyles.flex}`}>
-                    <Typography variant="body1">Private</Typography>
-                    <Tooltip sx={{ ml: 0.5 }} title="The ad server will not synchronize with any other ad server.">
-                      <HelpIcon color="primary" />
-                    </Tooltip>
-                  </Box>
-                }
+                label="Private"
+                tooltip="The ad server will not synchronize with any other ad server."
               />
             </RadioGroup>
           </FormControl>

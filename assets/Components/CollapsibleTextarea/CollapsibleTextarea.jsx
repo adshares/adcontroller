@@ -24,7 +24,7 @@ const CollapsibleStyledTextarea = styled(MuiTextField, {
           borderRadius: '10px',
         },
         '&::-webkit-scrollbar-thumb': {
-          backgroundColor: theme.palette.primary.main,
+          backgroundColor: `${theme.palette.primary.main}50`,
           borderRadius: '10px',
         },
       },

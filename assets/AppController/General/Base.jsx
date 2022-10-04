@@ -35,7 +35,7 @@ const BaseInformationCard = () => {
       SupportChat: ['url'],
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
   const onSaveClick = async () => {
     const body = {};
     Object.keys(form.changedFields).forEach((field) => {
@@ -44,14 +44,11 @@ const BaseInformationCard = () => {
       }
     });
 
-    try {
-      const response = await setBaseInformation(body).unwrap();
-      if (response.code === 200) {
-        dispatch(changeBaseInformation(response.data));
-      }
+    const response = await setBaseInformation(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeBaseInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
@@ -166,7 +163,7 @@ const CRMNotificationsCard = () => {
     },
   });
   const [setCrmNotificationsConfig, { isLoading }] = useSetCrmNotificationsConfigMutation();
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const body = {};
@@ -176,12 +173,11 @@ const CRMNotificationsCard = () => {
       }
     });
 
-    try {
-      const response = await setCrmNotificationsConfig(body).unwrap();
-      dispatch(changeCrmNotificationsInformation(response.data));
+    const response = await setCrmNotificationsConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeCrmNotificationsInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
