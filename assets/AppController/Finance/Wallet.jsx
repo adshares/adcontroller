@@ -35,7 +35,7 @@ const WalletSettingsCard = () => {
   const [getWalletNode, { isFetching: isNodeVerification }] = useGetWalletNodeMutation();
   const [editMode, setEditMode] = useState(false);
   const [isKnownNode, setKnownNode] = useState(false);
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
   const walletForm = useForm({
     initialFields: { WalletAddress: '', WalletSecretKey: '' },
     validation: {
@@ -63,15 +63,15 @@ const WalletSettingsCard = () => {
   }, [walletForm.fields.WalletAddress]);
 
   const getWalletNodes = async () => {
-    try {
-      const response = await getWalletNode({ WalletAddress: walletForm.fields.WalletAddress }).unwrap();
+    const response = await getWalletNode({ WalletAddress: walletForm.fields.WalletAddress });
+    if (response.data && response.data.message === 'OK') {
       nodeForm.setFields({ ...response });
-    } catch (err) {
+    }
+    if (response.error) {
       nodeForm.setFields({
         WalletNodeHost: '',
         WalletNodePort: '',
       });
-      createErrorNotification(err);
     }
   };
 
@@ -89,15 +89,14 @@ const WalletSettingsCard = () => {
   };
 
   const onSaveClick = async () => {
-    try {
-      const response = await setWalletConfig({ ...walletForm.fields, ...nodeForm.fields }).unwrap();
-      dispatch(changeWalletConfigInformation(response.data));
+    const response = await setWalletConfig({ ...walletForm.fields, ...nodeForm.fields });
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeWalletConfigInformation(response.data.data));
       setEditMode((prevState) => !prevState);
       walletForm.resetForm();
       nodeForm.resetForm();
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
@@ -257,7 +256,7 @@ const ColdWalletSettingsCard = () => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setColdWalletConfig, { isLoading }] = useSetColdWalletConfigMutation();
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
   const [ColdWalletIsActive, setColdWalletIsActive] = useState(appData.AdServer.ColdWalletIsActive || false);
   const form = useForm({
     initialFields: {
@@ -273,21 +272,20 @@ const ColdWalletSettingsCard = () => {
   });
 
   const onSaveClick = async () => {
-    try {
-      const response = await setColdWalletConfig(
-        ColdWalletIsActive
-          ? {
-              ColdWalletIsActive,
-              HotWalletMinValue: adsToClicks(returnNumber(form.fields.HotWalletMinValue)),
-              HotWalletMaxValue: adsToClicks(returnNumber(form.fields.HotWalletMaxValue)),
-              ColdWalletAddress: form.fields.ColdWalletAddress,
-            }
-          : { ColdWalletIsActive },
-      ).unwrap();
-      dispatch(changeColdWalletConfigInformation(response.data));
+    const body = ColdWalletIsActive
+      ? {
+          ColdWalletIsActive,
+          HotWalletMinValue: adsToClicks(returnNumber(form.fields.HotWalletMinValue)),
+          HotWalletMaxValue: adsToClicks(returnNumber(form.fields.HotWalletMaxValue)),
+          ColdWalletAddress: form.fields.ColdWalletAddress,
+        }
+      : { ColdWalletIsActive };
+
+    const response = await setColdWalletConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeColdWalletConfigInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 

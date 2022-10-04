@@ -83,6 +83,7 @@ class AdServerConfigurationClient
     public const HOT_WALLET_MAX_VALUE = 'hotwallet-max-value';
     public const HOT_WALLET_MIN_VALUE = 'hotwallet-min-value';
     public const INVENTORY_EXPORT_WHITELIST = 'inventory-export-whitelist';
+    private const INVENTORY_FAILED_CONNECTION_LIMIT = 'inventory-failed-connection-limit';
     public const INVENTORY_IMPORT_WHITELIST = 'inventory-import-whitelist';
     public const INVENTORY_WHITELIST = 'inventory-whitelist';
     private const INVOICE_CURRENCIES = 'invoice-currencies';
@@ -185,6 +186,12 @@ class AdServerConfigurationClient
     public function storePlaceholders(array $data): array
     {
         return $this->patchData($this->buildPlaceholdersUri(), self::mapPlaceholderDataToAdServerFormat($data));
+    }
+
+    public function resetHostConnectionError(int $hostId): array
+    {
+        $uri = sprintf('%s/%d/reset', $this->buildMonitoringUri('hosts'), $hostId);
+        return $this->patchData($uri, []);
     }
 
     private function buildConfigUri(): string

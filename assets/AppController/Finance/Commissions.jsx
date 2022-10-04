@@ -38,7 +38,7 @@ function Commissions() {
     },
   });
   const [ReferralRefundEnabled, setReferralRefundEnabled] = useState(appData.AdServer.ReferralRefundEnabled);
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const body = { ...(ReferralRefundEnabled !== appData.AdServer.ReferralRefundEnabled ? { ReferralRefundEnabled } : {}) };
@@ -48,12 +48,11 @@ function Commissions() {
       }
     });
 
-    try {
-      const response = await setCommissionsConfig(body).unwrap();
-      dispatch(changeCommissionsConfigInformation(response.data));
+    const response = await setCommissionsConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeCommissionsConfigInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 

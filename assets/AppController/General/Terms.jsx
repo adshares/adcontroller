@@ -26,19 +26,18 @@ const PrivacyCard = () => {
       PrivacyPolicy: appData.AdServer.PrivacyPolicy || '',
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const body = {
       ...(form.changedFields.PrivacyPolicy ? { PrivacyPolicy: form.fields.PrivacyPolicy } : {}),
     };
 
-    try {
-      const response = await setRegulationsConfig(body).unwrap();
-      dispatch(changeRegulationsInformation(response.data));
+    const response = await setRegulationsConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeRegulationsInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
@@ -78,19 +77,18 @@ const TermAndConditionCard = () => {
       Terms: appData.AdServer.Terms || '',
     },
   });
-  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
+  const { createSuccessNotification } = useCreateNotification();
 
   const onSaveClick = async () => {
     const body = {
       ...(form.changedFields.Terms ? { Terms: form.fields.Terms } : {}),
     };
 
-    try {
-      const response = await setRegulationsConfig(body).unwrap();
-      dispatch(changeRegulationsInformation(response.data));
+    const response = await setRegulationsConfig(body);
+
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeRegulationsInformation(response.data.data));
       createSuccessNotification();
-    } catch (err) {
-      createErrorNotification(err);
     }
   };
 
