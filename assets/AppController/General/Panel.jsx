@@ -44,6 +44,7 @@ const Placeholders = () => {
       PlaceholderIndexTitle: appData.AdPanel.PlaceholderIndexTitle || '',
       PlaceholderLoginInfo: appData.AdPanel.PlaceholderLoginInfo || '',
       PlaceholderRobotsTxt: appData.AdPanel.PlaceholderRobotsTxt || '',
+      PlaceholderStyleCss: appData.AdPanel.PlaceholderStyleCss || '',
     },
   });
   const { createSuccessNotification } = useCreateNotification();
@@ -61,7 +62,6 @@ const Placeholders = () => {
       dispatch(changePlaceholdersInformation(response.data.data));
       createSuccessNotification();
     }
-    console.log(body);
   };
 
   return (
@@ -131,8 +131,8 @@ const Placeholders = () => {
           />
           <CollapsibleTextarea
             collapsible
-            value={form.fields.PlaceholderLoginInfo}
-            name="PlaceholderLoginInfo"
+            value={form.fields.PlaceholderStyleCss}
+            name="PlaceholderStyleCss"
             label="Login page info (CSS)"
             multiline
             rows={20}
