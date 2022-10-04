@@ -4,8 +4,9 @@ import configSelectors from '../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../hooks';
 import { useSetRegulationsConfigMutation } from '../../redux/config/configApi';
 import { changeRegulationsInformation } from '../../redux/config/configSlice';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, CardHeader } from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
+import CollapsibleTextarea from '../../Components/CollapsibleTextarea/CollapsibleTextarea';
 
 export default function Terms() {
   return (
@@ -46,7 +47,15 @@ const PrivacyCard = () => {
       <CardHeader title="Privacy policy" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
-          <TextField value={form.fields.PrivacyPolicy} name="PrivacyPolicy" fullWidth multiline rows={8} label="Privacy" />
+          <CollapsibleTextarea
+            collapsible
+            value={form.fields.PrivacyPolicy}
+            name="PrivacyPolicy"
+            fullWidth
+            multiline
+            rows={20}
+            label="Privacy"
+          />
         </Box>
       </CardContent>
       <CardActions>
@@ -90,7 +99,15 @@ const TermAndConditionCard = () => {
       <CardHeader title="Terms and conditions" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
-          <TextField value={form.fields.Terms} name="Terms" fullWidth multiline rows={8} label="Terms and conditions" />
+          <CollapsibleTextarea
+            collapsible
+            value={form.fields.Terms}
+            name="Terms"
+            fullWidth
+            multiline
+            rows={20}
+            label="Terms and conditions"
+          />
         </Box>
       </CardContent>
       <CardActions>
