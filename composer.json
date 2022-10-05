@@ -19,6 +19,7 @@
         "symfony/console": "*",
         "symfony/dotenv": "*",
         "symfony/filesystem": "6.1.*",
+        "symfony/finder": "6.1.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "*",
         "symfony/http-client": "6.1.*",

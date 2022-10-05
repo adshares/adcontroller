@@ -9,6 +9,7 @@ use App\Service\AdPanelReload;
 use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 class PanelPlaceholders implements ConfiguratorCategory
 {
@@ -34,18 +35,21 @@ class PanelPlaceholders implements ConfiguratorCategory
         $result = [];
         if (array_key_exists(AdPanelConfig::PlaceholderStyleCss->name, $input)) {
             $styleCssContent = $input[AdPanelConfig::PlaceholderStyleCss->name];
-            $styleCssFilename = $this->panelAssets->getAssetDirectory() . self::STYLE_FILENAME;
             if ($styleCssContent) {
-                file_put_contents($styleCssFilename, $styleCssContent);
-                $styleCssTmpFilename = $this->panelAssets->appendHashToFileName(
-                    $this->panelAssets->getAssetTmpDirectory() . self::STYLE_FILENAME,
+                $file = $this->panelAssets->appendHashToFileName(
+                    self::STYLE_FILENAME,
                     $this->panelAssets->computeHash($styleCssContent)
                 );
-                file_put_contents($styleCssTmpFilename, $styleCssContent);
+                file_put_contents($this->panelAssets->getAssetDirectory() . $file, $styleCssContent);
+                file_put_contents($this->panelAssets->getAssetTmpDirectory() . $file, $styleCssContent);
             } else {
-                $filesystem = new Filesystem();
-                if ($filesystem->exists($styleCssFilename)) {
-                    $filesystem->remove($styleCssFilename);
+                $finder = new Finder();
+                $finder->files()->in($this->panelAssets->getAssetDirectory())->name('custom*.css')->depth('== 0');
+                if ($finder->hasResults()) {
+                    foreach ($finder as $file) {
+                        $filesystem = new Filesystem();
+                        $filesystem->remove($file);
+                    }
                 }
             }
 
