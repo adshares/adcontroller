@@ -82,6 +82,7 @@ class AdServerConfigurationClient
     private const FIAT_DEPOSIT_MIN_AMOUNT = 'fiat-deposit-min-amount';
     public const HOT_WALLET_MAX_VALUE = 'hotwallet-max-value';
     public const HOT_WALLET_MIN_VALUE = 'hotwallet-min-value';
+    private const HOURS_UNTIL_INACTIVE_HOST_REMOVAL = 'hours-until-inactive-host-removal';
     public const INVENTORY_EXPORT_WHITELIST = 'inventory-export-whitelist';
     private const INVENTORY_FAILED_CONNECTION_LIMIT = 'inventory-failed-connection-limit';
     public const INVENTORY_IMPORT_WHITELIST = 'inventory-import-whitelist';
