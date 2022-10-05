@@ -64,7 +64,8 @@ class Registration implements ConfiguratorCategory
                     sprintf('Field `%s` must be a non-empty array', AdServerConfig::DefaultUserRoles->name)
                 );
             }
-            $input[AdServerConfig::DefaultUserRoles->name] = array_unique($input[AdServerConfig::DefaultUserRoles->name]);
+            $input[AdServerConfig::DefaultUserRoles->name] =
+                array_unique($input[AdServerConfig::DefaultUserRoles->name]);
             foreach ($input[AdServerConfig::DefaultUserRoles->name] as $item) {
                 if (!in_array($item, ['advertiser', 'publisher'])) {
                     throw new InvalidArgumentException(

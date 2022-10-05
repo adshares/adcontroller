@@ -2,24 +2,34 @@
 
 namespace App\Service\Configurator\Category;
 
-use App\Entity\Asset;
+use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\PanelAssetConfig;
+use App\Entity\PanelAsset;
 use App\Exception\InvalidArgumentException;
-use App\Repository\AssetRepository;
+use App\Repository\ConfigurationRepository;
+use App\Repository\PanelAssetRepository;
+use App\Service\AdPanelReload;
 use App\Service\Env\AdPanelEnvVar;
 use App\Service\Env\EnvEditorFactory;
 use App\Utility\DirUtils;
 use App\ValueObject\Module;
+use DateTimeInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PanelAssets implements ConfiguratorCategory
 {
     private const ASSETS_DIRECTORY = 'var/panel-assets/';
+    private const ASSETS_TMP_DIRECTORY = 'var/panel-assets-tmp/';
+    private const FILE_CONTENT_HASH_LENGTH = 16;
+    private const IMAGES_DIRECTORY = 'assets/images/';
+    private const MAXIMAL_FILE_ID_LENGTH = 255 - self::FILE_CONTENT_HASH_LENGTH;
     private const MAXIMAL_FILE_SIZE = 512 * 1024;
 
     public function __construct(
-        private readonly AssetRepository $assetRepository,
+        private readonly AdPanelReload $adPanelReload,
+        private readonly PanelAssetRepository $assetRepository,
+        private readonly ConfigurationRepository $configurationRepository,
         private readonly EnvEditorFactory $envEditorFactory,
         private readonly string $appDirectory,
     ) {
@@ -28,17 +38,15 @@ class PanelAssets implements ConfiguratorCategory
     public function process(array $content): array
     {
         $this->validate($content);
-        $this->store($content);
+        $storedAssets = $this->store($content);
         $this->deploy();
 
-        return [];
+        return $storedAssets;
     }
 
-    public function validateFileId(string $fileId): void
+    public function isAdPanelFileId(string $fileId): bool
     {
-        if (!in_array($fileId, self::fields())) {
-            throw new InvalidArgumentException(sprintf('File id `%s` is not supported', $fileId));
-        }
+        return in_array($fileId, self::fields());
     }
 
     private function validate(array $content): void
@@ -46,15 +54,11 @@ class PanelAssets implements ConfiguratorCategory
         if (empty($content)) {
             throw new InvalidArgumentException('At least one file is required');
         }
-        $fields = self::fields();
         /**
          * @var string $fileId
          * @var UploadedFile $file
          */
         foreach ($content as $fileId => $file) {
-            if (!in_array($fileId, $fields)) {
-                throw new InvalidArgumentException(sprintf('File id `%s` is not supported', $fileId));
-            }
             $size = $file->getSize();
             if (false === $size || $size > self::MAXIMAL_FILE_SIZE) {
                 throw new InvalidArgumentException(
@@ -62,16 +66,16 @@ class PanelAssets implements ConfiguratorCategory
                 );
             }
             $mimeType = $file->getMimeType();
-            if (false === $mimeType || !str_starts_with($mimeType, 'image/')) {
-                throw new InvalidArgumentException(sprintf('File `%s` must be an image', $fileId));
-            }
-            if (in_array($fileId, self::fieldsFavicon()) && 'image/png' !== $mimeType) {
-                throw new InvalidArgumentException(sprintf('File `%s` must be a PNG', $fileId));
+            if (false === $mimeType) {
+                throw new InvalidArgumentException(sprintf('File `%s` must have a known MIME type', $fileId));
             }
 
-            $fileInfo = getimagesize($file->getPathname());
-            [$width, $height] = $fileInfo;
             if (in_array($fileId, self::fieldsFavicon())) {
+                if ('image/png' !== $mimeType) {
+                    throw new InvalidArgumentException(sprintf('File `%s` must be a PNG', $fileId));
+                }
+                $fileInfo = getimagesize($file->getPathname());
+                [$width, $height] = $fileInfo;
                 [$expectedWidth, $expectedHeight] = array_map(
                     fn($item) => (int)$item,
                     explode('x', substr($fileId, strlen('Favicon')))
@@ -87,66 +91,178 @@ class PanelAssets implements ConfiguratorCategory
                     );
                 }
             } elseif (in_array($fileId, self::fieldsLogo())) {
+                if (!str_starts_with($mimeType, 'image/')) {
+                    throw new InvalidArgumentException(sprintf('File `%s` must be an image', $fileId));
+                }
+                $fileInfo = getimagesize($file->getPathname());
+                $height = $fileInfo[1];
                 $expectedMinimalHeight = (int)substr($fileId, strlen('LogoH'));
                 if ($height < $expectedMinimalHeight) {
                     throw new InvalidArgumentException(
                         sprintf('File `%s` must be at least %d pixels high', $fileId, $expectedMinimalHeight)
                     );
                 }
+            } else {
+                if (!str_starts_with($mimeType, 'image/')) {
+                    throw new InvalidArgumentException(sprintf('File `%s` must be an image', $fileId));
+                }
+                if (strlen($fileId) > self::MAXIMAL_FILE_ID_LENGTH) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'File id `%s` must have at most %d characters',
+                            $fileId,
+                            self::MAXIMAL_FILE_ID_LENGTH
+                        )
+                    );
+                }
+                if (1 !== substr_count($file->getClientOriginalName(), '.')) {
+                    throw new InvalidArgumentException(
+                        sprintf('File name `%s` must have exactly one dot', $file->getClientOriginalName())
+                    );
+                }
+                $encodedName = str_replace('.', '_', $file->getClientOriginalName());
+                if ($fileId !== $encodedName) {
+                    throw new InvalidArgumentException(sprintf('File id `%s` must match uploaded file', $fileId));
+                }
             }
         }
     }
 
-    private function store(array $content): void
+    private function store(array $content): array
     {
         $assets = [];
+        $storedFileIds = [];
+        $assetDirectory = $this->getAssetDirectory();
+        $assetTmpDirectory = $this->getAssetTmpDirectory();
+
         /**
-         * @var string $filename
+         * @var string $fileId
          * @var UploadedFile $file
          */
-        foreach ($content as $filename => $file) {
-            $asset = new Asset();
-            $asset->setModule(PanelAssetConfig::MODULE);
-            $asset->setName($filename);
+        foreach ($content as $fileId => $file) {
+            $fileContent = $file->getContent();
+            $hash = $this->computeHash($fileContent);
+            if ($this->isAdPanelFileId($fileId)) {
+                /** @var PanelAssetConfig $enum */
+                $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
+                $filePath = $enum->filePath();
+            } else {
+                $filePath = self::IMAGES_DIRECTORY . $file->getClientOriginalName();
+                $fileId = $file->getClientOriginalName();
+            }
+            if (str_starts_with($filePath, '/')) {
+                $filePath = substr($filePath, 1);
+            }
+            if (false !== ($index = strrpos($filePath, '/'))) {
+                $path = substr($filePath, 0, $index + 1);
+                $directory = $assetDirectory . $path;
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0777, true);
+                }
+                $directory = $assetTmpDirectory . $path;
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0777, true);
+                }
+            }
+
+            file_put_contents($assetDirectory . $filePath, $fileContent);
+            file_put_contents($assetTmpDirectory . $this->appendHashToFileName($filePath, $hash), $fileContent);
+
+            $asset = new PanelAsset();
+            $asset->setFileId($fileId);
+            $asset->setFilePath($filePath);
             $asset->setMimeType($file->getMimeType());
-            $asset->setContent($file->getContent());
+            $asset->setHash($hash);
             $assets[] = $asset;
+            $storedFileIds[] = $fileId;
         }
         $this->assetRepository->upsert($assets);
+        $this->adPanelReload->reload();
+
+        return $this->mapAssetsToArray($this->assetRepository->findByFileIds($storedFileIds));
     }
 
-    public function remove(): void
+    public function list(): array
     {
-        $assets = $this->assetRepository->findBy(['module' => PanelAssetConfig::MODULE]);
+        return $this->mapAssetsToArray($this->assetRepository->findAll());
+    }
+
+    private function mapAssetsToArray(array $assets): array
+    {
+        $result = [];
+        foreach ($assets as $asset) {
+            $result[] = [
+                'fileId' => $asset->getFileId(),
+                'fileName' => $asset->getFileName(),
+                'url' => $this->buildUrl($asset->getFilePath()),
+                'createdAt' => $asset->getCreatedAt()->format(DateTimeInterface::ATOM),
+                'updatedAt' => $asset->getUpdatedAt()->format(DateTimeInterface::ATOM),
+            ];
+        }
+
+        return $result;
+    }
+
+    public function remove(?array $fileIds): array
+    {
+        $removedFileIds = [];
+        $assetDirectory = $this->getAssetDirectory();
+        $filesystem = new Filesystem();
+        if (null === $fileIds) {
+            $assets = $this->assetRepository->findAll();
+        } else {
+            $assets = $this->assetRepository->findByFileIds($fileIds);
+        }
+        foreach ($assets as $asset) {
+            $removedFileIds[] = $asset->getFileId();
+            $filesystem->remove($assetDirectory . $asset->getFilePath());
+        }
         $this->assetRepository->remove($assets);
-        $this->undeploy();
+        $this->adPanelReload->reload();
+
+        return $removedFileIds;
     }
 
     private function deploy(): void
     {
-        $directory = DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
-        if (!file_exists($directory)) {
-            mkdir($directory, 0777, true);
-        }
-
-        $assets = $this->assetRepository->findBy(['module' => PanelAssetConfig::MODULE]);
-        foreach ($assets as $asset) {
-            /** @var PanelAssetConfig $enum */
-            $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $asset->getName()));
-            file_put_contents($directory . $enum->file(), $asset->getContent());
-        }
-
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
-        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $directory);
+        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $this->getAssetDirectory());
     }
 
-    private function undeploy(): void
+    public function buildUrl(string $filePath): string
     {
-        $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
-        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, '');
+        $baseUrl = $this->configurationRepository->fetchValueByEnum(AdPanelConfig::Url);
+        if (str_ends_with($baseUrl, '/')) {
+            $baseUrl = substr($baseUrl, 0, strlen($baseUrl) - 1);
+        }
+        if (str_starts_with($filePath, '/')) {
+            $filePath = substr($filePath, 1);
+        }
+        return sprintf('%s/%s', $baseUrl, $filePath);
+    }
 
-        $directory = DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
-        (new Filesystem())->remove($directory);
+    public function appendHashToFileName(string $fileName, string $hash): string
+    {
+        if (false === ($index = strrpos($fileName, '.'))) {
+            throw new InvalidArgumentException(sprintf("Filename '%s' does not contain dot", $fileName));
+        }
+
+        return substr($fileName, 0, $index + 1) . $hash . substr($fileName, $index);
+    }
+
+    public function computeHash(string $fileContent): string
+    {
+        return substr(sha1($fileContent), 0, self::FILE_CONTENT_HASH_LENGTH);
+    }
+
+    public function getAssetDirectory(): string
+    {
+        return DirUtils::canonicalize($this->appDirectory) . self::ASSETS_DIRECTORY;
+    }
+
+    public function getAssetTmpDirectory(): string
+    {
+        return DirUtils::canonicalize($this->appDirectory) . self::ASSETS_TMP_DIRECTORY;
     }
 
     private static function fields(): array

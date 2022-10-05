@@ -19,13 +19,7 @@ enum PanelAssetConfig implements ConfigEnum
         return self::MODULE;
     }
 
-    public function file(): string
-    {
-        $filepath = $this->filepath();
-        return substr($filepath, strrpos($filepath, '/') + 1);
-    }
-
-    public function filepath(): string
+    public function filePath(): string
     {
         return match ($this) {
             self::Favicon16x16 => '/favicon-16x16.png',

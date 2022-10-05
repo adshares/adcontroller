@@ -9,10 +9,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 class CustomAuthenticator extends JWTAuthenticator
 {
-    /**
-     * @return Passport
-     */
-    public function doAuthenticate(Request $request) /*: Passport */
+    public function doAuthenticate(Request $request): Passport
     {
         $passport = parent::doAuthenticate($request);
 

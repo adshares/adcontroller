@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\PanelAssetConfig;
-use App\Repository\AssetRepository;
-use App\Repository\ConfigurationRepository;
+use App\Repository\PanelAssetRepository;
 use App\Service\Configurator\Category\PanelAssets;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,23 +17,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[Route('/assets', name: 'assets_')]
 class AssetsController extends AbstractController
 {
-    #[Route('/panel/{fileId}', name: 'fetch_panel', methods: ['GET'])]
+    #[Route('/panel/{fileId}', name: 'fetch_panel', requirements: ['fileId' => '.+'], methods: ['GET'])]
     public function fetchPanelAssets(
         string $fileId,
-        AssetRepository $assetRepository,
-        ConfigurationRepository $configurationRepository,
+        PanelAssetRepository $assetRepository,
         HttpClientInterface $httpClient,
         LoggerInterface $logger,
-        PanelAssets $panelAssets
+        PanelAssets $panelAssets,
     ): Response {
-        $panelAssets->validateFileId($fileId);
-        $entity = $assetRepository->findOneBy(['module' => PanelAssetConfig::MODULE, 'name' => $fileId]);
+        $entity = $assetRepository->findOneBy(['fileId' => $fileId]);
 
         if (null === $entity) {
-            $baseUrl = $configurationRepository->fetchValueByEnum(AdPanelConfig::Url);
+            if (!$panelAssets->isAdPanelFileId($fileId)) {
+                throw new NotFoundHttpException(sprintf('File `%s` not found', $fileId));
+            }
+
             /** @var PanelAssetConfig $enum */
             $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
-            $url = self::buildUrl($baseUrl, $enum->filepath());
+            $url = $panelAssets->buildUrl($enum->filePath());
 
             try {
                 $response = $httpClient->request('GET', $url);
@@ -51,7 +50,7 @@ class AssetsController extends AbstractController
             $content = $response->getContent();
             $mimeType = $response->getHeaders()['content-type'][0];
         } else {
-            $content = stream_get_contents($entity->getContent());
+            $content = file_get_contents($panelAssets->getAssetDirectory() . $entity->getFilePath());
             $mimeType = $entity->getMimeType();
         }
 
@@ -61,13 +60,5 @@ class AssetsController extends AbstractController
         $response->headers->set('Content-Type', $mimeType);
 
         return $response;
-    }
-
-    private static function buildUrl(string $baseUrl, string $filepath): string
-    {
-        if (str_ends_with($baseUrl, '/')) {
-            $baseUrl = substr($baseUrl, 0, strlen($baseUrl) - 1);
-        }
-        return $baseUrl . $filepath;
     }
 }
