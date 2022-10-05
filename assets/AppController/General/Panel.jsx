@@ -5,6 +5,7 @@ import { useSetPlaceholdersConfigMutation, useUploadAssetsMutation } from '../..
 import { changePlaceholdersInformation } from '../../redux/config/configSlice';
 import { useCreateNotification, useForm } from '../../hooks';
 import configuration from '../../controllerConfig/configuration';
+import CollapsibleTextarea from '../../Components/CollapsibleTextarea/CollapsibleTextarea';
 import {
   Box,
   Button,
@@ -43,6 +44,7 @@ const Placeholders = () => {
       PlaceholderIndexTitle: appData.AdPanel.PlaceholderIndexTitle || '',
       PlaceholderLoginInfo: appData.AdPanel.PlaceholderLoginInfo || '',
       PlaceholderRobotsTxt: appData.AdPanel.PlaceholderRobotsTxt || '',
+      PlaceholderStyleCss: appData.AdPanel.PlaceholderStyleCss || '',
     },
   });
   const { createSuccessNotification } = useCreateNotification();
@@ -66,7 +68,7 @@ const Placeholders = () => {
     <Card className={commonStyles.card}>
       <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
       <CardContent>
-        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+        <Box component="form" onChange={(e) => form.onChange(e)} onFocus={(e) => form.setTouched(e)}>
           <TextField
             value={form.fields.PlaceholderIndexTitle}
             name="PlaceholderIndexTitle"
@@ -75,12 +77,13 @@ const Placeholders = () => {
             margin="dense"
             fullWidth
           />
-          <TextField
+          <CollapsibleTextarea
+            collapsible
             value={form.fields.PlaceholderIndexDescription}
             name="PlaceholderIndexDescription"
             label="Description"
             multiline
-            rows={2}
+            rows={8}
             margin="dense"
             fullWidth
             size="small"
@@ -93,8 +96,9 @@ const Placeholders = () => {
             margin="dense"
             fullWidth
           />
-          <TextField
-            value={form.fields.PlaceholderIndexMetaTags}
+          <CollapsibleTextarea
+            collapsible
+            defaultValue={form.fields.PlaceholderIndexMetaTags}
             name="PlaceholderIndexMetaTags"
             label="Custom meta tags"
             multiline
@@ -103,7 +107,8 @@ const Placeholders = () => {
             fullWidth
             size="small"
           />
-          <TextField
+          <CollapsibleTextarea
+            collapsible
             value={form.fields.PlaceholderRobotsTxt}
             name="PlaceholderRobotsTxt"
             label="robots.txt"
@@ -113,12 +118,24 @@ const Placeholders = () => {
             fullWidth
             size="small"
           />
-          <TextField
+          <CollapsibleTextarea
+            collapsible
             value={form.fields.PlaceholderLoginInfo}
             name="PlaceholderLoginInfo"
             label="Login page info (HTML)"
             multiline
-            rows={8}
+            rows={20}
+            margin="dense"
+            fullWidth
+            size="small"
+          />
+          <CollapsibleTextarea
+            collapsible
+            value={form.fields.PlaceholderStyleCss}
+            name="PlaceholderStyleCss"
+            label="Login page info (CSS)"
+            multiline
+            rows={20}
             margin="dense"
             fullWidth
             size="small"
@@ -421,7 +438,13 @@ const Rebranding = () => {
             </TableBody>
           </Table>
         </Box>
+
+        <Box className={commonStyles.card}>
+          <Typography variant="h6">Logos</Typography>
+          <Typography variant="body2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. At consectetur </Typography>
+        </Box>
       </CardContent>
+
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
           <Button disabled={isLoading || Object.keys(changedImages).length === 0} onClick={onSaveClick} variant="contained" type="button">
