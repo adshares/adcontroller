@@ -23,6 +23,7 @@ CREATE TABLE panel_asset (
   file_id VARCHAR(255) NOT NULL,
   file_path VARCHAR(255) NOT NULL,
   mime_type VARCHAR(127) NOT NULL,
+  hash CHAR(16) NOT NULL,
   created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_FILE_ID (file_id),

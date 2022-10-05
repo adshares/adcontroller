@@ -18,14 +18,18 @@ class PanelAsset
     private ?int $id = null;
 
     #[ORM\Column(name: 'file_id', length: 255)]
+    #[Gedmo\Versioned]
     private ?string $fileId = null;
 
     #[ORM\Column(name: 'file_path', length: 255)]
-    #[Gedmo\Versioned]
     private ?string $filePath = null;
 
     #[ORM\Column(name: 'mime_type', length: 127)]
     private ?string $mimeType = null;
+
+    #[ORM\Column(length: 16)]
+    #[Gedmo\Versioned]
+    private ?string $hash = null;
 
     #[ORM\Column(name: 'created_at')]
     #[Gedmo\Timestampable(on: 'create')]
@@ -81,6 +85,18 @@ class PanelAsset
     public function setMimeType(string $mimeType): self
     {
         $this->mimeType = $mimeType;
+        return $this;
+    }
+
+    public function getHash(): ?string
+    {
+        return $this->hash;
+    }
+
+    public function setHash(string $hash): self
+    {
+        $this->hash = $hash;
+
         return $this;
     }
 

@@ -21,6 +21,7 @@ class PanelAssets implements ConfiguratorCategory
     private const ASSETS_DIRECTORY = 'var/panel-assets/';
     private const ASSETS_TMP_DIRECTORY = 'var/panel-assets-tmp/';
     private const FILE_CONTENT_HASH_LENGTH = 16;
+    private const IMAGES_DIRECTORY = 'assets/images/';
     private const MAXIMAL_FILE_ID_LENGTH = 255 - self::FILE_CONTENT_HASH_LENGTH;
     private const MAXIMAL_FILE_SIZE = 512 * 1024;
 
@@ -118,7 +119,7 @@ class PanelAssets implements ConfiguratorCategory
                     );
                 }
                 $encodedName = str_replace('.', '_', $file->getClientOriginalName());
-                if (!str_ends_with($fileId, $encodedName)) {
+                if ($fileId !== $encodedName) {
                     throw new InvalidArgumentException(sprintf('File id `%s` must match uploaded file', $fileId));
                 }
             }
@@ -130,9 +131,7 @@ class PanelAssets implements ConfiguratorCategory
         $assets = [];
         $storedFileIds = [];
         $assetDirectory = $this->getAssetDirectory();
-        if (!file_exists($assetDirectory)) {
-            mkdir($assetDirectory, 0777, true);
-        }
+        $assetTmpDirectory = $this->getAssetTmpDirectory();
 
         /**
          * @var string $fileId
@@ -140,33 +139,38 @@ class PanelAssets implements ConfiguratorCategory
          */
         foreach ($content as $fileId => $file) {
             $fileContent = $file->getContent();
+            $hash = $this->computeHash($fileContent);
             if ($this->isAdPanelFileId($fileId)) {
                 /** @var PanelAssetConfig $enum */
                 $enum = constant(sprintf('%s::%s', PanelAssetConfig::class, $fileId));
                 $filePath = $enum->filePath();
             } else {
-                $originalFileName = $file->getClientOriginalName();
-                $fileName = $this->appendHashToFileName($originalFileName, $fileContent);
-                $path = substr($fileId, 0, -strlen($originalFileName));
-                $fileId = $path . $originalFileName;
-                $filePath = $path . $fileName;
+                $filePath = self::IMAGES_DIRECTORY . $file->getClientOriginalName();
+                $fileId = $file->getClientOriginalName();
             }
             if (str_starts_with($filePath, '/')) {
                 $filePath = substr($filePath, 1);
             }
             if (false !== ($index = strrpos($filePath, '/'))) {
-                $directory = $assetDirectory . substr($filePath, 0, $index + 1);
+                $path = substr($filePath, 0, $index + 1);
+                $directory = $assetDirectory . $path;
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0777, true);
+                }
+                $directory = $assetTmpDirectory . $path;
                 if (!file_exists($directory)) {
                     mkdir($directory, 0777, true);
                 }
             }
 
             file_put_contents($assetDirectory . $filePath, $fileContent);
+            file_put_contents($assetTmpDirectory . $this->appendHashToFileName($filePath, $hash), $fileContent);
 
             $asset = new PanelAsset();
             $asset->setFileId($fileId);
             $asset->setFilePath($filePath);
             $asset->setMimeType($file->getMimeType());
+            $asset->setHash($hash);
             $assets[] = $asset;
             $storedFileIds[] = $fileId;
         }
@@ -203,21 +207,14 @@ class PanelAssets implements ConfiguratorCategory
         $filesystem = new Filesystem();
         if (null === $fileIds) {
             $assets = $this->assetRepository->findAll();
-            foreach ($assets as $asset) {
-                $removedFileIds[] = $asset->getFileId();
-            }
         } else {
             $assets = $this->assetRepository->findByFileIds($fileIds);
-            foreach ($assets as $asset) {
-                $removedFileIds[] = $asset->getFileId();
-                $filesystem->remove($assetDirectory . $asset->getFilePath());
-            }
+        }
+        foreach ($assets as $asset) {
+            $removedFileIds[] = $asset->getFileId();
+            $filesystem->remove($assetDirectory . $asset->getFilePath());
         }
         $this->assetRepository->remove($assets);
-
-        if (0 === $this->assetRepository->count([])) {
-            $filesystem->remove($assetDirectory);
-        }
 
         return $removedFileIds;
     }
@@ -240,10 +237,18 @@ class PanelAssets implements ConfiguratorCategory
         return sprintf('%s/%s', $baseUrl, $filePath);
     }
 
-    public function appendHashToFileName(string $fileName, string $fileContent): string
+    public function appendHashToFileName(string $fileName, string $hash): string
     {
-        $hash = substr(sha1($fileContent), 0, self::FILE_CONTENT_HASH_LENGTH);
-        return join(sprintf('.%s.', $hash), explode('.', $fileName));
+        if (false === ($index = strrpos($fileName, '.'))) {
+            throw new InvalidArgumentException(sprintf("Filename '%s' does not contain dot", $fileName));
+        }
+
+        return substr($fileName, 0, $index + 1) . $hash . substr($fileName, $index);
+    }
+
+    public function computeHash(string $fileContent): string
+    {
+        return substr(sha1($fileContent), 0, self::FILE_CONTENT_HASH_LENGTH);
     }
 
     public function getAssetDirectory(): string

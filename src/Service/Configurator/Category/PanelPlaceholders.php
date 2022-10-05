@@ -35,8 +35,10 @@ class PanelPlaceholders implements ConfiguratorCategory
             $styleCssFilename = $this->panelAssets->getAssetDirectory() . self::STYLE_FILENAME;
             if ($styleCssContent) {
                 file_put_contents($styleCssFilename, $styleCssContent);
-                $styleCssTmpFilename = $this->panelAssets->getAssetTmpDirectory()
-                    . $this->panelAssets->appendHashToFileName(self::STYLE_FILENAME, $styleCssContent);
+                $styleCssTmpFilename = $this->panelAssets->appendHashToFileName(
+                    $this->panelAssets->getAssetTmpDirectory() . self::STYLE_FILENAME,
+                    $this->panelAssets->computeHash($styleCssContent)
+                );
                 file_put_contents($styleCssTmpFilename, $styleCssContent);
             } else {
                 $filesystem = new Filesystem();
