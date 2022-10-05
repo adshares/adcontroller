@@ -12,7 +12,9 @@ const initialState = {
       PlaceholderIndexKeywords: null,
       PlaceholderIndexMetaTags: null,
       PlaceholderIndexTitle: null,
+      PlaceholderLoginInfo: null,
       PlaceholderRobotsTxt: null,
+      PlaceholderStyleCss: null,
       Url: null,
     },
     AdPay: {
