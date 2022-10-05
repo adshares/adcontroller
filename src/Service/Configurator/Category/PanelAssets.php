@@ -8,6 +8,7 @@ use App\Entity\PanelAsset;
 use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Repository\PanelAssetRepository;
+use App\Service\AdPanelReload;
 use App\Service\Env\AdPanelEnvVar;
 use App\Service\Env\EnvEditorFactory;
 use App\Utility\DirUtils;
@@ -26,6 +27,7 @@ class PanelAssets implements ConfiguratorCategory
     private const MAXIMAL_FILE_SIZE = 512 * 1024;
 
     public function __construct(
+        private readonly AdPanelReload $adPanelReload,
         private readonly PanelAssetRepository $assetRepository,
         private readonly ConfigurationRepository $configurationRepository,
         private readonly EnvEditorFactory $envEditorFactory,
@@ -175,6 +177,7 @@ class PanelAssets implements ConfiguratorCategory
             $storedFileIds[] = $fileId;
         }
         $this->assetRepository->upsert($assets);
+        $this->adPanelReload->reload();
 
         return $this->mapAssetsToArray($this->assetRepository->findByFileIds($storedFileIds));
     }
@@ -215,6 +218,7 @@ class PanelAssets implements ConfiguratorCategory
             $filesystem->remove($assetDirectory . $asset->getFilePath());
         }
         $this->assetRepository->remove($assets);
+        $this->adPanelReload->reload();
 
         return $removedFileIds;
     }
