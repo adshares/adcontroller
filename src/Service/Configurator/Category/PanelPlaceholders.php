@@ -4,12 +4,13 @@ namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdPanelConfig;
 use App\Exception\InvalidArgumentException;
+use App\Message\AdPanelReload;
 use App\Repository\ConfigurationRepository;
-use App\Service\AdPanelReload;
 use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class PanelPlaceholders implements ConfiguratorCategory
 {
@@ -17,9 +18,9 @@ class PanelPlaceholders implements ConfiguratorCategory
     private const STYLE_FILENAME = 'custom.css';
 
     public function __construct(
-        private readonly AdPanelReload $adPanelReload,
         private readonly ConfigurationRepository $configurationRepository,
         private readonly DataCollector $dataCollector,
+        private readonly MessageBusInterface $bus,
         private readonly PanelAssets $panelAssets,
     ) {
     }
@@ -59,7 +60,7 @@ class PanelPlaceholders implements ConfiguratorCategory
                     AdPanelConfig::PlaceholderStyleCss->name => $styleCssContent,
                 ]
             ];
-            $this->adPanelReload->reload();
+            $this->bus->dispatch(new AdPanelReload());
             unset($input[AdPanelConfig::PlaceholderStyleCss->name]);
         }
 
