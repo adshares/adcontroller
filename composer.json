@@ -96,10 +96,6 @@
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "php -S ${APP_HOST:-localhost}:${APP_PORT:-8030} -t public dev-router.php"
-        ],
-        "debug": [
-            "Composer\\Config::disableProcessTimeout",
-            "export XDEBUG_CONFIG=idekey=14242 && php -dxdebug.mode=debug -dxdebug.client_port=9000 -dxdebug.client_host=172.29.144.1 -S ${APP_HOST:-localhost}:${APP_PORT:-8030} -t public dev-router.php"
         ]
     },
     "conflict": {
