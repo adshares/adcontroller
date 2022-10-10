@@ -143,7 +143,13 @@ export const configApi = createApi({
         body,
       }),
     }),
-    uploadAssets: builder.mutation({
+    getPanelAssets: builder.query({
+      query: () => ({
+        url: '/api/config/panel-assets',
+        method: 'GET',
+      }),
+    }),
+    uploadPanelAssets: builder.mutation({
       query: (body) => ({
         url: '/api/config/panel-assets',
         method: 'POST',
@@ -174,5 +180,6 @@ export const {
   useSetAutoWithdrawalConfigMutation,
   useSetRegulationsConfigMutation,
   useSetSmtpConfigMutation,
-  useUploadAssetsMutation,
+  useGetPanelAssetsQuery,
+  useUploadPanelAssetsMutation,
 } = configApi;

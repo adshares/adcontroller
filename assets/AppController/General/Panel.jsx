@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
-import { useSetPlaceholdersConfigMutation, useUploadAssetsMutation } from '../../redux/config/configApi';
+import { useGetPanelAssetsQuery, useSetPlaceholdersConfigMutation, useUploadPanelAssetsMutation } from '../../redux/config/configApi';
 import { changePlaceholdersInformation } from '../../redux/config/configSlice';
-import { useCreateNotification, useForm } from '../../hooks';
+import { useCreateNotification, useForm, useSkipFirstRenderEffect } from '../../hooks';
 import configuration from '../../controllerConfig/configuration';
 import CollapsibleTextarea from '../../Components/CollapsibleTextarea/CollapsibleTextarea';
 import {
@@ -155,11 +155,21 @@ const Placeholders = () => {
 };
 
 const Rebranding = () => {
-  const [uploadAssets, { isLoading }] = useUploadAssetsMutation();
+  const { data } = useGetPanelAssetsQuery();
+  const [uploadAssets, { isLoading }] = useUploadPanelAssetsMutation();
   const [changedImages, setChangedImages] = useState({});
+  const [panelAssets, setPanelAssets] = useState([]);
   const [previews, setPreviews] = useState({});
   const { enqueueSnackbar } = useSnackbar();
   const { createSuccessNotification } = useCreateNotification();
+
+  useSkipFirstRenderEffect(() => {
+    if (data) {
+      setPanelAssets(data.data.assets);
+    }
+  }, [data]);
+
+  console.log(panelAssets);
 
   const onSaveClick = async () => {
     const formData = new FormData();
