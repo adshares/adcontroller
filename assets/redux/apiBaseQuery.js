@@ -21,7 +21,7 @@ export const baseQueryWithGlobalErrorHandler = async (args, api, extraOptions) =
     api.dispatch(
       setNotification({
         showNotification: true,
-        notificationType: 'error',
+        notificationType: 'warning',
         notificationMessage: result.error.data.message,
       }),
     );
