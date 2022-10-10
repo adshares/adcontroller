@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import { useSetPlaceholdersConfigMutation, useUploadAssetsMutation } from '../../redux/config/configApi';
 import { changePlaceholdersInformation } from '../../redux/config/configSlice';
-import { useCreateNotification, useForm } from '../../hooks';
+import { useCreateNotification, useForm, useSkipFirstRenderEffect } from '../../hooks';
 import configuration from '../../controllerConfig/configuration';
 import CollapsibleTextarea from '../../Components/CollapsibleTextarea/CollapsibleTextarea';
 import {
@@ -49,11 +49,15 @@ const Placeholders = () => {
   });
   const { createSuccessNotification } = useCreateNotification();
 
+  useSkipFirstRenderEffect(() => {
+    form.resetForm();
+  }, [appData.AdPanel]);
+
   const onSaveClick = async () => {
     const body = {};
     Object.keys(form.changedFields).forEach((field) => {
       if (form.changedFields[field]) {
-        body[field] = form.fields[field];
+        body[field] = form.fields[field].trim() || null;
       }
     });
     const response = await setPlaceholdersConfig(body);
@@ -98,7 +102,7 @@ const Placeholders = () => {
           />
           <CollapsibleTextarea
             collapsible
-            defaultValue={form.fields.PlaceholderIndexMetaTags}
+            value={form.fields.PlaceholderIndexMetaTags}
             name="PlaceholderIndexMetaTags"
             label="Custom meta tags"
             multiline
@@ -133,7 +137,7 @@ const Placeholders = () => {
             collapsible
             value={form.fields.PlaceholderStyleCss}
             name="PlaceholderStyleCss"
-            label="Login page info (CSS)"
+            label="AdPanel styles (CSS)"
             multiline
             rows={20}
             margin="dense"
