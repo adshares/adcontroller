@@ -12,12 +12,16 @@ use App\Entity\Enum\AdUserConfig;
 use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
 use App\Entity\Enum\InstallerStepEnum;
+use App\Messenger\Message\AdServerFetchExchangeRate;
+use App\Messenger\Message\AdServerUpdateFiltering;
+use App\Messenger\Message\AdServerUpdateTargeting;
 use App\Repository\ConfigurationRepository;
 use App\Service\Env\AdServerEnvVar;
 use App\Service\Env\EnvEditorFactory;
 use App\ValueObject\Module;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -32,6 +36,7 @@ class StatusStep implements InstallerStep
         private readonly EnvEditorFactory $envEditorFactory,
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -44,8 +49,16 @@ class StatusStep implements InstallerStep
                 AppConfig::AppState->name => AppStateEnum::InstallationCompleted->name,
             ]
         );
+        $this->executeTasks();
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdServer);
         $envEditor->setOne(AdServerEnvVar::AppSetup->value, '0');
+    }
+
+    private function executeTasks(): void
+    {
+        $this->bus->dispatch(new AdServerFetchExchangeRate());
+        $this->bus->dispatch(new AdServerUpdateFiltering());
+        $this->bus->dispatch(new AdServerUpdateTargeting());
     }
 
     public function getName(): string
@@ -71,6 +84,7 @@ class StatusStep implements InstallerStep
             $url = $this->repository->fetchValueByEnum($enum);
             $data[$module->toLowerCase()] = $this->getModuleStatus($module, $url);
         }
+        $data['main.js'] = $this->getMainJsStatus($this->repository->fetchValueByEnum(AdServerConfig::Url));
 
         return $data;
     }
@@ -115,6 +129,31 @@ class StatusStep implements InstallerStep
         $data['code'] = $status;
 
         return $data;
+    }
+
+    private function getMainJsStatus(string $adServerUrl): array
+    {
+        $url = $adServerUrl . '/main.js';
+        try {
+            $response = $this->httpClient->request('GET', $url);
+            $status = $response->getStatusCode();
+        } catch (
+            ClientExceptionInterface |
+            RedirectionExceptionInterface |
+            ServerExceptionInterface |
+            TransportExceptionInterface $exception
+        ) {
+            $this->logger->warning(
+                sprintf('Fetching status of main.js failed: %s', $exception->getMessage())
+            );
+            $status = Response::HTTP_BAD_GATEWAY;
+        }
+        return [
+            'module' => 'main.js',
+            'version' => 'N/A',
+            'url' => $url,
+            'code' => $status,
+        ];
     }
 
     public function isDataRequired(): bool
