@@ -71,6 +71,7 @@ class StatusStep implements InstallerStep
             $url = $this->repository->fetchValueByEnum($enum);
             $data[$module->toLowerCase()] = $this->getModuleStatus($module, $url);
         }
+        $data['main.js'] = $this->getMainJsStatus($this->repository->fetchValueByEnum(AdServerConfig::Url));
 
         return $data;
     }
@@ -115,6 +116,31 @@ class StatusStep implements InstallerStep
         $data['code'] = $status;
 
         return $data;
+    }
+
+    private function getMainJsStatus(string $adServerUrl): array
+    {
+        $url = $adServerUrl . '/main.js';
+        try {
+            $response = $this->httpClient->request('GET', $url);
+            $status = $response->getStatusCode();
+        } catch (
+            ClientExceptionInterface |
+            RedirectionExceptionInterface |
+            ServerExceptionInterface |
+            TransportExceptionInterface $exception
+        ) {
+            $this->logger->warning(
+                sprintf('Fetching status of main.js failed: %s', $exception->getMessage())
+            );
+            $status = Response::HTTP_BAD_GATEWAY;
+        }
+        return [
+            'module' => 'main.js',
+            'version' => 'N/A',
+            'url' => $url,
+            'code' => $status,
+        ];
     }
 
     public function isDataRequired(): bool
