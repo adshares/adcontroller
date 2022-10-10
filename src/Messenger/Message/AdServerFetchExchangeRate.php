@@ -2,9 +2,10 @@
 
 namespace App\Messenger\Message;
 
-class AdServerFetchExchangeRate extends AdServerCommand
+final class AdServerFetchExchangeRate implements AdServerCommand
 {
-    public function __construct() {
-        parent::__construct('ops:exchange-rate:fetch');
+    public function getSignature(): string
+    {
+        return 'ops:exchange-rate:fetch';
     }
 }

@@ -2,9 +2,10 @@
 
 namespace App\Messenger\Message;
 
-class AdServerUpdateFiltering extends AdServerCommand
+final class AdServerUpdateFiltering implements AdServerCommand
 {
-    public function __construct() {
-        parent::__construct('ops:filtering-options:update');
+    public function getSignature(): string
+    {
+        return 'ops:filtering-options:update';
     }
 }

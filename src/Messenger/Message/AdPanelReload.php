@@ -2,6 +2,6 @@
 
 namespace App\Messenger\Message;
 
-class AdPanelReload
+final class AdPanelReload
 {
 }

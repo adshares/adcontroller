@@ -2,9 +2,10 @@
 
 namespace App\Messenger\Message;
 
-class AdServerUpdateTargeting extends AdServerCommand
+final class AdServerUpdateTargeting implements AdServerCommand
 {
-    public function __construct() {
-        parent::__construct('ops:targeting-options:update');
+    public function getSignature(): string
+    {
+        return 'ops:targeting-options:update';
     }
 }
