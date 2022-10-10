@@ -34,7 +34,11 @@ function GlobalNotificationsWrapper() {
 
   useEffect(() => {
     if (showNotification) {
-      enqueueSnackbar(`${notificationTitle}: ${notificationMessage}`, { variant: notificationType, persist: true });
+      enqueueSnackbar(`${notificationTitle}: ${notificationMessage}`, {
+        variant: notificationType,
+        persist: notificationType === 'error',
+        autoHideDuration: 3000,
+      });
     }
   }, [showNotification]);
 
@@ -42,19 +46,21 @@ function GlobalNotificationsWrapper() {
 }
 
 export default function AppWindow({ children }) {
-  const { notificationType } = useSelector(globalNotificationsSelectors.getGlobalNotificationState);
+  const { notificationType, showNotification } = useSelector(globalNotificationsSelectors.getGlobalNotificationState);
   const snackBarRef = useRef(null);
   const dispatch = useDispatch();
   const handleClose = () => {
-    dispatch(closeNotification());
+    if (showNotification) {
+      dispatch(closeNotification());
+    }
   };
+  console.log(notificationType);
   return (
     <StyledSnackbarProvider
       onClose={handleClose}
       ref={snackBarRef}
       maxSnack={3}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      autoHideDuration={notificationType === 'error' ? null : 3000}
       action={(id) => (
         <IconButton color="inherit" onClick={() => snackBarRef.current.closeSnackbar(id)}>
           <CloseIcon />
