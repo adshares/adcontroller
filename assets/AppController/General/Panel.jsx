@@ -57,7 +57,8 @@ const Placeholders = () => {
     const body = {};
     Object.keys(form.changedFields).forEach((field) => {
       if (form.changedFields[field]) {
-        body[field] = form.fields[field].trim() || null;
+        console.log(form.fields[field].trim());
+        body[field] = !!form.fields[field].trim() ? form.fields[field] : null;
       }
     });
     const response = await setPlaceholdersConfig(body);
