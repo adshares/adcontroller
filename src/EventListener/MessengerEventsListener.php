@@ -19,22 +19,22 @@ class MessengerEventsListener implements EventSubscriberInterface
 
     public function onSendMessageToTransportsEvent(SendMessageToTransportsEvent $event): void
     {
-        $this->logger->error('onSendMessageToTransportsEvent');
+        $this->logger->info('onSendMessageToTransportsEvent');
     }
 
     public function onWorkerMessageReceivedEvent(WorkerMessageReceivedEvent $event): void
     {
-        $this->logger->error('onWorkerMessageReceivedEvent');
+        $this->logger->info('onWorkerMessageReceivedEvent');
     }
 
     public function onWorkerMessageFailedEvent(WorkerMessageFailedEvent $event): void
     {
-        $this->logger->error('onWorkerMessageFailedEvent');
+        $this->logger->info('onWorkerMessageFailedEvent');
     }
 
     public function onWorkerMessageHandledEvent(WorkerMessageHandledEvent $event): void
     {
-        $this->logger->error('onWorkerMessageHandledEvent');
+        $this->logger->info('onWorkerMessageHandledEvent');
     }
 
     public static function getSubscribedEvents(): array
