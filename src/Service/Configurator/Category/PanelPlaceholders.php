@@ -62,6 +62,9 @@ class PanelPlaceholders implements ConfiguratorCategory
             ];
             $this->bus->dispatch(new AdPanelReload());
             unset($input[AdPanelConfig::PlaceholderStyleCss->name]);
+            if (empty($input)) {
+                return $result;
+            }
         }
 
         foreach ($fields as $field) {
