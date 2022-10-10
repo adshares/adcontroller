@@ -133,7 +133,7 @@ const Placeholders = () => {
             collapsible
             value={form.fields.PlaceholderStyleCss}
             name="PlaceholderStyleCss"
-            label="Login page info (CSS)"
+            label="AdPanel styles (CSS)"
             multiline
             rows={20}
             margin="dense"
