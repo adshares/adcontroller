@@ -46,7 +46,7 @@ function GlobalNotificationsWrapper() {
 }
 
 export default function AppWindow({ children }) {
-  const { notificationType, showNotification } = useSelector(globalNotificationsSelectors.getGlobalNotificationState);
+  const { showNotification } = useSelector(globalNotificationsSelectors.getGlobalNotificationState);
   const snackBarRef = useRef(null);
   const dispatch = useDispatch();
   const handleClose = () => {
@@ -54,7 +54,6 @@ export default function AppWindow({ children }) {
       dispatch(closeNotification());
     }
   };
-  console.log(notificationType);
   return (
     <StyledSnackbarProvider
       onClose={handleClose}
