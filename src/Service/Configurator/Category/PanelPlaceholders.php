@@ -4,7 +4,7 @@ namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdPanelConfig;
 use App\Exception\InvalidArgumentException;
-use App\Message\AdPanelReload;
+use App\Messenger\Message\AdPanelReload;
 use App\Repository\ConfigurationRepository;
 use App\Service\DataCollector;
 use App\Utility\ArrayUtils;

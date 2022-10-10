@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Middleware;
+namespace App\Messenger\Middleware;
 
-use App\Message\AdPanelReload;
+use App\Messenger\Message\AdPanelReload;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;

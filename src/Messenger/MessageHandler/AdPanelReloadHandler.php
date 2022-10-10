@@ -1,9 +1,9 @@
 <?php
 
-namespace App\MessageHandler;
+namespace App\Messenger\MessageHandler;
 
 use App\Exception\UnexpectedResponseException;
-use App\Message\AdPanelReload;
+use App\Messenger\Message\AdPanelReload;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Process\Process;

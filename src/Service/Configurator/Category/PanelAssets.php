@@ -6,7 +6,7 @@ use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\PanelAssetConfig;
 use App\Entity\PanelAsset;
 use App\Exception\InvalidArgumentException;
-use App\Message\AdPanelReload;
+use App\Messenger\Message\AdPanelReload;
 use App\Repository\ConfigurationRepository;
 use App\Repository\PanelAssetRepository;
 use App\Service\Env\AdPanelEnvVar;
