@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class PanelAssets implements ConfiguratorCategory
 {
     private const ASSETS_DIRECTORY = 'var/panel-assets/';
-    private const ASSETS_TMP_DIRECTORY = 'var/panel-assets-tmp/';
+    private const ASSETS_TMP_DIRECTORY = 'var/panel-assets-history/';
     private const FILE_CONTENT_HASH_LENGTH = 16;
     private const IMAGES_DIRECTORY = 'assets/images/';
     private const MAXIMAL_FILE_ID_LENGTH = 255 - self::FILE_CONTENT_HASH_LENGTH;
