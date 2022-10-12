@@ -8,4 +8,9 @@ final class AdServerFetchExchangeRate implements AdServerCommand
     {
         return 'ops:exchange-rate:fetch';
     }
+
+    public function getArguments(): array
+    {
+        return [];
+    }
 }

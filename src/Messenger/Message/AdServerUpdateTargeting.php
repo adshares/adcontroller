@@ -8,4 +8,9 @@ final class AdServerUpdateTargeting implements AdServerCommand
     {
         return 'ops:targeting-options:update';
     }
+
+    public function getArguments(): array
+    {
+        return [];
+    }
 }

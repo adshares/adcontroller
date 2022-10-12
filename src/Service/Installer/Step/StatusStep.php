@@ -13,8 +13,11 @@ use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
 use App\Entity\Enum\InstallerStepEnum;
 use App\Messenger\Message\AdServerFetchExchangeRate;
+use App\Messenger\Message\AdServerGetBlocks;
+use App\Messenger\Message\AdServerSendBroadcast;
 use App\Messenger\Message\AdServerUpdateFiltering;
 use App\Messenger\Message\AdServerUpdateTargeting;
+use App\Messenger\Message\AdUserFetchPageData;
 use App\Repository\ConfigurationRepository;
 use App\Service\Env\AdServerEnvVar;
 use App\Service\Env\EnvEditorFactory;
@@ -59,6 +62,9 @@ class StatusStep implements InstallerStep
         $this->bus->dispatch(new AdServerFetchExchangeRate());
         $this->bus->dispatch(new AdServerUpdateFiltering());
         $this->bus->dispatch(new AdServerUpdateTargeting());
+        $this->bus->dispatch(new AdServerGetBlocks());
+        $this->bus->dispatch(new AdServerSendBroadcast());
+        $this->bus->dispatch(new AdUserFetchPageData());
     }
 
     public function getName(): string
