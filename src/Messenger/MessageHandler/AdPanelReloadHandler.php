@@ -11,6 +11,8 @@ use Symfony\Component\Process\Process;
 #[AsMessageHandler]
 class AdPanelReloadHandler
 {
+    private const TIMEOUT = 15 * 60;
+
     public function __construct(
         private readonly string $adPanelHomeDirectory,
         private readonly LoggerInterface $logger,
@@ -25,7 +27,7 @@ class AdPanelReloadHandler
     private function reload(): void
     {
         $process = new Process(['deploy/reload.sh'], $this->adPanelHomeDirectory);
-        $process->setTimeout(null);
+        $process->setTimeout(self::TIMEOUT);
         $process->run();
         $process->wait();
 

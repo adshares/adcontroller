@@ -10,7 +10,7 @@ use Symfony\Component\Process\Process;
 #[AsMessageHandler]
 class AdServerCommandHandler
 {
-    private const TIMEOUT = 60 * 5;
+    private const TIMEOUT = 5 * 60;
 
     public function __construct(private readonly string $adServerHomeDirectory)
     {
