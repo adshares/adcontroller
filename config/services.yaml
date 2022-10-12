@@ -14,6 +14,7 @@ services:
             string $adPanelHomeDirectory: '%env(ADPANEL_HOME_DIRECTORY)%'
             string $adServerBaseUri: '%env(ADSERVER_BASE_URI)%'
             string $adServerHomeDirectory: '%env(ADSERVER_HOME_DIRECTORY)%'
+            string $adUserHomeDirectory: '%env(ADUSER_HOME_DIRECTORY)%'
             string $appDirectory: '%kernel.project_dir%'
             string $appName: '%env(APP_NAME)%'
             string $appSecret: '%env(APP_SECRET)%'
