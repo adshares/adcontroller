@@ -19,7 +19,7 @@ class AdServerCommandHandler
     public function __invoke(AdServerCommand $message): void
     {
         $process = new Process(
-            ['php', 'artisan', ...$message->getSignature()],
+            ['php', 'artisan', $message->getSignature(), ...$message->getArguments()],
             $this->adServerHomeDirectory,
             null,
             null,

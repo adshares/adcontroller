@@ -4,8 +4,13 @@ namespace App\Messenger\Message;
 
 final class AdServerUpdateFiltering implements AdServerCommand
 {
-    public function getSignature(): array
+    public function getSignature(): string
     {
-        return ['ops:filtering-options:update'];
+        return 'ops:filtering-options:update';
+    }
+
+    public function getArguments(): array
+    {
+        return [];
     }
 }
