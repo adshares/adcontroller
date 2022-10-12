@@ -35,6 +35,14 @@ class PanelPlaceholders implements ConfiguratorCategory
 
         $result = [];
         if (array_key_exists(AdPanelConfig::PlaceholderStyleCss->name, $input)) {
+            $finder = new Finder();
+            $finder->files()->in($this->panelAssets->getAssetDirectory())->name('custom.*.css')->depth('== 0');
+            if ($finder->hasResults()) {
+                $filesystem = new Filesystem();
+                foreach ($finder as $file) {
+                    $filesystem->remove($file);
+                }
+            }
             $styleCssContent = $input[AdPanelConfig::PlaceholderStyleCss->name];
             if ($styleCssContent) {
                 $file = $this->panelAssets->appendHashToFileName(
@@ -43,15 +51,6 @@ class PanelPlaceholders implements ConfiguratorCategory
                 );
                 file_put_contents($this->panelAssets->getAssetDirectory() . $file, $styleCssContent);
                 file_put_contents($this->panelAssets->getAssetTmpDirectory() . $file, $styleCssContent);
-            } else {
-                $finder = new Finder();
-                $finder->files()->in($this->panelAssets->getAssetDirectory())->name('custom*.css')->depth('== 0');
-                if ($finder->hasResults()) {
-                    foreach ($finder as $file) {
-                        $filesystem = new Filesystem();
-                        $filesystem->remove($file);
-                    }
-                }
             }
 
             $this->configurationRepository->insertOrUpdateOne(AdPanelConfig::PlaceholderStyleCss, $styleCssContent);
