@@ -4,8 +4,8 @@ namespace App\Messenger\Message;
 
 final class AdServerSendBroadcast implements AdServerCommand
 {
-    public function getSignature(): string
+    public function getSignature(): array
     {
-        return 'ads:broadcast-host';
+        return ['ads:broadcast-host'];
     }
 }

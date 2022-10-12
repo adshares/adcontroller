@@ -4,8 +4,8 @@ namespace App\Messenger\Message;
 
 final class AdServerUpdateTargeting implements AdServerCommand
 {
-    public function getSignature(): string
+    public function getSignature(): array
     {
-        return 'ops:targeting-options:update';
+        return ['ops:targeting-options:update'];
     }
 }

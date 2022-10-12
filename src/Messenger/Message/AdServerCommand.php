@@ -4,5 +4,5 @@ namespace App\Messenger\Message;
 
 interface AdServerCommand
 {
-    public function getSignature(): string;
+    public function getSignature(): array;
 }

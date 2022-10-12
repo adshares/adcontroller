@@ -4,8 +4,8 @@ namespace App\Messenger\Message;
 
 final class AdServerFetchExchangeRate implements AdServerCommand
 {
-    public function getSignature(): string
+    public function getSignature(): array
     {
-        return 'ops:exchange-rate:fetch';
+        return ['ops:exchange-rate:fetch'];
     }
 }
