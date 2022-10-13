@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Reload AdPanel asynchronously
+### Changed
+- AdServer configuration client uses API in camel case
 
 ## [1.0.2] - 2022-10-04
 ### Added
@@ -20,11 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2022-09-28
 ### Added
 - Controller
+### Changed
+- ADS account checker verifies balance
 ### Fixed
 - Send partial data in installer's steps
 - Send installer's step data if required
-### Changed
-- ADS account checker verifies balance
 
 ## [0.1.0] - 2022-08-12
 ### Added
