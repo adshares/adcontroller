@@ -2,11 +2,11 @@
 
 namespace App\Messenger\Message;
 
-final class AdServerUpdateFiltering implements AdServerCommand
+final class AdServerSendBroadcast implements AdServerCommand
 {
     public function getSignature(): string
     {
-        return 'ops:filtering-options:update';
+        return 'ads:broadcast-host';
     }
 
     public function getArguments(): array

@@ -4,6 +4,7 @@ namespace App\Messenger\Middleware;
 
 use App\Messenger\Message\AdPanelReload;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -38,16 +39,17 @@ class QueueCleanUpMiddleware implements MiddlewareInterface
     private function cleanUpAdPanelReloadMessages(): void
     {
         $connection = $this->entityManager->getConnection();
-        $rows = $connection->executeQuery(
-            'SELECT * FROM messenger_messages WHERE queue_name = :queue_name',
-            ['queue_name' => self::QUEUE_NAME]
-        )->fetchAllAssociative();
+        try {
+            $rows = $connection->executeQuery(
+                'SELECT * FROM messenger_messages WHERE queue_name = :queue_name AND delivered_at IS NULL',
+                ['queue_name' => self::QUEUE_NAME]
+            )->fetchAllAssociative();
+        } catch (TableNotFoundException) {
+            return;
+        }
 
         $idsToDelete = [];
         foreach ($rows as $row) {
-            if (null !== $row['delivered_at']) {
-                continue;
-            }
             $envelope = $this->serializer->decode([
                 'body' => $row['body'],
                 'headers' => $row['headers'],
