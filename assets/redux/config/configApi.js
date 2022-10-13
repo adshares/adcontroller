@@ -156,6 +156,13 @@ export const configApi = createApi({
         body,
       }),
     }),
+    deletePanelAssets: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/panel-assets',
+        method: 'DELETE',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -182,4 +189,5 @@ export const {
   useSetSmtpConfigMutation,
   useGetPanelAssetsQuery,
   useUploadPanelAssetsMutation,
+  useDeletePanelAssetsMutation,
 } = configApi;
