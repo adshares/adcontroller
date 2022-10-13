@@ -11,7 +11,13 @@ export const monitoringApi = createApi({
         method: 'GET',
       }),
     }),
+    getConnectedHosts: builder.query({
+      query: () => ({
+        url: '/api/monitoring/hosts',
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
-export const { useGetWalletMonitoringQuery } = monitoringApi;
+export const { useGetWalletMonitoringQuery, useGetConnectedHostsQuery } = monitoringApi;

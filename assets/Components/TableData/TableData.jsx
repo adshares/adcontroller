@@ -420,6 +420,8 @@ const EnhancedTableHead = ({
             return (
               <TableCell
                 ref={headCellsRefs.current[index]}
+                padding="none"
+                align="center"
                 sx={{
                   ...(columnsPinnedToLeftIds.includes(headCell.id)
                     ? {
@@ -446,7 +448,7 @@ const EnhancedTableHead = ({
                 onMouseLeave={() => setShowColumnSubmenu(null)}
                 sortDirection={headCell.sortable ? (orderBy === headCell.id ? order : false) : undefined}
               >
-                <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyCenter}`}>
                   {!headCell.disableCellSubmenu && (
                     <ColumnSubMenu
                       cellOptions={headCell}
@@ -595,7 +597,7 @@ const EnhancedTableHead = ({
   );
 };
 
-export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading }) {
+export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading, padding = 'normal' }) {
   const initColumnPosition = headCells.map((cell) => cell.id);
   const [columns] = useState([...headCells]);
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
@@ -612,7 +614,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   const [rowsPerPage, setRowsPerPage] = useState(15);
   // const [offset, setOffset] = useState(page * rowsPerPage);
 
-  const filteredRows = useMemo(() => multiFilterFn(rows, filterBy), [filterBy]);
+  const filteredRows = useMemo(() => multiFilterFn(rows, filterBy), [filterBy, rows]);
 
   const columnsPinnedToLeftWidth = useMemo(
     () =>
@@ -747,7 +749,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         setFilterBy={setFilterBy}
       />
       <TableContainer>
-        <Table stickyHeader padding="none">
+        <Table stickyHeader padding={padding}>
           <EnhancedTableHead
             headCells={columns}
             cellsWithFilterableBySelectValues={cellsWithFilterableBySelectValues}
@@ -772,28 +774,31 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                       {columns
                         .sort(sortByModel(initColumnPosition, 'id'))
                         .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
-                        .map((cell, index) => (
-                          <TableCell
-                            sx={{
-                              ...(columnsPinnedToLeftIds.includes(cell.id)
-                                ? {
-                                    position: 'sticky',
-                                    left: columnsPinnedToLeftWidth[cell.id] + 'rem' || 0,
-                                    borderRight: '1px solid rgba(224, 224, 224, 1)',
-                                  }
-                                : {}),
-                              ...(index === columns.length - 1 && cell.pinToRight
-                                ? { position: 'sticky', right: 0, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
-                                : {}),
-                              pl: 1,
-                              pr: 1,
-                              backgroundColor: 'background.paper',
-                            }}
-                            key={`${cell.id}-${row.id}`}
-                          >
-                            {row[cell.id]}
-                          </TableCell>
-                        ))}
+                        .map((cell, index) => {
+                          return (
+                            <TableCell
+                              align={cell.alignContent || 'left'}
+                              sx={{
+                                ...(columnsPinnedToLeftIds.includes(cell.id)
+                                  ? {
+                                      position: 'sticky',
+                                      left: columnsPinnedToLeftWidth[cell.id] + 'rem' || 0,
+                                      borderRight: '1px solid rgba(224, 224, 224, 1)',
+                                    }
+                                  : {}),
+                                ...(index === columns.length - 1 && cell.pinToRight
+                                  ? { position: 'sticky', right: 0, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
+                                  : {}),
+                                pl: 1,
+                                pr: 1,
+                                backgroundColor: 'background.paper',
+                              }}
+                              key={`${cell.id}-${row.id}`}
+                            >
+                              {row[cell.id]}
+                            </TableCell>
+                          );
+                        })}
                     </TableRow>
                   ))
               : renderSkeletons(columns, rowsPerPage)}
