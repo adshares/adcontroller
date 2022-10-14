@@ -26,7 +26,7 @@ CREATE TABLE configuration (
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_NAME (module, name),
   PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`;
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_520_ci`;
 SQL
         );
     }

@@ -35,7 +35,7 @@ CREATE TABLE asset (
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_NAME (module, name),
   PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`;
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_520_ci`;
 SQL
         );
 
@@ -54,7 +54,7 @@ CREATE TABLE ext_log_entries (
   INDEX log_user_lookup_idx (username),
   INDEX log_version_lookup_idx (object_id, object_class, version),
   PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ROW_FORMAT = DYNAMIC
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_520_ci` ROW_FORMAT = DYNAMIC
 SQL
         );
     }
