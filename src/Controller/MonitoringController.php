@@ -25,6 +25,7 @@ class MonitoringController extends AbstractController
     private const ALLOWED_KEYS = [
         'events',
         'hosts',
+        'latest-events',
         'wallet',
     ];
 
