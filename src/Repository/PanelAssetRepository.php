@@ -34,6 +34,8 @@ class PanelAssetRepository extends ServiceEntityRepository
                 $dbEntity = $entity;
             } else {
                 $dbEntity->setFilePath($entity->getFilePath());
+                $dbEntity->setHash($entity->getHash());
+                $dbEntity->setMimeType($entity->getMimeType());
             }
 
             $this->getEntityManager()->persist($dbEntity);
