@@ -9,6 +9,8 @@ use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -169,9 +171,10 @@ class AdServerConfigurationClient
         return $this->getData($this->buildConfigUri());
     }
 
-    public function fetchMonitoringData(string $resource): array
+    public function proxyMonitoringRequest(Request $request, string $resource): array
     {
-        return $this->getData($this->buildMonitoringUri($resource));
+        $data = $this->getData($this->buildMonitoringUri($resource), $request->query);
+        return self::overwriteUriInCaseOfPagination($data, $request);
     }
 
     public function fetchPlaceholders(): array
@@ -213,6 +216,21 @@ class AdServerConfigurationClient
     private function getAuthorizationHeader(): string
     {
         return 'Bearer ' . $this->tokenStorage->getToken()->getCredentials();
+    }
+
+    private static function overwriteUriInCaseOfPagination(array $data, Request $request): array
+    {
+        if (isset($data['path'])) {
+            $remoteUri = $data['path'];
+            $localUri = strtok($request->getUri(), '?');
+            $data['path'] = $localUri;
+            foreach (['nextPageUrl', 'prevPageUrl'] as $urlKey) {
+                if (isset($data[$urlKey])) {
+                    $data[$urlKey] = str_replace($remoteUri, $localUri, $data[$urlKey]);
+                }
+            }
+        }
+        return $data;
     }
 
     private static function mapDataToAdServerFormat(array $data): array
@@ -375,7 +393,7 @@ class AdServerConfigurationClient
         );
     }
 
-    private function getData(string $url): mixed
+    private function getData(string $url, InputBag $query = null): mixed
     {
         $response = $this->httpClient->request(
             'GET',
@@ -384,6 +402,7 @@ class AdServerConfigurationClient
                 'headers' => [
                     'Authorization' => $this->getAuthorizationHeader(),
                 ],
+                'query' => $query?->all() ?? [],
             ]
         );
         $this->checkStatusCode($response);
