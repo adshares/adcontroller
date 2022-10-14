@@ -28,7 +28,7 @@ CREATE TABLE panel_asset (
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_FILE_ID (file_id),
   PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`;
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_520_ci`;
 SQL
         );
         $this->addSql('DROP TABLE asset');
@@ -48,7 +48,7 @@ CREATE TABLE asset (
   updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   UNIQUE INDEX UNIQUE_NAME (module, name),
   PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`;
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_520_ci`;
 SQL
         );
     }
