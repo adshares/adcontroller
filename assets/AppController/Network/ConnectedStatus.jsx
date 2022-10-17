@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Box, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
-import { useGetConnectedHostsQuery } from '../../redux/monitoring/monitoringApi';
+import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
@@ -14,85 +14,62 @@ const headCells = [
     id: 'name',
     label: 'Name',
     cellWidth: '10rem',
-    // pinnedToLeft: true,
-    sortable: true,
     alignContent: 'left',
-    filterableBy: ['text', 'range', 'select'],
   },
   {
     id: 'status',
     label: 'Status',
     cellWidth: '6rem',
-    // pinnedToLeft: true,
-    sortable: true,
     alignContent: 'center',
-    // filterableBy: ['text', 'range', 'select'],
   },
   {
     id: 'url',
     label: 'URL',
-    cellWidth: '6rem',
-    // pinnedToLeft: true,
-    sortable: true,
+    cellWidth: '12rem',
     alignContent: 'left',
-    // filterableBy: ['text', 'range', 'select'],
   },
   {
     id: 'wallet',
     label: 'Wallet',
     cellWidth: '10rem',
-    // pinnedToLeft: true,
-    sortable: true,
     alignContent: 'left',
-    // filterableBy: ['text', 'range', 'select'],
   },
   {
     id: 'lastSync',
     label: 'Last synchronization',
     cellWidth: '6rem',
-    // pinnedToLeft: true,
-    sortable: true,
     alignContent: 'center',
-    // filterableBy: ['text', 'range', 'select'],
   },
   {
     id: 'campaigns',
     label: 'Campaigns',
     cellWidth: '6rem',
-    // pinnedToLeft: true,
-    sortable: true,
     alignContent: 'center',
-    // filterableBy: ['text', 'range', 'select'],
   },
   {
     id: 'sites',
     label: 'Sites',
     cellWidth: '6rem',
-    // pinnedToLeft: true,
-    sortable: true,
     alignContent: 'center',
-    // filterableBy: ['text', 'range', 'select'],
   },
   {
     id: 'countOfError',
     label: 'Count of connection error',
     cellWidth: '6rem',
-    // pinnedToLeft: true,
-    sortable: true,
     alignContent: 'center',
-    // filterableBy: ['text', 'range', 'select'],
+    // pinToRight: true,
   },
 ];
 
 export default function ConnectedStatus() {
-  const { data: response, isFetching } = useGetConnectedHostsQuery();
-
-  const handleTableChanges = (event) => {
-    console.log(event);
-  };
+  const [resetHostConnectionError] = useResetHostConnectionErrorMutation();
+  const [currentPage, setCurrentPage] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [cursor, setCursor] = useState(null);
+  const { data: response, isFetching, refetch } = useGetConnectedHostsQuery({ limit, cursor });
 
   const rows = useMemo(() => {
-    const hosts = response?.data?.hosts || [];
+    const hosts = response?.data || [];
     return hosts.map((host) => ({
       id: host.id,
       name: host.name,
@@ -137,8 +114,26 @@ export default function ConnectedStatus() {
     }));
   }, [response]);
 
-  const onResetCounterClick = (id) => {
-    console.log(id);
+  const onResetCounterClick = async (id) => {
+    const result = await resetHostConnectionError({ id });
+    if (result.data.message === 'OK') {
+      refetch();
+    }
+  };
+
+  const handleTableChanges = (event) => {
+    if (event.page > currentPage) {
+      setCursor(response.nextCursor);
+      setCurrentPage(event.page);
+    }
+    if (event.page < currentPage) {
+      setCursor(response.prevCursor);
+      setCurrentPage(event.page);
+    }
+    if (limit !== event.rowsPerPage) {
+      setCursor(null);
+    }
+    setLimit(event.rowsPerPage);
   };
 
   return (
@@ -157,6 +152,7 @@ export default function ConnectedStatus() {
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
           defaultSortBy="name" //(must be same of cell id)
+          paginationParams={{ limit, count: response?.total || 0 }}
         />
       </CardContent>
     </Card>

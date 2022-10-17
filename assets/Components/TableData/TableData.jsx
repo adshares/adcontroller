@@ -1,5 +1,4 @@
 import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
-import { useSkipFirstRenderEffect } from '../../hooks';
 import {
   Chip,
   Collapse,
@@ -597,9 +596,8 @@ const EnhancedTableHead = ({
   );
 };
 
-export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading, padding = 'normal' }) {
+export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading, padding = 'normal', paginationParams }) {
   const initColumnPosition = headCells.map((cell) => cell.id);
-  const [columns] = useState([...headCells]);
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
@@ -611,9 +609,9 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   );
   const [filterBy, setFilterBy] = useState({});
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
-  // const [offset, setOffset] = useState(page * rowsPerPage);
+  const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
 
+  const columns = useMemo(() => [...headCells], [headCells]);
   const filteredRows = useMemo(() => multiFilterFn(rows, filterBy), [filterBy, rows]);
 
   const columnsPinnedToLeftWidth = useMemo(
@@ -639,14 +637,13 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
     [headCells, rows],
   );
 
-  useSkipFirstRenderEffect(() => {
+  useEffect(() => {
     onTableChange({
       order,
       orderBy,
       filterBy,
       page,
       rowsPerPage,
-      // offset,
     });
   }, [order, orderBy, page, filterBy, rowsPerPage]);
 
@@ -766,54 +763,51 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
           />
           <TableBody>
             {!isDataLoading
-              ? filteredRows
-                  .sort(getOrderComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow hover tabIndex={-1} key={row.id}>
-                      {columns
-                        .sort(sortByModel(initColumnPosition, 'id'))
-                        .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
-                        .map((cell, index) => {
-                          return (
-                            <TableCell
-                              align={cell.alignContent || 'left'}
-                              sx={{
-                                ...(columnsPinnedToLeftIds.includes(cell.id)
-                                  ? {
-                                      position: 'sticky',
-                                      left: columnsPinnedToLeftWidth[cell.id] + 'rem' || 0,
-                                      borderRight: '1px solid rgba(224, 224, 224, 1)',
-                                    }
-                                  : {}),
-                                ...(index === columns.length - 1 && cell.pinToRight
-                                  ? { position: 'sticky', right: 0, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
-                                  : {}),
-                                pl: 1,
-                                pr: 1,
-                                backgroundColor: 'background.paper',
-                              }}
-                              key={`${cell.id}-${row.id}`}
-                            >
-                              {row[cell.id]}
-                            </TableCell>
-                          );
-                        })}
-                    </TableRow>
-                  ))
+              ? filteredRows.sort(getOrderComparator(order, orderBy)).map((row) => (
+                  <TableRow hover tabIndex={-1} key={row.id}>
+                    {columns
+                      .sort(sortByModel(initColumnPosition, 'id'))
+                      .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
+                      .map((cell, index) => {
+                        return (
+                          <TableCell
+                            align={cell.alignContent || 'left'}
+                            sx={{
+                              ...(columnsPinnedToLeftIds.includes(cell.id)
+                                ? {
+                                    position: 'sticky',
+                                    left: columnsPinnedToLeftWidth[cell.id] + 'rem' || 0,
+                                    borderRight: '1px solid rgba(224, 224, 224, 1)',
+                                  }
+                                : {}),
+                              ...(index === columns.length - 1 && cell.pinToRight
+                                ? { position: 'sticky', right: 0, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
+                                : {}),
+                              pl: 1,
+                              pr: 1,
+                              backgroundColor: 'background.paper',
+                            }}
+                            key={`${cell.id}-${row.id}`}
+                          >
+                            {row[cell.id]}
+                          </TableCell>
+                        );
+                      })}
+                  </TableRow>
+                ))
               : renderSkeletons(columns, rowsPerPage)}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
         sx={{ overflow: 'visible' }}
-        rowsPerPageOptions={[5, 10, 15, 20]}
         component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
         onPageChange={handleChangePage}
+        page={page}
+        count={paginationParams.count || rows.length}
+        rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 15, 20]}
       />
     </Box>
   );
