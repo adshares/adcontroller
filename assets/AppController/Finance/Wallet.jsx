@@ -64,8 +64,8 @@ const WalletSettingsCard = () => {
 
   const getWalletNodes = async () => {
     const response = await getWalletNode({ WalletAddress: walletForm.fields.WalletAddress });
-    if (response.data && response.data.message === 'OK') {
-      nodeForm.setFields({ ...response });
+    if (response.data) {
+      nodeForm.setFields({ ...response.data });
     }
     if (response.error) {
       nodeForm.setFields({

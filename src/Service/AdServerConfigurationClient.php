@@ -9,6 +9,8 @@ use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -18,143 +20,143 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class AdServerConfigurationClient
 {
     // Config
-    public const ADPANEL_URL = 'adpanel-url';
-    private const ADPAY_BID_STRATEGY_EXPORT_TIME = 'adpay-bid-strategy-export';
-    private const ADPAY_CAMPAIGN_EXPORT_TIME = 'adpay-campaign-export';
-    private const ADPAY_LAST_EXPORTED_CONVERSION_TIME = 'adpay-last-conversion-time';
-    private const ADPAY_LAST_EXPORTED_EVENT_TIME = 'adpay-last-event-time';
-    public const ADPAY_URL = 'adpay-url';
-    private const ADS_LOG_START = 'ads-log-start';
-    private const ADS_OPERATOR_SERVER_URL = 'ads-operator-server-url';
-    private const ADS_RPC_URL = 'ads-rpc-url';
-    private const ADSELECT_INVENTORY_EXPORT_TIME = 'adselect-inventory-export';
-    public const ADSELECT_URL = 'adselect-url';
-    public const ADSERVER_NAME = 'adserver-name';
-    public const ADSHARES_ADDRESS = 'adshares-address';
-    public const ADSHARES_LICENSE_KEY = 'adshares-license-key';
-    private const ADSHARES_LICENSE_SERVER_URL = 'adshares-license-server-url';
-    public const ADSHARES_NODE_HOST = 'adshares-node-host';
-    public const ADSHARES_NODE_PORT = 'adshares-node-port';
-    public const ADSHARES_SECRET = 'adshares-secret';
-    public const ADUSER_BASE_URL = 'aduser-base-url';
-    private const ADUSER_INFO_URL = 'aduser-info-url';
-    public const ADUSER_INTERNAL_URL = 'aduser-internal-url';
-    private const ADUSER_SERVE_SUBDOMAIN = 'aduser-serve-subdomain';
-    public const ADVERTISER_APPLY_FORM_URL = 'advertiser-apply-form-url';
-    public const ALLOW_ZONE_IN_IFRAME = 'allow_zone-in-iframe';
-    public const AUTO_CONFIRMATION_ENABLED = 'auto-confirmation-enabled';
-    public const AUTO_REGISTRATION_ENABLED = 'auto-registration-enabled';
-    public const AUTO_WITHDRAWAL_LIMIT_ADS = 'auto-withdrawal-limit-ads';
-    public const AUTO_WITHDRAWAL_LIMIT_BSC = 'auto-withdrawal-limit-bsc';
-    public const AUTO_WITHDRAWAL_LIMIT_BTC = 'auto-withdrawal-limit-btc';
-    public const AUTO_WITHDRAWAL_LIMIT_ETH = 'auto-withdrawal-limit-eth';
-    private const BANNER_FORCE_HTTPS = 'banner-force-https';
-    private const BTC_WITHDRAW = 'btc-withdraw';
-    private const BTC_WITHDRAW_FEE = 'btc-withdraw-fee';
-    private const BTC_WITHDRAW_MAX_AMOUNT = 'btc-withdraw-max-amount';
-    private const BTC_WITHDRAW_MIN_AMOUNT = 'btc-withdraw-min-amount';
-    public const CAMPAIGN_MIN_BUDGET = 'campaign-min-budget';
-    public const CAMPAIGN_MIN_CPA = 'campaign-min-cpa';
-    public const CAMPAIGN_MIN_CPM = 'campaign-min-cpm';
-    private const CAMPAIGN_TARGETING_EXCLUDE = 'campaign-targeting-exclude';
-    private const CAMPAIGN_TARGETING_REQUIRE = 'campaign-targeting-require';
-    private const CDN_PROVIDER = 'cdn-provider';
-    private const CHECK_ZONE_DOMAIN = 'check-zone-domain';
-    public const CLASSIFIER_EXTERNAL_API_KEY_NAME = 'classifier-external-api-key-name';
-    public const CLASSIFIER_EXTERNAL_API_KEY_SECRET = 'classifier-external-api-key-secret';
-    public const CLASSIFIER_EXTERNAL_BASE_URL = 'classifier-external-base-url';
-    private const CLASSIFIER_EXTERNAL_NAME = 'classifier-external-name';
-    private const CLASSIFIER_EXTERNAL_PUBLIC_KEY = 'classifier-external-public-key';
-    public const COLD_WALLET_ADDRESS = 'cold-wallet-address';
-    public const COLD_WALLET_IS_ACTIVE = 'cold-wallet-is-active';
-    public const CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED = 'crm-mail-address-on-campaign-created';
-    public const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crm-mail-address-on-site-added';
-    public const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crm-mail-address-on-user-registered';
+    public const ADPANEL_URL = 'adpanelUrl';
+    private const ADPAY_BID_STRATEGY_EXPORT_TIME = 'adpayBidStrategyExport';
+    private const ADPAY_CAMPAIGN_EXPORT_TIME = 'adpayCampaignExport';
+    private const ADPAY_LAST_EXPORTED_CONVERSION_TIME = 'adpayLastConversionTime';
+    private const ADPAY_LAST_EXPORTED_EVENT_TIME = 'adpayLastEventTime';
+    public const ADPAY_URL = 'adpayUrl';
+    private const ADS_LOG_START = 'adsLogStart';
+    private const ADS_OPERATOR_SERVER_URL = 'adsOperatorServerUrl';
+    private const ADS_RPC_URL = 'adsRpcUrl';
+    private const ADSELECT_INVENTORY_EXPORT_TIME = 'adselectInventoryExport';
+    public const ADSELECT_URL = 'adselectUrl';
+    public const ADSERVER_NAME = 'adserverName';
+    public const ADSHARES_ADDRESS = 'adsharesAddress';
+    public const ADSHARES_LICENSE_KEY = 'adsharesLicenseKey';
+    private const ADSHARES_LICENSE_SERVER_URL = 'adsharesLicenseServerUrl';
+    public const ADSHARES_NODE_HOST = 'adsharesNodeHost';
+    public const ADSHARES_NODE_PORT = 'adsharesNodePort';
+    public const ADSHARES_SECRET = 'adsharesSecret';
+    public const ADUSER_BASE_URL = 'aduserBaseUrl';
+    private const ADUSER_INFO_URL = 'aduserInfoUrl';
+    public const ADUSER_INTERNAL_URL = 'aduserInternalUrl';
+    private const ADUSER_SERVE_SUBDOMAIN = 'aduserServeSubdomain';
+    public const ADVERTISER_APPLY_FORM_URL = 'advertiserApplyFormUrl';
+    public const ALLOW_ZONE_IN_IFRAME = 'allow_zoneInIframe';
+    public const AUTO_CONFIRMATION_ENABLED = 'autoConfirmationEnabled';
+    public const AUTO_REGISTRATION_ENABLED = 'autoRegistrationEnabled';
+    public const AUTO_WITHDRAWAL_LIMIT_ADS = 'autoWithdrawalLimitAds';
+    public const AUTO_WITHDRAWAL_LIMIT_BSC = 'autoWithdrawalLimitBsc';
+    public const AUTO_WITHDRAWAL_LIMIT_BTC = 'autoWithdrawalLimitBtc';
+    public const AUTO_WITHDRAWAL_LIMIT_ETH = 'autoWithdrawalLimitEth';
+    private const BANNER_FORCE_HTTPS = 'bannerForceHttps';
+    private const BTC_WITHDRAW = 'btcWithdraw';
+    private const BTC_WITHDRAW_FEE = 'btcWithdrawFee';
+    private const BTC_WITHDRAW_MAX_AMOUNT = 'btcWithdrawMaxAmount';
+    private const BTC_WITHDRAW_MIN_AMOUNT = 'btcWithdrawMinAmount';
+    public const CAMPAIGN_MIN_BUDGET = 'campaignMinBudget';
+    public const CAMPAIGN_MIN_CPA = 'campaignMinCpa';
+    public const CAMPAIGN_MIN_CPM = 'campaignMinCpm';
+    private const CAMPAIGN_TARGETING_EXCLUDE = 'campaignTargetingExclude';
+    private const CAMPAIGN_TARGETING_REQUIRE = 'campaignTargetingRequire';
+    private const CDN_PROVIDER = 'cdnProvider';
+    private const CHECK_ZONE_DOMAIN = 'checkZoneDomain';
+    public const CLASSIFIER_EXTERNAL_API_KEY_NAME = 'classifierExternalApiKeyName';
+    public const CLASSIFIER_EXTERNAL_API_KEY_SECRET = 'classifierExternalApiKeySecret';
+    public const CLASSIFIER_EXTERNAL_BASE_URL = 'classifierExternalBaseUrl';
+    private const CLASSIFIER_EXTERNAL_NAME = 'classifierExternalName';
+    private const CLASSIFIER_EXTERNAL_PUBLIC_KEY = 'classifierExternalPublicKey';
+    public const COLD_WALLET_ADDRESS = 'coldWalletAddress';
+    public const COLD_WALLET_IS_ACTIVE = 'coldWalletIsActive';
+    public const CRM_MAIL_ADDRESS_ON_CAMPAIGN_CREATED = 'crmMailAddressOnCampaignCreated';
+    public const CRM_MAIL_ADDRESS_ON_SITE_ADDED = 'crmMailAddressOnSiteAdded';
+    public const CRM_MAIL_ADDRESS_ON_USER_REGISTERED = 'crmMailAddressOnUserRegistered';
     private const CURRENCY = 'currency';
-    public const DEFAULT_USER_ROLES = 'default-user-roles';
-    private const DISPLAY_CURRENCY = 'display-currency';
-    public const EMAIL_VERIFICATION_REQUIRED = 'email-verification-required';
-    private const EXCHANGE_API_KEY = 'exchange-api-key';
-    private const EXCHANGE_API_SECRET = 'exchange-api-secret';
-    private const EXCHANGE_API_URL = 'exchange-api-url';
-    private const EXCHANGE_CURRENCIES = 'exchange-currencies';
-    private const FIAT_DEPOSIT_MAX_AMOUNT = 'fiat-deposit-max-amount';
-    private const FIAT_DEPOSIT_MIN_AMOUNT = 'fiat-deposit-min-amount';
-    public const HOT_WALLET_MAX_VALUE = 'hotwallet-max-value';
-    public const HOT_WALLET_MIN_VALUE = 'hotwallet-min-value';
-    private const HOURS_UNTIL_INACTIVE_HOST_REMOVAL = 'hours-until-inactive-host-removal';
-    public const INVENTORY_EXPORT_WHITELIST = 'inventory-export-whitelist';
-    private const INVENTORY_FAILED_CONNECTION_LIMIT = 'inventory-failed-connection-limit';
-    public const INVENTORY_IMPORT_WHITELIST = 'inventory-import-whitelist';
-    public const INVENTORY_WHITELIST = 'inventory-whitelist';
-    private const INVOICE_CURRENCIES = 'invoice-currencies';
-    private const INVOICE_COMPANY_ADDRESS = 'invoice-company-address';
-    private const INVOICE_COMPANY_BANK_ACCOUNTS = 'invoice-company-bank-accounts';
-    private const INVOICE_COMPANY_CITY = 'invoice-company-city';
-    private const INVOICE_COMPANY_COUNTRY = 'invoice-company-country';
-    private const INVOICE_COMPANY_NAME = 'invoice-company-name';
-    private const INVOICE_COMPANY_POSTAL_CODE = 'invoice-company-postal-code';
-    private const INVOICE_COMPANY_VAT_ID = 'invoice-company-vat-id';
-    private const INVOICE_ENABLED = 'invoice-enabled';
-    private const INVOICE_NUMBER_FORMAT = 'invoice-number-format';
-    private const LAST_UPDATED_IMPRESSION_ID = 'last-updated-impression-id';
-    private const MAIL_FROM_ADDRESS = 'mail-from-address';
-    public const MAIL_FROM_NAME = 'mail-from-name';
-    private const MAIL_MAILER = 'mail-mailer';
-    private const MAIL_SMTP_ENCRYPTION = 'mail-smtp-encryption';
-    public const MAIL_SMTP_HOST = 'mail-smtp-host';
-    public const MAIL_SMTP_PASSWORD = 'mail-smtp-password';
-    public const MAIL_SMTP_PORT = 'mail-smtp-port';
-    public const MAIL_SMTP_USERNAME = 'mail-smtp-username';
-    private const MAIN_JS_BASE_URL = 'main-js-base-url';
-    private const MAIN_JS_TLD = 'main-js-tld';
-    public const MAX_PAGE_ZONES = 'max-page-zones';
-    private const NETWORK_DATA_CACHE_TTL = 'network_data_cache-ttl';
-    private const NOW_PAYMENTS_API_KEY = 'now-payments-api-key';
-    private const NOW_PAYMENTS_CURRENCY = 'now-payments-currency';
-    private const NOW_PAYMENTS_EXCHANGE = 'now-payments-exchange';
-    private const NOW_PAYMENTS_FEE = 'now-payments-fee';
-    private const NOW_PAYMENTS_IPN_SECRET = 'now-payments-ipn-secret';
-    private const NOW_PAYMENTS_MAX_AMOUNT = 'now-payments-max-amount';
-    private const NOW_PAYMENTS_MIN_AMOUNT = 'now-payments-min-amount';
-    private const PANEL_PLACEHOLDER_NOTIFICATION_TIME = 'panel-placeholder-notification-time';
-    private const PANEL_PLACEHOLDER_UPDATE_TIME = 'panel-placeholder-update-time';
-    public const PUBLISHER_APPLY_FORM_URL = 'publisher-apply-form-url';
-    public const REFERRAL_REFUND_COMMISSION = 'referral-refund-commission';
-    public const REFERRAL_REFUND_ENABLED = 'referral-refund-enabled';
-    public const REGISTRATION_MODE = 'registration-mode';
-    public const OPERATOR_RX_FEE = 'payment-rx-fee';
-    public const OPERATOR_TX_FEE = 'payment-tx-fee';
-    private const OPERATOR_WALLET_EMAIL_LAST_TIME = 'operator-wallet-transfer-email-time';
-    private const SERVE_BASE_URL = 'serve-base-url';
-    public const SITE_ACCEPT_BANNERS_MANUALLY = 'site-accept-banners-manually';
-    public const SITE_CLASSIFIER_LOCAL_BANNERS = 'site-classifier-local-banners';
-    private const SITE_FILTERING_EXCLUDE = 'site-filtering-exclude';
-    private const SITE_FILTERING_REQUIRE = 'site-filtering-require';
-    private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'site-verification-time-threshold';
-    public const SUPPORT_CHAT = 'support-chat';
-    public const SUPPORT_EMAIL = 'support-email';
-    public const SUPPORT_TELEGRAM = 'support-telegram';
-    private const SKYNET_API_KEY = 'skynet-api-key';
-    private const SKYNET_API_URL = 'skynet-api-url';
-    private const SKYNET_CDN_URL = 'skynet-cdn-url';
-    public const TECHNICAL_EMAIL = 'technical-email';
-    public const UPLOAD_LIMIT_IMAGE = 'upload-limit-image';
-    public const UPLOAD_LIMIT_MODEL = 'upload-limit-model';
-    public const UPLOAD_LIMIT_VIDEO = 'upload-limit-video';
-    public const UPLOAD_LIMIT_ZIP = 'upload-limit-zip';
+    public const DEFAULT_USER_ROLES = 'defaultUserRoles';
+    private const DISPLAY_CURRENCY = 'displayCurrency';
+    public const EMAIL_VERIFICATION_REQUIRED = 'emailVerificationRequired';
+    private const EXCHANGE_API_KEY = 'exchangeApiKey';
+    private const EXCHANGE_API_SECRET = 'exchangeApiSecret';
+    private const EXCHANGE_API_URL = 'exchangeApiUrl';
+    private const EXCHANGE_CURRENCIES = 'exchangeCurrencies';
+    private const FIAT_DEPOSIT_MAX_AMOUNT = 'fiatDepositMaxAmount';
+    private const FIAT_DEPOSIT_MIN_AMOUNT = 'fiatDepositMinAmount';
+    public const HOT_WALLET_MAX_VALUE = 'hotwalletMaxValue';
+    public const HOT_WALLET_MIN_VALUE = 'hotwalletMinValue';
+    private const HOURS_UNTIL_INACTIVE_HOST_REMOVAL = 'hoursUntilInactiveHostRemoval';
+    public const INVENTORY_EXPORT_WHITELIST = 'inventoryExportWhitelist';
+    private const INVENTORY_FAILED_CONNECTION_LIMIT = 'inventoryFailedConnectionLimit';
+    public const INVENTORY_IMPORT_WHITELIST = 'inventoryImportWhitelist';
+    public const INVENTORY_WHITELIST = 'inventoryWhitelist';
+    private const INVOICE_CURRENCIES = 'invoiceCurrencies';
+    private const INVOICE_COMPANY_ADDRESS = 'invoiceCompanyAddress';
+    private const INVOICE_COMPANY_BANK_ACCOUNTS = 'invoiceCompanyBankAccounts';
+    private const INVOICE_COMPANY_CITY = 'invoiceCompanyCity';
+    private const INVOICE_COMPANY_COUNTRY = 'invoiceCompanyCountry';
+    private const INVOICE_COMPANY_NAME = 'invoiceCompanyName';
+    private const INVOICE_COMPANY_POSTAL_CODE = 'invoiceCompanyPostalCode';
+    private const INVOICE_COMPANY_VAT_ID = 'invoiceCompanyVatId';
+    private const INVOICE_ENABLED = 'invoiceEnabled';
+    private const INVOICE_NUMBER_FORMAT = 'invoiceNumberFormat';
+    private const LAST_UPDATED_IMPRESSION_ID = 'lastUpdatedImpressionId';
+    private const MAIL_FROM_ADDRESS = 'mailFromAddress';
+    public const MAIL_FROM_NAME = 'mailFromName';
+    private const MAIL_MAILER = 'mailMailer';
+    private const MAIL_SMTP_ENCRYPTION = 'mailSmtpEncryption';
+    public const MAIL_SMTP_HOST = 'mailSmtpHost';
+    public const MAIL_SMTP_PASSWORD = 'mailSmtpPassword';
+    public const MAIL_SMTP_PORT = 'mailSmtpPort';
+    public const MAIL_SMTP_USERNAME = 'mailSmtpUsername';
+    private const MAIN_JS_BASE_URL = 'mainJsBaseUrl';
+    private const MAIN_JS_TLD = 'mainJsTld';
+    public const MAX_PAGE_ZONES = 'maxPageZones';
+    private const NETWORK_DATA_CACHE_TTL = 'network_data_cacheTtl';
+    private const NOW_PAYMENTS_API_KEY = 'nowPaymentsApiKey';
+    private const NOW_PAYMENTS_CURRENCY = 'nowPaymentsCurrency';
+    private const NOW_PAYMENTS_EXCHANGE = 'nowPaymentsExchange';
+    private const NOW_PAYMENTS_FEE = 'nowPaymentsFee';
+    private const NOW_PAYMENTS_IPN_SECRET = 'nowPaymentsIpnSecret';
+    private const NOW_PAYMENTS_MAX_AMOUNT = 'nowPaymentsMaxAmount';
+    private const NOW_PAYMENTS_MIN_AMOUNT = 'nowPaymentsMinAmount';
+    private const PANEL_PLACEHOLDER_NOTIFICATION_TIME = 'panelPlaceholderNotificationTime';
+    private const PANEL_PLACEHOLDER_UPDATE_TIME = 'panelPlaceholderUpdateTime';
+    public const PUBLISHER_APPLY_FORM_URL = 'publisherApplyFormUrl';
+    public const REFERRAL_REFUND_COMMISSION = 'referralRefundCommission';
+    public const REFERRAL_REFUND_ENABLED = 'referralRefundEnabled';
+    public const REGISTRATION_MODE = 'registrationMode';
+    public const OPERATOR_RX_FEE = 'paymentRxFee';
+    public const OPERATOR_TX_FEE = 'paymentTxFee';
+    private const OPERATOR_WALLET_EMAIL_LAST_TIME = 'operatorWalletTransferEmailTime';
+    private const SERVE_BASE_URL = 'serveBaseUrl';
+    public const SITE_ACCEPT_BANNERS_MANUALLY = 'siteAcceptBannersManually';
+    public const SITE_CLASSIFIER_LOCAL_BANNERS = 'siteClassifierLocalBanners';
+    private const SITE_FILTERING_EXCLUDE = 'siteFilteringExclude';
+    private const SITE_FILTERING_REQUIRE = 'siteFilteringRequire';
+    private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'siteVerificationTimeThreshold';
+    public const SUPPORT_CHAT = 'supportChat';
+    public const SUPPORT_EMAIL = 'supportEmail';
+    public const SUPPORT_TELEGRAM = 'supportTelegram';
+    private const SKYNET_API_KEY = 'skynetApiKey';
+    private const SKYNET_API_URL = 'skynetApiUrl';
+    private const SKYNET_CDN_URL = 'skynetCdnUrl';
+    public const TECHNICAL_EMAIL = 'technicalEmail';
+    public const UPLOAD_LIMIT_IMAGE = 'uploadLimitImage';
+    public const UPLOAD_LIMIT_MODEL = 'uploadLimitModel';
+    public const UPLOAD_LIMIT_VIDEO = 'uploadLimitVideo';
+    public const UPLOAD_LIMIT_ZIP = 'uploadLimitZip';
     public const URL = 'url';
     // PanelPlaceholder
-    public const PLACEHOLDER_INDEX_DESCRIPTION = 'index-description';
-    public const PLACEHOLDER_INDEX_KEYWORDS = 'index-keywords';
-    public const PLACEHOLDER_INDEX_META_TAGS = 'index-meta-tags';
-    public const PLACEHOLDER_INDEX_TITLE = 'index-title';
-    public const PLACEHOLDER_LOGIN_INFO = 'login-info';
-    public const PLACEHOLDER_ROBOTS_TXT = 'robots-txt';
-    public const PLACEHOLDER_PRIVACY_POLICY = 'privacy-policy';
+    public const PLACEHOLDER_INDEX_DESCRIPTION = 'indexDescription';
+    public const PLACEHOLDER_INDEX_KEYWORDS = 'indexKeywords';
+    public const PLACEHOLDER_INDEX_META_TAGS = 'indexMetaTags';
+    public const PLACEHOLDER_INDEX_TITLE = 'indexTitle';
+    public const PLACEHOLDER_LOGIN_INFO = 'loginInfo';
+    public const PLACEHOLDER_ROBOTS_TXT = 'robotsTxt';
+    public const PLACEHOLDER_PRIVACY_POLICY = 'privacyPolicy';
     public const PLACEHOLDER_TERMS = 'terms';
     // SiteRejectedDomain
-    public const REJECTED_DOMAINS = 'rejected-domains';
+    public const REJECTED_DOMAINS = 'rejectedDomains';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -169,9 +171,10 @@ class AdServerConfigurationClient
         return $this->getData($this->buildConfigUri());
     }
 
-    public function fetchMonitoringData(string $resource): array
+    public function proxyMonitoringRequest(Request $request, string $resource): array
     {
-        return $this->getData($this->buildMonitoringUri($resource));
+        $data = $this->getData($this->buildMonitoringUri($resource), $request->query);
+        return self::overwriteUriInCaseOfPagination($data, $request);
     }
 
     public function fetchPlaceholders(): array
@@ -213,6 +216,21 @@ class AdServerConfigurationClient
     private function getAuthorizationHeader(): string
     {
         return 'Bearer ' . $this->tokenStorage->getToken()->getCredentials();
+    }
+
+    private static function overwriteUriInCaseOfPagination(array $data, Request $request): array
+    {
+        if (isset($data['path'])) {
+            $remoteUri = $data['path'];
+            $localUri = strtok($request->getUri(), '?');
+            $data['path'] = $localUri;
+            foreach (['nextPageUrl', 'prevPageUrl'] as $urlKey) {
+                if (isset($data[$urlKey])) {
+                    $data[$urlKey] = str_replace($remoteUri, $localUri, $data[$urlKey]);
+                }
+            }
+        }
+        return $data;
     }
 
     private static function mapDataToAdServerFormat(array $data): array
@@ -375,7 +393,7 @@ class AdServerConfigurationClient
         );
     }
 
-    private function getData(string $url): mixed
+    private function getData(string $url, InputBag $query = null): mixed
     {
         $response = $this->httpClient->request(
             'GET',
@@ -384,6 +402,7 @@ class AdServerConfigurationClient
                 'headers' => [
                     'Authorization' => $this->getAuthorizationHeader(),
                 ],
+                'query' => $query?->all() ?? [],
             ]
         );
         $this->checkStatusCode($response);

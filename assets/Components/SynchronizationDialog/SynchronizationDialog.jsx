@@ -54,8 +54,10 @@ export default function SynchronizationDialog({ isSyncInProgress, isDataSynchron
                             .map((change) => {
                               const { field, value } = change;
                               return (
-                                <Box className={`${commonStyles.flex}`} key={field.split('::')[1]}>
-                                  <Typography sx={{ mr: 1 }} variant="body1">{`${field.split('::')[1]}: `}</Typography>
+                                <Box className={`${commonStyles.flex}`} key={field}>
+                                  <Typography sx={{ mr: 1 }} variant="body1">
+                                    {`${field.split('::')[0]} ${field.split('::')[1]}: `}
+                                  </Typography>
                                   <Typography variant="body1">{`${value}`}</Typography>
                                 </Box>
                               );
@@ -73,8 +75,10 @@ export default function SynchronizationDialog({ isSyncInProgress, isDataSynchron
                             .map((change) => {
                               const { field, previousValue, value } = change;
                               return (
-                                <Box className={`${commonStyles.flex}`} key={field.split('::')[1]}>
-                                  <Typography sx={{ mr: 1 }} variant="body1">{`${field.split('::')[1]}: `}</Typography>
+                                <Box className={`${commonStyles.flex}`} key={field}>
+                                  <Typography sx={{ mr: 1 }} variant="body1">
+                                    {`${field.split('::')[0]} ${field.split('::')[1]}: `}
+                                  </Typography>
                                   <Typography variant="body1">{`${previousValue}`}</Typography>
                                   <StraightIcon sx={{ transform: 'rotate(90deg)' }} />
                                   <Typography variant="body1">{`${value}`}</Typography>
@@ -94,8 +98,10 @@ export default function SynchronizationDialog({ isSyncInProgress, isDataSynchron
                             .map((change) => {
                               const { field, previousValue } = change;
                               return (
-                                <Box className={`${commonStyles.flex}`} key={field.split('::')[1]}>
-                                  <Typography sx={{ mr: 1 }} variant="body1">{`${field.split('::')[1]}: `}</Typography>
+                                <Box className={`${commonStyles.flex}`} key={field}>
+                                  <Typography sx={{ mr: 1 }} variant="body1">
+                                    {`${field.split('::')[0]} ${field.split('::')[1]}: `}
+                                  </Typography>
                                   <Typography variant="body1">{`${previousValue}`}</Typography>
                                 </Box>
                               );
