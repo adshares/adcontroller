@@ -13,7 +13,7 @@ const headCells = [
   {
     id: 'name',
     label: 'Name',
-    cellWidth: '6rem',
+    cellWidth: '10rem',
     // pinnedToLeft: true,
     sortable: true,
     alignContent: 'left',
@@ -86,7 +86,6 @@ const headCells = [
 
 export default function ConnectedStatus() {
   const { data: response, isFetching } = useGetConnectedHostsQuery();
-  console.log(response);
 
   const handleTableChanges = (event) => {
     console.log(event);
@@ -97,6 +96,11 @@ export default function ConnectedStatus() {
     return hosts.map((host) => ({
       id: host.id,
       name: host.name,
+      url: host.url,
+      wallet: host.walletAddress,
+      lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
+      campaigns: host.campaignCount,
+      sites: host.siteCount,
       status:
         (host.status === 'operational' && (
           <Tooltip title={host.error || 'Operational'}>
@@ -118,17 +122,12 @@ export default function ConnectedStatus() {
             <SyncOutlinedIcon color="info" />
           </Tooltip>
         )),
-      url: host.url,
-      wallet: host.walletAddress,
-      lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
-      campaigns: host.campaignCount,
-      sites: host.siteCount,
       countOfError: (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyCenter}`}>
           <Typography variant="body2">{host.connectionErrorCount}</Typography>
           {Number(host.connectionErrorCount) > 0 && (
             <Tooltip title="Reset counter">
-              <IconButton size="small" color="primary">
+              <IconButton size="small" color="primary" onClick={() => onResetCounterClick(host.id)}>
                 <RestartAltOutlinedIcon />
               </IconButton>
             </Tooltip>
@@ -138,7 +137,9 @@ export default function ConnectedStatus() {
     }));
   }, [response]);
 
-  console.log(rows);
+  const onResetCounterClick = (id) => {
+    console.log(id);
+  };
 
   return (
     <Card
