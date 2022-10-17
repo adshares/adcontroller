@@ -12,12 +12,18 @@ export const monitoringApi = createApi({
       }),
     }),
     getConnectedHosts: builder.query({
-      query: () => ({
-        url: '/api/monitoring/hosts',
+      query: ({ limit, cursor }) => ({
+        url: `/api/monitoring/hosts?limit=${limit}${!!cursor ? `&cursor=${cursor}` : ''}`,
         method: 'GET',
+      }),
+    }),
+    resetHostConnectionError: builder.mutation({
+      query: ({ id }) => ({
+        url: `/api/monitoring/hosts/${id}/reset`,
+        method: 'PATCH',
       }),
     }),
   }),
 });
 
-export const { useGetWalletMonitoringQuery, useGetConnectedHostsQuery } = monitoringApi;
+export const { useGetWalletMonitoringQuery, useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } = monitoringApi;
