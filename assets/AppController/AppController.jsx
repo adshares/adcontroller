@@ -29,6 +29,7 @@ import Panel from './General/Panel';
 import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
 import ConnectedStatus from './Network/ConnectedStatus';
+import Events from './Events/Events';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -160,6 +161,12 @@ const appModules = [
     name: 'AdClassifier',
     path: '/adclassifier',
     component: AdClassifier,
+    icon: DashboardIcon,
+  },
+  {
+    name: 'Events',
+    path: '/events',
+    component: Events,
     icon: DashboardIcon,
   },
 ];

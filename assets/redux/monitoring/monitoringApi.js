@@ -13,7 +13,11 @@ export const monitoringApi = createApi({
     }),
     getConnectedHosts: builder.query({
       query: ({ limit, cursor }) => ({
-        url: `/api/monitoring/hosts?limit=${limit}${!!cursor ? `&cursor=${cursor}` : ''}`,
+        url: `/api/monitoring/hosts`,
+        params: {
+          limit,
+          ...(cursor ? { cursor } : {}),
+        },
         method: 'GET',
       }),
     }),
@@ -23,7 +27,24 @@ export const monitoringApi = createApi({
         method: 'PATCH',
       }),
     }),
+    getEvents: builder.query({
+      query: ({ limit, cursor, typeQueryParams }) => {
+        const limitParamPhrase = `limit=${limit}`;
+        const cursorParamPhrase = !!cursor ? `&cursor=${cursor}` : '';
+        const typesQueryParamsPhrase = typeQueryParams.length
+          ? typeQueryParams
+              .map((param) => `&types[]=${param}`)
+              .join(',')
+              .replaceAll(',', '')
+          : '';
+        return {
+          url: '/api/monitoring/events?' + limitParamPhrase + cursorParamPhrase + typesQueryParamsPhrase,
+          method: 'GET',
+        };
+      },
+    }),
   }),
 });
 
-export const { useGetWalletMonitoringQuery, useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } = monitoringApi;
+export const { useGetWalletMonitoringQuery, useGetConnectedHostsQuery, useResetHostConnectionErrorMutation, useGetEventsQuery } =
+  monitoringApi;
