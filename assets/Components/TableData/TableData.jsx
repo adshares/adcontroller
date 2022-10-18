@@ -416,6 +416,12 @@ const EnhancedTableHead = ({
       <TableHead>
         <TableRow>
           {headCells.map((headCell, index) => {
+            const units = headCell.cellWidth
+              .trim()
+              .split(/\d+/g)
+              .filter((n) => n)
+              .pop()
+              .trim();
             return (
               <TableCell
                 ref={headCellsRefs.current[index]}
@@ -425,7 +431,7 @@ const EnhancedTableHead = ({
                   ...(columnsPinnedToLeftIds.includes(headCell.id)
                     ? {
                         position: 'sticky',
-                        left: columnsPinnedToLeftWidth[headCell.id] + 'rem' || 0,
+                        left: columnsPinnedToLeftWidth[headCell.id] + units || 0,
                         borderRight: '1px solid rgba(224, 224, 224, 1)',
                         zIndex: 10,
                       }
@@ -434,6 +440,8 @@ const EnhancedTableHead = ({
                     ? { position: 'sticky', right: 0, zIndex: 10, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
                     : {}),
                   minWidth: headCell.cellWidth,
+                  maxWidth: headCell.cellWidth,
+                  width: headCell.cellWidth,
                   pl: 1,
                   pr: 1,
                   pb: 0.5,
@@ -469,6 +477,7 @@ const EnhancedTableHead = ({
                     headCell.label
                   )}
                 </Box>
+
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
                   open={showFilterByTextInput[headCell.id]}
@@ -504,6 +513,7 @@ const EnhancedTableHead = ({
                     />
                   </Box>
                 </Popover>
+
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
                   open={showFilterByRangeInput[headCell.id]}
@@ -551,6 +561,7 @@ const EnhancedTableHead = ({
                     </Box>
                   </Box>
                 </Popover>
+
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
                   open={showFilterBySelectInput[headCell.id]}
@@ -630,7 +641,8 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         .reduce(
           (acc, val) => ({
             ...acc,
-            [val.id]: rows.map((row) => row[val.id]).filter((value, index, self) => self.indexOf(value) === index),
+            [val.id]:
+              val.possibleSelectionOptions || rows.map((row) => row[val.id]).filter((value, index, self) => self.indexOf(value) === index),
           }),
           {},
         ),
@@ -769,6 +781,12 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                       .sort(sortByModel(initColumnPosition, 'id'))
                       .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
                       .map((cell, index) => {
+                        const units = cell.cellWidth
+                          .trim()
+                          .split(/\d+/g)
+                          .filter((n) => n)
+                          .pop()
+                          .trim();
                         return (
                           <TableCell
                             align={cell.alignContent || 'left'}
@@ -776,7 +794,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                               ...(columnsPinnedToLeftIds.includes(cell.id)
                                 ? {
                                     position: 'sticky',
-                                    left: columnsPinnedToLeftWidth[cell.id] + 'rem' || 0,
+                                    left: columnsPinnedToLeftWidth[cell.id] + units || 0,
                                     borderRight: '1px solid rgba(224, 224, 224, 1)',
                                   }
                                 : {}),
@@ -800,7 +818,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         </Table>
       </TableContainer>
       <TablePagination
-        sx={{ overflow: 'visible' }}
+        sx={{ overflow: 'visible', marginTop: 'auto' }}
         component="div"
         onPageChange={handleChangePage}
         page={page}

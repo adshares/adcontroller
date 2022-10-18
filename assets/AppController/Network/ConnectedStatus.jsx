@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { Box, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
+import { Box, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
@@ -37,25 +37,25 @@ const headCells = [
   {
     id: 'lastSync',
     label: 'Last synchronization',
-    cellWidth: '6rem',
+    cellWidth: '10rem',
     alignContent: 'center',
   },
   {
     id: 'campaigns',
     label: 'Campaigns',
-    cellWidth: '6rem',
+    cellWidth: '8rem',
     alignContent: 'center',
   },
   {
     id: 'sites',
     label: 'Sites',
-    cellWidth: '6rem',
+    cellWidth: '8rem',
     alignContent: 'center',
   },
   {
     id: 'countOfError',
     label: 'Count of connection error',
-    cellWidth: '6rem',
+    cellWidth: '8rem',
     alignContent: 'center',
     // pinToRight: true,
   },
@@ -66,7 +66,7 @@ export default function ConnectedStatus() {
   const [currentPage, setCurrentPage] = useState(0);
   const [limit, setLimit] = useState(5);
   const [cursor, setCursor] = useState(null);
-  const { data: response, isFetching, refetch } = useGetConnectedHostsQuery({ limit, cursor });
+  const { data: response, isFetching, refetch } = useGetConnectedHostsQuery({ limit, cursor }, { refetchOnMountOrArgChange: true });
 
   const rows = useMemo(() => {
     const hosts = response?.data || [];
