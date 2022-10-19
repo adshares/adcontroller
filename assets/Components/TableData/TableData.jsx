@@ -654,7 +654,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
       order,
       orderBy,
       filterBy,
-      page,
+      page: page + 1,
       rowsPerPage,
     });
   }, [order, orderBy, page, filterBy, rowsPerPage]);
@@ -728,6 +728,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
       }
       return filterQueries;
     });
+    setPage(0);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -826,6 +827,8 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         rowsPerPageOptions={[5, 10, 15, 20]}
+        showFirstButton={paginationParams.showFirstButton || undefined}
+        showLastButton={paginationParams.showLastButton || undefined}
       />
     </Box>
   );

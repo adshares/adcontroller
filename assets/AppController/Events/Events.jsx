@@ -26,6 +26,7 @@ const headCells = [
     label: 'Date of occurrence',
     cellWidth: '10rem',
     alignContent: 'center',
+    filterableBy: ['range'],
   },
   {
     id: 'properties',
@@ -36,11 +37,13 @@ const headCells = [
 ];
 
 export default function Events() {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [limit, setLimit] = useState(5);
-  const [cursor, setCursor] = useState(null);
-  const [typeQueryParams, setTypeQueryParams] = useState([]);
-  const { data: response, isFetching } = useGetEventsQuery({ limit, cursor, typeQueryParams }, { refetchOnMountOrArgChange: true });
+  const [queryConfig, setQueryConfig] = useState({
+    limit: 5,
+    cursor: null,
+    page: 1,
+    types: null,
+  });
+  const { data: response, isFetching } = useGetEventsQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   const rows = useMemo(() => {
     const events = response?.data || [];
@@ -57,19 +60,13 @@ export default function Events() {
   }, [response]);
 
   const handleTableChanges = (event) => {
-    if (event.page > currentPage) {
-      setCursor(response.nextCursor);
-      setCurrentPage(event.page);
-    }
-    if (event.page < currentPage) {
-      setCursor(response.prevCursor);
-      setCurrentPage(event.page);
-    }
-    if (limit !== event.rowsPerPage) {
-      setCursor(null);
-    }
-    setTypeQueryParams(event.filterBy.select?.type || []);
-    setLimit(event.rowsPerPage);
+    setQueryConfig((prevState) => ({
+      ...prevState,
+      cursor: response?.cursor || null,
+      page: event.page,
+      limit: event.rowsPerPage,
+      types: event.filterBy.select?.type || null,
+    }));
   };
 
   return (
@@ -88,7 +85,7 @@ export default function Events() {
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
           defaultSortBy="type"
-          paginationParams={{ limit, count: response?.total || 0 }}
+          paginationParams={{ limit: queryConfig.limit, count: response?.total || 0, showFirstButton: true, showLastButton: true }}
         />
       </CardContent>
     </Card>

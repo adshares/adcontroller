@@ -62,11 +62,13 @@ const headCells = [
 ];
 
 export default function ConnectedStatus() {
+  const [queryConfig, setQueryConfig] = useState({
+    page: 1,
+    cursor: null,
+    limit: 5,
+  });
   const [resetHostConnectionError] = useResetHostConnectionErrorMutation();
-  const [currentPage, setCurrentPage] = useState(0);
-  const [limit, setLimit] = useState(5);
-  const [cursor, setCursor] = useState(null);
-  const { data: response, isFetching, refetch } = useGetConnectedHostsQuery({ limit, cursor }, { refetchOnMountOrArgChange: true });
+  const { data: response, isFetching, refetch } = useGetConnectedHostsQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   const rows = useMemo(() => {
     const hosts = response?.data || [];
@@ -122,25 +124,19 @@ export default function ConnectedStatus() {
   };
 
   const handleTableChanges = (event) => {
-    if (event.page > currentPage) {
-      setCursor(response.nextCursor);
-      setCurrentPage(event.page);
-    }
-    if (event.page < currentPage) {
-      setCursor(response.prevCursor);
-      setCurrentPage(event.page);
-    }
-    if (limit !== event.rowsPerPage) {
-      setCursor(null);
-    }
-    setLimit(event.rowsPerPage);
+    setQueryConfig((prevState) => ({
+      ...prevState,
+      cursor: response?.cursor || null,
+      page: event.page,
+      limit: event.rowsPerPage,
+    }));
   };
 
   return (
     <Card
       className={`${commonStyles.card}`}
       sx={{
-        maxHeight: 'calc(100vh - 8rem)',
+        height: 'calc(100vh - 8rem)',
         maxWidth: 'calc(100vw - 21rem)',
       }}
     >
@@ -152,7 +148,7 @@ export default function ConnectedStatus() {
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
           defaultSortBy="name" //(must be same of cell id)
-          paginationParams={{ limit, count: response?.total || 0 }}
+          paginationParams={{ limit: queryConfig.limit, count: response?.total || 0, showFirstButton: true, showLastButton: true }}
         />
       </CardContent>
     </Card>

@@ -1,6 +1,18 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithGlobalErrorHandler } from '../apiBaseQuery';
 
+const parseParamsEntries = (entries) => {
+  const paramsEntries = [];
+  entries.forEach((entry) => {
+    if (Array.isArray(entry[1])) {
+      entry[1].map((paramValue) => [`${entry[0]}[]`, paramValue]).forEach((entry) => paramsEntries.push(entry));
+      return;
+    }
+    paramsEntries.push(entry);
+  });
+  return paramsEntries;
+};
+
 export const monitoringApi = createApi({
   reducerPath: 'monitoringApi',
   baseQuery: baseQueryWithGlobalErrorHandler,
@@ -12,14 +24,15 @@ export const monitoringApi = createApi({
       }),
     }),
     getConnectedHosts: builder.query({
-      query: ({ limit, cursor }) => ({
-        url: `/api/monitoring/hosts`,
-        params: {
-          limit,
-          ...(cursor ? { cursor } : {}),
-        },
-        method: 'GET',
-      }),
+      query: (queryConfig) => {
+        const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
+        const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
+        return {
+          url: `/api/monitoring/hosts`,
+          params: urlQueryParams,
+          method: 'GET',
+        };
+      },
     }),
     resetHostConnectionError: builder.mutation({
       query: ({ id }) => ({
@@ -28,17 +41,12 @@ export const monitoringApi = createApi({
       }),
     }),
     getEvents: builder.query({
-      query: ({ limit, cursor, typeQueryParams }) => {
-        const limitParamPhrase = `limit=${limit}`;
-        const cursorParamPhrase = !!cursor ? `&cursor=${cursor}` : '';
-        const typesQueryParamsPhrase = typeQueryParams.length
-          ? typeQueryParams
-              .map((param) => `&types[]=${param}`)
-              .join(',')
-              .replaceAll(',', '')
-          : '';
+      query: (queryConfig) => {
+        const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
+        const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
         return {
-          url: '/api/monitoring/events?' + limitParamPhrase + cursorParamPhrase + typesQueryParamsPhrase,
+          url: '/api/monitoring/events',
+          params: urlQueryParams,
           method: 'GET',
         };
       },
