@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 class UploadFileLimit
 {
     private const NGINX_CONFIGURATION = '/etc/nginx/sites-available/adshares-adserver';
-    private const PHP_CONFIGURATION = '/etc/php/8.1/fpm/php.ini';
+    private const PHP_CONFIGURATION_TEMPLATE = '/etc/php/%s/fpm/php.ini';
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -37,7 +37,7 @@ class UploadFileLimit
 
     private function getPhpLimit(): ?int
     {
-        if (null === ($contents = $this->getFileContents(self::PHP_CONFIGURATION))) {
+        if (null === ($contents = $this->getFileContents($this->getPhpConfigurationFileName()))) {
             return null;
         }
         $postMaxSize = $this->getLimitFromPhpIni($contents, 'post_max_size');
@@ -46,6 +46,13 @@ class UploadFileLimit
             return null;
         }
         return min($postMaxSize, $uploadMaxFilesize);
+    }
+
+    private function getPhpConfigurationFileName(): string
+    {
+        $versionParts = explode('.', phpversion());
+        $version = $versionParts[0] . '.' . $versionParts[1];
+        return sprintf(self::PHP_CONFIGURATION_TEMPLATE, $version);
     }
 
     private function getNginxLimit(): ?int
