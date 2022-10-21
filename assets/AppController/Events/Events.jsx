@@ -8,7 +8,7 @@ const headCells = [
   {
     id: 'type',
     label: 'Type',
-    cellWidth: '10rem',
+    cellWidth: '15rem',
     alignContent: 'center',
     filterableBy: ['select'],
     possibleSelectionOptions: [
@@ -24,14 +24,14 @@ const headCells = [
   {
     id: 'createdAt',
     label: 'Date of occurrence',
-    cellWidth: '10rem',
+    cellWidth: '15rem',
     alignContent: 'center',
-    filterableBy: ['range'],
+    filterableBy: ['date'],
   },
   {
     id: 'properties',
     label: 'Properties',
-    cellWidth: '10rem',
+    cellWidth: '15rem',
     alignContent: 'left',
   },
 ];
@@ -42,6 +42,8 @@ export default function Events() {
     cursor: null,
     page: 1,
     types: null,
+    from: null,
+    to: null,
   });
   const { data: response, isFetching } = useGetEventsQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
@@ -60,12 +62,25 @@ export default function Events() {
   }, [response]);
 
   const handleTableChanges = (event) => {
+    const fromDate = event.filterBy.dateRange?.createdAt?.from || null;
+    const toDate = event.filterBy.dateRange?.createdAt?.to || null;
+
+    const formatDate = (date) => {
+      if (!date) {
+        return null;
+      }
+      const TZOffset = new Date().getTimezoneOffset() * 60000;
+      return new Date(date.getTime() - TZOffset).toISOString().split('.')[0] + 'Z';
+    };
+
     setQueryConfig((prevState) => ({
       ...prevState,
       cursor: response?.cursor || null,
       page: event.page,
       limit: event.rowsPerPage,
       types: event.filterBy.select?.type || null,
+      from: formatDate(fromDate),
+      to: formatDate(toDate),
     }));
   };
 

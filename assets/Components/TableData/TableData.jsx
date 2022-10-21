@@ -26,14 +26,28 @@ import {
   InputLabel,
   Select,
   Checkbox,
+  Button,
 } from '@mui/material';
-import commonStyles from '../../styles/commonStyles.scss';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import commonStyles from '../../styles/commonStyles.scss';
+import { TimePicker } from '@mui/x-date-pickers';
+import { useSkipFirstRenderEffect } from '../../hooks';
+import { instance } from 'eslint-plugin-react/lib/util/lifecycleMethods';
+import { instanceOf } from 'prop-types';
+import { current } from '@reduxjs/toolkit';
+
+const dateRegExp = new RegExp(/^([0-2]\d|(3)[0-1])(-)(((0)\d)|((1)[0-2]))(-)\d{4}$/, 'i');
 
 const descendingOrderComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -278,7 +292,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
       >
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('text') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByText', handleClose)}>
-            <FilterListIcon />
+            <FilterListIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by text
             </Typography>
@@ -287,7 +301,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('range') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByRange', handleClose)}>
-            <NumbersIcon />
+            <NumbersIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by range
             </Typography>
@@ -296,24 +310,34 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('select') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterBySelect', handleClose)}>
-            <LibraryAddCheckIcon />
+            <LibraryAddCheckIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by select
             </Typography>
           </MenuItem>
         )}
+
+        {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('date') && (
+          <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByDate', handleClose)}>
+            <CalendarMonthIcon color="primary" />
+            <Typography sx={{ pl: 1 }} variant="body1">
+              Filter by date
+            </Typography>
+          </MenuItem>
+        )}
+
         {cellOptions.filterableBy?.length && <Divider />}
 
         {columnsPinnedToLeft.includes(cellOptions.id) ? (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'unpin', handleClose)}>
-            <PushPinOutlinedIcon />
+            <PushPinOutlinedIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Unpin
             </Typography>
           </MenuItem>
         ) : (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'pinToLeft', handleClose)}>
-            <PushPinIcon />
+            <PushPinIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Pin to left
             </Typography>
@@ -334,15 +358,41 @@ const EnhancedTableHead = ({
   pinnedToLeft,
   onRequestFilterByText,
   onRequestFilterByRange,
+  onRequestFilterByDateRange,
   onRequestFilterBySelect,
   onPinToLeftColumnRequest,
   onUnpinColumnRequest,
 }) => {
   const { columnsPinnedToLeftIds, columnsPinnedToLeftWidth } = pinnedToLeft;
-  const [showFilterByTextInput, setShowFilterByTextInput] = useState(headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}));
-  const [showFilterByRangeInput, setShowFilterByRangeInput] = useState(headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}));
+  const [showFilterByTextInput, setShowFilterByTextInput] = useState(
+    headCells.reduce(
+      (acc, head) => ({
+        ...acc,
+        [head.id]: false,
+      }),
+      {},
+    ),
+  );
+  const [showFilterByRangeInput, setShowFilterByRangeInput] = useState(
+    headCells.reduce(
+      (acc, head) => ({
+        ...acc,
+        [head.id]: false,
+      }),
+      {},
+    ),
+  );
   const [showFilterBySelectInput, setShowFilterBySelectInput] = useState(
     headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}),
+  );
+  const [showFilterByDateInput, setShowFilterByDateInput] = useState(
+    headCells.reduce(
+      (acc, head) => ({
+        ...acc,
+        [head.id]: false,
+      }),
+      {},
+    ),
   );
   const [showColumnSubmenu, setShowColumnSubmenu] = useState(null);
   const headCellsRefs = useRef([]);
@@ -363,6 +413,10 @@ const EnhancedTableHead = ({
     onRequestFilterByRange(event, property);
   };
 
+  const createFilterByDateRangeHandler = (property) => (event) => {
+    onRequestFilterByDateRange(event, property);
+  };
+
   const createFilterBySelectHandler = (property) => (event) => {
     onRequestFilterBySelect(event, property);
   };
@@ -379,6 +433,10 @@ const EnhancedTableHead = ({
     setShowFilterBySelectInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
   };
 
+  const toggleShowFilterByDate = (prop) => {
+    setShowFilterByDateInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
+  };
+
   const handleMenuItemClick = (column, option, closeSubmenu) => {
     switch (option) {
       case 'columnFilterByText':
@@ -393,6 +451,11 @@ const EnhancedTableHead = ({
 
       case 'columnFilterBySelect':
         toggleShowFilterBySelect(column);
+        closeSubmenu();
+        break;
+
+      case 'columnFilterByDate':
+        toggleShowFilterByDate(column);
         closeSubmenu();
         break;
 
@@ -491,7 +554,7 @@ const EnhancedTableHead = ({
                     horizontal: 'left',
                   }}
                 >
-                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                  <Box sx={{ padding: '16px', width: '18rem' }}>
                     <Typography variant="body1">Filter {headCell.label} by text</Typography>
                     <TextField
                       autoFocus
@@ -527,7 +590,7 @@ const EnhancedTableHead = ({
                     horizontal: 'left',
                   }}
                 >
-                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                  <Box sx={{ padding: '16px', width: '18rem' }}>
                     <Typography variant="body1">Filter {headCell.label} by range</Typography>
                     <Box className={`${commonStyles.flex}`}>
                       <TextField
@@ -564,6 +627,25 @@ const EnhancedTableHead = ({
 
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
+                  open={showFilterByDateInput[headCell.id]}
+                  onClose={() => toggleShowFilterByDate(headCell.id)}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                >
+                  <Box sx={{ padding: '16px', width: '18rem' }}>
+                    <Typography variant="body1">Filter {headCell.label} by range</Typography>
+                    <FilterByDateRange createFilterByDateRangeHandler={createFilterByDateRangeHandler(headCell.id)} />
+                  </Box>
+                </Popover>
+
+                <Popover
+                  anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
                   open={showFilterBySelectInput[headCell.id]}
                   onClose={() => toggleShowFilterBySelect(headCell.id)}
                   anchorOrigin={{
@@ -575,7 +657,7 @@ const EnhancedTableHead = ({
                     horizontal: 'left',
                   }}
                 >
-                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                  <Box sx={{ padding: '16px', width: '18rem' }}>
                     <FormControl size="small" fullWidth>
                       <InputLabel id={headCell.id}>{`Filter ${headCell.label} by select`}</InputLabel>
                       <Select
@@ -691,7 +773,10 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         ...prevState,
         range: {
           ...(prevState.range || {}),
-          [property]: { ...(prevState.range ? prevState.range[property] : {}), [event.target.name]: event.target.value },
+          [property]: {
+            ...(prevState.range ? prevState.range[property] : {}),
+            [event.target.name]: event.target.value,
+          },
         },
       };
 
@@ -705,6 +790,23 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 
       if (!Object.keys(filterQueries.range).length) {
         delete filterQueries.range;
+      }
+      return filterQueries;
+    });
+  };
+
+  const handleRequestFilterByDateRange = (event, property) => {
+    setFilterBy((prevState) => {
+      const filterQueries = {
+        ...prevState,
+        dateRange: {
+          ...(prevState.dateRange || {}),
+          [property]: event,
+        },
+      };
+
+      if (event.from === null && event.to === null) {
+        delete filterQueries.dateRange;
       }
       return filterQueries;
     });
@@ -769,6 +871,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
             onRequestSort={handleRequestSort}
             onRequestFilterByText={handleRequestFilterByText}
             onRequestFilterByRange={handleRequestFilterByRange}
+            onRequestFilterByDateRange={handleRequestFilterByDateRange}
             onRequestFilterBySelect={handleRequestFilterBySelect}
             onPinToLeftColumnRequest={handlePinToLeft}
             onUnpinColumnRequest={handleUnpinColumn}
@@ -833,3 +936,122 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
     </Box>
   );
 }
+
+const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [controlString, setControlString] = useState({ fromDate: null, toDate: null });
+  const [error, setError] = useState({
+    fromDate: { reason: null, value: '', showError: false },
+    toDate: { reason: null, value: '', showError: false },
+  });
+
+  const isFromDateValid = useMemo(() => {
+    return !fromDate || (!!fromDate && fromDate.$d instanceof Date && !isNaN(fromDate.$d));
+  }, [fromDate]);
+
+  const isToDateValid = useMemo(() => {
+    return !toDate || (!!toDate && toDate.$d instanceof Date && !isNaN(toDate.$d));
+  }, [toDate]);
+
+  const isWasChanged = useMemo(() => {
+    return (
+      controlString.fromDate !== (fromDate && isFromDateValid && fromDate.$d.toISOString()) ||
+      controlString.toDate !== (toDate && isToDateValid && toDate.$d.toISOString())
+    );
+  }, [fromDate, toDate, controlString]);
+
+  const onApplyClick = () => {
+    if (!isFromDateValid || !isToDateValid) {
+      setError((prevState) => ({
+        ...prevState,
+        fromDate: { ...prevState.fromDate, ...(isFromDateValid ? {} : { showError: true }) },
+        toDate: { ...prevState.toDate, ...(isToDateValid ? {} : { showError: true }) },
+      }));
+      return;
+    }
+    if (!isWasChanged) {
+      return;
+    }
+    setControlString({ fromDate: fromDate && fromDate.$d.toISOString(), toDate: toDate && toDate.$d.toISOString() });
+    createFilterByDateRangeHandler({
+      from: fromDate && fromDate.$d,
+      to: toDate && toDate.$d,
+    });
+  };
+
+  const handleError = (inputName) => (reason, value) =>
+    setError((prevState) => ({ ...prevState, [inputName]: { ...prevState[inputName], reason, value } }));
+
+  return (
+    <>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DateTimePicker
+          ampm={false}
+          label="From"
+          inputFormat={'DD-MM-YYYY HH:mm'}
+          value={fromDate}
+          onChange={(newValue) => {
+            setFromDate(newValue);
+            setError((prevState) => ({
+              ...prevState,
+              fromDate: { ...prevState.fromDate, ...(isFromDateValid ? {} : { showError: false }) },
+            }));
+          }}
+          onError={handleError('fromDate')}
+          renderInput={(params) => {
+            params.error = error.fromDate.showError;
+            return (
+              <TextField
+                helperText={error.fromDate.showError ? error.fromDate.reason : undefined}
+                onBlur={(e) => {
+                  if (dateRegExp.test(e.target.value.trim())) {
+                    setFromDate(dayjs(e.target.value + '00:00', 'DD/MM/YYYY HH/mm'));
+                  }
+                }}
+                size="small"
+                margin="dense"
+                {...params}
+              />
+            );
+          }}
+        />
+        <DateTimePicker
+          ampm={false}
+          label="To"
+          value={toDate}
+          inputFormat={'DD-MM-YYYY HH:mm'}
+          onChange={(newValue) => {
+            setToDate(newValue);
+            setError((prevState) => ({
+              ...prevState,
+              toDate: { ...prevState.toDate, ...(isToDateValid ? {} : { showError: false }) },
+            }));
+          }}
+          onError={handleError('toDate')}
+          renderInput={(params) => {
+            params.error = error.toDate.showError;
+            return (
+              <TextField
+                helperText={error.toDate.showError ? error.toDate.reason : undefined}
+                onBlur={(e) => {
+                  if (dateRegExp.test(e.target.value.trim())) {
+                    setToDate(dayjs(e.target.value + '00:00', 'DD/MM/YYYY HH/mm'));
+                  }
+                }}
+                size="small"
+                margin="dense"
+                {...params}
+              />
+            );
+          }}
+        />
+      </LocalizationProvider>
+      <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+        <Button disabled={false /*!isFromDateValid || !isToDateValid || !isWasChanged */} onClick={onApplyClick} variant="contained">
+          Apply
+        </Button>
+      </Box>
+    </>
+  );
+};

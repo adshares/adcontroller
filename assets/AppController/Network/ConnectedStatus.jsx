@@ -124,6 +124,7 @@ export default function ConnectedStatus() {
   };
 
   const handleTableChanges = (event) => {
+    console.log(event);
     setQueryConfig((prevState) => ({
       ...prevState,
       cursor: response?.cursor || null,
