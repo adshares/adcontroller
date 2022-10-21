@@ -26,6 +26,7 @@ class MonitoringController extends AbstractController
         'events',
         'hosts',
         'latest-events',
+        'users',
         'wallet',
     ];
 
@@ -57,7 +58,7 @@ class MonitoringController extends AbstractController
     public function fetch(
         string $key,
         AdServerConfigurationClient $adServerConfigurationClient,
-        Request $request
+        Request $request,
     ): JsonResponse {
         if (!in_array($key, self::ALLOWED_KEYS, true)) {
             throw new UnprocessableEntityHttpException('Invalid resource');
@@ -77,10 +78,27 @@ class MonitoringController extends AbstractController
     #[Route('/hosts/{hostId}/reset', name: 'reset_host_connection_error', methods: ['PATCH'])]
     public function resetHostConnectionError(
         int $hostId,
-        AdServerConfigurationClient $adServerConfigurationClient
+        AdServerConfigurationClient $adServerConfigurationClient,
     ): JsonResponse {
         try {
             $data = $adServerConfigurationClient->resetHostConnectionError($hostId);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+        }
+
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/users/{userId}/{action}', name: 'patch_user', methods: ['PATCH'])]
+    public function patchUser(
+        int $userId,
+        string $action,
+        AdServerConfigurationClient $adServerConfigurationClient,
+    ): JsonResponse {
+        try {
+            $data = $adServerConfigurationClient->patchUser($userId, $action);
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
