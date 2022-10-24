@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Reload AdPanel asynchronously
 - Ad server's event log
+- Check upload file limit
 - User list
 ### Changed
 - AdServer configuration client uses API in camel case

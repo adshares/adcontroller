@@ -149,15 +149,16 @@ const CampaignSettingsCard = () => {
 };
 
 const BannerSettingsCard = () => {
+  const megabyteInBytes = 1024 * 1024;
   const appData = useSelector(configSelectors.getAppData);
   const [setBannerSettingsConfig, { isLoading }] = useSetBannerSettingsConfigMutation();
   const dispatch = useDispatch();
   const form = useForm({
     initialFields: {
-      UploadLimitImage: appData.AdServer.UploadLimitImage / 1024 || 0,
-      UploadLimitModel: appData.AdServer.UploadLimitModel / 1024 || 0,
-      UploadLimitVideo: appData.AdServer.UploadLimitVideo / 1024 || 0,
-      UploadLimitZip: appData.AdServer.UploadLimitZip / 1024 || 0,
+      UploadLimitImage: appData.AdServer.UploadLimitImage / megabyteInBytes || 0,
+      UploadLimitModel: appData.AdServer.UploadLimitModel / megabyteInBytes || 0,
+      UploadLimitVideo: appData.AdServer.UploadLimitVideo / megabyteInBytes || 0,
+      UploadLimitZip: appData.AdServer.UploadLimitZip / megabyteInBytes || 0,
     },
     validation: {
       UploadLimitImage: ['number'],
@@ -172,7 +173,7 @@ const BannerSettingsCard = () => {
     const body = {};
     Object.keys(form.changedFields).forEach((field) => {
       if (form.changedFields[field]) {
-        body[field] = returnNumber(form.fields[field]) * 1024;
+        body[field] = returnNumber(form.fields[field]) * megabyteInBytes;
       }
     });
 

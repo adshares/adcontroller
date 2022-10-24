@@ -9,6 +9,7 @@ use App\Entity\Enum\AdPayConfig;
 use App\Entity\Enum\AdSelectConfig;
 use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\AdUserConfig;
+use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\GeneralConfig;
 use App\Repository\ConfigurationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -112,6 +113,7 @@ class DataCollector
         private readonly ConfigurationRepository $repository,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
+        private readonly UploadFileLimit $uploadFileLimit,
     ) {
         $this->logEntryRepository = new LogEntryRepository(
             $entityManager,
@@ -121,12 +123,15 @@ class DataCollector
 
     public function synchronize(): array
     {
-        return array_filter([AdServerConfig::MODULE => $this->synchronizeAdServer()]);
+        return array_filter([
+            AdServerConfig::MODULE => $this->synchronizeAdServer(),
+            AppConfig::MODULE => $this->synchronizeApp(),
+        ]);
     }
 
     private function synchronizeAdServer(): array
     {
-        $synchronizeStart = $this->getLatestLogId();
+        $logId = $this->getLatestLogId();
 
         $adServerConfig = $this->adServerConfigurationClient->fetch();
         $config = self::map(self::KEY_MAP, $adServerConfig);
@@ -145,7 +150,7 @@ class DataCollector
             throw $exception;
         }
 
-        return $this->fetchChanges($synchronizeStart);
+        return $this->fetchChanges($logId);
     }
 
     private static function map(array $keyMap, array $adServerConfig): array
@@ -248,5 +253,12 @@ class DataCollector
         $this->store($placeholders);
 
         return $placeholders;
+    }
+
+    private function synchronizeApp(): array
+    {
+        $logId = $this->getLatestLogId();
+        $this->repository->insertOrUpdateOne(AppConfig::UploadFileLimit, $this->uploadFileLimit->getLimit());
+        return $this->fetchChanges($logId);
     }
 }
