@@ -37,22 +37,12 @@ class UploadFileLimit
 
     private function getPhpLimit(): ?int
     {
-        if (null === ($contents = $this->getFileContents($this->getPhpConfigurationFileName()))) {
-            return null;
-        }
-        $postMaxSize = $this->getLimitFromPhpIni($contents, 'post_max_size');
-        $uploadMaxFilesize = $this->getLimitFromPhpIni($contents, 'upload_max_filesize');
+        $postMaxSize = $this->getLimitFromPhpIni('post_max_size');
+        $uploadMaxFilesize = $this->getLimitFromPhpIni('upload_max_filesize');
         if (null === $postMaxSize || null === $uploadMaxFilesize) {
             return null;
         }
         return min($postMaxSize, $uploadMaxFilesize);
-    }
-
-    private function getPhpConfigurationFileName(): string
-    {
-        $versionParts = explode('.', phpversion());
-        $version = $versionParts[0] . '.' . $versionParts[1];
-        return sprintf(self::PHP_CONFIGURATION_TEMPLATE, $version);
     }
 
     private function getNginxLimit(): ?int
@@ -84,36 +74,38 @@ class UploadFileLimit
         return $contents;
     }
 
-    private static function convertToBytes(string $size): ?int
+    private static function convertToBytes(string $value): ?int
     {
-        preg_match_all('/^(\d+)(\w*)$/', $size, $matches);
-        $value = (int)$matches[1][0];
-        if (0 === $value) {
-            return null;
+        $value = trim($value);
+        if ('0' === $value) {
+            return PHP_INT_MAX;
         }
-        $unit = strtolower($matches[2][0]);
+
+        $number = substr($value, 0, -1);
+        $unit = strtolower(substr($value, - 1));
         switch ($unit) {
             case 'k':
-                $value *= 1024;
+                $number *= 1024;
                 break;
             case 'm':
-                $value *= (1024 * 1024);
+                $number *= (1024 * 1024);
                 break;
             case 'g':
-                $value *= (1024 * 1024 * 1024);
+                $number *= (1024 * 1024 * 1024);
                 break;
             default:
                 break;
         }
-        return $value;
+
+        return $number;
     }
 
-    private function getLimitFromPhpIni(string $contents, string $key): ?int
+    private function getLimitFromPhpIni(string $key): ?int
     {
-        if (1 === preg_match('/' . $key . '\s*=\s*(\S+)/', $contents, $matches)) {
-            return self::convertToBytes($matches[1]);
+        if (false === ($value = ini_get($key))) {
+            $this->logger->error(sprintf('PHP %s cannot be read', $key));
+            return null;
         }
-        $this->logger->error(sprintf('PHP %s cannot be read', $key));
-        return null;
+        return self::convertToBytes($value);
     }
 }
