@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Chip,
   Collapse,
@@ -32,7 +32,6 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
@@ -41,13 +40,9 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
-import { TimePicker } from '@mui/x-date-pickers';
 import { useSkipFirstRenderEffect } from '../../hooks';
-import { instance } from 'eslint-plugin-react/lib/util/lifecycleMethods';
-import { instanceOf } from 'prop-types';
-import { current } from '@reduxjs/toolkit';
-
-const dateRegExp = new RegExp(/^([0-2]\d|(3)[0-1])(-)(((0)\d)|((1)[0-2]))(-)\d{4}$/, 'i');
+import { validate } from '@babel/core/lib/config/validation/options';
+import { returnNumber } from '../../utils/helpers';
 
 const descendingOrderComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -938,50 +933,80 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 }
 
 const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
-  const [controlString, setControlString] = useState({ fromDate: null, toDate: null });
-  const [error, setError] = useState({
-    fromDate: { reason: null, value: '', showError: false },
-    toDate: { reason: null, value: '', showError: false },
+  const dateRegExp = new RegExp(/^([0-2]\d|(3)[0-1])(-)(((0)\d)|((1)[0-2]))(-)\d{4}$/, 'i');
+  const [dateState, setDateState] = useState({ fromDate: { value: null, string: null }, toDate: { value: null, string: null } });
+  const [prevPickedDate, setPrevPickedDate] = useState({ fromDate: null, toDate: null });
+  const [errorObj, setErrorObj] = useState({
+    fromDate: { reason: null, isValid: false },
+    toDate: { reason: null, isValid: false },
   });
 
-  const isFromDateValid = useMemo(() => {
-    return !fromDate || (!!fromDate && fromDate.$d instanceof Date && !isNaN(fromDate.$d));
-  }, [fromDate]);
+  useEffect(() => {
+    validateDate();
+  }, [dateState]);
 
-  const isToDateValid = useMemo(() => {
-    return !toDate || (!!toDate && toDate.$d instanceof Date && !isNaN(toDate.$d));
-  }, [toDate]);
-
-  const isWasChanged = useMemo(() => {
-    return (
-      controlString.fromDate !== (fromDate && isFromDateValid && fromDate.$d.toISOString()) ||
-      controlString.toDate !== (toDate && isToDateValid && toDate.$d.toISOString())
-    );
-  }, [fromDate, toDate, controlString]);
-
-  const onApplyClick = () => {
-    if (!isFromDateValid || !isToDateValid) {
-      setError((prevState) => ({
-        ...prevState,
-        fromDate: { ...prevState.fromDate, ...(isFromDateValid ? {} : { showError: true }) },
-        toDate: { ...prevState.toDate, ...(isToDateValid ? {} : { showError: true }) },
-      }));
-      return;
-    }
-    if (!isWasChanged) {
-      return;
-    }
-    setControlString({ fromDate: fromDate && fromDate.$d.toISOString(), toDate: toDate && toDate.$d.toISOString() });
-    createFilterByDateRangeHandler({
-      from: fromDate && fromDate.$d,
-      to: toDate && toDate.$d,
-    });
+  const onPickerChange = (name) => (newValue, string) => {
+    setDateState((prevState) => ({ ...prevState, [name]: { value: newValue, string: string || null } }));
   };
 
-  const handleError = (inputName) => (reason, value) =>
-    setError((prevState) => ({ ...prevState, [inputName]: { ...prevState[inputName], reason, value } }));
+  const validateDate = () => {
+    const fromDateValidationResult = {
+      isValid: true,
+      reason: '',
+    };
+    const toDateValidationResult = {
+      isValid: true,
+      reason: '',
+    };
+
+    const fromDate =
+      dateState.fromDate.string && dateRegExp.test(dateState.fromDate.string.trim())
+        ? dayjs(dateState.fromDate.string + '00:00', 'DD/MM/YYYY HH/mm')
+        : dayjs(dateState.fromDate.string, 'DD/MM/YYYY HH/mm');
+
+    const toDate =
+      dateState.toDate.string && dateRegExp.test(dateState.toDate.string.trim())
+        ? dayjs(dateState.toDate.string + '00:00', 'DD/MM/YYYY HH/mm')
+        : dayjs(dateState.toDate.string, 'DD/MM/YYYY HH/mm');
+
+    if (dateState.fromDate.value !== null && !fromDate.isValid()) {
+      fromDateValidationResult.isValid = false;
+      fromDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
+    }
+    if (dateState.toDate.value !== null && !toDate.isValid()) {
+      toDateValidationResult.isValid = false;
+      toDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
+    }
+    if (!isNaN(toDate.diff(fromDate)) && toDate.diff(fromDate) < 0) {
+      toDateValidationResult.isValid = false;
+      toDateValidationResult.reason = 'Invalid time range: "From" must be earlier than "To"';
+    }
+
+    setErrorObj((prevState) => ({
+      ...prevState,
+      fromDate: fromDateValidationResult,
+      toDate: toDateValidationResult,
+    }));
+  };
+
+  const onInputBlur = (name) => (e) => {
+    if (dateRegExp.test(e.target.value.trim())) {
+      onPickerChange(name)(dayjs(e.target.value + '00:00', 'DD/MM/YYYY HH/mm'), e.target.value + '00:00');
+    }
+  };
+
+  console.log(prevPickedDate);
+
+  const onApplyClick = () => {
+    setPrevPickedDate({
+      fromDate: dateState.fromDate.value && dayjs(dateState.fromDate.value).format('DD-MM-YYYY HH:mm'),
+      toDate: dateState.toDate.value && dayjs(dateState.toDate.value).format('DD-MM-YYYY HH:mm'),
+    });
+    createFilterByDateRangeHandler({
+      from: dateState.fromDate.value && dateState.fromDate.value.$d,
+      to: dateState.toDate.value && dateState.toDate.value.$d,
+    });
+  };
 
   return (
     <>
@@ -990,25 +1015,14 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
           ampm={false}
           label="From"
           inputFormat={'DD-MM-YYYY HH:mm'}
-          value={fromDate}
-          onChange={(newValue) => {
-            setFromDate(newValue);
-            setError((prevState) => ({
-              ...prevState,
-              fromDate: { ...prevState.fromDate, ...(isFromDateValid ? {} : { showError: false }) },
-            }));
-          }}
-          onError={handleError('fromDate')}
+          value={dateState.fromDate.value}
+          onChange={onPickerChange('fromDate')}
           renderInput={(params) => {
-            params.error = error.fromDate.showError;
+            params.error = !errorObj.fromDate.isValid;
             return (
               <TextField
-                helperText={error.fromDate.showError ? error.fromDate.reason : undefined}
-                onBlur={(e) => {
-                  if (dateRegExp.test(e.target.value.trim())) {
-                    setFromDate(dayjs(e.target.value + '00:00', 'DD/MM/YYYY HH/mm'));
-                  }
-                }}
+                helperText={!errorObj.fromDate.isValid ? errorObj.fromDate.reason : undefined}
+                onBlur={onInputBlur('fromDate')}
                 size="small"
                 margin="dense"
                 {...params}
@@ -1017,28 +1031,18 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
           }}
         />
         <DateTimePicker
+          minDate={dateState.fromDate.value}
           ampm={false}
           label="To"
-          value={toDate}
+          value={dateState.toDate.value}
           inputFormat={'DD-MM-YYYY HH:mm'}
-          onChange={(newValue) => {
-            setToDate(newValue);
-            setError((prevState) => ({
-              ...prevState,
-              toDate: { ...prevState.toDate, ...(isToDateValid ? {} : { showError: false }) },
-            }));
-          }}
-          onError={handleError('toDate')}
+          onChange={onPickerChange('toDate')}
           renderInput={(params) => {
-            params.error = error.toDate.showError;
+            params.error = !errorObj.toDate.isValid;
             return (
               <TextField
-                helperText={error.toDate.showError ? error.toDate.reason : undefined}
-                onBlur={(e) => {
-                  if (dateRegExp.test(e.target.value.trim())) {
-                    setToDate(dayjs(e.target.value + '00:00', 'DD/MM/YYYY HH/mm'));
-                  }
-                }}
+                helperText={!errorObj.toDate.isValid ? errorObj.toDate.reason : undefined}
+                onBlur={onInputBlur('toDate')}
                 size="small"
                 margin="dense"
                 {...params}
@@ -1048,7 +1052,15 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
         />
       </LocalizationProvider>
       <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-        <Button disabled={false /*!isFromDateValid || !isToDateValid || !isWasChanged */} onClick={onApplyClick} variant="contained">
+        <Button
+          disabled={
+            !errorObj.fromDate.isValid ||
+            !errorObj.toDate.isValid ||
+            (prevPickedDate.fromDate === dateState.fromDate.string && prevPickedDate.toDate === dateState.toDate.string)
+          }
+          onClick={onApplyClick}
+          variant="contained"
+        >
           Apply
         </Button>
       </Box>
