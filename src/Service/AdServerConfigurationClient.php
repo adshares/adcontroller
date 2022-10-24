@@ -198,6 +198,12 @@ class AdServerConfigurationClient
         return $this->patchData($uri, []);
     }
 
+    public function patchUser(int $userId, string $action): array
+    {
+        $uri = sprintf('%s/%d/%s', $this->buildMonitoringUri('users'), $userId, $action);
+        return $this->patchData($uri, []);
+    }
+
     private function buildConfigUri(): string
     {
         return sprintf('%s/api/config', $this->adServerBaseUri);
