@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 class UploadFileLimit
 {
     private const NGINX_CONFIGURATION = '/etc/nginx/sites-available/adshares-adserver';
-    private const PHP_CONFIGURATION_TEMPLATE = '/etc/php/%s/fpm/php.ini';
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
