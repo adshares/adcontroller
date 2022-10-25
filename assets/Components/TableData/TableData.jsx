@@ -313,7 +313,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByDate', handleClose)}>
             <CalendarMonthIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
-              Filter by date
+              Filter by date range
             </Typography>
           </MenuItem>
         )}
@@ -944,7 +944,10 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
   }, [dateState]);
 
   const onPickerChange = (name) => (newValue, string) => {
-    setDateState((prevState) => ({ ...prevState, [name]: { value: newValue, string: string || null } }));
+    setDateState((prevState) => ({
+      ...prevState,
+      [name]: { value: newValue, string: string || newValue.format('DD-MM-YYYY HH:mm') || null },
+    }));
   };
 
   const validateDate = () => {
