@@ -946,7 +946,7 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
   const onPickerChange = (name) => (newValue, string) => {
     setDateState((prevState) => ({
       ...prevState,
-      [name]: { value: newValue, string: string || newValue.format('DD-MM-YYYY HH:mm') || null },
+      [name]: { value: newValue, string: string || (dayjs(newValue).isValid() ? dayjs(newValue).format('DD-MM-YYYY HH:mm') : null) },
     }));
   };
 
