@@ -944,7 +944,10 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
   }, [dateState]);
 
   const onPickerChange = (name) => (newValue, string) => {
-    setDateState((prevState) => ({ ...prevState, [name]: { value: newValue, string: string || null } }));
+    setDateState((prevState) => ({
+      ...prevState,
+      [name]: { value: newValue, string: string || newValue.format('DD-MM-YYYY HH:mm') || null },
+    }));
   };
 
   const validateDate = () => {
