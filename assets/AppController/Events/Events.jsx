@@ -69,8 +69,7 @@ export default function Events() {
       if (!date) {
         return null;
       }
-      const TZOffset = new Date().getTimezoneOffset() * 60000;
-      return new Date(date.getTime() - TZOffset).toISOString().split('.')[0] + 'Z';
+      return new Date(date.getTime()).toISOString().split('.')[0] + 'Z';
     };
 
     setQueryConfig((prevState) => ({
