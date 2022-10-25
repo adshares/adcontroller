@@ -91,7 +91,14 @@ const renderSkeletons = (columns, rowsPerPage) => {
   return rows;
 };
 
-const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, onRequestFilterByRange, onRequestFilterBySelect }) => {
+const FilteringInformationBox = ({
+  headCells,
+  filterBy,
+  onRequestFilterByText,
+  onRequestFilterByRange,
+  onRequestFilterByDateRange,
+  onRequestFilterBySelect,
+}) => {
   const [showFilters, setShowFilters] = useState(false);
 
   const handleDelete = (opt, property) => {
@@ -114,6 +121,13 @@ const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, o
           },
         };
         onRequestFilterByRange(byRangeEventSlice, prop);
+        break;
+
+      case 'byDateRange':
+        const byDateRangeEventSlice = {
+          [name]: null,
+        };
+        onRequestFilterByDateRange(byDateRangeEventSlice, prop);
         break;
 
       case 'bySelect':
@@ -184,6 +198,36 @@ const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, o
         .filter(Boolean)
     : [];
 
+  const chipsByDateRange = filterBy.dateRange
+    ? Object.keys(filterBy.dateRange)
+        .map((filterName) => {
+          const head = headCells.find((el) => el.id === filterName);
+          return (
+            head && (
+              <ListItem disableGutters disablePadding sx={{ display: 'inline' }} key={filterName}>
+                {filterBy.dateRange[filterName]?.from && (
+                  <Chip
+                    sx={{ margin: 0.5 }}
+                    size="small"
+                    onDelete={() => handleDelete('byDateRange', { prop: filterName, name: 'from' })}
+                    label={`${head.label} from: ${filterBy.dateRange[filterName]?.from.toLocaleString()}`}
+                  />
+                )}
+                {filterBy.dateRange[filterName]?.to && (
+                  <Chip
+                    sx={{ margin: 0.5 }}
+                    size="small"
+                    onDelete={() => handleDelete('byDateRange', { prop: filterName, name: 'to' })}
+                    label={`${head.label} to: ${filterBy.dateRange[filterName]?.to.toLocaleString()}`}
+                  />
+                )}
+              </ListItem>
+            )
+          );
+        })
+        .filter(Boolean)
+    : [];
+
   const chipsBySelect = filterBy.select
     ? Object.keys(filterBy.select)
         .map((filterName) => {
@@ -240,6 +284,14 @@ const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, o
             By range:
           </Typography>
           <List>{chipsByRange}</List>
+        </Box>
+      )}
+      {!!chipsByDateRange.length && (
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+            By date range:
+          </Typography>
+          <List>{chipsByDateRange}</List>
         </Box>
       )}
       {!!chipsBySelect.length && (
@@ -632,7 +684,10 @@ const EnhancedTableHead = ({
                 >
                   <Box sx={{ padding: '16px', width: '18rem' }}>
                     <Typography variant="body1">Filter {headCell.label} by range</Typography>
-                    <FilterByDateRange createFilterByDateRangeHandler={createFilterByDateRangeHandler(headCell.id)} />
+                    <FilterByDateRange
+                      createFilterByDateRangeHandler={createFilterByDateRangeHandler(headCell.id)}
+                      initialState={filterBy.dateRange && filterBy.dateRange[headCell.id]}
+                    />
                   </Box>
                 </Popover>
 
@@ -793,15 +848,22 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         ...prevState,
         dateRange: {
           ...(prevState.dateRange || {}),
-          [property]: event,
+          [property]: {
+            ...(prevState.dateRange ? prevState.dateRange[property] : {}),
+            ...event,
+          },
         },
       };
 
-      if (event.from === null && event.to === null) {
+      if (filterQueries.dateRange[property].from === null && filterQueries.dateRange[property].to === null) {
+        delete filterQueries.dateRange[property];
+      }
+      if (!Object.keys(filterQueries.dateRange).length) {
         delete filterQueries.dateRange;
       }
       return filterQueries;
     });
+    setPage(0);
   };
 
   const handleRequestFilterBySelect = (event, property) => {
@@ -847,6 +909,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
       <FilteringInformationBox
         onRequestFilterByText={handleRequestFilterByText}
         onRequestFilterByRange={handleRequestFilterByRange}
+        onRequestFilterByDateRange={handleRequestFilterByDateRange}
         onRequestFilterBySelect={handleRequestFilterBySelect}
         headCells={columns}
         filterBy={filterBy}
@@ -929,11 +992,22 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   );
 }
 
-const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
+const FilterByDateRange = ({ createFilterByDateRangeHandler, initialState = { from: null, to: null } }) => {
   const dateRegExp = new RegExp(/^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-[12]\d{3}$/, 'i');
   const dateTimeRegExp = new RegExp(/((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-[12]\d{3} ([01]\d|2[0-3]):[0-5]\d)$/, 'i');
-  const [dateState, setDateState] = useState({ fromDate: { value: null, string: null }, toDate: { value: null, string: null } });
-  const [prevPickedDate, setPrevPickedDate] = useState({ fromDate: null, toDate: null });
+  const [dateState, setDateState] = useState({
+    fromDate: {
+      ...(initialState.from
+        ? { value: dayjs(initialState.from), string: dayjs(initialState.from).format('DD-MM-YYYY HH:mm') }
+        : { value: null, string: null }),
+    },
+    toDate: {
+      ...(initialState.to
+        ? { value: dayjs(initialState.to), string: dayjs(initialState.to).format('DD-MM-YYYY HH:mm') }
+        : { value: null, string: null }),
+    },
+  });
+  const [prevPickedDate, setPrevPickedDate] = useState({ fromDate: dateState.fromDate.string, toDate: null });
   const [errorObj, setErrorObj] = useState({
     fromDate: { reason: null, isValid: false },
     toDate: { reason: null, isValid: false },
