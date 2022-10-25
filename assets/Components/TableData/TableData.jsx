@@ -1,4 +1,4 @@
-import React, { createRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Chip,
   Collapse,
@@ -40,9 +40,6 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
-import { useSkipFirstRenderEffect } from '../../hooks';
-import { validate } from '@babel/core/lib/config/validation/options';
-import { returnNumber } from '../../utils/helpers';
 
 const descendingOrderComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -933,7 +930,8 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 }
 
 const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
-  const dateRegExp = new RegExp(/^([0-2]\d|(3)[0-1])(-)(((0)\d)|((1)[0-2]))(-)\d{4}$/, 'i');
+  const dateRegExp = new RegExp(/^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-[12]\d{3}$/, 'i');
+  const dateTimeRegExp = new RegExp(/((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-[12]\d{3} ([01]\d|2[0-3]):[0-5]\d)$/, 'i');
   const [dateState, setDateState] = useState({ fromDate: { value: null, string: null }, toDate: { value: null, string: null } });
   const [prevPickedDate, setPrevPickedDate] = useState({ fromDate: null, toDate: null });
   const [errorObj, setErrorObj] = useState({
@@ -969,6 +967,24 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
         ? dayjs(dateState.toDate.string + '00:00', 'DD/MM/YYYY HH/mm')
         : dayjs(dateState.toDate.string, 'DD/MM/YYYY HH/mm');
 
+    if (
+      !!dateState.fromDate.string &&
+      !dateTimeRegExp.test(dateState.fromDate.string) &&
+      !dateRegExp.test(dateState.fromDate.string.trim())
+    ) {
+      fromDateValidationResult.isValid = false;
+      fromDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
+    }
+
+    if (
+      !!dateState.toDate.string &&
+      !dateTimeRegExp.test(dateState.toDate.string.trim()) &&
+      !dateRegExp.test(dateState.toDate.string.trim())
+    ) {
+      toDateValidationResult.isValid = false;
+      toDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
+    }
+
     if (dateState.fromDate.value !== null && !fromDate.isValid()) {
       fromDateValidationResult.isValid = false;
       fromDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
@@ -994,8 +1010,6 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler }) => {
       onPickerChange(name)(dayjs(e.target.value + '00:00', 'DD/MM/YYYY HH/mm'), e.target.value + '00:00');
     }
   };
-
-  console.log(prevPickedDate);
 
   const onApplyClick = () => {
     setPrevPickedDate({
