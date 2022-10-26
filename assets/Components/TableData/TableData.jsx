@@ -1,5 +1,4 @@
 import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
-import { useSkipFirstRenderEffect } from '../../hooks';
 import {
   Chip,
   Collapse,
@@ -27,14 +26,20 @@ import {
   InputLabel,
   Select,
   Checkbox,
+  Button,
 } from '@mui/material';
-import commonStyles from '../../styles/commonStyles.scss';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import commonStyles from '../../styles/commonStyles.scss';
 
 const descendingOrderComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -86,7 +91,14 @@ const renderSkeletons = (columns, rowsPerPage) => {
   return rows;
 };
 
-const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, onRequestFilterByRange, onRequestFilterBySelect }) => {
+const FilteringInformationBox = ({
+  headCells,
+  filterBy,
+  onRequestFilterByText,
+  onRequestFilterByRange,
+  onRequestFilterByDateRange,
+  onRequestFilterBySelect,
+}) => {
   const [showFilters, setShowFilters] = useState(false);
 
   const handleDelete = (opt, property) => {
@@ -109,6 +121,13 @@ const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, o
           },
         };
         onRequestFilterByRange(byRangeEventSlice, prop);
+        break;
+
+      case 'byDateRange':
+        const byDateRangeEventSlice = {
+          [name]: null,
+        };
+        onRequestFilterByDateRange(byDateRangeEventSlice, prop);
         break;
 
       case 'bySelect':
@@ -179,6 +198,36 @@ const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, o
         .filter(Boolean)
     : [];
 
+  const chipsByDateRange = filterBy.dateRange
+    ? Object.keys(filterBy.dateRange)
+        .map((filterName) => {
+          const head = headCells.find((el) => el.id === filterName);
+          return (
+            head && (
+              <ListItem disableGutters disablePadding sx={{ display: 'inline' }} key={filterName}>
+                {filterBy.dateRange[filterName]?.from && (
+                  <Chip
+                    sx={{ margin: 0.5 }}
+                    size="small"
+                    onDelete={() => handleDelete('byDateRange', { prop: filterName, name: 'from' })}
+                    label={`${head.label} from: ${filterBy.dateRange[filterName]?.from.toLocaleString()}`}
+                  />
+                )}
+                {filterBy.dateRange[filterName]?.to && (
+                  <Chip
+                    sx={{ margin: 0.5 }}
+                    size="small"
+                    onDelete={() => handleDelete('byDateRange', { prop: filterName, name: 'to' })}
+                    label={`${head.label} to: ${filterBy.dateRange[filterName]?.to.toLocaleString()}`}
+                  />
+                )}
+              </ListItem>
+            )
+          );
+        })
+        .filter(Boolean)
+    : [];
+
   const chipsBySelect = filterBy.select
     ? Object.keys(filterBy.select)
         .map((filterName) => {
@@ -237,6 +286,14 @@ const FilteringInformationBox = ({ headCells, filterBy, onRequestFilterByText, o
           <List>{chipsByRange}</List>
         </Box>
       )}
+      {!!chipsByDateRange.length && (
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+            By date range:
+          </Typography>
+          <List>{chipsByDateRange}</List>
+        </Box>
+      )}
       {!!chipsBySelect.length && (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
           <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
@@ -279,7 +336,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
       >
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('text') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByText', handleClose)}>
-            <FilterListIcon />
+            <FilterListIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by text
             </Typography>
@@ -288,7 +345,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('range') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByRange', handleClose)}>
-            <NumbersIcon />
+            <NumbersIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by range
             </Typography>
@@ -297,24 +354,34 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('select') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterBySelect', handleClose)}>
-            <LibraryAddCheckIcon />
+            <LibraryAddCheckIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by select
             </Typography>
           </MenuItem>
         )}
+
+        {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('date') && (
+          <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByDate', handleClose)}>
+            <CalendarMonthIcon color="primary" />
+            <Typography sx={{ pl: 1 }} variant="body1">
+              Filter by date range
+            </Typography>
+          </MenuItem>
+        )}
+
         {cellOptions.filterableBy?.length && <Divider />}
 
         {columnsPinnedToLeft.includes(cellOptions.id) ? (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'unpin', handleClose)}>
-            <PushPinOutlinedIcon />
+            <PushPinOutlinedIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Unpin
             </Typography>
           </MenuItem>
         ) : (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'pinToLeft', handleClose)}>
-            <PushPinIcon />
+            <PushPinIcon color="primary" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Pin to left
             </Typography>
@@ -335,15 +402,41 @@ const EnhancedTableHead = ({
   pinnedToLeft,
   onRequestFilterByText,
   onRequestFilterByRange,
+  onRequestFilterByDateRange,
   onRequestFilterBySelect,
   onPinToLeftColumnRequest,
   onUnpinColumnRequest,
 }) => {
   const { columnsPinnedToLeftIds, columnsPinnedToLeftWidth } = pinnedToLeft;
-  const [showFilterByTextInput, setShowFilterByTextInput] = useState(headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}));
-  const [showFilterByRangeInput, setShowFilterByRangeInput] = useState(headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}));
+  const [showFilterByTextInput, setShowFilterByTextInput] = useState(
+    headCells.reduce(
+      (acc, head) => ({
+        ...acc,
+        [head.id]: false,
+      }),
+      {},
+    ),
+  );
+  const [showFilterByRangeInput, setShowFilterByRangeInput] = useState(
+    headCells.reduce(
+      (acc, head) => ({
+        ...acc,
+        [head.id]: false,
+      }),
+      {},
+    ),
+  );
   const [showFilterBySelectInput, setShowFilterBySelectInput] = useState(
     headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}),
+  );
+  const [showFilterByDateInput, setShowFilterByDateInput] = useState(
+    headCells.reduce(
+      (acc, head) => ({
+        ...acc,
+        [head.id]: false,
+      }),
+      {},
+    ),
   );
   const [showColumnSubmenu, setShowColumnSubmenu] = useState(null);
   const headCellsRefs = useRef([]);
@@ -364,6 +457,10 @@ const EnhancedTableHead = ({
     onRequestFilterByRange(event, property);
   };
 
+  const createFilterByDateRangeHandler = (property) => (event) => {
+    onRequestFilterByDateRange(event, property);
+  };
+
   const createFilterBySelectHandler = (property) => (event) => {
     onRequestFilterBySelect(event, property);
   };
@@ -380,6 +477,10 @@ const EnhancedTableHead = ({
     setShowFilterBySelectInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
   };
 
+  const toggleShowFilterByDate = (prop) => {
+    setShowFilterByDateInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
+  };
+
   const handleMenuItemClick = (column, option, closeSubmenu) => {
     switch (option) {
       case 'columnFilterByText':
@@ -394,6 +495,11 @@ const EnhancedTableHead = ({
 
       case 'columnFilterBySelect':
         toggleShowFilterBySelect(column);
+        closeSubmenu();
+        break;
+
+      case 'columnFilterByDate':
+        toggleShowFilterByDate(column);
         closeSubmenu();
         break;
 
@@ -417,14 +523,22 @@ const EnhancedTableHead = ({
       <TableHead>
         <TableRow>
           {headCells.map((headCell, index) => {
+            const units = headCell.cellWidth
+              .trim()
+              .split(/\d+/g)
+              .filter((n) => n)
+              .pop()
+              .trim();
             return (
               <TableCell
                 ref={headCellsRefs.current[index]}
+                padding="none"
+                align="center"
                 sx={{
                   ...(columnsPinnedToLeftIds.includes(headCell.id)
                     ? {
                         position: 'sticky',
-                        left: columnsPinnedToLeftWidth[headCell.id] + 'rem' || 0,
+                        left: columnsPinnedToLeftWidth[headCell.id] + units || 0,
                         borderRight: '1px solid rgba(224, 224, 224, 1)',
                         zIndex: 10,
                       }
@@ -433,6 +547,8 @@ const EnhancedTableHead = ({
                     ? { position: 'sticky', right: 0, zIndex: 10, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
                     : {}),
                   minWidth: headCell.cellWidth,
+                  maxWidth: headCell.cellWidth,
+                  width: headCell.cellWidth,
                   pl: 1,
                   pr: 1,
                   pb: 0.5,
@@ -446,7 +562,7 @@ const EnhancedTableHead = ({
                 onMouseLeave={() => setShowColumnSubmenu(null)}
                 sortDirection={headCell.sortable ? (orderBy === headCell.id ? order : false) : undefined}
               >
-                <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyCenter}`}>
                   {!headCell.disableCellSubmenu && (
                     <ColumnSubMenu
                       cellOptions={headCell}
@@ -468,6 +584,7 @@ const EnhancedTableHead = ({
                     headCell.label
                   )}
                 </Box>
+
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
                   open={showFilterByTextInput[headCell.id]}
@@ -481,7 +598,7 @@ const EnhancedTableHead = ({
                     horizontal: 'left',
                   }}
                 >
-                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                  <Box sx={{ padding: '16px', width: '18rem' }}>
                     <Typography variant="body1">Filter {headCell.label} by text</Typography>
                     <TextField
                       autoFocus
@@ -503,6 +620,7 @@ const EnhancedTableHead = ({
                     />
                   </Box>
                 </Popover>
+
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
                   open={showFilterByRangeInput[headCell.id]}
@@ -516,7 +634,7 @@ const EnhancedTableHead = ({
                     horizontal: 'left',
                   }}
                 >
-                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                  <Box sx={{ padding: '16px', width: '18rem' }}>
                     <Typography variant="body1">Filter {headCell.label} by range</Typography>
                     <Box className={`${commonStyles.flex}`}>
                       <TextField
@@ -550,6 +668,29 @@ const EnhancedTableHead = ({
                     </Box>
                   </Box>
                 </Popover>
+
+                <Popover
+                  anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
+                  open={showFilterByDateInput[headCell.id]}
+                  onClose={() => toggleShowFilterByDate(headCell.id)}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                >
+                  <Box sx={{ padding: '16px', width: '18rem' }}>
+                    <Typography variant="body1">Filter {headCell.label} by range</Typography>
+                    <FilterByDateRange
+                      createFilterByDateRangeHandler={createFilterByDateRangeHandler(headCell.id)}
+                      initialState={filterBy.dateRange && filterBy.dateRange[headCell.id]}
+                    />
+                  </Box>
+                </Popover>
+
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
                   open={showFilterBySelectInput[headCell.id]}
@@ -563,7 +704,7 @@ const EnhancedTableHead = ({
                     horizontal: 'left',
                   }}
                 >
-                  <Box sx={{ padding: '16px', width: headCell.cellWidth, minWidth: '15rem' }}>
+                  <Box sx={{ padding: '16px', width: '18rem' }}>
                     <FormControl size="small" fullWidth>
                       <InputLabel id={headCell.id}>{`Filter ${headCell.label} by select`}</InputLabel>
                       <Select
@@ -595,9 +736,8 @@ const EnhancedTableHead = ({
   );
 };
 
-export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading }) {
+export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading, padding = 'normal', paginationParams }) {
   const initColumnPosition = headCells.map((cell) => cell.id);
-  const [columns] = useState([...headCells]);
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
@@ -609,10 +749,10 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   );
   const [filterBy, setFilterBy] = useState({});
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
-  // const [offset, setOffset] = useState(page * rowsPerPage);
+  const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
 
-  const filteredRows = useMemo(() => multiFilterFn(rows, filterBy), [filterBy]);
+  const columns = useMemo(() => [...headCells], [headCells]);
+  const filteredRows = useMemo(() => multiFilterFn(rows, filterBy), [filterBy, rows]);
 
   const columnsPinnedToLeftWidth = useMemo(
     () =>
@@ -630,21 +770,21 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         .reduce(
           (acc, val) => ({
             ...acc,
-            [val.id]: rows.map((row) => row[val.id]).filter((value, index, self) => self.indexOf(value) === index),
+            [val.id]:
+              val.possibleSelectionOptions || rows.map((row) => row[val.id]).filter((value, index, self) => self.indexOf(value) === index),
           }),
           {},
         ),
     [headCells, rows],
   );
 
-  useSkipFirstRenderEffect(() => {
+  useEffect(() => {
     onTableChange({
       order,
       orderBy,
       filterBy,
-      page,
+      page: page + 1,
       rowsPerPage,
-      // offset,
     });
   }, [order, orderBy, page, filterBy, rowsPerPage]);
 
@@ -680,7 +820,10 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         ...prevState,
         range: {
           ...(prevState.range || {}),
-          [property]: { ...(prevState.range ? prevState.range[property] : {}), [event.target.name]: event.target.value },
+          [property]: {
+            ...(prevState.range ? prevState.range[property] : {}),
+            [event.target.name]: event.target.value,
+          },
         },
       };
 
@@ -697,6 +840,30 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
       }
       return filterQueries;
     });
+  };
+
+  const handleRequestFilterByDateRange = (event, property) => {
+    setFilterBy((prevState) => {
+      const filterQueries = {
+        ...prevState,
+        dateRange: {
+          ...(prevState.dateRange || {}),
+          [property]: {
+            ...(prevState.dateRange ? prevState.dateRange[property] : {}),
+            ...event,
+          },
+        },
+      };
+
+      if (filterQueries.dateRange[property].from === null && filterQueries.dateRange[property].to === null) {
+        delete filterQueries.dateRange[property];
+      }
+      if (!Object.keys(filterQueries.dateRange).length) {
+        delete filterQueries.dateRange;
+      }
+      return filterQueries;
+    });
+    setPage(0);
   };
 
   const handleRequestFilterBySelect = (event, property) => {
@@ -717,6 +884,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
       }
       return filterQueries;
     });
+    setPage(0);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -741,13 +909,14 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
       <FilteringInformationBox
         onRequestFilterByText={handleRequestFilterByText}
         onRequestFilterByRange={handleRequestFilterByRange}
+        onRequestFilterByDateRange={handleRequestFilterByDateRange}
         onRequestFilterBySelect={handleRequestFilterBySelect}
         headCells={columns}
         filterBy={filterBy}
         setFilterBy={setFilterBy}
       />
       <TableContainer>
-        <Table stickyHeader padding="none">
+        <Table stickyHeader padding={padding}>
           <EnhancedTableHead
             headCells={columns}
             cellsWithFilterableBySelectValues={cellsWithFilterableBySelectValues}
@@ -757,6 +926,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
             onRequestSort={handleRequestSort}
             onRequestFilterByText={handleRequestFilterByText}
             onRequestFilterByRange={handleRequestFilterByRange}
+            onRequestFilterByDateRange={handleRequestFilterByDateRange}
             onRequestFilterBySelect={handleRequestFilterBySelect}
             onPinToLeftColumnRequest={handlePinToLeft}
             onUnpinColumnRequest={handleUnpinColumn}
@@ -764,21 +934,26 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
           />
           <TableBody>
             {!isDataLoading
-              ? filteredRows
-                  .sort(getOrderComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow hover tabIndex={-1} key={row.id}>
-                      {columns
-                        .sort(sortByModel(initColumnPosition, 'id'))
-                        .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
-                        .map((cell, index) => (
+              ? filteredRows.sort(getOrderComparator(order, orderBy)).map((row) => (
+                  <TableRow hover tabIndex={-1} key={row.id}>
+                    {columns
+                      .sort(sortByModel(initColumnPosition, 'id'))
+                      .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
+                      .map((cell, index) => {
+                        const units = cell.cellWidth
+                          .trim()
+                          .split(/\d+/g)
+                          .filter((n) => n)
+                          .pop()
+                          .trim();
+                        return (
                           <TableCell
+                            align={cell.alignContent || 'left'}
                             sx={{
                               ...(columnsPinnedToLeftIds.includes(cell.id)
                                 ? {
                                     position: 'sticky',
-                                    left: columnsPinnedToLeftWidth[cell.id] + 'rem' || 0,
+                                    left: columnsPinnedToLeftWidth[cell.id] + units || 0,
                                     borderRight: '1px solid rgba(224, 224, 224, 1)',
                                   }
                                 : {}),
@@ -793,23 +968,193 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                           >
                             {row[cell.id]}
                           </TableCell>
-                        ))}
-                    </TableRow>
-                  ))
+                        );
+                      })}
+                  </TableRow>
+                ))
               : renderSkeletons(columns, rowsPerPage)}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
-        sx={{ overflow: 'visible' }}
-        rowsPerPageOptions={[5, 10, 15, 20]}
+        sx={{ overflow: 'visible', marginTop: 'auto' }}
         component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
         onPageChange={handleChangePage}
+        page={page}
+        count={paginationParams.count || rows.length}
+        rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 15, 20]}
+        showFirstButton={paginationParams.showFirstButton || undefined}
+        showLastButton={paginationParams.showLastButton || undefined}
       />
     </Box>
   );
 }
+
+const FilterByDateRange = ({ createFilterByDateRangeHandler, initialState = { from: null, to: null } }) => {
+  const dateRegExp = new RegExp(/^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-[12]\d{3}$/, 'i');
+  const dateTimeRegExp = new RegExp(/((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-[12]\d{3} ([01]\d|2[0-3]):[0-5]\d)$/, 'i');
+  const [dateState, setDateState] = useState({
+    fromDate: {
+      ...(initialState.from
+        ? { value: dayjs(initialState.from), string: dayjs(initialState.from).format('DD-MM-YYYY HH:mm') }
+        : { value: null, string: null }),
+    },
+    toDate: {
+      ...(initialState.to
+        ? { value: dayjs(initialState.to), string: dayjs(initialState.to).format('DD-MM-YYYY HH:mm') }
+        : { value: null, string: null }),
+    },
+  });
+  const [prevPickedDate, setPrevPickedDate] = useState({ fromDate: dateState.fromDate.string, toDate: null });
+  const [errorObj, setErrorObj] = useState({
+    fromDate: { reason: null, isValid: false },
+    toDate: { reason: null, isValid: false },
+  });
+
+  useEffect(() => {
+    validateDate();
+  }, [dateState]);
+
+  const onPickerChange = (name) => (newValue, string) => {
+    setDateState((prevState) => ({
+      ...prevState,
+      [name]: { value: newValue, string: string || (dayjs(newValue).isValid() ? dayjs(newValue).format('DD-MM-YYYY HH:mm') : null) },
+    }));
+  };
+
+  const validateDate = () => {
+    const fromDateValidationResult = {
+      isValid: true,
+      reason: '',
+    };
+    const toDateValidationResult = {
+      isValid: true,
+      reason: '',
+    };
+
+    const fromDate =
+      dateState.fromDate.string && dateRegExp.test(dateState.fromDate.string.trim())
+        ? dayjs(dateState.fromDate.string + '00:00', 'DD/MM/YYYY HH/mm')
+        : dayjs(dateState.fromDate.string, 'DD/MM/YYYY HH/mm');
+
+    const toDate =
+      dateState.toDate.string && dateRegExp.test(dateState.toDate.string.trim())
+        ? dayjs(dateState.toDate.string + '00:00', 'DD/MM/YYYY HH/mm')
+        : dayjs(dateState.toDate.string, 'DD/MM/YYYY HH/mm');
+
+    if (
+      !!dateState.fromDate.string &&
+      !dateTimeRegExp.test(dateState.fromDate.string) &&
+      !dateRegExp.test(dateState.fromDate.string.trim())
+    ) {
+      fromDateValidationResult.isValid = false;
+      fromDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
+    }
+
+    if (
+      !!dateState.toDate.string &&
+      !dateTimeRegExp.test(dateState.toDate.string.trim()) &&
+      !dateRegExp.test(dateState.toDate.string.trim())
+    ) {
+      toDateValidationResult.isValid = false;
+      toDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
+    }
+
+    if (dateState.fromDate.value !== null && !fromDate.isValid()) {
+      fromDateValidationResult.isValid = false;
+      fromDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
+    }
+    if (dateState.toDate.value !== null && !toDate.isValid()) {
+      toDateValidationResult.isValid = false;
+      toDateValidationResult.reason = 'Date format DD-MM-YY HH:mm';
+    }
+    if (!isNaN(toDate.diff(fromDate)) && toDate.diff(fromDate) < 0) {
+      toDateValidationResult.isValid = false;
+      toDateValidationResult.reason = 'Invalid time range: "From" must be earlier than "To"';
+    }
+
+    setErrorObj((prevState) => ({
+      ...prevState,
+      fromDate: fromDateValidationResult,
+      toDate: toDateValidationResult,
+    }));
+  };
+
+  const onInputBlur = (name) => (e) => {
+    if (dateRegExp.test(e.target.value.trim())) {
+      onPickerChange(name)(dayjs(e.target.value + '00:00', 'DD/MM/YYYY HH/mm'), e.target.value + '00:00');
+    }
+  };
+
+  const onApplyClick = () => {
+    setPrevPickedDate({
+      fromDate: dateState.fromDate.value && dayjs(dateState.fromDate.value).format('DD-MM-YYYY HH:mm'),
+      toDate: dateState.toDate.value && dayjs(dateState.toDate.value).format('DD-MM-YYYY HH:mm'),
+    });
+    createFilterByDateRangeHandler({
+      from: dateState.fromDate.value && dateState.fromDate.value.$d,
+      to: dateState.toDate.value && dateState.toDate.value.$d,
+    });
+  };
+
+  return (
+    <>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DateTimePicker
+          ampm={false}
+          label="From"
+          inputFormat={'DD-MM-YYYY HH:mm'}
+          value={dateState.fromDate.value}
+          onChange={onPickerChange('fromDate')}
+          renderInput={(params) => {
+            params.error = !errorObj.fromDate.isValid;
+            return (
+              <TextField
+                helperText={!errorObj.fromDate.isValid ? errorObj.fromDate.reason : undefined}
+                onBlur={onInputBlur('fromDate')}
+                size="small"
+                margin="dense"
+                {...params}
+              />
+            );
+          }}
+        />
+        <DateTimePicker
+          minDate={dateState.fromDate.value}
+          ampm={false}
+          label="To"
+          value={dateState.toDate.value}
+          inputFormat={'DD-MM-YYYY HH:mm'}
+          onChange={onPickerChange('toDate')}
+          renderInput={(params) => {
+            params.error = !errorObj.toDate.isValid;
+            return (
+              <TextField
+                helperText={!errorObj.toDate.isValid ? errorObj.toDate.reason : undefined}
+                onBlur={onInputBlur('toDate')}
+                size="small"
+                margin="dense"
+                {...params}
+              />
+            );
+          }}
+        />
+      </LocalizationProvider>
+      <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+        <Button
+          disabled={
+            !errorObj.fromDate.isValid ||
+            !errorObj.toDate.isValid ||
+            (prevPickedDate.fromDate === dateState.fromDate.string && prevPickedDate.toDate === dateState.toDate.string)
+          }
+          onClick={onApplyClick}
+          variant="contained"
+        >
+          Apply
+        </Button>
+      </Box>
+    </>
+  );
+};

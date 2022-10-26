@@ -230,7 +230,7 @@ class AdServerConfigurationClient
             $remoteUri = $data['path'];
             $localUri = strtok($request->getUri(), '?');
             $data['path'] = $localUri;
-            foreach (['nextPageUrl', 'prevPageUrl'] as $urlKey) {
+            foreach (['nextPageUrl', 'prevPageUrl', 'firstPageUrl', 'lastPageUrl'] as $urlKey) {
                 if (isset($data[$urlKey])) {
                     $data[$urlKey] = str_replace($remoteUri, $localUri, $data[$urlKey]);
                 }

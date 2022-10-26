@@ -28,6 +28,8 @@ import UsersSettings from './Users/Settings';
 import Panel from './General/Panel';
 import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
+import ConnectedStatus from './Network/ConnectedStatus';
+import Events from './Events/Events';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -42,6 +44,7 @@ import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import PeopleIcon from '@mui/icons-material/People';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import EmailIcon from '@mui/icons-material/Email';
+import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import commonStyles from '../styles/commonStyles.scss';
 
 const appModules = [
@@ -91,6 +94,12 @@ const appModules = [
         path: '/network/settings',
         component: NetworkSettings,
         icon: SettingsIcon,
+      },
+      {
+        name: 'Connected status',
+        path: '/network/connected-status',
+        component: ConnectedStatus,
+        icon: LanOutlinedIcon,
       },
     ],
   },
@@ -152,6 +161,12 @@ const appModules = [
     name: 'AdClassifier',
     path: '/adclassifier',
     component: AdClassifier,
+    icon: DashboardIcon,
+  },
+  {
+    name: 'Events',
+    path: '/events',
+    component: Events,
     icon: DashboardIcon,
   },
 ];
