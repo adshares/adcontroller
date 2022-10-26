@@ -12,6 +12,7 @@ enum AdPanelConfig implements ConfigEnum
     case PlaceholderIndexTitle;
     case PlaceholderLoginInfo;
     case PlaceholderRobotsTxt;
+    case PlaceholderStyleCss;
     case Url;
 
     public function getModule(): string

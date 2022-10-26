@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Exception\UnexpectedResponseException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -37,7 +38,11 @@ class AdClassifyClient
             );
         }
 
-        $body = json_decode($response->getContent(), true);
+        try {
+            $body = json_decode($response->getContent(), true);
+        } catch (HttpExceptionInterface) {
+            throw new UnexpectedResponseException('AdClassify response cannot be decoded');
+        }
 
         if (!isset($body['apiKeyName']) || !isset($body['apiKeySecret'])) {
             throw new UnexpectedResponseException('AdClassify response cannot be processed');

@@ -9,6 +9,7 @@ enum AppConfig implements ConfigEnum
     case AppState;
     case InstallerStep;
     case EmailSent;
+    case UploadFileLimit;
 
     public function getModule(): string
     {

@@ -46,6 +46,12 @@ function Status({ handlePrevStep, step }) {
       url: null,
       code: null,
     },
+    'main.js': {
+      module: null,
+      version: null,
+      url: null,
+      code: null,
+    },
     DataRequired: false,
   });
   const { createErrorNotification } = useCreateNotification();
@@ -65,6 +71,7 @@ function Status({ handlePrevStep, step }) {
         adselect: response.adselect,
         adserver: response.adserver,
         aduser: response.aduser,
+        'main.js': response['main.js'],
       });
     } catch (err) {
       createErrorNotification(err);
@@ -154,6 +161,16 @@ function Status({ handlePrevStep, step }) {
               <TableCell>
                 <Tooltip title={stepData.adpay.code}>
                   <Icon>{stepData.adpay.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align="left">{stepData['main.js'].module}</TableCell>
+              <TableCell align="left">{stepData['main.js'].version}</TableCell>
+              <TableCell align="left">{stepData['main.js'].url}</TableCell>
+              <TableCell>
+                <Tooltip title={stepData['main.js'].code}>
+                  <Icon>{stepData['main.js'].code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
                 </Tooltip>
               </TableCell>
             </TableRow>

@@ -12,6 +12,7 @@ use App\Service\AdServerConfigurationClient;
 use App\Service\LicenseReader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -22,7 +23,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class MonitoringController extends AbstractController
 {
     private const ALLOWED_KEYS = [
+        'events',
         'hosts',
+        'latest-events',
+        'users',
         'wallet',
     ];
 
@@ -51,14 +55,17 @@ class MonitoringController extends AbstractController
     }
 
     #[Route('/{key}', name: 'fetch_by_key', methods: ['GET'])]
-    public function fetch(string $key, AdServerConfigurationClient $adServerConfigurationClient): JsonResponse
-    {
+    public function fetch(
+        string $key,
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
         if (!in_array($key, self::ALLOWED_KEYS, true)) {
             throw new UnprocessableEntityHttpException('Invalid resource');
         }
 
         try {
-            $data = $adServerConfigurationClient->fetchMonitoringData($key);
+            $data = $adServerConfigurationClient->proxyMonitoringRequest($request, $key);
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
@@ -69,8 +76,10 @@ class MonitoringController extends AbstractController
     }
 
     #[Route('/hosts/{hostId}/reset', name: 'reset_host_connection_error', methods: ['PATCH'])]
-    public function resetHostConnectionError(int $hostId, AdServerConfigurationClient $adServerConfigurationClient): JsonResponse
-    {
+    public function resetHostConnectionError(
+        int $hostId,
+        AdServerConfigurationClient $adServerConfigurationClient,
+    ): JsonResponse {
         try {
             $data = $adServerConfigurationClient->resetHostConnectionError($hostId);
         } catch (ServiceNotPresent $exception) {
@@ -82,12 +91,33 @@ class MonitoringController extends AbstractController
         return $this->jsonOk($data);
     }
 
+    #[Route('/users/{userId}/{action}', name: 'patch_user', methods: ['PATCH'])]
+    public function patchUser(
+        int $userId,
+        string $action,
+        AdServerConfigurationClient $adServerConfigurationClient,
+    ): JsonResponse {
+        try {
+            $data = $adServerConfigurationClient->patchUser($userId, $action);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+        }
+
+        return $this->jsonOk($data);
+    }
+
     protected function jsonOk(array $data = []): JsonResponse
     {
-        return parent::json([
-            'message' => 'OK',
-            'code' => Response::HTTP_OK,
-            'data' => $data,
-        ]);
+        if (array_key_exists('data', $data)) {
+            $response = $data;
+        } else {
+            $response = ['data' => $data];
+        }
+        $response['code'] = Response::HTTP_OK;
+        $response['message'] = 'OK';
+
+        return parent::json($response);
     }
 }
