@@ -93,7 +93,7 @@ const PlaceholdersCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
+      <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata." />
       <CardContent>
         <Box component="form" onChange={(e) => form.onChange(e)} onFocus={(e) => form.setTouched(e)}>
           <TextField
@@ -192,12 +192,12 @@ const RebrandingCard = () => {
 
   return (
     <Card className={commonStyles.card}>
-      <CardHeader title="Rebranding" subheader="Customize the ad server panel." />
+      <CardHeader title="Panel assets" subheader="Change or add the ad server panel assets." />
       <TabContext value={activeTab}>
         <CardContent>
           <TabList onChange={handleTabChange}>
-            <Tab label="Required assets" value="requiredAssets" sx={{ padding: 0 }} />
-            <Tab label="Additional assets" value="additionalAssets" />
+            <Tab label="Built-in assets" value="requiredAssets" sx={{ padding: 0 }} />
+            <Tab label="Custom assets" value="additionalAssets" />
           </TabList>
         </CardContent>
         <TabPanel value="requiredAssets" sx={{ padding: 0 }}>
@@ -277,7 +277,7 @@ const AdditionalAssets = ({ rejectedAssets }) => {
     const file = files[0];
     const isFileIsImage = file && file.type.split('/')[0] === 'image';
     if (!isFileIsImage) {
-      enqueueSnackbar('File must be image', { variant: 'error' });
+      enqueueSnackbar('The file must be an image.', { variant: 'error' });
       return;
     }
     const renameFile = (originalFile, newName) =>
@@ -491,12 +491,12 @@ const AdditionalAssets = ({ rejectedAssets }) => {
                         <Typography variant="body2" noWrap>
                           {img.name}
                         </Typography>
-                        {!img.isImage && <Typography color="error">File must be image</Typography>}
+                        {!img.isImage && <Typography color="error">The file must be an image.</Typography>}
                         {img.isImage && !img.isNameValid && (
-                          <Typography color="error">File name cannot contain blank characters</Typography>
+                          <Typography color="error">The file name cannot contain blank characters.</Typography>
                         )}
                         {img.isImage && img.isNameValid && img.isNameExistOnList && (
-                          <Typography color="error">File with this name already exist. Uploading will overwrite it</Typography>
+                          <Typography color="error">Uploading will overwrite an existing file.</Typography>
                         )}
                       </Box>
                     </TableCell>
@@ -570,7 +570,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
     const isFileTypeIsPng = file && file.type.split('/')[1] === 'png';
 
     if (!isFileIsImage) {
-      enqueueSnackbar('File must be image', { variant: 'error' });
+      enqueueSnackbar('The file must be an image.', { variant: 'error' });
       return;
     }
 
