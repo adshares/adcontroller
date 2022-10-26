@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Configuration;
 use App\Entity\Enum\AdClassifyConfig;
 use App\Entity\Enum\AdServerConfig;
+use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\ConfigEnum;
 use App\Entity\Enum\GeneralConfig;
 use App\Service\Crypt;
@@ -192,6 +193,7 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::UploadLimitModel->name => ConfigType::Integer,
             AdServerConfig::UploadLimitVideo->name => ConfigType::Integer,
             AdServerConfig::UploadLimitZip->name => ConfigType::Integer,
+            AppConfig::UploadFileLimit->name => ConfigType::Integer,
             GeneralConfig::SmtpPort->name => ConfigType::Integer,
 
 //            self::BANNER_FORCE_HTTPS => ConfigType::Bool,
