@@ -7,7 +7,8 @@ use Psr\Log\LoggerInterface;
 
 class UploadFileLimit
 {
-    private const NGINX_CONFIGURATION = '/etc/nginx/sites-available/adshares-adserver';
+    private const NGINX_CONFIGURATION = '/etc/nginx/nginx.conf';
+    private const NGINX_ADSERVER_CONFIGURATION = '/etc/nginx/sites-available/adshares-adserver';
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -46,14 +47,19 @@ class UploadFileLimit
 
     private function getNginxLimit(): ?int
     {
-        if (null === ($contents = $this->getFileContents(self::NGINX_CONFIGURATION))) {
-            return null;
+        if (null !== ($contents = $this->getFileContents(self::NGINX_ADSERVER_CONFIGURATION))) {
+            if (1 === preg_match('/client_max_body_size\s+(.*);/', $contents, $matches)) {
+                return self::convertToBytes($matches[1]);
+            }
         }
-        if (1 === preg_match('/client_max_body_size\s+(.*);/', $contents, $matches)) {
-            return self::convertToBytes($matches[1]);
+        if (null !== ($contents = $this->getFileContents(self::NGINX_CONFIGURATION))) {
+            if (1 === preg_match('/client_max_body_size\s+(.*);/', $contents, $matches)) {
+                return self::convertToBytes($matches[1]);
+            }
+            return self::convertToBytes('1M');
         }
-        $this->logger->error('Nginx client_max_body_size cannot be read');
-        return null;
+        $this->logger->error('Nginx config cannot be read');
+        return PHP_INT_MAX;
     }
 
     private function getFileContents(string $fileName): ?string
