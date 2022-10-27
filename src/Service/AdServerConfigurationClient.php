@@ -206,17 +206,17 @@ class AdServerConfigurationClient
 
     private function buildConfigUri(): string
     {
-        return sprintf('%s/api/config', $this->adServerBaseUri);
+        return sprintf('%s/api/v2/config', $this->adServerBaseUri);
     }
 
     private function buildMonitoringUri(string $resource): string
     {
-        return sprintf('%s/api/monitoring/%s', $this->adServerBaseUri, $resource);
+        return sprintf('%s/api/v2/%s', $this->adServerBaseUri, $resource);
     }
 
     private function buildPlaceholdersUri(): string
     {
-        return sprintf('%s/api/config/placeholders', $this->adServerBaseUri);
+        return sprintf('%s/api/v2/config/placeholders', $this->adServerBaseUri);
     }
 
     private function getAuthorizationHeader(): string
