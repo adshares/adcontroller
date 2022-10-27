@@ -19,13 +19,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/monitoring', name: 'api_monitoring_')]
+#[Route('/api', name: 'api_')]
 class MonitoringController extends AbstractController
 {
     private const ALLOWED_KEYS = [
         'events',
         'hosts',
-        'latest-events',
+        'events/latest',
         'users',
         'wallet',
     ];
