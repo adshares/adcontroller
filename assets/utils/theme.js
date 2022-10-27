@@ -14,6 +14,18 @@ const theme = createTheme({
         },
       },
     },
+    MuiCard: {
+      variants: [
+        {
+          props: { width: 'full' },
+          style: { width: '100%' },
+        },
+        {
+          props: { width: 'mainContainer' },
+          style: { width: '100%', maxWidth: '1280px' },
+        },
+      ],
+    },
   },
 });
 

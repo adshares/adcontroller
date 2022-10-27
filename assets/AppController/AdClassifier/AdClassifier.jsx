@@ -36,7 +36,7 @@ export default function AdClassifier() {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="AdClassifier" subheader="Set up integration with the classifier." />
         <CardActions>

@@ -53,7 +53,7 @@ const BaseInformationCard = () => {
   };
 
   return (
-    <Card className={`${commonStyles.card}`}>
+    <Card className={`${commonStyles.card}`} width="mainContainer">
       <CardHeader title="Base information" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
@@ -182,7 +182,7 @@ const CRMNotificationsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader
         title="CRM notifications"
         subheader="Set up email addresses for sending notifications. The message will be sent each time the event occurs."

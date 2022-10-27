@@ -66,11 +66,9 @@ export default function AppWindow({ children }) {
         </IconButton>
       )}
     >
-      <Box className={styles.wrapper}>
-        <Box className={styles.container}>
-          {children}
-          <GlobalNotificationsWrapper />
-        </Box>
+      <Box className={styles.container}>
+        {children}
+        <GlobalNotificationsWrapper />
       </Box>
     </StyledSnackbarProvider>
   );

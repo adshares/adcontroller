@@ -90,6 +90,7 @@ export default function Events() {
         height: 'calc(100vh - 8rem)',
         maxWidth: 'calc(100vw - 21rem)',
       }}
+      width="full"
     >
       <CardHeader title="Events" />
       <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
@@ -99,7 +100,12 @@ export default function Events() {
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
           defaultSortBy="type"
-          paginationParams={{ limit: queryConfig.limit, count: response?.total || 0, showFirstButton: true, showLastButton: true }}
+          paginationParams={{
+            limit: queryConfig.limit,
+            count: response?.total || 0,
+            showFirstButton: true,
+            showLastButton: true,
+          }}
         />
       </CardContent>
     </Card>

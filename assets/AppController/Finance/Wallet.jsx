@@ -109,7 +109,7 @@ const WalletSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="Hot wallet" />
         <IconButton type="button" onClick={toggleEditMode}>
@@ -223,7 +223,7 @@ const WalletStatusCard = () => {
   });
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Ad server balance" />
       <CardContent>
         <Box className={commonStyles.flex}>
@@ -290,7 +290,7 @@ const ColdWalletSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Cold wallet" />
       <FormControlLabel
         sx={{ pl: 2 }}
