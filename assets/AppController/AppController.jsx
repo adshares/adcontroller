@@ -30,6 +30,7 @@ import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
 import ConnectedStatus from './Network/ConnectedStatus';
 import Events from './Events/Events';
+import UsersList from './Users/UsersList';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -52,6 +53,12 @@ const appModules = [
     name: 'Users',
     icon: PeopleIcon,
     children: [
+      {
+        name: 'List of users',
+        path: '/users/list',
+        component: UsersList,
+        icon: PeopleIcon,
+      },
       {
         name: 'Settings',
         path: '/users/settings',

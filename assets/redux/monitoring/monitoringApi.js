@@ -51,8 +51,24 @@ export const monitoringApi = createApi({
         };
       },
     }),
+    getUsersList: builder.query({
+      query: (queryConfig) => {
+        const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
+        const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
+        return {
+          url: '/api/v2/users',
+          params: urlQueryParams,
+          method: 'GET',
+        };
+      },
+    }),
   }),
 });
 
-export const { useGetWalletMonitoringQuery, useGetConnectedHostsQuery, useResetHostConnectionErrorMutation, useGetEventsQuery } =
-  monitoringApi;
+export const {
+  useGetWalletMonitoringQuery,
+  useGetConnectedHostsQuery,
+  useResetHostConnectionErrorMutation,
+  useGetEventsQuery,
+  useGetUsersListQuery,
+} = monitoringApi;

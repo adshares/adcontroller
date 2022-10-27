@@ -27,6 +27,7 @@ import {
   Select,
   Checkbox,
   Button,
+  Tooltip,
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -41,19 +42,19 @@ import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
 
-const descendingOrderComparator = (a, b, orderBy) => {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-};
+// const descendingOrderComparator = (a, b, orderBy) => {
+//   if (b[orderBy] < a[orderBy]) {
+//     return -1;
+//   }
+//   if (b[orderBy] > a[orderBy]) {
+//     return 1;
+//   }
+//   return 0;
+// };
 
-const getOrderComparator = (order, orderBy) => {
-  return order === 'desc' ? (a, b) => descendingOrderComparator(a, b, orderBy) : (a, b) => -descendingOrderComparator(a, b, orderBy);
-};
+// const getOrderComparator = (order, orderBy) => {
+//   return order === 'desc' ? (a, b) => descendingOrderComparator(a, b, orderBy) : (a, b) => -descendingOrderComparator(a, b, orderBy);
+// };
 
 const sortByModel = (model, property) => (a, b) => {
   let ai = model.indexOf(a[property]);
@@ -81,7 +82,16 @@ const renderSkeletons = (columns, rowsPerPage) => {
     rows.push(
       <TableRow key={i}>
         {columns.map((name) => (
-          <TableCell key={`${name.id}-${i}`}>
+          <TableCell
+            key={`${name.id}-${i}`}
+            sx={{
+              pl: 1,
+              pr: 1,
+              pt: 0.5,
+              pb: 0.5,
+              backgroundColor: 'background.paper',
+            }}
+          >
             <Skeleton animation="wave" variant="text" />
           </TableCell>
         ))}
@@ -318,9 +328,11 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
   };
   return (
     <>
-      <IconButton sx={sxButton} size="small" onClick={handleOpenMenu}>
-        <MoreVertIcon fontSize="small" />
-      </IconButton>
+      <Tooltip title="Column options">
+        <IconButton sx={sxButton} size="small" onClick={handleOpenMenu}>
+          <MoreVertIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -336,7 +348,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
       >
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('text') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByText', handleClose)}>
-            <FilterListIcon color="primary" />
+            <FilterListIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by text
             </Typography>
@@ -345,7 +357,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('range') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByRange', handleClose)}>
-            <NumbersIcon color="primary" />
+            <NumbersIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by range
             </Typography>
@@ -354,7 +366,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('select') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterBySelect', handleClose)}>
-            <LibraryAddCheckIcon color="primary" />
+            <LibraryAddCheckIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by select
             </Typography>
@@ -363,7 +375,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('date') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByDate', handleClose)}>
-            <CalendarMonthIcon color="primary" />
+            <CalendarMonthIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by date range
             </Typography>
@@ -374,14 +386,14 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {columnsPinnedToLeft.includes(cellOptions.id) ? (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'unpin', handleClose)}>
-            <PushPinOutlinedIcon color="primary" />
+            <PushPinOutlinedIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Unpin
             </Typography>
           </MenuItem>
         ) : (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'pinToLeft', handleClose)}>
-            <PushPinIcon color="primary" />
+            <PushPinIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Pin to left
             </Typography>
@@ -532,7 +544,7 @@ const EnhancedTableHead = ({
             return (
               <TableCell
                 ref={headCellsRefs.current[index]}
-                padding="none"
+                // padding="none"
                 align="center"
                 sx={{
                   ...(columnsPinnedToLeftIds.includes(headCell.id)
@@ -745,8 +757,9 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   const [orderBy, setOrderBy] = useState(
     defaultSortBy && headCells.map((cell) => cell.id).includes(defaultSortBy)
       ? headCells.find((cell) => cell.id === defaultSortBy)?.id
-      : headCells[0].id,
+      : null,
   );
+  // const [multiSort, setMultiSort] = useState();
   const [filterBy, setFilterBy] = useState({});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
@@ -780,8 +793,8 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 
   useEffect(() => {
     onTableChange({
-      order,
-      orderBy,
+      // order,
+      orderBy: orderBy && `${orderBy}:${order}`,
       filterBy,
       page: page + 1,
       rowsPerPage,
@@ -789,6 +802,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   }, [order, orderBy, page, filterBy, rowsPerPage]);
 
   const handleRequestSort = (event, property) => {
+    console.log(property);
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -934,7 +948,8 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
           />
           <TableBody>
             {!isDataLoading
-              ? filteredRows.sort(getOrderComparator(order, orderBy)).map((row) => (
+              ? filteredRows.map((row) => (
+                  // ? filteredRows.sort(getOrderComparator(order, orderBy)).map((row) => (
                   <TableRow hover tabIndex={-1} key={row.id}>
                     {columns
                       .sort(sortByModel(initColumnPosition, 'id'))
@@ -962,6 +977,8 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                                 : {}),
                               pl: 1,
                               pr: 1,
+                              pt: 0.5,
+                              pb: 0.5,
                               backgroundColor: 'background.paper',
                             }}
                             key={`${cell.id}-${row.id}`}
@@ -1020,7 +1037,10 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler, initialState = { fr
   const onPickerChange = (name) => (newValue, string) => {
     setDateState((prevState) => ({
       ...prevState,
-      [name]: { value: newValue, string: string || (dayjs(newValue).isValid() ? dayjs(newValue).format('DD-MM-YYYY HH:mm') : null) },
+      [name]: {
+        value: newValue,
+        string: string || (dayjs(newValue).isValid() ? dayjs(newValue).format('DD-MM-YYYY HH:mm') : null),
+      },
     }));
   };
 
