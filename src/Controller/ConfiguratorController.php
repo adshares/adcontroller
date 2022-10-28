@@ -187,7 +187,7 @@ class ConfiguratorController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         if (Smtp::class === $service::class) {
@@ -211,7 +211,7 @@ class ConfiguratorController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($changes);
@@ -229,5 +229,13 @@ class ConfiguratorController extends AbstractController
             'code' => Response::HTTP_OK,
             'data' => $data,
         ]);
+    }
+
+    private function rethrowUnexpectedResponseException(UnexpectedResponseException $exception): void
+    {
+        $statusCode = $exception->getCode() >= 400 && $exception->getCode() < 500
+            ? $exception->getCode()
+            : Response::HTTP_BAD_GATEWAY;
+        throw new HttpException($statusCode, $exception->getMessage());
     }
 }

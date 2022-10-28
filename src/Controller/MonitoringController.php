@@ -156,7 +156,7 @@ class MonitoringController extends AbstractController
         return parent::json($response);
     }
 
-    private function rethrowUnexpectedResponseException(UnexpectedResponseException $exception)
+    private function rethrowUnexpectedResponseException(UnexpectedResponseException $exception): void
     {
         $statusCode = $exception->getCode() >= 400 && $exception->getCode() < 500
             ? $exception->getCode()
