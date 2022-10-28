@@ -360,10 +360,11 @@ class AdServerConfigurationClient
         if (Response::HTTP_OK !== $statusCode) {
             if (Response::HTTP_UNPROCESSABLE_ENTITY === $statusCode) {
                 $message = json_decode($response->getContent(false))->message;
-                throw new UnexpectedResponseException($message);
+                throw new UnexpectedResponseException($message, $statusCode);
             }
             throw new UnexpectedResponseException(
-                sprintf('AdServer responded with an invalid code (%d)', $statusCode)
+                sprintf('AdServer responded with an invalid code (%d)', $statusCode),
+                $statusCode,
             );
         }
     }

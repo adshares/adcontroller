@@ -34,7 +34,8 @@ class AdClassifyClient
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
             throw new UnexpectedResponseException(
-                sprintf('AdClassify responded with an invalid code (%d)', $response->getStatusCode())
+                sprintf('AdClassify responded with an invalid code (%d)', $response->getStatusCode()),
+                $response->getStatusCode(),
             );
         }
 
@@ -73,7 +74,8 @@ class AdClassifyClient
         }
         if (Response::HTTP_OK !== $statusCode) {
             throw new UnexpectedResponseException(
-                sprintf('AdClassify responded with an invalid code (%d)', $statusCode)
+                sprintf('AdClassify responded with an invalid code (%d)', $statusCode),
+                $statusCode,
             );
         }
 

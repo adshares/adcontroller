@@ -38,7 +38,7 @@ class LicenseServerClient
         if (Response::HTTP_OK !== $response->getStatusCode()) {
             $errorMessage = sprintf('Unexpected status code (%d)', $response->getStatusCode());
             $this->logger->debug($errorMessage);
-            throw new UnexpectedResponseException($errorMessage);
+            throw new UnexpectedResponseException($errorMessage, $response->getStatusCode());
         }
 
         return json_decode($response->getContent())->data;
@@ -65,7 +65,7 @@ class LicenseServerClient
         if (Response::HTTP_CREATED !== $response->getStatusCode()) {
             $errorMessage = sprintf('Unexpected status code (%d)', $response->getStatusCode());
             $this->logger->debug($errorMessage);
-            throw new UnexpectedResponseException($errorMessage);
+            throw new UnexpectedResponseException($errorMessage, $response->getStatusCode());
         }
 
         return json_decode($response->getContent())->key;

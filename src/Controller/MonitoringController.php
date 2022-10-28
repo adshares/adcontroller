@@ -48,7 +48,7 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk([Configuration::LICENSE_DATA => $license->toArray()]);
@@ -69,7 +69,7 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($data);
@@ -85,7 +85,7 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($data);
@@ -102,7 +102,7 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($data);
@@ -120,7 +120,7 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($data);
@@ -137,7 +137,7 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($data);
@@ -154,5 +154,13 @@ class MonitoringController extends AbstractController
         $response['message'] = 'OK';
 
         return parent::json($response);
+    }
+
+    private function rethrowUnexpectedResponseException(UnexpectedResponseException $exception)
+    {
+        $statusCode = $exception->getCode() >= 400 && $exception->getCode() < 500
+            ? $exception->getCode()
+            : Response::HTTP_BAD_GATEWAY;
+        throw new HttpException($statusCode, $exception->getMessage());
     }
 }
