@@ -563,6 +563,13 @@ const EnhancedTableHead = ({
                       active={orderBy === headCell.id}
                       direction={orderBy === headCell.id ? order : 'asc'}
                       onClick={createSortHandler(headCell.id)}
+                      sx={{
+                        '&.MuiTableSortLabel-root.Mui-active': {
+                          '& .MuiTableSortLabel-icon': {
+                            color: 'primary.main',
+                          },
+                        },
+                      }}
                     >
                       {headCell.label}
                     </TableSortLabel>
@@ -723,7 +730,7 @@ const EnhancedTableHead = ({
 };
 
 export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading, padding = 'normal', paginationParams }) {
-  const initColumnPosition = headCells.map((cell) => cell.id);
+  const initColumnPosition = [...headCells.map((cell) => cell.id)];
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
@@ -737,10 +744,12 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
 
+  const columns = useMemo(() => [...headCells], [headCells]);
+
   const columnsPinnedToLeftWidth = useMemo(
     () =>
       columnsPinnedToLeftIds.reduce((acc, val, idx) => {
-        const prevCellWidth = parseFloat(headCells.find((cell) => cell.id === columnsPinnedToLeftIds[idx - 1])?.cellWidth || 0);
+        const prevCellWidth = parseFloat(columns.find((cell) => cell.id === columnsPinnedToLeftIds[idx - 1])?.cellWidth || 0);
         return { ...acc, [val]: prevCellWidth + acc[columnsPinnedToLeftIds[idx - 1]] || 0 };
       }, {}),
     [columnsPinnedToLeftIds],
@@ -894,14 +903,14 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         onRequestFilterByRange={handleRequestFilterByRange}
         onRequestFilterByDateRange={handleRequestFilterByDateRange}
         onRequestFilterBySelect={handleRequestFilterBySelect}
-        headCells={headCells}
+        headCells={columns}
         filterBy={filterBy}
         setFilterBy={setFilterBy}
       />
       <TableContainer>
         <Table stickyHeader padding={padding}>
           <EnhancedTableHead
-            headCells={headCells}
+            headCells={columns}
             cellsWithFilterableBySelectValues={cellsWithFilterableBySelectValues}
             order={sortDirection}
             orderBy={orderBy}
@@ -919,7 +928,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
             {!isDataLoading
               ? rows.map((row) => (
                   <TableRow hover tabIndex={-1} key={row.id}>
-                    {headCells
+                    {columns
                       .sort(sortByModel(initColumnPosition, 'id'))
                       .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
                       .map((cell, index) => {
@@ -940,7 +949,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                                     borderRight: '1px solid rgba(224, 224, 224, 1)',
                                   }
                                 : {}),
-                              ...(index === headCells.length - 1 && cell.pinToRight
+                              ...(index === columns.length - 1 && cell.pinToRight
                                 ? { position: 'sticky', right: 0, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
                                 : {}),
                               pl: 1,
@@ -957,7 +966,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                       })}
                   </TableRow>
                 ))
-              : renderSkeletons(headCells, rowsPerPage)}
+              : renderSkeletons(columns, rowsPerPage)}
           </TableBody>
         </Table>
       </TableContainer>

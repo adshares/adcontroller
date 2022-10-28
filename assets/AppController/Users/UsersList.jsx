@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useGetUsersListQuery } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import { formatMoney } from '../../utils/helpers';
-import { Box, Card, CardContent, CardHeader, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Box, Card, CardContent, CardHeader, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EmailIcon from '@mui/icons-material/Email';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
@@ -55,7 +55,6 @@ const headCells = [
     label: 'Role',
     cellWidth: '9rem',
     alignContent: 'center',
-    sortable: true,
   },
   {
     id: 'campaignCount',
@@ -127,6 +126,20 @@ export default function UsersList() {
     [response],
   );
 
+  const parseConnectedWallet = (wallet) => {
+    if (!wallet) {
+      return null;
+    }
+    if (wallet.length > 18) {
+      return (
+        <Tooltip title={wallet}>
+          <Typography variant="body1">{wallet.slice(0, 15) + '...'}</Typography>
+        </Tooltip>
+      );
+    }
+    return wallet;
+  };
+
   const rows = useMemo(() => {
     const users = response?.data || [];
     return users.map((user) => ({
@@ -142,7 +155,7 @@ export default function UsersList() {
           </Tooltip>
         </Box>
       ),
-      connectedWallet: user.connectedWallet.address,
+      connectedWallet: parseConnectedWallet(user.connectedWallet.address),
       walletBalance: formatMoney(user.adsharesWallet.walletBalance, 2) + ' ADS',
       bonusBalance: formatMoney(user.adsharesWallet.bonusBalance, 2) + ' ADS',
       role: parseRoles(user.roles),
