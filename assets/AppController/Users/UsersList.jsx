@@ -59,7 +59,7 @@ const headCells = [
   {
     id: 'campaignCount',
     label: 'Campaigns',
-    cellWidth: '7rem',
+    cellWidth: '9rem',
     alignContent: 'center',
     sortable: true,
   },
@@ -168,12 +168,18 @@ export default function UsersList() {
 
   const handleTableChanges = (event) => {
     console.log(event);
+    const createOrderByParams = (params) => {
+      if (!params.length) {
+        return null;
+      }
+      return params.map((param) => param.join(':')).join(',');
+    };
     setQueryConfig((prevState) => ({
       ...prevState,
       limit: event.rowsPerPage,
       cursor: response?.cursor || null,
       page: event.page,
-      orderBy: event.orderBy || null,
+      orderBy: createOrderByParams(event.orderBy),
     }));
   };
 
@@ -193,6 +199,7 @@ export default function UsersList() {
           rows={rows}
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
+          multiSort
           // defaultSortBy="email"
           paginationParams={{
             limit: queryConfig.limit,
