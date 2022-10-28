@@ -42,37 +42,12 @@ import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
 
-// const descendingOrderComparator = (a, b, orderBy) => {
-//   if (b[orderBy] < a[orderBy]) {
-//     return -1;
-//   }
-//   if (b[orderBy] > a[orderBy]) {
-//     return 1;
-//   }
-//   return 0;
-// };
-
-// const getOrderComparator = (order, orderBy) => {
-//   return order === 'desc' ? (a, b) => descendingOrderComparator(a, b, orderBy) : (a, b) => -descendingOrderComparator(a, b, orderBy);
-// };
-
 const sortByModel = (model, property) => (a, b) => {
   let ai = model.indexOf(a[property]);
   let bi = model.indexOf(b[property]);
   if (ai === -1) ai = 999;
   if (bi === -1) bi = 999;
   return ai - bi;
-};
-
-const filterFn = (arr, [head, query]) =>
-  arr.filter((el) => (el[head] ? el[head].toString().toLowerCase().includes(query.toString().toLowerCase()) : true));
-
-const multiFilterFn = (arr, filterBy) => {
-  let result = [...arr];
-  Object.keys(filterBy).forEach((prop) => {
-    result = filterFn(result, [prop, filterBy[prop]]);
-  });
-  return result;
 };
 
 const renderSkeletons = (columns, rowsPerPage) => {
@@ -438,9 +413,6 @@ const EnhancedTableHead = ({
       {},
     ),
   );
-  const [showFilterBySelectInput, setShowFilterBySelectInput] = useState(
-    headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}),
-  );
   const [showFilterByDateInput, setShowFilterByDateInput] = useState(
     headCells.reduce(
       (acc, head) => ({
@@ -449,6 +421,9 @@ const EnhancedTableHead = ({
       }),
       {},
     ),
+  );
+  const [showFilterBySelectInput, setShowFilterBySelectInput] = useState(
+    headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}),
   );
   const [showColumnSubmenu, setShowColumnSubmenu] = useState(null);
   const headCellsRefs = useRef([]);
@@ -544,7 +519,6 @@ const EnhancedTableHead = ({
             return (
               <TableCell
                 ref={headCellsRefs.current[index]}
-                // padding="none"
                 align="center"
                 sx={{
                   ...(columnsPinnedToLeftIds.includes(headCell.id)
@@ -753,24 +727,20 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
-  const [order, setOrder] = useState('asc');
+  const [sortDirection, setSortDirection] = useState('asc');
   const [orderBy, setOrderBy] = useState(
     defaultSortBy && headCells.map((cell) => cell.id).includes(defaultSortBy)
       ? headCells.find((cell) => cell.id === defaultSortBy)?.id
       : null,
   );
-  // const [multiSort, setMultiSort] = useState();
   const [filterBy, setFilterBy] = useState({});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
 
-  const columns = useMemo(() => [...headCells], [headCells]);
-  const filteredRows = useMemo(() => multiFilterFn(rows, filterBy), [filterBy, rows]);
-
   const columnsPinnedToLeftWidth = useMemo(
     () =>
       columnsPinnedToLeftIds.reduce((acc, val, idx) => {
-        const prevCellWidth = parseFloat(columns.find((cell) => cell.id === columnsPinnedToLeftIds[idx - 1])?.cellWidth || 0);
+        const prevCellWidth = parseFloat(headCells.find((cell) => cell.id === columnsPinnedToLeftIds[idx - 1])?.cellWidth || 0);
         return { ...acc, [val]: prevCellWidth + acc[columnsPinnedToLeftIds[idx - 1]] || 0 };
       }, {}),
     [columnsPinnedToLeftIds],
@@ -793,19 +763,18 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 
   useEffect(() => {
     onTableChange({
-      // order,
-      orderBy: orderBy && `${orderBy}:${order}`,
+      orderBy: orderBy && `${orderBy}:${sortDirection}`,
       filterBy,
       page: page + 1,
       rowsPerPage,
     });
-  }, [order, orderBy, page, filterBy, rowsPerPage]);
+  }, [sortDirection, orderBy, page, filterBy, rowsPerPage]);
 
   const handleRequestSort = (event, property) => {
-    console.log(property);
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+    const isAsc = orderBy === property && sortDirection === 'asc';
+    const isDesc = orderBy === property && sortDirection === 'desc';
+    setSortDirection(isAsc ? 'desc' : 'asc');
+    setOrderBy(isDesc ? null : property);
   };
 
   const handleRequestFilterByText = (event, property) => {
@@ -925,16 +894,16 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         onRequestFilterByRange={handleRequestFilterByRange}
         onRequestFilterByDateRange={handleRequestFilterByDateRange}
         onRequestFilterBySelect={handleRequestFilterBySelect}
-        headCells={columns}
+        headCells={headCells}
         filterBy={filterBy}
         setFilterBy={setFilterBy}
       />
       <TableContainer>
         <Table stickyHeader padding={padding}>
           <EnhancedTableHead
-            headCells={columns}
+            headCells={headCells}
             cellsWithFilterableBySelectValues={cellsWithFilterableBySelectValues}
-            order={order}
+            order={sortDirection}
             orderBy={orderBy}
             filterBy={filterBy}
             onRequestSort={handleRequestSort}
@@ -948,10 +917,9 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
           />
           <TableBody>
             {!isDataLoading
-              ? filteredRows.map((row) => (
-                  // ? filteredRows.sort(getOrderComparator(order, orderBy)).map((row) => (
+              ? rows.map((row) => (
                   <TableRow hover tabIndex={-1} key={row.id}>
-                    {columns
+                    {headCells
                       .sort(sortByModel(initColumnPosition, 'id'))
                       .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
                       .map((cell, index) => {
@@ -972,7 +940,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                                     borderRight: '1px solid rgba(224, 224, 224, 1)',
                                   }
                                 : {}),
-                              ...(index === columns.length - 1 && cell.pinToRight
+                              ...(index === headCells.length - 1 && cell.pinToRight
                                 ? { position: 'sticky', right: 0, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
                                 : {}),
                               pl: 1,
@@ -989,7 +957,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                       })}
                   </TableRow>
                 ))
-              : renderSkeletons(columns, rowsPerPage)}
+              : renderSkeletons(headCells, rowsPerPage)}
           </TableBody>
         </Table>
       </TableContainer>

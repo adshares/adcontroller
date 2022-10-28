@@ -19,7 +19,7 @@ export const monitoringApi = createApi({
   endpoints: (builder) => ({
     getWalletMonitoring: builder.query({
       query: () => ({
-        url: '/api/monitoring/wallet',
+        url: '/api/wallet',
         method: 'GET',
       }),
     }),
@@ -28,7 +28,7 @@ export const monitoringApi = createApi({
         const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
         const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
         return {
-          url: `/api/monitoring/hosts`,
+          url: `/api/hosts`,
           params: urlQueryParams,
           method: 'GET',
         };
@@ -36,7 +36,7 @@ export const monitoringApi = createApi({
     }),
     resetHostConnectionError: builder.mutation({
       query: ({ id }) => ({
-        url: `/api/monitoring/hosts/${id}/reset`,
+        url: `/api/hosts/${id}/reset`,
         method: 'PATCH',
       }),
     }),
@@ -45,7 +45,7 @@ export const monitoringApi = createApi({
         const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
         const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
         return {
-          url: '/api/monitoring/events',
+          url: '/api/events',
           params: urlQueryParams,
           method: 'GET',
         };
@@ -56,7 +56,7 @@ export const monitoringApi = createApi({
         const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
         const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
         return {
-          url: '/api/v2/users',
+          url: '/api/users',
           params: urlQueryParams,
           method: 'GET',
         };

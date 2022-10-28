@@ -1,14 +1,14 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import TableData from '../../Components/TableData/TableData';
-import { Box, Card, CardContent, CardHeader, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import commonStyles from '../../styles/commonStyles.scss';
 import { useGetUsersListQuery } from '../../redux/monitoring/monitoringApi';
+import TableData from '../../Components/TableData/TableData';
 import { formatMoney } from '../../utils/helpers';
+import { Box, Card, CardContent, CardHeader, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EmailIcon from '@mui/icons-material/Email';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import commonStyles from '../../styles/commonStyles.scss';
 
 const headCells = [
   {
@@ -87,6 +87,7 @@ const headCells = [
     ),
     cellWidth: '4.5rem',
     alignContent: 'center',
+    disableCellSubmenu: true,
     pinToRight: true,
   },
 ];
@@ -97,8 +98,6 @@ export default function UsersList() {
     cursor: null,
     page: 1,
     orderBy: null,
-    // direction: '',
-    // orderBy: 'email:asc',
   });
   const { data: response, isFetching } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
@@ -162,8 +161,6 @@ export default function UsersList() {
       cursor: response?.cursor || null,
       page: event.page,
       orderBy: event.orderBy || null,
-      // direction: event.order,
-      // orderBy: event.orderBy,
     }));
   };
 
