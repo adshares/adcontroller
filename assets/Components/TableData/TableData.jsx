@@ -382,8 +382,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 const EnhancedTableHead = ({
   headCells,
   cellsWithFilterableBySelectValues,
-  order,
-  orderBy,
+  multiSortParams,
   onRequestSort,
   filterBy,
   pinnedToLeft,
@@ -546,7 +545,6 @@ const EnhancedTableHead = ({
                 id={headCell.id}
                 onMouseEnter={() => setShowColumnSubmenu(headCell.id)}
                 onMouseLeave={() => setShowColumnSubmenu(null)}
-                sortDirection={headCell.sortable ? (orderBy === headCell.id ? order : false) : undefined}
               >
                 <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyCenter}`}>
                   {!headCell.disableCellSubmenu && (
@@ -559,20 +557,27 @@ const EnhancedTableHead = ({
                   )}
 
                   {headCell.sortable ? (
-                    <TableSortLabel
-                      active={orderBy === headCell.id}
-                      direction={orderBy === headCell.id ? order : 'asc'}
-                      onClick={createSortHandler(headCell.id)}
-                      sx={{
-                        '&.MuiTableSortLabel-root.Mui-active': {
-                          '& .MuiTableSortLabel-icon': {
-                            color: 'primary.main',
+                    <>
+                      <TableSortLabel
+                        active={multiSortParams.hasOwnProperty(headCell.id)}
+                        direction={multiSortParams[headCell.id] ? multiSortParams[headCell.id] : 'asc'}
+                        onClick={createSortHandler(headCell.id)}
+                        sx={{
+                          '&.MuiTableSortLabel-root.Mui-active': {
+                            '& .MuiTableSortLabel-icon': {
+                              color: 'primary.main',
+                            },
                           },
-                        },
-                      }}
-                    >
-                      {headCell.label}
-                    </TableSortLabel>
+                        }}
+                      >
+                        {headCell.label}
+                      </TableSortLabel>
+                      {multiSortParams.hasOwnProperty(headCell.id) && Object.keys(multiSortParams).length > 1 && (
+                        <Typography sx={{ fontWeight: 700 }} variant="overline" color="primary">
+                          {Object.keys(multiSortParams).indexOf(headCell.id) + 1}
+                        </Typography>
+                      )}
+                    </>
                   ) : (
                     headCell.label
                   )}
@@ -729,17 +734,21 @@ const EnhancedTableHead = ({
   );
 };
 
-export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading, padding = 'normal', paginationParams }) {
+export default function TableData({
+  multiSort = false,
+  defaultOrderBy = undefined,
+  headCells,
+  rows,
+  onTableChange,
+  isDataLoading,
+  padding = 'normal',
+  paginationParams,
+}) {
   const initColumnPosition = [...headCells.map((cell) => cell.id)];
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [orderBy, setOrderBy] = useState(
-    defaultSortBy && headCells.map((cell) => cell.id).includes(defaultSortBy)
-      ? headCells.find((cell) => cell.id === defaultSortBy)?.id
-      : null,
-  );
+  const [multiSortParams, setMultiSortParams] = useState(defaultOrderBy || {});
   const [filterBy, setFilterBy] = useState({});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
@@ -772,18 +781,24 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 
   useEffect(() => {
     onTableChange({
-      orderBy: orderBy && `${orderBy}:${sortDirection}`,
+      orderBy: multiSortParams,
       filterBy,
       page: page + 1,
       rowsPerPage,
     });
-  }, [sortDirection, orderBy, page, filterBy, rowsPerPage]);
+  }, [multiSortParams, page, filterBy, rowsPerPage]);
 
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && sortDirection === 'asc';
-    const isDesc = orderBy === property && sortDirection === 'desc';
-    setSortDirection(isAsc ? 'desc' : 'asc');
-    setOrderBy(isDesc ? null : property);
+    setMultiSortParams((prevState) => {
+      const newSortParams = {
+        ...(multiSort ? prevState : {}),
+        [property]: prevState[property] === 'asc' ? 'desc' : 'asc',
+      };
+      if (prevState[property] === 'desc') {
+        delete newSortParams[property];
+      }
+      return newSortParams;
+    });
   };
 
   const handleRequestFilterByText = (event, property) => {
@@ -912,8 +927,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
           <EnhancedTableHead
             headCells={columns}
             cellsWithFilterableBySelectValues={cellsWithFilterableBySelectValues}
-            order={sortDirection}
-            orderBy={orderBy}
+            multiSortParams={multiSortParams}
             filterBy={filterBy}
             onRequestSort={handleRequestSort}
             onRequestFilterByText={handleRequestFilterByText}
