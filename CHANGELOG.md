@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - User list
+### Changed
+- Controller passes 4xx status code
 
 ## [1.1.0] - 2022-10-26
 ### Added
