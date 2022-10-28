@@ -158,6 +158,11 @@ class AdServerConfigurationClient
     // SiteRejectedDomain
     public const REJECTED_DOMAINS = 'rejectedDomains';
 
+    private const RESOURCE_CONFIG = 'config';
+    private const RESOURCE_CONFIG_PLACEHOLDERS = 'config/placeholders';
+    private const RESOURCE_HOSTS = 'hosts';
+    private const RESOURCE_USERS = 'users';
+
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
@@ -168,55 +173,57 @@ class AdServerConfigurationClient
 
     public function fetch(): array
     {
-        return $this->getData($this->buildConfigUri());
+        return $this->getData($this->buildUri(self::RESOURCE_CONFIG));
     }
 
     public function proxyMonitoringRequest(Request $request, string $resource): array
     {
-        $data = $this->getData($this->buildMonitoringUri($resource), $request->query);
+        $data = $this->getData($this->buildUri($resource), $request->query);
         return self::overwriteUriInCaseOfPagination($data, $request);
     }
 
     public function fetchPlaceholders(): array
     {
-        return $this->getData($this->buildPlaceholdersUri());
+        return $this->getData($this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS));
     }
 
     public function store(array $data): array
     {
-        return $this->patchData($this->buildConfigUri(), self::mapDataToAdServerFormat($data));
+        return $this->patchData($this->buildUri(self::RESOURCE_CONFIG), self::mapDataToAdServerFormat($data));
     }
 
     public function storePlaceholders(array $data): array
     {
-        return $this->patchData($this->buildPlaceholdersUri(), self::mapPlaceholderDataToAdServerFormat($data));
+        return $this->patchData($this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS), self::mapPlaceholderDataToAdServerFormat($data));
     }
 
     public function resetHostConnectionError(int $hostId): array
     {
-        $uri = sprintf('%s/%d/reset', $this->buildMonitoringUri('hosts'), $hostId);
+        $uri = sprintf('%s/%d/reset', $this->buildUri(self::RESOURCE_HOSTS), $hostId);
         return $this->patchData($uri, []);
+    }
+
+    public function addUser(array $data): array
+    {
+        $uri = $this->buildUri(self::RESOURCE_USERS);
+        return $this->postData($uri, $data);
+    }
+
+    public function editUser(int $userId, array $data): array
+    {
+        $uri = sprintf('%s/%d', $this->buildUri(self::RESOURCE_USERS), $userId);
+        return $this->patchData($uri, $data);
     }
 
     public function patchUser(int $userId, string $action): array
     {
-        $uri = sprintf('%s/%d/%s', $this->buildMonitoringUri('users'), $userId, $action);
+        $uri = sprintf('%s/%d/%s', $this->buildUri(self::RESOURCE_USERS), $userId, $action);
         return $this->patchData($uri, []);
     }
 
-    private function buildConfigUri(): string
-    {
-        return sprintf('%s/api/v2/config', $this->adServerBaseUri);
-    }
-
-    private function buildMonitoringUri(string $resource): string
+    private function buildUri(string $resource): string
     {
         return sprintf('%s/api/v2/%s', $this->adServerBaseUri, $resource);
-    }
-
-    private function buildPlaceholdersUri(): string
-    {
-        return sprintf('%s/api/v2/config/placeholders', $this->adServerBaseUri);
     }
 
     private function getAuthorizationHeader(): string
@@ -364,7 +371,7 @@ class AdServerConfigurationClient
     public function setupAdClassify(string $adClassifyUrl, string $apiKeyName, string $apiKeySecret): void
     {
         $this->patchData(
-            $this->buildConfigUri(),
+            $this->buildUri(self::RESOURCE_CONFIG),
             [
                 self::CLASSIFIER_EXTERNAL_API_KEY_NAME => $apiKeyName,
                 self::CLASSIFIER_EXTERNAL_API_KEY_SECRET => $apiKeySecret,
@@ -375,23 +382,23 @@ class AdServerConfigurationClient
 
     public function setupAdPanel(string $adPanelUrl): void
     {
-        $this->patchData($this->buildConfigUri(), [self::ADPANEL_URL => $adPanelUrl]);
+        $this->patchData($this->buildUri(self::RESOURCE_CONFIG), [self::ADPANEL_URL => $adPanelUrl]);
     }
 
     public function setupAdPay(string $adPayUrl): void
     {
-        $this->patchData($this->buildConfigUri(), [self::ADPAY_URL => $adPayUrl]);
+        $this->patchData($this->buildUri(self::RESOURCE_CONFIG), [self::ADPAY_URL => $adPayUrl]);
     }
 
     public function setupAdSelect(string $adSelectUrl): void
     {
-        $this->patchData($this->buildConfigUri(), [self::ADSELECT_URL => $adSelectUrl]);
+        $this->patchData($this->buildUri(self::RESOURCE_CONFIG), [self::ADSELECT_URL => $adSelectUrl]);
     }
 
     public function setupAdUser(string $adUserUrl, string $adUserInternalUrl): void
     {
         $this->patchData(
-            $this->buildConfigUri(),
+            $this->buildUri(self::RESOURCE_CONFIG),
             [
                 self::ADUSER_BASE_URL => $adUserUrl,
                 self::ADUSER_INTERNAL_URL => $adUserInternalUrl === $adUserUrl ? null : $adUserInternalUrl,
@@ -420,6 +427,23 @@ class AdServerConfigurationClient
     {
         $response = $this->httpClient->request(
             'PATCH',
+            $url,
+            [
+                'headers' => [
+                    'Authorization' => $this->getAuthorizationHeader(),
+                ],
+                'json' => $data
+            ]
+        );
+        $this->checkStatusCode($response);
+
+        return json_decode($response->getContent(), true);
+    }
+
+    private function postData(string $url, array $data): array
+    {
+        $response = $this->httpClient->request(
+            'POST',
             $url,
             [
                 'headers' => [

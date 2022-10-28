@@ -54,7 +54,7 @@ class MonitoringController extends AbstractController
         return $this->jsonOk([Configuration::LICENSE_DATA => $license->toArray()]);
     }
 
-    #[Route('/{key}', name: 'fetch_by_key', methods: ['GET'])]
+    #[Route('/{key}', name: 'fetch_by_key', requirements: ['key' => '.+'], methods: ['GET'])]
     public function fetch(
         string $key,
         AdServerConfigurationClient $adServerConfigurationClient,
@@ -82,6 +82,41 @@ class MonitoringController extends AbstractController
     ): JsonResponse {
         try {
             $data = $adServerConfigurationClient->resetHostConnectionError($hostId);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+        }
+
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/users', name: 'add_user', methods: ['POST'])]
+    public function addUser(
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
+        $content = json_decode($request->getContent(), true) ?? [];
+        try {
+            $data = $adServerConfigurationClient->addUser($content);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+        }
+
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/users/{userId}', name: 'edit_user', methods: ['PATCH'])]
+    public function editUser(
+        int $userId,
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
+        $content = json_decode($request->getContent(), true) ?? [];
+        try {
+            $data = $adServerConfigurationClient->editUser($userId, $content);
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
