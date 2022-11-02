@@ -1,7 +1,6 @@
 import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Chip,
-  Collapse,
   InputAdornment,
   List,
   ListItem,
@@ -83,10 +82,10 @@ const FilteringInformationBox = ({
   onRequestFilterByRange,
   onRequestFilterByDateRange,
   onRequestFilterBySelect,
+  onRequestCustomFilter,
+  customFiltersEl,
 }) => {
-  const [showFilters, setShowFilters] = useState(false);
-
-  const handleDelete = (opt, property) => {
+  const handleChipDelete = (opt, property) => {
     const { name, prop, el } = property;
     switch (opt) {
       case 'byText':
@@ -129,10 +128,6 @@ const FilteringInformationBox = ({
     }
   };
 
-  const createFilterHandler = (event) => {
-    onRequestFilterByText(event, 'all');
-  };
-
   const chipsByText = filterBy.text
     ? Object.keys(filterBy.text)
         .map((filterName) => {
@@ -143,7 +138,7 @@ const FilteringInformationBox = ({
                 <Chip
                   sx={{ margin: 0.5 }}
                   size="small"
-                  onDelete={() => handleDelete('byText', { prop: filterName })}
+                  onDelete={() => handleChipDelete('byText', { prop: filterName })}
                   label={`${head.label}: ${filterBy.text[filterName]}`}
                 />
               </ListItem>
@@ -164,7 +159,7 @@ const FilteringInformationBox = ({
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
-                    onDelete={() => handleDelete('byRange', { prop: filterName, name: 'min' })}
+                    onDelete={() => handleChipDelete('byRange', { prop: filterName, name: 'min' })}
                     label={`${head.label} min: ${filterBy.range[filterName]?.min}`}
                   />
                 )}
@@ -172,7 +167,7 @@ const FilteringInformationBox = ({
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
-                    onDelete={() => handleDelete('byRange', { prop: filterName, name: 'max' })}
+                    onDelete={() => handleChipDelete('byRange', { prop: filterName, name: 'max' })}
                     label={`${head.label} max: ${filterBy.range[filterName]?.max}`}
                   />
                 )}
@@ -194,7 +189,7 @@ const FilteringInformationBox = ({
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
-                    onDelete={() => handleDelete('byDateRange', { prop: filterName, name: 'from' })}
+                    onDelete={() => handleChipDelete('byDateRange', { prop: filterName, name: 'from' })}
                     label={`${head.label} from: ${filterBy.dateRange[filterName]?.from.toLocaleString()}`}
                   />
                 )}
@@ -202,7 +197,7 @@ const FilteringInformationBox = ({
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
-                    onDelete={() => handleDelete('byDateRange', { prop: filterName, name: 'to' })}
+                    onDelete={() => handleChipDelete('byDateRange', { prop: filterName, name: 'to' })}
                     label={`${head.label} to: ${filterBy.dateRange[filterName]?.to.toLocaleString()}`}
                   />
                 )}
@@ -225,7 +220,7 @@ const FilteringInformationBox = ({
                 <Chip
                   sx={{ margin: 0.5 }}
                   size="small"
-                  onDelete={() => handleDelete('bySelect', { prop: filterName, el })}
+                  onDelete={() => handleChipDelete('bySelect', { prop: filterName, el })}
                   label={`${head.label}: ${el}`}
                 />
               </ListItem>
@@ -237,23 +232,11 @@ const FilteringInformationBox = ({
 
   return (
     <Box>
-      <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-        <Typography variant="h6">Filters</Typography>
-        <IconButton onClick={() => setShowFilters((prevState) => !prevState)}>
-          <FilterListIcon />
-        </IconButton>
-        <Collapse in={showFilters} timeout="auto">
-          <TextField
-            name="filterQuery"
-            label="Filter all"
-            fullWidth
-            variant="outlined"
-            size="small"
-            margin="none"
-            onChange={createFilterHandler}
-            inputProps={{ autoComplete: 'off' }}
-          />
-        </Collapse>
+      <Box>
+        {customFiltersEl.length > 0 &&
+          customFiltersEl.map((FilterElement, idx) => (
+            <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} filterBy={filterBy} />
+          ))}
       </Box>
       {!!chipsByText.length && (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
@@ -742,19 +725,21 @@ const EnhancedTableHead = ({
 export default function TableData({
   multiSort = false,
   defaultOrderBy = undefined,
+  defaultFilterBy = undefined,
   headCells,
   rows,
   onTableChange,
   isDataLoading,
   padding = 'normal',
   paginationParams,
+  customFiltersEl = [],
 }) {
   const initColumnPosition = [...headCells.map((cell) => cell.id)];
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
   const [multiSortParams, setMultiSortParams] = useState(defaultOrderBy || {});
-  const [filterBy, setFilterBy] = useState({});
+  const [filterBy, setFilterBy] = useState({ ...defaultFilterBy });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
 
@@ -899,6 +884,21 @@ export default function TableData({
     setPage(0);
   };
 
+  const handleRequestCustomFilter = (value, property) => {
+    setFilterBy((prevState) => {
+      const filterQueries = {
+        ...prevState,
+
+        [property]: value,
+      };
+      if (value === '' || value === null) {
+        delete filterQueries[property];
+      }
+      return filterQueries;
+    });
+    setPage(0);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -923,9 +923,11 @@ export default function TableData({
         onRequestFilterByRange={handleRequestFilterByRange}
         onRequestFilterByDateRange={handleRequestFilterByDateRange}
         onRequestFilterBySelect={handleRequestFilterBySelect}
+        onRequestCustomFilter={handleRequestCustomFilter}
         headCells={columns}
         filterBy={filterBy}
         setFilterBy={setFilterBy}
+        customFiltersEl={customFiltersEl}
       />
       <TableContainer>
         <Table stickyHeader padding={padding}>
