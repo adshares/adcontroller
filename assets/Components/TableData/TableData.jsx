@@ -884,16 +884,19 @@ export default function TableData({
     setPage(0);
   };
 
-  const handleRequestCustomFilter = (value, property) => {
+  const handleRequestCustomFilter = (entries) => {
+    console.log(entries);
     setFilterBy((prevState) => {
       const filterQueries = {
         ...prevState,
-
-        [property]: value,
+        ...entries,
       };
-      if (value === '' || value === null) {
-        delete filterQueries[property];
-      }
+      Object.entries(entries).forEach((entry) => {
+        if (entry[1] === null) {
+          delete filterQueries[entry[0]];
+        }
+      });
+
       return filterQueries;
     });
     setPage(0);
