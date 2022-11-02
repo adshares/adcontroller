@@ -412,7 +412,7 @@ const EnhancedTableHead = ({
       {},
     ),
   );
-  const [showFilterByDateInput, setShowFilterByDateInput] = useState(
+  const [showFilterByDateRangeInput, setShowFilterByDateRangeInput] = useState(
     headCells.reduce(
       (acc, head) => ({
         ...acc,
@@ -464,7 +464,7 @@ const EnhancedTableHead = ({
   };
 
   const toggleShowFilterByDate = (prop) => {
-    setShowFilterByDateInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
+    setShowFilterByDateRangeInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
   };
 
   const handleMenuItemClick = (column, option, closeSubmenu) => {
@@ -568,15 +568,20 @@ const EnhancedTableHead = ({
                               color: 'primary.main',
                             },
                           },
+                          '&::after': {
+                            content:
+                              multiSortParams.hasOwnProperty(headCell.id) && Object.keys(multiSortParams).length > 1
+                                ? `'${Object.keys(multiSortParams).indexOf(headCell.id) + 1}'`
+                                : '""',
+                            position: 'relative',
+                            bottom: '-5px',
+                            left: '-5px',
+                            color: 'primary.main',
+                          },
                         }}
                       >
                         {headCell.label}
                       </TableSortLabel>
-                      {multiSortParams.hasOwnProperty(headCell.id) && Object.keys(multiSortParams).length > 1 && (
-                        <Typography sx={{ fontWeight: 700 }} variant="overline" color="primary">
-                          {Object.keys(multiSortParams).indexOf(headCell.id) + 1}
-                        </Typography>
-                      )}
                     </>
                   ) : (
                     headCell.label
@@ -669,7 +674,7 @@ const EnhancedTableHead = ({
 
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
-                  open={showFilterByDateInput[headCell.id]}
+                  open={showFilterByDateRangeInput[headCell.id]}
                   onClose={() => toggleShowFilterByDate(headCell.id)}
                   anchorOrigin={{
                     vertical: 'bottom',
