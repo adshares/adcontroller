@@ -231,12 +231,19 @@ const FilteringInformationBox = ({
     : [];
 
   return (
-    <Box>
+    <>
       <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.flexWrap}`}>
-        {customFiltersEl.length > 0 &&
-          customFiltersEl.map((FilterElement, idx) => (
-            <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} filterBy={filterBy} />
-          ))}
+        {customFiltersEl.length > 0 && (
+          <>
+            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 1 }}>
+              <FilterListIcon />
+              <Typography variant="h6">Filter list:</Typography>
+            </Box>
+            {customFiltersEl.map((FilterElement, idx) => (
+              <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} filterBy={filterBy} />
+            ))}
+          </>
+        )}
       </Box>
       {!!chipsByText.length && (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
@@ -270,7 +277,7 @@ const FilteringInformationBox = ({
           <List>{chipsBySelect}</List>
         </Box>
       )}
-    </Box>
+    </>
   );
 };
 
@@ -884,16 +891,19 @@ export default function TableData({
     setPage(0);
   };
 
-  const handleRequestCustomFilter = (value, property) => {
+  const handleRequestCustomFilter = (entries) => {
+    console.log(entries);
     setFilterBy((prevState) => {
       const filterQueries = {
         ...prevState,
-
-        [property]: value,
+        ...entries,
       };
-      if (value === '' || value === null) {
-        delete filterQueries[property];
-      }
+      Object.entries(entries).forEach((entry) => {
+        if (entry[1] === null) {
+          delete filterQueries[entry[0]];
+        }
+      });
+
       return filterQueries;
     });
     setPage(0);

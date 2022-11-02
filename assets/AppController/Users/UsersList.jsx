@@ -8,8 +8,10 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   FormControl,
   FormControlLabel,
+  FormGroup,
   FormLabel,
   IconButton,
   Menu,
@@ -117,6 +119,8 @@ export default function UsersList() {
     orderBy: null,
     'filter[query]': null,
     'filter[role]': null,
+    'filter[emailConfirmed]': null,
+    'filter[adminConfirmed]': null,
   });
   const { data: response, isFetching } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
@@ -203,6 +207,8 @@ export default function UsersList() {
       orderBy: createOrderByParams(event.orderBy),
       'filter[query]': event.filterBy.query || null,
       'filter[role]': event.filterBy.role || null,
+      'filter[emailConfirmed]': JSON.stringify(event.filterBy.emailConfirmed) || null,
+      'filter[adminConfirmed]': JSON.stringify(event.filterBy.adminConfirmed) || null,
     }));
   };
 
@@ -230,7 +236,7 @@ export default function UsersList() {
             showLastButton: true,
           }}
           defaultFilterBy={queryConfig.filter}
-          customFiltersEl={[FilterByEmail, FilterByRole]}
+          customFiltersEl={[FilterByEmail, FilterByRole, FilterByStatus]}
         />
       </CardContent>
     </Card>
@@ -282,11 +288,12 @@ const FilterByEmail = ({ customFiltersHandler, filterBy }) => {
   const debouncedQuery = useDebounce(query, 500);
 
   useSkipFirstRenderEffect(() => {
-    customFiltersHandler(query, 'query');
+    customFiltersHandler({ query });
   }, [debouncedQuery]);
 
   return (
     <TextField
+      sx={{ mr: 2 }}
       name="query"
       label="Search by email or domain"
       variant="outlined"
@@ -300,17 +307,55 @@ const FilterByEmail = ({ customFiltersHandler, filterBy }) => {
 
 const FilterByRole = ({ customFiltersHandler, filterBy }) => {
   return (
-    <FormControl sx={{ ml: 1.5 }}>
+    <FormControl>
       <FormLabel focused={false}>Filter by user's role:</FormLabel>
       <RadioGroup
         row
         value={filterBy.role || 'all'}
-        onChange={(e) => customFiltersHandler(e.target.value === 'all' ? null : e.target.value, 'role')}
+        onChange={(e) => customFiltersHandler(e.target.value === 'all' ? { role: null } : { role: e.target.value })}
       >
         <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
         <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
         <FormControlLabel value="all" control={<Radio />} label="All" />
       </RadioGroup>
+    </FormControl>
+  );
+};
+
+const FilterByStatus = ({ customFiltersHandler, filterBy }) => {
+  return (
+    <FormControl>
+      <FormLabel focused={false}>Filter by status:</FormLabel>
+      <FormGroup aria-label="position" row>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filterBy.hasOwnProperty('emailConfirmed') && filterBy.emailConfirmed}
+              onChange={() => customFiltersHandler({ emailConfirmed: !filterBy.emailConfirmed })}
+            />
+          }
+          label="Confirmed email"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filterBy.hasOwnProperty('adminConfirmed') && filterBy.adminConfirmed}
+              onChange={() => customFiltersHandler({ adminConfirmed: !filterBy.adminConfirmed })}
+            />
+          }
+          label="Confirmed account"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              disabled={!(filterBy.hasOwnProperty('adminConfirmed') || filterBy.hasOwnProperty('emailConfirmed'))}
+              checked={!(filterBy.hasOwnProperty('adminConfirmed') || filterBy.hasOwnProperty('emailConfirmed'))}
+              onChange={() => customFiltersHandler({ adminConfirmed: null, emailConfirmed: null })}
+            />
+          }
+          label="All"
+        />
+      </FormGroup>
     </FormControl>
   );
 };
