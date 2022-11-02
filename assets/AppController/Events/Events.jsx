@@ -41,7 +41,7 @@ export default function Events() {
     limit: 5,
     cursor: null,
     page: 1,
-    types: null,
+    'filter[type]': null,
     from: null,
     to: null,
   });
@@ -77,7 +77,7 @@ export default function Events() {
       cursor: response?.cursor || null,
       page: event.page,
       limit: event.rowsPerPage,
-      types: event.filterBy.select?.type || null,
+      'filter[type]': event.filterBy.select?.type || null,
       from: formatDate(fromDate),
       to: formatDate(toDate),
     }));

@@ -1,17 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithGlobalErrorHandler } from '../apiBaseQuery';
-
-const parseParamsEntries = (entries) => {
-  const paramsEntries = [];
-  entries.forEach((entry) => {
-    if (Array.isArray(entry[1])) {
-      entry[1].map((paramValue) => [`${entry[0]}[]`, paramValue]).forEach((entry) => paramsEntries.push(entry));
-      return;
-    }
-    paramsEntries.push(entry);
-  });
-  return paramsEntries;
-};
+import queryString from 'query-string';
 
 export const monitoringApi = createApi({
   reducerPath: 'monitoringApi',
@@ -25,11 +14,9 @@ export const monitoringApi = createApi({
     }),
     getConnectedHosts: builder.query({
       query: (queryConfig) => {
-        const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
-        const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
+        const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
         return {
-          url: `/api/hosts`,
-          params: urlQueryParams,
+          url: `/api/hosts?${queryParams}`,
           method: 'GET',
         };
       },
@@ -42,22 +29,18 @@ export const monitoringApi = createApi({
     }),
     getEvents: builder.query({
       query: (queryConfig) => {
-        const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
-        const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
+        const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
         return {
-          url: '/api/events',
-          params: urlQueryParams,
+          url: `/api/events?${queryParams}`,
           method: 'GET',
         };
       },
     }),
     getUsersList: builder.query({
       query: (queryConfig) => {
-        const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
-        const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
+        const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
         return {
-          url: '/api/users',
-          params: urlQueryParams,
+          url: `/api/users?${queryParams}`,
           method: 'GET',
         };
       },
