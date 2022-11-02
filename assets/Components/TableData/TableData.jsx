@@ -232,7 +232,7 @@ const FilteringInformationBox = ({
 
   return (
     <Box>
-      <Box>
+      <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.flexWrap}`}>
         {customFiltersEl.length > 0 &&
           customFiltersEl.map((FilterElement, idx) => (
             <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} filterBy={filterBy} />

@@ -1,15 +1,31 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useGetUsersListQuery } from '../../redux/monitoring/monitoringApi';
-import TableData from '../../Components/TableData/TableData';
+import { useDebounce, useSkipFirstRenderEffect } from '../../hooks';
 import { formatMoney } from '../../utils/helpers';
-import { Box, Card, CardContent, CardHeader, IconButton, Menu, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
+import TableData from '../../Components/TableData/TableData';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  Menu,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EmailIcon from '@mui/icons-material/Email';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import commonStyles from '../../styles/commonStyles.scss';
-import { useDebounce, useSkipFirstRenderEffect } from '../../hooks';
 
 const headCells = [
   {
@@ -100,6 +116,7 @@ export default function UsersList() {
     page: 1,
     orderBy: null,
     'filter[query]': null,
+    'filter[role]': null,
   });
   const { data: response, isFetching } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
@@ -185,6 +202,7 @@ export default function UsersList() {
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
       'filter[query]': event.filterBy.query || null,
+      'filter[role]': event.filterBy.role || null,
     }));
   };
 
@@ -212,7 +230,7 @@ export default function UsersList() {
             showLastButton: true,
           }}
           defaultFilterBy={queryConfig.filter}
-          customFiltersEl={[FilterByEmail]}
+          customFiltersEl={[FilterByEmail, FilterByRole]}
         />
       </CardContent>
     </Card>
@@ -272,11 +290,27 @@ const FilterByEmail = ({ customFiltersHandler, filterBy }) => {
       name="query"
       label="Search by email or domain"
       variant="outlined"
-      size="small"
       margin="none"
       value={query}
       onChange={(e) => setQuery(e.target.value)}
       inputProps={{ autoComplete: 'off' }}
     />
+  );
+};
+
+const FilterByRole = ({ customFiltersHandler, filterBy }) => {
+  return (
+    <FormControl sx={{ ml: 1.5 }}>
+      <FormLabel focused={false}>Filter by user's role:</FormLabel>
+      <RadioGroup
+        row
+        value={filterBy.role || 'all'}
+        onChange={(e) => customFiltersHandler(e.target.value === 'all' ? null : e.target.value, 'role')}
+      >
+        <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
+        <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
+        <FormControlLabel value="all" control={<Radio />} label="All" />
+      </RadioGroup>
+    </FormControl>
   );
 };
