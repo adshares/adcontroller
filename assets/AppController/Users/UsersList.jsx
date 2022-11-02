@@ -2,13 +2,14 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useGetUsersListQuery } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import { formatMoney } from '../../utils/helpers';
-import { Box, Card, CardContent, CardHeader, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardHeader, IconButton, Menu, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EmailIcon from '@mui/icons-material/Email';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import commonStyles from '../../styles/commonStyles.scss';
+import { useDebounce, useSkipFirstRenderEffect } from '../../hooks';
 
 const headCells = [
   {
@@ -26,6 +27,7 @@ const headCells = [
     label: 'Email',
     cellWidth: '15rem',
     alignContent: 'left',
+    filterableBy: ['text'],
     sortable: true,
   },
 
@@ -97,6 +99,7 @@ export default function UsersList() {
     cursor: null,
     page: 1,
     orderBy: null,
+    'filter[query]': null,
   });
   const { data: response, isFetching } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
@@ -178,9 +181,10 @@ export default function UsersList() {
     setQueryConfig((prevState) => ({
       ...prevState,
       limit: event.rowsPerPage,
-      cursor: response?.cursor || null,
+      cursor: event.page === 1 ? null : response?.cursor,
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
+      'filter[query]': event.filterBy.query || null,
     }));
   };
 
@@ -207,6 +211,8 @@ export default function UsersList() {
             showFirstButton: true,
             showLastButton: true,
           }}
+          defaultFilterBy={queryConfig.filter}
+          customFiltersEl={[FilterByEmail]}
         />
       </CardContent>
     </Card>
@@ -250,5 +256,27 @@ const PositionedMenu = ({ id }) => {
         <MenuItem onClick={handleClose}>Logout</MenuItem>
       </Menu>
     </>
+  );
+};
+
+const FilterByEmail = ({ customFiltersHandler, filterBy }) => {
+  const [query, setQuery] = useState(filterBy.query || '');
+  const debouncedQuery = useDebounce(query, 500);
+
+  useSkipFirstRenderEffect(() => {
+    customFiltersHandler(query, 'query');
+  }, [debouncedQuery]);
+
+  return (
+    <TextField
+      name="query"
+      label="Search by email or domain"
+      variant="outlined"
+      size="small"
+      margin="none"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      inputProps={{ autoComplete: 'off' }}
+    />
   );
 };
