@@ -62,8 +62,8 @@ export default function Events() {
   }, [response]);
 
   const handleTableChanges = (event) => {
-    const fromDate = event.filterBy.dateRange?.createdAt?.from || null;
-    const toDate = event.filterBy.dateRange?.createdAt?.to || null;
+    const fromDate = event.tableFilters.dateRange?.createdAt?.from || null;
+    const toDate = event.tableFilters.dateRange?.createdAt?.to || null;
 
     const formatDate = (date) => {
       if (!date) {
@@ -77,7 +77,7 @@ export default function Events() {
       cursor: response?.cursor || null,
       page: event.page,
       limit: event.rowsPerPage,
-      'filter[type]': event.filterBy.select?.type || null,
+      'filter[type]': event.tableFilters.select?.type || null,
       from: formatDate(fromDate),
       to: formatDate(toDate),
     }));

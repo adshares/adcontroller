@@ -1,13 +1,13 @@
-import React, { useMemo, useState } from 'react'
-import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi'
-import TableData from '../../Components/TableData/TableData'
-import { Box, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material'
-import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined'
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
-import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined'
-import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined'
-import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined'
-import commonStyles from '../../styles/commonStyles.scss'
+import React, { useMemo, useState } from 'react';
+import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
+import TableData from '../../Components/TableData/TableData';
+import { Box, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
+import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
+import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
+import commonStyles from '../../styles/commonStyles.scss';
 
 const headCells = [
   {
@@ -59,23 +59,19 @@ const headCells = [
     alignContent: 'center',
     // pinToRight: true,
   },
-]
+];
 
-export default function ConnectedStatus () {
+export default function ConnectedStatus() {
   const [queryConfig, setQueryConfig] = useState({
     page: 1,
     cursor: null,
     limit: 5,
-  })
-  const [resetHostConnectionError] = useResetHostConnectionErrorMutation()
-  const {
-    data: response,
-    isFetching,
-    refetch
-  } = useGetConnectedHostsQuery(queryConfig, { refetchOnMountOrArgChange: true })
+  });
+  const [resetHostConnectionError] = useResetHostConnectionErrorMutation();
+  const { data: response, isFetching, refetch } = useGetConnectedHostsQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   const rows = useMemo(() => {
-    const hosts = response?.data || []
+    const hosts = response?.data || [];
     return hosts.map((host) => ({
       id: host.id,
       name: host.name,
@@ -87,22 +83,22 @@ export default function ConnectedStatus () {
       status:
         (host.status === 'operational' && (
           <Tooltip title={host.error || 'Operational'}>
-            <PublishedWithChangesOutlinedIcon color="success"/>
+            <PublishedWithChangesOutlinedIcon color="success" />
           </Tooltip>
         )) ||
         (host.status === 'failure' && (
           <Tooltip title={host.error || 'Failure'}>
-            <CloseOutlinedIcon color="error"/>
+            <CloseOutlinedIcon color="error" />
           </Tooltip>
         )) ||
         (host.status === 'unreachable' && (
           <Tooltip title={host.error || 'Server is unreachable'}>
-            <SyncProblemOutlinedIcon color="warning"/>
+            <SyncProblemOutlinedIcon color="warning" />
           </Tooltip>
         )) ||
         (host.status === 'initialization' && (
           <Tooltip title="Initialization in progress">
-            <SyncOutlinedIcon color="info"/>
+            <SyncOutlinedIcon color="info" />
           </Tooltip>
         )),
       countOfError: (
@@ -111,31 +107,31 @@ export default function ConnectedStatus () {
           {Number(host.connectionErrorCount) > 0 && (
             <Tooltip title="Reset counter">
               <IconButton size="small" color="primary" onClick={() => onResetCounterClick(host.id)}>
-                <RestartAltOutlinedIcon/>
+                <RestartAltOutlinedIcon />
               </IconButton>
             </Tooltip>
           )}
         </Box>
       ),
-    }))
-  }, [response])
+    }));
+  }, [response]);
 
   const onResetCounterClick = async (id) => {
-    const result = await resetHostConnectionError({ id })
+    const result = await resetHostConnectionError({ id });
     if (result.data.message === 'OK') {
-      refetch()
+      refetch();
     }
-  }
+  };
 
   const handleTableChanges = (event) => {
-    console.log(event)
+    console.log(event);
     setQueryConfig((prevState) => ({
       ...prevState,
       cursor: response?.cursor || null,
       page: event.page,
       limit: event.rowsPerPage,
-    }))
-  }
+    }));
+  };
 
   return (
     <Card
@@ -146,7 +142,7 @@ export default function ConnectedStatus () {
       }}
       width="full"
     >
-      <CardHeader title="Connected status"/>
+      <CardHeader title="Connected status" />
       <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
         <TableData
           headCells={headCells} // array of objects {id, label, ...additional params}
@@ -163,5 +159,5 @@ export default function ConnectedStatus () {
         />
       </CardContent>
     </Card>
-  )
+  );
 }

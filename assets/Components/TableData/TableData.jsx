@@ -33,6 +33,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
@@ -77,12 +78,14 @@ const renderSkeletons = (columns, rowsPerPage) => {
 
 const FilteringInformationBox = ({
   headCells,
-  filterBy,
+  tableFilters,
+  customFilters,
   onRequestFilterByText,
   onRequestFilterByRange,
   onRequestFilterByDateRange,
   onRequestFilterBySelect,
   onRequestCustomFilter,
+  onRequestResetFilters,
   customFiltersEl,
 }) => {
   const handleChipDelete = (opt, property) => {
@@ -117,7 +120,7 @@ const FilteringInformationBox = ({
       case 'bySelect':
         const bySelectEventSlice = {
           target: {
-            value: filterBy.select ? filterBy.select[prop].filter((val) => val !== el) : [],
+            value: tableFilters.select ? tableFilters.select[prop].filter((val) => val !== el) : [],
           },
         };
         onRequestFilterBySelect(bySelectEventSlice, prop);
@@ -128,8 +131,8 @@ const FilteringInformationBox = ({
     }
   };
 
-  const chipsByText = filterBy.text
-    ? Object.keys(filterBy.text)
+  const chipsByText = tableFilters.text
+    ? Object.keys(tableFilters.text)
         .map((filterName) => {
           const head = headCells.find((el) => el.id === filterName);
           return (
@@ -139,7 +142,7 @@ const FilteringInformationBox = ({
                   sx={{ margin: 0.5 }}
                   size="small"
                   onDelete={() => handleChipDelete('byText', { prop: filterName })}
-                  label={`${head.label}: ${filterBy.text[filterName]}`}
+                  label={`${head.label}: ${tableFilters.text[filterName]}`}
                 />
               </ListItem>
             )
@@ -148,27 +151,27 @@ const FilteringInformationBox = ({
         .filter(Boolean)
     : [];
 
-  const chipsByRange = filterBy.range
-    ? Object.keys(filterBy.range)
+  const chipsByRange = tableFilters.range
+    ? Object.keys(tableFilters.range)
         .map((filterName) => {
           const head = headCells.find((el) => el.id === filterName);
           return (
             head && (
               <ListItem disableGutters disablePadding sx={{ display: 'inline' }} key={filterName}>
-                {filterBy.range[filterName]?.min && (
+                {tableFilters.range[filterName]?.min && (
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
                     onDelete={() => handleChipDelete('byRange', { prop: filterName, name: 'min' })}
-                    label={`${head.label} min: ${filterBy.range[filterName]?.min}`}
+                    label={`${head.label} min: ${tableFilters.range[filterName]?.min}`}
                   />
                 )}
-                {filterBy.range[filterName]?.max && (
+                {tableFilters.range[filterName]?.max && (
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
                     onDelete={() => handleChipDelete('byRange', { prop: filterName, name: 'max' })}
-                    label={`${head.label} max: ${filterBy.range[filterName]?.max}`}
+                    label={`${head.label} max: ${tableFilters.range[filterName]?.max}`}
                   />
                 )}
               </ListItem>
@@ -178,27 +181,27 @@ const FilteringInformationBox = ({
         .filter(Boolean)
     : [];
 
-  const chipsByDateRange = filterBy.dateRange
-    ? Object.keys(filterBy.dateRange)
+  const chipsByDateRange = tableFilters.dateRange
+    ? Object.keys(tableFilters.dateRange)
         .map((filterName) => {
           const head = headCells.find((el) => el.id === filterName);
           return (
             head && (
               <ListItem disableGutters disablePadding sx={{ display: 'inline' }} key={filterName}>
-                {filterBy.dateRange[filterName]?.from && (
+                {tableFilters.dateRange[filterName]?.from && (
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
                     onDelete={() => handleChipDelete('byDateRange', { prop: filterName, name: 'from' })}
-                    label={`${head.label} from: ${filterBy.dateRange[filterName]?.from.toLocaleString()}`}
+                    label={`${head.label} from: ${tableFilters.dateRange[filterName]?.from.toLocaleString()}`}
                   />
                 )}
-                {filterBy.dateRange[filterName]?.to && (
+                {tableFilters.dateRange[filterName]?.to && (
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
                     onDelete={() => handleChipDelete('byDateRange', { prop: filterName, name: 'to' })}
-                    label={`${head.label} to: ${filterBy.dateRange[filterName]?.to.toLocaleString()}`}
+                    label={`${head.label} to: ${tableFilters.dateRange[filterName]?.to.toLocaleString()}`}
                   />
                 )}
               </ListItem>
@@ -208,14 +211,14 @@ const FilteringInformationBox = ({
         .filter(Boolean)
     : [];
 
-  const chipsBySelect = filterBy.select
-    ? Object.keys(filterBy.select)
+  const chipsBySelect = tableFilters.select
+    ? Object.keys(tableFilters.select)
         .map((filterName) => {
           const head = headCells.find((el) => el.id === filterName);
           return (
             head &&
-            filterBy.select[filterName].length &&
-            filterBy.select[filterName].map((el) => (
+            tableFilters.select[filterName].length &&
+            tableFilters.select[filterName].map((el) => (
               <ListItem disableGutters disablePadding sx={{ display: 'inline' }} dense key={filterName + el}>
                 <Chip
                   sx={{ margin: 0.5 }}
@@ -232,19 +235,22 @@ const FilteringInformationBox = ({
 
   return (
     <>
-      <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.flexWrap}`}>
-        {customFiltersEl.length > 0 && (
-          <>
-            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 1 }}>
-              <FilterListIcon />
-              <Typography variant="h6">Filter list:</Typography>
-            </Box>
-            {customFiltersEl.map((FilterElement, idx) => (
-              <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} filterBy={filterBy} />
-            ))}
-          </>
-        )}
-      </Box>
+      {customFiltersEl.length > 0 && (
+        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap}`}>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 1 }}>
+            <FilterListIcon />
+            <Typography variant="h6">Filter list:</Typography>
+          </Box>
+          {customFiltersEl.map((FilterElement, idx) => (
+            <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} customFilters={customFilters} />
+          ))}
+          <IconButton disabled={Object.keys(customFilters).length === 0} color="error" onClick={onRequestResetFilters}>
+            <Tooltip title="Reset filters">
+              <FilterListOffIcon />
+            </Tooltip>
+          </IconButton>
+        </Box>
+      )}
       {!!chipsByText.length && (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
           <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
@@ -374,7 +380,7 @@ const EnhancedTableHead = ({
   cellsWithFilterableBySelectValues,
   multiSortParams,
   onRequestSort,
-  filterBy,
+  tableFilters,
   pinnedToLeft,
   onRequestFilterByText,
   onRequestFilterByRange,
@@ -595,7 +601,7 @@ const EnhancedTableHead = ({
                     <Typography variant="body1">Filter {headCell.label} by text</Typography>
                     <TextField
                       autoFocus
-                      value={(filterBy.text && filterBy.text[headCell.id]) || ''}
+                      value={(tableFilters.text && tableFilters.text[headCell.id]) || ''}
                       name={headCell.id}
                       fullWidth
                       variant="standard"
@@ -633,7 +639,7 @@ const EnhancedTableHead = ({
                       <TextField
                         sx={{ mr: 1 }}
                         autoFocus
-                        value={(filterBy.range && filterBy.range[headCell.id]?.min) || ''}
+                        value={(tableFilters.range && tableFilters.range[headCell.id]?.min) || ''}
                         name="min"
                         variant="standard"
                         size="small"
@@ -647,7 +653,7 @@ const EnhancedTableHead = ({
                       />
                       <TextField
                         name="max"
-                        value={(filterBy.range && filterBy.range[headCell.id]?.max) || ''}
+                        value={(tableFilters.range && tableFilters.range[headCell.id]?.max) || ''}
                         variant="standard"
                         size="small"
                         margin="none"
@@ -679,7 +685,7 @@ const EnhancedTableHead = ({
                     <Typography variant="body1">Filter {headCell.label} by range</Typography>
                     <FilterByDateRange
                       createFilterByDateRangeHandler={createFilterByDateRangeHandler(headCell.id)}
-                      initialState={filterBy.dateRange && filterBy.dateRange[headCell.id]}
+                      initialState={tableFilters.dateRange && tableFilters.dateRange[headCell.id]}
                     />
                   </Box>
                 </Popover>
@@ -705,14 +711,14 @@ const EnhancedTableHead = ({
                         labelId={headCell.id}
                         multiple
                         label={`Filter ${headCell.label} by select`}
-                        value={filterBy.select ? filterBy.select[headCell.id] || [] : []}
+                        value={tableFilters.select ? tableFilters.select[headCell.id] || [] : []}
                         onChange={createFilterBySelectHandler(headCell.id)}
                         renderValue={(selected) => selected.join(', ')}
                         onClose={() => toggleShowFilterBySelect(headCell.id)}
                       >
                         {cellsWithFilterableBySelectValues[headCell.id]?.map((value) => (
                           <MenuItem key={headCell.id + value} value={value}>
-                            <Checkbox checked={filterBy.select ? filterBy.select[headCell.id]?.indexOf(value) > -1 : false} />
+                            <Checkbox checked={tableFilters.select ? tableFilters.select[headCell.id]?.indexOf(value) > -1 : false} />
                             {value}
                           </MenuItem>
                         ))}
@@ -745,8 +751,9 @@ export default function TableData({
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
-  const [multiSortParams, setMultiSortParams] = useState(defaultOrderBy || {});
-  const [filterBy, setFilterBy] = useState({ ...defaultFilterBy });
+  const [orderBy, setOrderBy] = useState(defaultOrderBy || {});
+  const [tableFilters, setTableFilters] = useState(defaultFilterBy || {});
+  const [customFilters, setCustomFilters] = useState(defaultFilterBy || {});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
 
@@ -778,15 +785,16 @@ export default function TableData({
 
   useEffect(() => {
     onTableChange({
-      orderBy: multiSortParams,
-      filterBy,
+      orderBy,
+      tableFilters,
+      customFilters,
       page: page + 1,
       rowsPerPage,
     });
-  }, [multiSortParams, page, filterBy, rowsPerPage]);
+  }, [orderBy, page, tableFilters, customFilters, rowsPerPage]);
 
   const handleRequestSort = (event, property) => {
-    setMultiSortParams((prevState) => {
+    setOrderBy((prevState) => {
       const newSortParams = {
         ...(multiSort ? prevState : {}),
         [property]: prevState[property] === 'asc' ? 'desc' : 'asc',
@@ -799,7 +807,7 @@ export default function TableData({
   };
 
   const handleRequestFilterByText = (event, property) => {
-    setFilterBy((prevState) => {
+    setTableFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         text: {
@@ -819,7 +827,7 @@ export default function TableData({
   };
 
   const handleRequestFilterByRange = (event, property) => {
-    setFilterBy((prevState) => {
+    setTableFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         range: {
@@ -847,7 +855,7 @@ export default function TableData({
   };
 
   const handleRequestFilterByDateRange = (event, property) => {
-    setFilterBy((prevState) => {
+    setTableFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         dateRange: {
@@ -871,7 +879,7 @@ export default function TableData({
   };
 
   const handleRequestFilterBySelect = (event, property) => {
-    setFilterBy((prevState) => {
+    setTableFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         select: {
@@ -892,8 +900,7 @@ export default function TableData({
   };
 
   const handleRequestCustomFilter = (entries) => {
-    console.log(entries);
-    setFilterBy((prevState) => {
+    setCustomFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         ...entries,
@@ -906,6 +913,11 @@ export default function TableData({
 
       return filterQueries;
     });
+    setPage(0);
+  };
+
+  const resetFilters = () => {
+    setCustomFilters({});
     setPage(0);
   };
 
@@ -934,9 +946,11 @@ export default function TableData({
         onRequestFilterByDateRange={handleRequestFilterByDateRange}
         onRequestFilterBySelect={handleRequestFilterBySelect}
         onRequestCustomFilter={handleRequestCustomFilter}
+        onRequestResetFilters={resetFilters}
         headCells={columns}
-        filterBy={filterBy}
-        setFilterBy={setFilterBy}
+        tableFilters={tableFilters}
+        customFilters={customFilters}
+        setFilterBy={setTableFilters}
         customFiltersEl={customFiltersEl}
       />
       <TableContainer>
@@ -944,8 +958,9 @@ export default function TableData({
           <EnhancedTableHead
             headCells={columns}
             cellsWithFilterableBySelectValues={cellsWithFilterableBySelectValues}
-            multiSortParams={multiSortParams}
-            filterBy={filterBy}
+            multiSortParams={orderBy}
+            tableFilters={tableFilters}
+            customFilters={customFilters}
             onRequestSort={handleRequestSort}
             onRequestFilterByText={handleRequestFilterByText}
             onRequestFilterByRange={handleRequestFilterByRange}
