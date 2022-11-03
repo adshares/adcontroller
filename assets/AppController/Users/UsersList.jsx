@@ -8,16 +8,12 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Checkbox,
   FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
   IconButton,
+  InputLabel,
   Menu,
   MenuItem,
-  Radio,
-  RadioGroup,
+  Select,
   TextField,
   Tooltip,
   Typography,
@@ -45,7 +41,6 @@ const headCells = [
     label: 'Email',
     cellWidth: '15rem',
     alignContent: 'left',
-    filterableBy: ['text'],
     sortable: true,
   },
 
@@ -171,10 +166,10 @@ export default function UsersList() {
       email: user.email,
       status: (
         <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-          <Tooltip title={user.emailConfirmed ? 'Confirmed email' : 'Unconfirmed email'}>
+          <Tooltip title={user.emailConfirmed ? 'Email confirmed' : 'Email unconfirmed'}>
             <EmailIcon sx={{ fontSize: 14 }} color={user.emailConfirmed ? 'success' : 'error'} />
           </Tooltip>
-          <Tooltip title={user.adminConfirmed ? 'Confirmed account' : 'Unconfirmed account'}>
+          <Tooltip title={user.adminConfirmed ? 'Account confirmed' : 'Account unconfirmed'}>
             <CheckBoxIcon sx={{ fontSize: 14 }} color={user.adminConfirmed ? 'success' : 'error'} />
           </Tooltip>
         </Box>
@@ -205,10 +200,10 @@ export default function UsersList() {
       cursor: event.page === 1 ? null : response?.cursor,
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
-      'filter[query]': event.filterBy.query || null,
-      'filter[role]': event.filterBy.role || null,
-      'filter[emailConfirmed]': JSON.stringify(event.filterBy.emailConfirmed) || null,
-      'filter[adminConfirmed]': JSON.stringify(event.filterBy.adminConfirmed) || null,
+      'filter[query]': event.customFilters.query || null,
+      'filter[role]': event.customFilters.role || null,
+      'filter[emailConfirmed]': JSON.stringify(event.customFilters.emailConfirmed) || null,
+      'filter[adminConfirmed]': JSON.stringify(event.customFilters.adminConfirmed) || null,
     }));
   };
 
@@ -236,7 +231,7 @@ export default function UsersList() {
             showLastButton: true,
           }}
           defaultFilterBy={queryConfig.filter}
-          customFiltersEl={[FilterByEmail, FilterByRole, FilterByStatus]}
+          customFiltersEl={[FilterByEmail, FilterByRole, FilterByEmailStatus, FilterByAccountStatus]}
         />
       </CardContent>
     </Card>
@@ -283,21 +278,29 @@ const PositionedMenu = ({ id }) => {
   );
 };
 
-const FilterByEmail = ({ customFiltersHandler, filterBy }) => {
-  const [query, setQuery] = useState(filterBy.query || '');
-  const debouncedQuery = useDebounce(query, 500);
+const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
+  const [query, setQuery] = useState(customFilters.query || '');
+  const debouncedQuery = useDebounce(query, 400);
 
   useSkipFirstRenderEffect(() => {
     customFiltersHandler({ query });
   }, [debouncedQuery]);
 
+  useSkipFirstRenderEffect(() => {
+    if (customFilters.query === query) {
+      return;
+    }
+    setQuery(customFilters.query || '');
+  }, [customFilters.query]);
+
   return (
     <TextField
+      size="small"
       sx={{ mr: 2 }}
+      margin="dense"
       name="query"
-      label="Search by email or domain"
+      label="By email or domain"
       variant="outlined"
-      margin="none"
       value={query}
       onChange={(e) => setQuery(e.target.value)}
       inputProps={{ autoComplete: 'off' }}
@@ -305,57 +308,101 @@ const FilterByEmail = ({ customFiltersHandler, filterBy }) => {
   );
 };
 
-const FilterByRole = ({ customFiltersHandler, filterBy }) => {
+const FilterByRole = ({ customFiltersHandler, customFilters }) => {
+  const handleChange = (e) => {
+    customFiltersHandler({ role: e.target.value || null });
+  };
+
   return (
-    <FormControl>
-      <FormLabel focused={false}>Filter by user's role:</FormLabel>
-      <RadioGroup
-        row
-        value={filterBy.role || 'all'}
-        onChange={(e) => customFiltersHandler(e.target.value === 'all' ? { role: null } : { role: e.target.value })}
+    <FormControl size="small" sx={{ minWidth: '9rem', mr: 2 }} margin="dense">
+      <InputLabel id="filterByRoleLabel">By user's role</InputLabel>
+      <Select
+        labelId="filterByRoleLabel"
+        id="filterByRoleSelect"
+        value={customFilters.role || ''}
+        label="By user's role"
+        onChange={handleChange}
+        onClose={(e) => {
+          if (!e.target.value) {
+            setTimeout(() => {
+              document.activeElement.blur();
+            }, 0);
+          }
+        }}
       >
-        <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
-        <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
-        <FormControlLabel value="all" control={<Radio />} label="All" />
-      </RadioGroup>
+        <MenuItem value="">
+          <em>All</em>
+        </MenuItem>
+        <MenuItem value={'admin'}>Admin</MenuItem>
+        <MenuItem value={'agency'}>Agency</MenuItem>
+        <MenuItem value={'moderator'}>Moderator</MenuItem>
+        <MenuItem value={'advertiser'}>Advertiser</MenuItem>
+        <MenuItem value={'publisher'}>Publisher</MenuItem>
+      </Select>
     </FormControl>
   );
 };
 
-const FilterByStatus = ({ customFiltersHandler, filterBy }) => {
+const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
+  const handleChange = (e) => {
+    customFiltersHandler({ emailConfirmed: e.target.value === '' ? null : e.target.value });
+  };
+
   return (
-    <FormControl>
-      <FormLabel focused={false}>Filter by status:</FormLabel>
-      <FormGroup aria-label="position" row>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filterBy.hasOwnProperty('emailConfirmed') && filterBy.emailConfirmed}
-              onChange={() => customFiltersHandler({ emailConfirmed: !filterBy.emailConfirmed })}
-            />
+    <FormControl size="small" sx={{ minWidth: '11.5rem', mr: 2 }} margin="dense">
+      <InputLabel id="filterByEmailStatusLabel">By email status</InputLabel>
+      <Select
+        labelId="filterByEmailStatusLabel"
+        id="filterByEmailStatusSelect"
+        value={customFilters.hasOwnProperty('emailConfirmed') ? customFilters.emailConfirmed : ''}
+        label="By email status"
+        onChange={handleChange}
+        onClose={(e) => {
+          if (!e.target.value) {
+            setTimeout(() => {
+              document.activeElement.blur();
+            }, 0);
           }
-          label="Confirmed email"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filterBy.hasOwnProperty('adminConfirmed') && filterBy.adminConfirmed}
-              onChange={() => customFiltersHandler({ adminConfirmed: !filterBy.adminConfirmed })}
-            />
+        }}
+      >
+        <MenuItem value="">
+          <em>All</em>
+        </MenuItem>
+        <MenuItem value={true}>Email confirmed</MenuItem>
+        <MenuItem value={false}>Email unconfirmed</MenuItem>
+      </Select>
+    </FormControl>
+  );
+};
+
+const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
+  const handleChange = (e) => {
+    customFiltersHandler({ adminConfirmed: e.target.value === '' ? null : e.target.value });
+  };
+
+  return (
+    <FormControl size="small" sx={{ minWidth: '12.5rem', mr: 2 }} margin="dense">
+      <InputLabel id="filterByAccountStatusLabel">By account status</InputLabel>
+      <Select
+        labelId="filterByAccountStatusLabel"
+        id="filterByEmailStatusSelect"
+        value={customFilters.hasOwnProperty('adminConfirmed') ? customFilters.adminConfirmed : ''}
+        label="By account status"
+        onChange={handleChange}
+        onClose={(e) => {
+          if (!e.target.value) {
+            setTimeout(() => {
+              document.activeElement.blur();
+            }, 0);
           }
-          label="Confirmed account"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              disabled={!(filterBy.hasOwnProperty('adminConfirmed') || filterBy.hasOwnProperty('emailConfirmed'))}
-              checked={!(filterBy.hasOwnProperty('adminConfirmed') || filterBy.hasOwnProperty('emailConfirmed'))}
-              onChange={() => customFiltersHandler({ adminConfirmed: null, emailConfirmed: null })}
-            />
-          }
-          label="All"
-        />
-      </FormGroup>
+        }}
+      >
+        <MenuItem value="">
+          <em>All</em>
+        </MenuItem>
+        <MenuItem value={true}>Account confirmed</MenuItem>
+        <MenuItem value={false}>Account unconfirmed</MenuItem>
+      </Select>
     </FormControl>
   );
 };
