@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import {
   useBanUserMutation,
   useConfirmUserMutation,
@@ -13,9 +15,22 @@ import {
   useSwitchToRegularMutation,
   useUnbanUserMutation,
 } from '../../redux/monitoring/monitoringApi';
+import {
+  banUserReducer,
+  confirmUserReducer,
+  denyAdvertisingReducer,
+  denyPublishingReducer,
+  grantAdvertisingReducer,
+  grantPublishingReducer,
+  switchToAgencyReducer,
+  switchToModeratorReducer,
+  switchToRegularReducer,
+  unbanUserReducer,
+} from '../../redux/monitoring/monitoringSlice';
 import { useDebounce, useSkipFirstRenderEffect } from '../../hooks';
 import { formatMoney } from '../../utils/helpers';
 import TableData from '../../Components/TableData/TableData';
+import Spinner from '../../Components/Spinner/Spinner';
 import {
   Box,
   Button,
@@ -46,20 +61,6 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import BlockIcon from '@mui/icons-material/Block';
 import HelpIcon from '@mui/icons-material/Help';
 import commonStyles from '../../styles/commonStyles.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
-import {
-  banUserReducer,
-  confirmUserReducer,
-  denyAdvertisingReducer,
-  denyPublishingReducer,
-  grantAdvertisingReducer,
-  grantPublishingReducer,
-  switchToAgencyReducer,
-  switchToModeratorReducer,
-  switchToRegularReducer,
-  unbanUserReducer,
-} from '../../redux/monitoring/monitoringSlice';
 
 const headCells = [
   {
@@ -153,97 +154,8 @@ export default function UsersList() {
     'filter[emailConfirmed]': null,
     'filter[adminConfirmed]': null,
   });
-  const dispatch = useDispatch();
   const users = useSelector(monitoringSelectors.getUsers);
   const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
-  const [confirmUser] = useConfirmUserMutation();
-  const [switchToModerator] = useSwitchToModeratorMutation();
-  const [switchToAgency] = useSwitchToAgencyMutation();
-  const [switchToRegular] = useSwitchToRegularMutation();
-  const [denyAdvertising] = useDenyAdvertisingMutation();
-  const [grantAdvertising] = useGrantAdvertisingMutation();
-  const [denyPublishing] = useDenyPublishingMutation();
-  const [grantPublishing] = useGrantPublishingMutation();
-  const [banUser] = useBanUserMutation();
-  const [unbanUser] = useUnbanUserMutation();
-  const [deleteUser] = useDeleteUserMutation();
-
-  const handleConfirmUser = async (id) => {
-    const response = await confirmUser(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(confirmUserReducer(response.data));
-    }
-  };
-
-  const handleSwitchToModerator = async (id) => {
-    const response = await switchToModerator(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(switchToModeratorReducer(response.data));
-    }
-  };
-
-  const handleSwitchToAgency = async (id) => {
-    const response = await switchToAgency(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(switchToAgencyReducer(response.data));
-    }
-  };
-
-  const handleSwitchToRegular = async (id) => {
-    const response = await switchToRegular(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(switchToRegularReducer(response.data));
-    }
-  };
-
-  const handleDenyAdvertising = async (id) => {
-    const response = await denyAdvertising(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(denyAdvertisingReducer(response.data));
-    }
-  };
-
-  const handleGrantAdvertising = async (id) => {
-    const response = await grantAdvertising(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(grantAdvertisingReducer(response.data));
-    }
-  };
-
-  const handleDenyPublishing = async (id) => {
-    const response = await denyPublishing(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(denyPublishingReducer(response.data));
-    }
-  };
-
-  const handleGrantPublishing = async (id) => {
-    const response = await grantPublishing(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(grantPublishingReducer(response.data));
-    }
-  };
-
-  const handleBanUser = async (id) => {
-    const response = await banUser(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(banUserReducer(response.data));
-    }
-  };
-
-  const handleUnbanUser = async (id) => {
-    const response = await unbanUser(id);
-    if (response.data && response.data.message === 'OK') {
-      dispatch(unbanUserReducer(response.data));
-    }
-  };
-
-  const handleDeleteUser = async (id) => {
-    const response = await deleteUser(id);
-    if (response.data && response.data.message === 'OK') {
-      refetch();
-    }
-  };
 
   const handleTableChanges = (event) => {
     console.log(event);
@@ -338,17 +250,7 @@ export default function UsersList() {
             <UserActionsMenu
               user={user}
               actions={{
-                handleConfirmUser,
-                handleSwitchToModerator,
-                handleSwitchToAgency,
-                handleSwitchToRegular,
-                handleDenyAdvertising,
-                handleGrantAdvertising,
-                handleDenyPublishing,
-                handleGrantPublishing,
-                handleBanUser,
-                handleUnbanUser,
-                handleDeleteUser,
+                refetch,
               }}
             />
           ),
@@ -388,6 +290,7 @@ export default function UsersList() {
 }
 
 const UserActionsMenu = ({ user, actions }) => {
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const menuOpen = Boolean(anchorEl);
   const [banUserDialog, setBanUserDialog] = useState(false);
@@ -395,11 +298,129 @@ const UserActionsMenu = ({ user, actions }) => {
   const [deleteUserDialog, setDeleteUserDialog] = useState(false);
   const [deletionConfirmed, setDeletionConfirmed] = useState(false);
   const [banReason, setBanReason] = useState('');
+  const [confirmUser, { isLoading: confirmUserPending }] = useConfirmUserMutation();
+  const [switchToModerator, { isLoading: switchToModeratorPending }] = useSwitchToModeratorMutation();
+  const [switchToAgency, { isLoading: switchToAgencyPending }] = useSwitchToAgencyMutation();
+  const [switchToRegular, { isLoading: switchToRegularPending }] = useSwitchToRegularMutation();
+  const [denyAdvertising, { isLoading: denyAdvertisingPending }] = useDenyAdvertisingMutation();
+  const [grantAdvertising, { isLoading: grantAdvertisingPending }] = useGrantAdvertisingMutation();
+  const [denyPublishing, { isLoading: denyPublishingPending }] = useDenyPublishingMutation();
+  const [grantPublishing, { isLoading: grantPublishingPending }] = useGrantPublishingMutation();
+  const [banUser, { isLoading: banUserPending }] = useBanUserMutation();
+  const [unbanUser, { isLoading: unbanUserPending }] = useUnbanUserMutation();
+  const [deleteUser, { isLoading: deleteUserPending }] = useDeleteUserMutation();
   const isAdmin = user.roles.includes('admin');
   const isModerator = user.roles.includes('moderator');
   const isAgency = user.roles.includes('agency');
   const isAdvertiser = user.roles.includes('advertiser');
   const isPublisher = user.roles.includes('publisher');
+
+  const isActionPending = useMemo(() => {
+    return (
+      confirmUserPending ||
+      switchToModeratorPending ||
+      switchToAgencyPending ||
+      switchToRegularPending ||
+      denyAdvertisingPending ||
+      grantAdvertisingPending ||
+      denyPublishingPending ||
+      grantPublishingPending ||
+      banUserPending ||
+      unbanUserPending ||
+      deleteUserPending
+    );
+  }, [
+    confirmUserPending,
+    switchToModeratorPending,
+    switchToAgencyPending,
+    switchToRegularPending,
+    denyAdvertisingPending,
+    grantAdvertisingPending,
+    denyPublishingPending,
+    grantPublishingPending,
+    banUserPending,
+    unbanUserPending,
+    deleteUserPending,
+  ]);
+
+  console.log(isActionPending);
+
+  const handleConfirmUser = async (id) => {
+    const response = await confirmUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(confirmUserReducer(response.data));
+    }
+  };
+
+  const handleSwitchToModerator = async (id) => {
+    const response = await switchToModerator(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(switchToModeratorReducer(response.data));
+    }
+  };
+
+  const handleSwitchToAgency = async (id) => {
+    const response = await switchToAgency(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(switchToAgencyReducer(response.data));
+    }
+  };
+
+  const handleSwitchToRegular = async (id) => {
+    const response = await switchToRegular(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(switchToRegularReducer(response.data));
+    }
+  };
+
+  const handleDenyAdvertising = async (id) => {
+    const response = await denyAdvertising(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(denyAdvertisingReducer(response.data));
+    }
+  };
+
+  const handleGrantAdvertising = async (id) => {
+    const response = await grantAdvertising(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(grantAdvertisingReducer(response.data));
+    }
+  };
+
+  const handleDenyPublishing = async (id) => {
+    const response = await denyPublishing(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(denyPublishingReducer(response.data));
+    }
+  };
+
+  const handleGrantPublishing = async (id) => {
+    const response = await grantPublishing(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(grantPublishingReducer(response.data));
+    }
+  };
+
+  const handleBanUser = async (id) => {
+    const response = await banUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(banUserReducer(response.data));
+    }
+  };
+
+  const handleUnbanUser = async (id) => {
+    const response = await unbanUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(unbanUserReducer(response.data));
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
+    const response = await deleteUser(id);
+    if (response.data && response.data.message === 'OK') {
+      actions.refetch();
+    }
+  };
 
   const handleMenuOpen = (e) => {
     setAnchorEl(e.currentTarget);
@@ -410,8 +431,8 @@ const UserActionsMenu = ({ user, actions }) => {
 
   return (
     <>
-      <IconButton onClick={handleMenuOpen}>
-        <MoreVertIcon size="small" />
+      <IconButton disabled={isActionPending} onClick={handleMenuOpen}>
+        {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
       </IconButton>
       <Menu
         variant="menu"
@@ -431,7 +452,7 @@ const UserActionsMenu = ({ user, actions }) => {
           <MenuItem
             sx={{ color: 'success.main' }}
             onClick={() => {
-              actions.handleConfirmUser(user.id);
+              handleConfirmUser(user.id);
               handleMenuClose();
             }}
           >
@@ -442,7 +463,7 @@ const UserActionsMenu = ({ user, actions }) => {
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
-              actions.handleSwitchToModerator(user.id);
+              handleSwitchToModerator(user.id);
               handleMenuClose();
             }}
           >
@@ -452,7 +473,7 @@ const UserActionsMenu = ({ user, actions }) => {
         {!isAdmin && !isModerator && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
-              actions.handleSwitchToAgency(user.id);
+              handleSwitchToAgency(user.id);
               handleMenuClose();
             }}
           >
@@ -463,7 +484,7 @@ const UserActionsMenu = ({ user, actions }) => {
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
-              actions.handleSwitchToRegular(user.id);
+              handleSwitchToRegular(user.id);
               handleMenuClose();
             }}
           >
@@ -473,7 +494,7 @@ const UserActionsMenu = ({ user, actions }) => {
         {!isAdvertiser && !user.isBanned && (
           <MenuItem
             onClick={() => {
-              actions.handleGrantAdvertising(user.id);
+              handleGrantAdvertising(user.id);
               handleMenuClose();
             }}
           >
@@ -483,7 +504,7 @@ const UserActionsMenu = ({ user, actions }) => {
         {isAdvertiser && !user.isBanned && (
           <MenuItem
             onClick={() => {
-              actions.handleDenyAdvertising(user.id);
+              handleDenyAdvertising(user.id);
               handleMenuClose();
             }}
           >
@@ -493,7 +514,7 @@ const UserActionsMenu = ({ user, actions }) => {
         {!isPublisher && !user.isBanned && (
           <MenuItem
             onClick={() => {
-              actions.handleGrantPublishing(user.id);
+              handleGrantPublishing(user.id);
               handleMenuClose();
             }}
           >
@@ -503,7 +524,7 @@ const UserActionsMenu = ({ user, actions }) => {
         {isPublisher && !user.isBanned && (
           <MenuItem
             onClick={() => {
-              actions.handleDenyPublishing(user.id);
+              handleDenyPublishing(user.id);
               handleMenuClose();
             }}
           >
@@ -586,7 +607,7 @@ const UserActionsMenu = ({ user, actions }) => {
               variant="contained"
               color="error"
               onClick={() => {
-                actions.handleBanUser({ id: user.id, banReason });
+                handleBanUser({ id: user.id, banReason });
                 setBanUserDialog((prevState) => !prevState);
               }}
             >
@@ -618,7 +639,7 @@ const UserActionsMenu = ({ user, actions }) => {
               variant="contained"
               color="primary"
               onClick={() => {
-                actions.handleUnbanUser(user.id);
+                handleUnbanUser(user.id);
                 setUnbanUserDialog((prevState) => !prevState);
               }}
             >
@@ -653,7 +674,7 @@ const UserActionsMenu = ({ user, actions }) => {
               variant="contained"
               color="error"
               onClick={() => {
-                actions.handleDeleteUser(user.id);
+                handleDeleteUser(user.id);
                 setDeleteUserDialog((prevState) => !prevState);
               }}
             >
