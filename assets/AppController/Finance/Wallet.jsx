@@ -217,7 +217,7 @@ const WalletSettingsCard = () => {
 };
 
 const WalletStatusCard = () => {
-  const monitoringData = useSelector(monitoringSelectors.getMonitoringData);
+  const monitoringWalletInfo = useSelector(monitoringSelectors.getMonitoringWalletInfo);
   useGetWalletMonitoringQuery([], {
     pollingInterval: 3000,
   });
@@ -229,7 +229,7 @@ const WalletStatusCard = () => {
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Total balance:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
-            {formatMoney(monitoringData.wallet.balance, 5)} ADS
+            {formatMoney(monitoringWalletInfo.balance, 5)} ADS
           </Typography>
         </Box>
         <Typography variant="body2">
@@ -241,7 +241,7 @@ const WalletStatusCard = () => {
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Unused bonuses:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
-            {formatMoney(monitoringData.wallet.unusedBonuses, 5)} ADS
+            {formatMoney(monitoringWalletInfo.unusedBonuses, 5)} ADS
           </Typography>
         </Box>
         <Typography variant="body2">

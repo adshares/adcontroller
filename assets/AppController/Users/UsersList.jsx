@@ -1,14 +1,34 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { useGetUsersListQuery } from '../../redux/monitoring/monitoringApi';
+import {
+  useBanUserMutation,
+  useConfirmUserMutation,
+  useDeleteUserMutation,
+  useDenyAdvertisingMutation,
+  useDenyPublishingMutation,
+  useGetUsersListQuery,
+  useGrantAdvertisingMutation,
+  useGrantPublishingMutation,
+  useSwitchToAgencyMutation,
+  useSwitchToModeratorMutation,
+  useSwitchToRegularMutation,
+  useUnbanUserMutation,
+} from '../../redux/monitoring/monitoringApi';
 import { useDebounce, useSkipFirstRenderEffect } from '../../hooks';
 import { formatMoney } from '../../utils/helpers';
 import TableData from '../../Components/TableData/TableData';
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
+  FormControlLabel,
   IconButton,
   InputLabel,
   Menu,
@@ -23,7 +43,23 @@ import EmailIcon from '@mui/icons-material/Email';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import BlockIcon from '@mui/icons-material/Block';
+import HelpIcon from '@mui/icons-material/Help';
 import commonStyles from '../../styles/commonStyles.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
+import {
+  banUserReducer,
+  confirmUserReducer,
+  denyAdvertisingReducer,
+  denyPublishingReducer,
+  grantAdvertisingReducer,
+  grantPublishingReducer,
+  switchToAgencyReducer,
+  switchToModeratorReducer,
+  switchToRegularReducer,
+  unbanUserReducer,
+} from '../../redux/monitoring/monitoringSlice';
 
 const headCells = [
   {
@@ -117,7 +153,119 @@ export default function UsersList() {
     'filter[emailConfirmed]': null,
     'filter[adminConfirmed]': null,
   });
-  const { data: response, isFetching } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const dispatch = useDispatch();
+  const users = useSelector(monitoringSelectors.getUsers);
+  const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const [confirmUser] = useConfirmUserMutation();
+  const [switchToModerator] = useSwitchToModeratorMutation();
+  const [switchToAgency] = useSwitchToAgencyMutation();
+  const [switchToRegular] = useSwitchToRegularMutation();
+  const [denyAdvertising] = useDenyAdvertisingMutation();
+  const [grantAdvertising] = useGrantAdvertisingMutation();
+  const [denyPublishing] = useDenyPublishingMutation();
+  const [grantPublishing] = useGrantPublishingMutation();
+  const [banUser] = useBanUserMutation();
+  const [unbanUser] = useUnbanUserMutation();
+  const [deleteUser] = useDeleteUserMutation();
+
+  const handleConfirmUser = async (id) => {
+    const response = await confirmUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(confirmUserReducer(response.data));
+    }
+  };
+
+  const handleSwitchToModerator = async (id) => {
+    const response = await switchToModerator(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(switchToModeratorReducer(response.data));
+    }
+  };
+
+  const handleSwitchToAgency = async (id) => {
+    const response = await switchToAgency(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(switchToAgencyReducer(response.data));
+    }
+  };
+
+  const handleSwitchToRegular = async (id) => {
+    const response = await switchToRegular(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(switchToRegularReducer(response.data));
+    }
+  };
+
+  const handleDenyAdvertising = async (id) => {
+    const response = await denyAdvertising(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(denyAdvertisingReducer(response.data));
+    }
+  };
+
+  const handleGrantAdvertising = async (id) => {
+    const response = await grantAdvertising(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(grantAdvertisingReducer(response.data));
+    }
+  };
+
+  const handleDenyPublishing = async (id) => {
+    const response = await denyPublishing(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(denyPublishingReducer(response.data));
+    }
+  };
+
+  const handleGrantPublishing = async (id) => {
+    const response = await grantPublishing(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(grantPublishingReducer(response.data));
+    }
+  };
+
+  const handleBanUser = async (id) => {
+    const response = await banUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(banUserReducer(response.data));
+    }
+  };
+
+  const handleUnbanUser = async (id) => {
+    const response = await unbanUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(unbanUserReducer(response.data));
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
+    const response = await deleteUser(id);
+    if (response.data && response.data.message === 'OK') {
+      refetch();
+    }
+  };
+
+  const handleTableChanges = (event) => {
+    console.log(event);
+    const createOrderByParams = (params) => {
+      const entries = Object.entries(params);
+      if (!entries.length) {
+        return null;
+      }
+      return entries.map((param) => param.join(':')).join(',');
+    };
+    setQueryConfig((prevState) => ({
+      ...prevState,
+      limit: event.rowsPerPage,
+      cursor: event.page === 1 ? null : users.cursor,
+      page: event.page,
+      orderBy: createOrderByParams(event.orderBy),
+      'filter[query]': event.customFilters.query || null,
+      'filter[role]': event.customFilters.role || null,
+      'filter[emailConfirmed]': JSON.stringify(event.customFilters.emailConfirmed) || null,
+      'filter[adminConfirmed]': JSON.stringify(event.customFilters.adminConfirmed) || null,
+    }));
+  };
 
   const parseRoles = useCallback(
     (roles) => {
@@ -142,7 +290,7 @@ export default function UsersList() {
         return 'No role';
       }
     },
-    [response],
+    [users],
   );
 
   const parseConnectedWallet = (wallet) => {
@@ -160,52 +308,53 @@ export default function UsersList() {
   };
 
   const rows = useMemo(() => {
-    const users = response?.data || [];
-    return users.map((user) => ({
-      id: user.id,
-      email: user.email,
-      status: (
-        <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-          <Tooltip title={user.emailConfirmed ? 'Email confirmed' : 'Email unconfirmed'}>
-            <EmailIcon sx={{ fontSize: 14 }} color={user.emailConfirmed ? 'success' : 'error'} />
-          </Tooltip>
-          <Tooltip title={user.adminConfirmed ? 'Account confirmed' : 'Account unconfirmed'}>
-            <CheckBoxIcon sx={{ fontSize: 14 }} color={user.adminConfirmed ? 'success' : 'error'} />
-          </Tooltip>
-        </Box>
-      ),
-      connectedWallet: parseConnectedWallet(user.connectedWallet.address),
-      walletBalance: formatMoney(user.adsharesWallet.walletBalance, 2) + ' ADS',
-      bonusBalance: formatMoney(user.adsharesWallet.bonusBalance, 2) + ' ADS',
-      role: parseRoles(user.roles),
-      campaignCount: user.campaignCount,
-      siteCount: user.siteCount,
-      lastActiveAt: user.lastActiveAt && new Date(user.lastActiveAt).toLocaleString(),
-      actions: <PositionedMenu id={user.id} />,
-    }));
-  }, [response]);
-
-  const handleTableChanges = (event) => {
-    console.log(event);
-    const createOrderByParams = (params) => {
-      const entries = Object.entries(params);
-      if (!entries.length) {
-        return null;
-      }
-      return entries.map((param) => param.join(':')).join(',');
-    };
-    setQueryConfig((prevState) => ({
-      ...prevState,
-      limit: event.rowsPerPage,
-      cursor: event.page === 1 ? null : response?.cursor,
-      page: event.page,
-      orderBy: createOrderByParams(event.orderBy),
-      'filter[query]': event.customFilters.query || null,
-      'filter[role]': event.customFilters.role || null,
-      'filter[emailConfirmed]': JSON.stringify(event.customFilters.emailConfirmed) || null,
-      'filter[adminConfirmed]': JSON.stringify(event.customFilters.adminConfirmed) || null,
-    }));
-  };
+    return users
+      ? users.data.map((user) => ({
+          id: user.id,
+          status: (
+            <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+              <Tooltip title={user.emailConfirmed ? 'Email confirmed' : 'Email unconfirmed'}>
+                <EmailIcon sx={{ fontSize: 14 }} color={user.emailConfirmed ? 'success' : 'error'} />
+              </Tooltip>
+              <Tooltip title={user.adminConfirmed ? 'Account confirmed' : 'Account unconfirmed'}>
+                <CheckBoxIcon sx={{ fontSize: 14 }} color={user.adminConfirmed ? 'success' : 'error'} />
+              </Tooltip>
+              {user.isBanned && (
+                <Tooltip title={`Banned user. Reason: ${user.banReason}`}>
+                  <BlockIcon sx={{ fontSize: 14 }} color="error" />
+                </Tooltip>
+              )}
+            </Box>
+          ),
+          email: user.email,
+          connectedWallet: parseConnectedWallet(user.connectedWallet.address),
+          walletBalance: formatMoney(user.adsharesWallet.walletBalance, 2) + ' ADS',
+          bonusBalance: formatMoney(user.adsharesWallet.bonusBalance, 2) + ' ADS',
+          role: parseRoles(user.roles),
+          campaignCount: user.campaignCount,
+          siteCount: user.siteCount,
+          lastActiveAt: user.lastActiveAt && new Date(user.lastActiveAt).toLocaleString(),
+          actions: (
+            <UserActionsMenu
+              user={user}
+              actions={{
+                handleConfirmUser,
+                handleSwitchToModerator,
+                handleSwitchToAgency,
+                handleSwitchToRegular,
+                handleDenyAdvertising,
+                handleGrantAdvertising,
+                handleDenyPublishing,
+                handleGrantPublishing,
+                handleBanUser,
+                handleUnbanUser,
+                handleDeleteUser,
+              }}
+            />
+          ),
+        }))
+      : [];
+  }, [users]);
 
   return (
     <Card
@@ -226,7 +375,7 @@ export default function UsersList() {
           multiSort
           paginationParams={{
             limit: queryConfig.limit,
-            count: response?.total || 0,
+            count: users?.total || 0,
             showFirstButton: true,
             showLastButton: true,
           }}
@@ -238,42 +387,281 @@ export default function UsersList() {
   );
 }
 
-const PositionedMenu = ({ id }) => {
+const UserActionsMenu = ({ user, actions }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const menuOpen = Boolean(anchorEl);
+  const [banUserDialog, setBanUserDialog] = useState(false);
+  const [unbanUserDialog, setUnbanUserDialog] = useState(false);
+  const [deleteUserDialog, setDeleteUserDialog] = useState(false);
+  const [deletionConfirmed, setDeletionConfirmed] = useState(false);
+  const [banReason, setBanReason] = useState('');
+  const isAdmin = user.roles.includes('admin');
+  const isModerator = user.roles.includes('moderator');
+  const isAgency = user.roles.includes('agency');
+  const isAdvertiser = user.roles.includes('advertiser');
+  const isPublisher = user.roles.includes('publisher');
 
-  const onMenuClick = () => {
-    console.log(id);
+  const handleMenuOpen = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   return (
     <>
-      <IconButton onClick={handleClick}>
+      <IconButton onClick={handleMenuOpen}>
         <MoreVertIcon size="small" />
       </IconButton>
       <Menu
+        variant="menu"
         anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
+        open={menuOpen}
+        onClose={handleMenuClose}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'right',
+          horizontal: 'left',
         }}
         transformOrigin={{
           vertical: 'top',
           horizontal: 'right',
         }}
       >
-        <MenuItem onClick={onMenuClick}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        {!user.adminConfirmed && !user.isBanned && (
+          <MenuItem
+            sx={{ color: 'success.main' }}
+            onClick={() => {
+              actions.handleConfirmUser(user.id);
+              handleMenuClose();
+            }}
+          >
+            Confirm
+          </MenuItem>
+        )}
+        {!isAdmin && !isModerator && !isAgency && !user.isBanned && (
+          <MenuItem
+            sx={{ color: 'warning.main' }}
+            onClick={() => {
+              actions.handleSwitchToModerator(user.id);
+              handleMenuClose();
+            }}
+          >
+            Switch to moderator
+          </MenuItem>
+        )}
+        {!isAdmin && !isModerator && !isAgency && !user.isBanned && (
+          <MenuItem
+            onClick={() => {
+              actions.handleSwitchToAgency(user.id);
+              handleMenuClose();
+            }}
+          >
+            Switch to agency
+          </MenuItem>
+        )}
+        {!isAdmin && (isModerator || isAgency) && !user.isBanned && (
+          <MenuItem
+            sx={{ color: 'warning.main' }}
+            onClick={() => {
+              actions.handleSwitchToRegular(user.id);
+              handleMenuClose();
+            }}
+          >
+            Switch to regular
+          </MenuItem>
+        )}
+        {!isAdvertiser && !user.isBanned && (
+          <MenuItem
+            onClick={() => {
+              actions.handleGrantAdvertising(user.id);
+              handleMenuClose();
+            }}
+          >
+            Allow advertising
+          </MenuItem>
+        )}
+        {isAdvertiser && !user.isBanned && (
+          <MenuItem
+            onClick={() => {
+              actions.handleDenyAdvertising(user.id);
+              handleMenuClose();
+            }}
+          >
+            Deny advertising
+          </MenuItem>
+        )}
+        {!isPublisher && !user.isBanned && (
+          <MenuItem
+            onClick={() => {
+              actions.handleGrantPublishing(user.id);
+              handleMenuClose();
+            }}
+          >
+            Allow publishing
+          </MenuItem>
+        )}
+        {isPublisher && !user.isBanned && (
+          <MenuItem
+            onClick={() => {
+              actions.handleDenyPublishing(user.id);
+              handleMenuClose();
+            }}
+          >
+            Deny publishing
+          </MenuItem>
+        )}
+        {!isAdmin && !user.isBanned && (
+          <MenuItem
+            sx={{ color: 'error.main' }}
+            onClick={() => {
+              setBanUserDialog((prevState) => !prevState);
+              handleMenuClose();
+            }}
+          >
+            Ban user
+          </MenuItem>
+        )}
+        {!isAdmin && user.isBanned && (
+          <MenuItem
+            sx={{ color: 'error.main' }}
+            onClick={() => {
+              setUnbanUserDialog((prevState) => !prevState);
+              handleMenuClose();
+            }}
+          >
+            Unban user
+          </MenuItem>
+        )}
+        {!isAdmin && (
+          <MenuItem
+            sx={{ color: 'error.main' }}
+            onClick={() => {
+              setDeleteUserDialog((prevState) => !prevState);
+              handleMenuClose();
+            }}
+          >
+            Delete user
+          </MenuItem>
+        )}
       </Menu>
+
+      {banUserDialog && (
+        <Dialog fullWidth maxWidth="xs" open={banUserDialog} onClose={() => setBanUserDialog((prevState) => !prevState)}>
+          <DialogTitle component="div">
+            <Typography variant="h6">Do you want ban this user?</Typography>
+            <Typography variant="body1" sx={{ color: 'gray' }}>
+              {user.email}
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            {user.banReason && (
+              <Typography sx={{ mb: 2 }} variant="body2">
+                Previous reason: {user.banReason}
+              </Typography>
+            )}
+            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+              <Typography sx={{ mr: 0.5 }} variant="body2">
+                Reason of ban
+              </Typography>
+              <Tooltip title="Reason will be displayed to the banned user">
+                <HelpIcon color="primary" sx={{ fontSize: 20 }} />
+              </Tooltip>
+            </Box>
+            <TextField
+              multiline
+              fullWidth
+              margin="dense"
+              label="Reason"
+              rows={4}
+              value={banReason}
+              onChange={(e) => setBanReason(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={() => setBanUserDialog((prevState) => !prevState)}>
+              Close
+            </Button>
+            <Button
+              disabled={!banReason}
+              variant="contained"
+              color="error"
+              onClick={() => {
+                actions.handleBanUser({ id: user.id, banReason });
+                setBanUserDialog((prevState) => !prevState);
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      {unbanUserDialog && (
+        <Dialog fullWidth maxWidth="xs" open={unbanUserDialog} onClose={() => setUnbanUserDialog((prevState) => !prevState)}>
+          <DialogTitle align="center">Confirm</DialogTitle>
+          <DialogContent>
+            <Typography align="center" variant="body1" sx={{ color: 'success.main' }}>
+              Do you want unban user {user.email}?
+            </Typography>
+            <Typography align="center" variant="body1" sx={{ color: 'error.main' }}>
+              <Typography component="span" variant="body1" sx={{ fontWeight: 700, mr: 1 }}>
+                Reason of ban:
+              </Typography>
+              {user.banReason}
+            </Typography>
+          </DialogContent>
+          <DialogActions className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+            <Button variant="outlined" onClick={() => setUnbanUserDialog((prevState) => !prevState)}>
+              No
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                actions.handleUnbanUser(user.id);
+                setUnbanUserDialog((prevState) => !prevState);
+              }}
+            >
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      {deleteUserDialog && (
+        <Dialog open={deleteUserDialog} onClose={() => setDeleteUserDialog((prevState) => !prevState)}>
+          <DialogTitle component="div">
+            <Typography align="center" variant="h6">
+              Do you want delete this user?
+            </Typography>
+            <Typography align="center" variant="body1" sx={{ color: 'gray' }}>
+              {user.email}
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <FormControlLabel
+              label="This operation is irreversible! Confirm the deletion"
+              control={<Checkbox onChange={() => setDeletionConfirmed((prevState) => !prevState)} />}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={() => setBanUserDialog((prevState) => !prevState)}>
+              Close
+            </Button>
+            <Button
+              disabled={!deletionConfirmed}
+              variant="contained"
+              color="error"
+              onClick={() => {
+                actions.handleDeleteUser(user.id);
+                setDeleteUserDialog((prevState) => !prevState);
+              }}
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </>
   );
 };

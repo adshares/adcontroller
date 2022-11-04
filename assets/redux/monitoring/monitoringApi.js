@@ -45,6 +45,73 @@ export const monitoringApi = createApi({
         };
       },
     }),
+    confirmUser: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/confirm`,
+        method: 'PATCH',
+      }),
+    }),
+    switchToModerator: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/switchToModerator`,
+        method: 'PATCH',
+      }),
+    }),
+    switchToAgency: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/switchToAgency`,
+        method: 'PATCH',
+      }),
+    }),
+    switchToRegular: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/switchToRegular`,
+        method: 'PATCH',
+      }),
+    }),
+    denyAdvertising: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/denyAdvertising`,
+        method: 'PATCH',
+      }),
+    }),
+    grantAdvertising: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/grantAdvertising`,
+        method: 'PATCH',
+      }),
+    }),
+    denyPublishing: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/denyPublishing`,
+        method: 'PATCH',
+      }),
+    }),
+    grantPublishing: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/grantPublishing`,
+        method: 'PATCH',
+      }),
+    }),
+    banUser: builder.mutation({
+      query: ({ id, banReason }) => ({
+        url: `/api/users/${id}/ban`,
+        method: 'PATCH',
+        body: { banReason },
+      }),
+    }),
+    unbanUser: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/unban`,
+        method: 'PATCH',
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
@@ -54,4 +121,15 @@ export const {
   useResetHostConnectionErrorMutation,
   useGetEventsQuery,
   useGetUsersListQuery,
+  useConfirmUserMutation,
+  useSwitchToModeratorMutation,
+  useSwitchToAgencyMutation,
+  useSwitchToRegularMutation,
+  useDenyAdvertisingMutation,
+  useGrantAdvertisingMutation,
+  useDenyPublishingMutation,
+  useGrantPublishingMutation,
+  useBanUserMutation,
+  useUnbanUserMutation,
+  useDeleteUserMutation,
 } = monitoringApi;
