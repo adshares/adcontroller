@@ -215,10 +215,16 @@ class AdServerConfigurationClient
         return $this->patchData($uri, $data);
     }
 
-    public function patchUser(int $userId, string $action): array
+    public function patchUser(int $userId, string $action, array $data): array
     {
         $uri = sprintf('%s/%d/%s', $this->buildUri(self::RESOURCE_USERS), $userId, $action);
-        return $this->patchData($uri, []);
+        return $this->patchData($uri, $data);
+    }
+
+    public function deleteUser(int $userId): void
+    {
+        $uri = sprintf('%s/%d', $this->buildUri(self::RESOURCE_USERS), $userId);
+        $this->deleteData($uri);
     }
 
     private function buildUri(string $resource): string
@@ -357,7 +363,7 @@ class AdServerConfigurationClient
             throw new ServiceNotPresent('AdServer does not respond');
         }
 
-        if (Response::HTTP_OK !== $statusCode) {
+        if ($statusCode < Response::HTTP_OK || $statusCode >= Response::HTTP_MULTIPLE_CHOICES) {
             if (Response::HTTP_UNPROCESSABLE_ENTITY === $statusCode) {
                 $message = json_decode($response->getContent(false))->message;
                 throw new UnexpectedResponseException($message, $statusCode);
@@ -456,5 +462,19 @@ class AdServerConfigurationClient
         $this->checkStatusCode($response);
 
         return json_decode($response->getContent(), true);
+    }
+
+    private function deleteData(string $url): void
+    {
+        $response = $this->httpClient->request(
+            'DELETE',
+            $url,
+            [
+                'headers' => [
+                    'Authorization' => $this->getAuthorizationHeader(),
+                ],
+            ]
+        );
+        $this->checkStatusCode($response);
     }
 }
