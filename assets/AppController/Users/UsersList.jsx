@@ -166,7 +166,6 @@ export default function UsersList() {
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
 
   const handleTableChanges = (event) => {
-    console.log(event);
     const createOrderByParams = (params) => {
       const entries = Object.entries(params);
       if (!entries.length) {
@@ -729,7 +728,6 @@ const UserActionsMenu = ({ user, actions }) => {
 };
 
 const UserDialog = ({ open, setOpen, mode, user, actions }) => {
-  console.log(actions);
   const possibleRoles = ['moderator', 'agency', 'advertiser', 'publisher'];
   const dispatch = useDispatch();
   const form = useForm({
