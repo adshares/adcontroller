@@ -131,9 +131,11 @@ class MonitoringController extends AbstractController
         int $userId,
         string $action,
         AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
     ): JsonResponse {
+        $content = json_decode($request->getContent(), true) ?? [];
         try {
-            $data = $adServerConfigurationClient->patchUser($userId, $action);
+            $data = $adServerConfigurationClient->patchUser($userId, $action, $content);
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {

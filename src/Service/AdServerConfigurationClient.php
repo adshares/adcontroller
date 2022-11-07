@@ -215,10 +215,10 @@ class AdServerConfigurationClient
         return $this->patchData($uri, $data);
     }
 
-    public function patchUser(int $userId, string $action): array
+    public function patchUser(int $userId, string $action, array $data): array
     {
         $uri = sprintf('%s/%d/%s', $this->buildUri(self::RESOURCE_USERS), $userId, $action);
-        return $this->patchData($uri, []);
+        return $this->patchData($uri, $data);
     }
 
     private function buildUri(string $resource): string
