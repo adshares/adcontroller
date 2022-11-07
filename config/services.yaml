@@ -20,6 +20,8 @@ services:
             string $appSecret: '%env(APP_SECRET)%'
             string $appVersion: '%env(APP_VERSION)%'
             string $licenseServerBaseUri: '%env(LICENSE_SERVER_BASE_URI)%'
+            string $oauthClientId: '%env(OAUTH_CLIENT_ID)%'
+            string $oauthClientSecret: '%env(OAUTH_CLIENT_SECRET)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
