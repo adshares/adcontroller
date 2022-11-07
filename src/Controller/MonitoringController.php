@@ -126,14 +126,32 @@ class MonitoringController extends AbstractController
         return $this->jsonOk($data);
     }
 
+    #[Route('/users/{userId}', name: 'delete_user', methods: ['DELETE'])]
+    public function deleteUser(
+        int $userId,
+        AdServerConfigurationClient $adServerConfigurationClient,
+    ): JsonResponse {
+        try {
+            $adServerConfigurationClient->deleteUser($userId);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+
+        return $this->jsonOk();
+    }
+
     #[Route('/users/{userId}/{action}', name: 'patch_user', methods: ['PATCH'])]
     public function patchUser(
         int $userId,
         string $action,
         AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
     ): JsonResponse {
+        $content = json_decode($request->getContent(), true) ?? [];
         try {
-            $data = $adServerConfigurationClient->patchUser($userId, $action);
+            $data = $adServerConfigurationClient->patchUser($userId, $action, $content);
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
