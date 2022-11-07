@@ -94,10 +94,10 @@ export const monitoringApi = createApi({
       }),
     }),
     banUser: builder.mutation({
-      query: ({ id, banReason }) => ({
+      query: ({ id, reason }) => ({
         url: `/api/users/${id}/ban`,
         method: 'PATCH',
-        body: { banReason },
+        body: { reason },
       }),
     }),
     unbanUser: builder.mutation({
@@ -110,6 +110,20 @@ export const monitoringApi = createApi({
       query: (id) => ({
         url: `/api/users/${id}`,
         method: 'DELETE',
+      }),
+    }),
+    addUser: builder.mutation({
+      query: (body) => ({
+        url: `/api/users`,
+        method: 'POST',
+        body,
+      }),
+    }),
+    editUser: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/api/users/${id}`,
+        method: 'PATCH',
+        body,
       }),
     }),
   }),
@@ -132,4 +146,6 @@ export const {
   useBanUserMutation,
   useUnbanUserMutation,
   useDeleteUserMutation,
+  useAddUserMutation,
+  useEditUserMutation,
 } = monitoringApi;

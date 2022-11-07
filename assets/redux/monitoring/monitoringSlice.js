@@ -47,6 +47,10 @@ const monitoringSlice = createSlice({
       const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
       state.monitoringData.users.data[userIdx] = payload.data;
     },
+    editUserReducer: (state, { payload }) => {
+      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
+      state.monitoringData.users.data[userIdx] = payload.data;
+    },
     banUserReducer: (state, { payload }) => {
       const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
       state.monitoringData.users.data[userIdx] = payload.data;
@@ -81,6 +85,7 @@ export const {
   grantAdvertisingReducer,
   denyPublishingReducer,
   grantPublishingReducer,
+  editUserReducer,
   banUserReducer,
   unbanUserReducer,
 } = monitoringSlice.actions;

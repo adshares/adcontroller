@@ -2,11 +2,13 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import {
+  useAddUserMutation,
   useBanUserMutation,
   useConfirmUserMutation,
   useDeleteUserMutation,
   useDenyAdvertisingMutation,
   useDenyPublishingMutation,
+  useEditUserMutation,
   useGetUsersListQuery,
   useGrantAdvertisingMutation,
   useGrantPublishingMutation,
@@ -20,6 +22,7 @@ import {
   confirmUserReducer,
   denyAdvertisingReducer,
   denyPublishingReducer,
+  editUserReducer,
   grantAdvertisingReducer,
   grantPublishingReducer,
   switchToAgencyReducer,
@@ -27,8 +30,8 @@ import {
   switchToRegularReducer,
   unbanUserReducer,
 } from '../../redux/monitoring/monitoringSlice';
-import { useDebounce, useSkipFirstRenderEffect } from '../../hooks';
-import { formatMoney } from '../../utils/helpers';
+import { useDebounce, useForm, useSkipFirstRenderEffect } from '../../hooks';
+import { compareArrays, formatMoney } from '../../utils/helpers';
 import TableData from '../../Components/TableData/TableData';
 import Spinner from '../../Components/Spinner/Spinner';
 import {
@@ -38,6 +41,7 @@ import {
   CardContent,
   CardHeader,
   Checkbox,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -48,6 +52,7 @@ import {
   InputLabel,
   Menu,
   MenuItem,
+  OutlinedInput,
   Select,
   TextField,
   Tooltip,
@@ -60,7 +65,9 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import BlockIcon from '@mui/icons-material/Block';
 import HelpIcon from '@mui/icons-material/Help';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import commonStyles from '../../styles/commonStyles.scss';
+import ListItemText from '@mui/material/ListItemText';
 
 const headCells = [
   {
@@ -156,6 +163,7 @@ export default function UsersList() {
   });
   const users = useSelector(monitoringSelectors.getUsers);
   const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
 
   const handleTableChanges = (event) => {
     console.log(event);
@@ -259,33 +267,46 @@ export default function UsersList() {
   }, [users]);
 
   return (
-    <Card
-      className={`${commonStyles.card}`}
-      sx={{
-        height: 'calc(100vh - 8rem)',
-        maxWidth: 'calc(100vw - 21rem)',
-      }}
-      width="full"
-    >
-      <CardHeader title="Users" />
-      <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
-        <TableData
-          headCells={headCells}
-          rows={rows}
-          onTableChange={handleTableChanges}
-          isDataLoading={isFetching}
-          multiSort
-          paginationParams={{
-            limit: queryConfig.limit,
-            count: users?.total || 0,
-            showFirstButton: true,
-            showLastButton: true,
-          }}
-          defaultFilterBy={queryConfig.filter}
-          customFiltersEl={[FilterByEmail, FilterByRole, FilterByEmailStatus, FilterByAccountStatus]}
-        />
-      </CardContent>
-    </Card>
+    <>
+      <Card
+        className={`${commonStyles.card}`}
+        sx={{
+          height: 'calc(100vh - 8rem)',
+          maxWidth: 'calc(100vw - 21rem)',
+        }}
+        width="full"
+      >
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
+          <CardHeader title="Users" />
+          <Button
+            onClick={() => setAddUserDialogOpen((prevState) => !prevState)}
+            variant="contained"
+            sx={{ mr: 2 }}
+            endIcon={<PersonAddAltIcon />}
+          >
+            Add user
+          </Button>
+        </Box>
+        <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
+          <TableData
+            headCells={headCells}
+            rows={rows}
+            onTableChange={handleTableChanges}
+            isDataLoading={isFetching}
+            multiSort
+            paginationParams={{
+              limit: queryConfig.limit,
+              count: users?.total || 0,
+              showFirstButton: true,
+              showLastButton: true,
+            }}
+            defaultFilterBy={queryConfig.filter}
+            customFiltersEl={[FilterByEmail, FilterByRole, FilterByEmailStatus, FilterByAccountStatus]}
+          />
+        </CardContent>
+      </Card>
+      <UserDialog mode="add" open={addUserDialogOpen} setOpen={setAddUserDialogOpen} actions={{ refetch }} />
+    </>
   );
 }
 
@@ -293,6 +314,7 @@ const UserActionsMenu = ({ user, actions }) => {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const menuOpen = Boolean(anchorEl);
+  const [editUserDialog, setEditUserDialog] = useState(false);
   const [banUserDialog, setBanUserDialog] = useState(false);
   const [unbanUserDialog, setUnbanUserDialog] = useState(false);
   const [deleteUserDialog, setDeleteUserDialog] = useState(false);
@@ -342,8 +364,6 @@ const UserActionsMenu = ({ user, actions }) => {
     unbanUserPending,
     deleteUserPending,
   ]);
-
-  console.log(isActionPending);
 
   const handleConfirmUser = async (id) => {
     const response = await confirmUser(id);
@@ -402,9 +422,10 @@ const UserActionsMenu = ({ user, actions }) => {
   };
 
   const handleBanUser = async (id) => {
-    const response = await banUser(id);
+    const response = await banUser({ id, reason: banReason });
     if (response.data && response.data.message === 'OK') {
       dispatch(banUserReducer(response.data));
+      setBanReason('');
     }
   };
 
@@ -533,6 +554,16 @@ const UserActionsMenu = ({ user, actions }) => {
         )}
         {!isAdmin && !user.isBanned && (
           <MenuItem
+            onClick={() => {
+              setEditUserDialog((prevState) => !prevState);
+              handleMenuClose();
+            }}
+          >
+            Edit user
+          </MenuItem>
+        )}
+        {!isAdmin && !user.isBanned && (
+          <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
               setBanUserDialog((prevState) => !prevState);
@@ -567,10 +598,18 @@ const UserActionsMenu = ({ user, actions }) => {
       </Menu>
 
       {banUserDialog && (
-        <Dialog fullWidth maxWidth="xs" open={banUserDialog} onClose={() => setBanUserDialog((prevState) => !prevState)}>
+        <Dialog
+          fullWidth
+          maxWidth="xs"
+          open={banUserDialog}
+          onClose={() => {
+            setBanUserDialog((prevState) => !prevState);
+            setBanReason('');
+          }}
+        >
           <DialogTitle component="div">
             <Typography variant="h6">Do you want ban this user?</Typography>
-            <Typography variant="body1" sx={{ color: 'gray' }}>
+            <Typography variant="body1" sx={{ color: 'grey.600' }}>
               {user.email}
             </Typography>
           </DialogTitle>
@@ -607,7 +646,7 @@ const UserActionsMenu = ({ user, actions }) => {
               variant="contained"
               color="error"
               onClick={() => {
-                handleBanUser({ id: user.id, banReason });
+                handleBanUser(user.id);
                 setBanUserDialog((prevState) => !prevState);
               }}
             >
@@ -655,7 +694,7 @@ const UserActionsMenu = ({ user, actions }) => {
             <Typography align="center" variant="h6">
               Do you want delete this user?
             </Typography>
-            <Typography align="center" variant="body1" sx={{ color: 'gray' }}>
+            <Typography align="center" variant="body1" sx={{ color: 'grey.600' }}>
               {user.email}
             </Typography>
           </DialogTitle>
@@ -683,6 +722,178 @@ const UserActionsMenu = ({ user, actions }) => {
           </DialogActions>
         </Dialog>
       )}
+
+      {editUserDialog && <UserDialog open={editUserDialog} setOpen={setEditUserDialog} mode="edit" user={user} />}
+    </>
+  );
+};
+
+const UserDialog = ({ open, setOpen, mode, user, actions }) => {
+  console.log(actions);
+  const possibleRoles = ['moderator', 'agency', 'advertiser', 'publisher'];
+  const dispatch = useDispatch();
+  const form = useForm({
+    initialFields: { email: user?.email || '', wallet: user?.connectedWallet.address || '', network: user?.connectedWallet.network || '' },
+  });
+  const [role, setRole] = useState({ initialState: user?.roles || [], currentState: user?.roles || [] });
+  const [forcePasswordChange, setForcePasswordChange] = useState(false);
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+  const [addUser, { isLoading: addUserPending, data: addUserData }] = useAddUserMutation();
+  const [editUser, { isLoading: editUserPending }] = useEditUserMutation();
+
+  const isRoleWasChanged = useMemo(() => !compareArrays(role.initialState, role.currentState), [role]);
+
+  const handleRolePick = (e) => {
+    const { value } = e.target;
+    setRole((prevState) => ({ ...prevState, currentState: typeof value === 'string' ? value.split(',') : value }));
+  };
+
+  const onConfirmClick = async () => {
+    if (!user) {
+      const body = {
+        email: form.fields.email || null,
+        role: role.currentState,
+        wallet: form.fields.wallet ? { address: form.fields.wallet, network: form.fields.network } : null,
+        forcePasswordChange: form.fields.email ? forcePasswordChange : null,
+      };
+      const response = await addUser(body);
+      if (response.data && response.data.message === 'OK') {
+        actions.refetch();
+        setOpen(false);
+        setInfoDialogOpen(true);
+        form.resetForm();
+      }
+    }
+    if (user) {
+      const body = {
+        ...(form.changedFields.email ? { email: form.fields.email } : {}),
+        ...(form.changedFields.wallet || form.changedFields.network
+          ? { wallet: { address: form.fields.wallet, network: form.fields.network } }
+          : {}),
+        ...(isRoleWasChanged ? { role: role.currentState } : {}),
+        ...(forcePasswordChange ? { forcePasswordChange } : {}),
+      };
+      const response = await editUser({ id: user.id, body });
+      if (response.data && response.data.message === 'OK') {
+        dispatch(editUserReducer(response.data));
+        setOpen(false);
+        form.resetForm();
+      }
+    }
+  };
+
+  const onCloseClick = () => {
+    setOpen(false);
+    form.resetForm();
+  };
+
+  return (
+    <>
+      <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen((prevState) => !prevState)}>
+        <DialogTitle>{mode === 'add' ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Email"
+            size="small"
+            name="email"
+            value={form.fields.email}
+            onFocus={form.setTouched}
+            onChange={form.onChange}
+          />
+          <Collapse in={form.fields.email.length > 0}>
+            <FormControlLabel
+              label="Send link to change password"
+              control={<Checkbox checked={forcePasswordChange} onChange={() => setForcePasswordChange((prevState) => !prevState)} />}
+            />
+          </Collapse>
+          <FormControl fullWidth size="small" margin="dense">
+            <InputLabel id="rolesPickerLabel">Roles</InputLabel>
+            <Select
+              labelId="rolesPickerLabel"
+              id="rolesPickerSelect"
+              multiple
+              value={role.currentState}
+              onChange={handleRolePick}
+              input={<OutlinedInput label="Roles" />}
+              renderValue={(selected) => selected.map((el) => el.charAt(0).toUpperCase() + el.slice(1)).join(', ')}
+            >
+              {possibleRoles.map((el) => (
+                <MenuItem key={el} value={el}>
+                  <Checkbox checked={role.currentState.indexOf(el) > -1} />
+                  <ListItemText primary={el.charAt(0).toUpperCase() + el.slice(1)} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth size="small" margin="dense">
+            <InputLabel id="networkLabel">Network</InputLabel>
+            <Select
+              labelId="networkLabel"
+              id="networkSelect"
+              label="Network"
+              name="network"
+              value={form.fields.network}
+              onFocus={form.setTouched}
+              onChange={form.onChange}
+            >
+              <MenuItem value="ADS">ADS</MenuItem>
+              <MenuItem value="BSC">BSC</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Wallet address"
+            size="small"
+            name={'wallet'}
+            value={form.fields.wallet}
+            onChange={form.onChange}
+            onFocus={form.setTouched}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onCloseClick} variant="outlined">
+            Close
+          </Button>
+          <Button
+            disabled={
+              (form.fields.wallet ? !!form.fields.wallet && !form.fields.network : !form.fields.email) ||
+              !(form.isFormWasChanged || isRoleWasChanged) ||
+              addUserPending ||
+              editUserPending
+            }
+            onClick={onConfirmClick}
+            variant="contained"
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog fullWidth maxWidth="xs" open={infoDialogOpen}>
+        <DialogTitle>User was {mode === 'add' ? 'added' : 'edited'}</DialogTitle>
+        <DialogContent>
+          {addUserData && addUserData.data.email && <Typography variant="body1">Email: {addUserData.data.email}</Typography>}
+          {addUserData && addUserData.data.connectedWallet.address && (
+            <Typography variant="body1"> Wallet: {addUserData.data.connectedWallet.address}</Typography>
+          )}
+          {addUserData && addUserData.data.password && (
+            <>
+              <Typography variant="body1">Password: {addUserData.data.password}</Typography>
+              <Typography variant="body2" sx={{ color: 'error.main' }}>
+                Save this password. After closing is not be available.
+              </Typography>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInfoDialogOpen(false)} variant="outlined">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
