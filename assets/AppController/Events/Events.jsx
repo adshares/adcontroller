@@ -42,8 +42,8 @@ export default function Events() {
     cursor: null,
     page: 1,
     'filter[type]': null,
-    from: null,
-    to: null,
+    'filter[createdAt][from]': null,
+    'filter[createdAt][to]': null,
   });
   const { data: response, isFetching } = useGetEventsQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
@@ -74,12 +74,12 @@ export default function Events() {
 
     setQueryConfig((prevState) => ({
       ...prevState,
-      cursor: response?.cursor || null,
+      cursor: event.page === 1 ? null : response.cursor,
       page: event.page,
       limit: event.rowsPerPage,
       'filter[type]': event.tableFilters.select?.type || null,
-      from: formatDate(fromDate),
-      to: formatDate(toDate),
+      'filter[createdAt][from]': formatDate(fromDate),
+      'filter[createdAt][to]': formatDate(toDate),
     }));
   };
 
