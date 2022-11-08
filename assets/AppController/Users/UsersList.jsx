@@ -260,14 +260,7 @@ export default function UsersList() {
           campaignCount: user.campaignCount,
           siteCount: user.siteCount,
           lastActiveAt: user.lastActiveAt && new Date(user.lastActiveAt).toLocaleString(),
-          actions: (
-            <UserActionsMenu
-              user={user}
-              actions={{
-                refetch,
-              }}
-            />
-          ),
+          actions: <UserActionsMenu user={user} actions={{ refetch }} />,
         }))
       : [];
   }, [users]);
@@ -457,7 +450,7 @@ const UserActionsMenu = ({ user, actions }) => {
 
   return (
     <>
-      <IconButton disabled={isActionPending} onClick={handleMenuOpen}>
+      <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen}>
         {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
       </IconButton>
       <Menu
@@ -517,7 +510,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to regular
           </MenuItem>
         )}
-        {!isAdvertiser && !user.isBanned && (
+        {!isAdmin && !isAdvertiser && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantAdvertising(user.id);
@@ -527,7 +520,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow advertising
           </MenuItem>
         )}
-        {isAdvertiser && !user.isBanned && (
+        {!isAdmin && isAdvertiser && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyAdvertising(user.id);
@@ -537,7 +530,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Deny advertising
           </MenuItem>
         )}
-        {!isPublisher && !user.isBanned && (
+        {!isAdmin && !isPublisher && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantPublishing(user.id);
@@ -547,7 +540,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow publishing
           </MenuItem>
         )}
-        {isPublisher && !user.isBanned && (
+        {!isAdmin && isPublisher && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyPublishing(user.id);
