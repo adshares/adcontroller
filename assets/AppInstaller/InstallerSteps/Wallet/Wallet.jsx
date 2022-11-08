@@ -14,7 +14,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   const walletForm = useForm({
     initialFields: { WalletAddress: '', WalletSecretKey: '' },
     validation: {
-      WalletAddress: ['required', 'wallet'],
+      WalletAddress: ['required', 'ADSWallet'],
       WalletSecretKey: ['required', 'walletSecret'],
     },
   });

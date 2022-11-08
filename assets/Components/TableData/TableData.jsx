@@ -236,7 +236,7 @@ const FilteringInformationBox = ({
   return (
     <>
       {customFiltersEl.length > 0 && (
-        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap}`}>
+        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignCenter}`}>
           <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 1 }}>
             <FilterListIcon />
             <Typography variant="h6">Filter list:</Typography>

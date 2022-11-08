@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import {
@@ -721,11 +721,11 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
     initialFields: {
       email: user?.email || '',
       wallet: user?.connectedWallet.address || '',
-      network: user?.connectedWallet.network || '',
+      network: user?.connectedWallet.network || 'ADS',
     },
     validation: {
       email: ['email'],
-      wallet: ['wallet: ADS | BSC'],
+      wallet: ['ADSWallet'],
     },
   });
   const [role, setRole] = useState({ initialState: user?.roles || [], currentState: user?.roles || [] });
@@ -733,6 +733,10 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const [addUser, { isLoading: addUserPending, data: addUserData }] = useAddUserMutation();
   const [editUser, { isLoading: editUserPending }] = useEditUserMutation();
+
+  useEffect(() => {
+    form.changeValidationRules({ wallet: [`${form.fields.network}Wallet`] });
+  }, [form.fields.network]);
 
   const isRoleWasChanged = useMemo(() => !compareArrays(role.initialState, role.currentState), [role]);
 

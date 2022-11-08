@@ -45,7 +45,7 @@ const testADSWallet = (value) => {
   const isValid = validateAddress(value);
   return {
     isValid,
-    helperText: isValid ? '' : 'Field must be valid wallet address',
+    helperText: isValid ? '' : 'Field must be valid ADS wallet address',
   };
 };
 
@@ -53,7 +53,7 @@ const testBSCWallet = (value) => {
   const isValid = new RegExp(/^0x[0-9a-f]{40}$/, 'i').test(value);
   return {
     isValid,
-    helperText: isValid ? '' : 'Field must be valid wallet address',
+    helperText: isValid ? '' : 'Field must be valid BSC wallet address',
   };
 };
 
@@ -97,10 +97,7 @@ const validate = (targetName, targetValue, validationOptions) => {
   const validationResult = {};
 
   const validateValue = (option, value) => {
-    const rule = option.split(':')[0];
-    const types = option.split(':')[1];
-
-    switch (rule) {
+    switch (option) {
       case 'required':
         return testRequired(value);
 
@@ -113,18 +110,10 @@ const validate = (targetName, targetValue, validationOptions) => {
       case 'url':
         return value ? testUrl(value) : validValueResult;
 
-      case 'wallet':
-        if (types) {
-          const setOfValidationsResults = types.split('|').map((type) => validateValue(type.trim(), targetValue));
-          const isValidValueExist = setOfValidationsResults.some((result) => result.isValid);
-          return isValidValueExist ? validValueResult : setOfValidationsResults.find((result) => !result.isValid);
-        }
+      case 'ADSWallet':
         return value ? testADSWallet(value) : validValueResult;
 
-      case 'ADS':
-        return value ? testADSWallet(value) : validValueResult;
-
-      case 'BSC':
+      case 'BSCWallet':
         return value ? testBSCWallet(value) : validValueResult;
 
       case 'walletSecret':
@@ -159,13 +148,14 @@ const validate = (targetName, targetValue, validationOptions) => {
 
 export default function useForm(options) {
   const [fields, setFields] = useState(options.initialFields);
+  const [validation, setValidation] = useState(options.validation || {});
   const [touchedFields, setTouchedFields] = useState(
     Object.keys(options.initialFields).reduce((acc, val) => ({ ...acc, [val]: false }), {}),
   );
 
   const errorObj = useMemo(
-    () => Object.keys(fields).reduce((acc, fieldName) => ({ ...acc, ...validate(fieldName, fields[fieldName], options.validation) }), {}),
-    [fields, touchedFields],
+    () => Object.keys(fields).reduce((acc, fieldName) => ({ ...acc, ...validate(fieldName, fields[fieldName], validation) }), {}),
+    [fields, touchedFields, validation],
   );
   const isFormValid = useMemo(() => Object.keys(errorObj).every((field) => errorObj[field].isValid), [errorObj]);
   const isFormWasChanged = useMemo(
@@ -180,6 +170,10 @@ export default function useForm(options) {
       ),
     [fields, touchedFields],
   );
+
+  const changeValidationRules = (rules) => {
+    setValidation((prevState) => ({ ...prevState, ...rules }));
+  };
 
   const setTouched = (e) => {
     if (!touchedFields[e.target.name]) {
@@ -211,5 +205,6 @@ export default function useForm(options) {
     resetForm,
     isFormWasChanged,
     changedFields,
+    changeValidationRules,
   };
 }

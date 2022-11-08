@@ -39,7 +39,7 @@ const WalletSettingsCard = () => {
   const walletForm = useForm({
     initialFields: { WalletAddress: '', WalletSecretKey: '' },
     validation: {
-      WalletAddress: ['required', 'wallet'],
+      WalletAddress: ['required', 'ADSWallet'],
       WalletSecretKey: ['required', 'walletSecret'],
     },
   });
@@ -265,7 +265,7 @@ const ColdWalletSettingsCard = () => {
       ColdWalletAddress: appData.AdServer.ColdWalletAddress,
     },
     validation: {
-      ColdWalletAddress: ['required', 'wallet'],
+      ColdWalletAddress: ['required', 'ADSWallet'],
       HotWalletMinValue: ['number'],
       HotWalletMaxValue: ['number'],
     },
