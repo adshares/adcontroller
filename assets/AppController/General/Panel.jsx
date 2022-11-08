@@ -568,6 +568,13 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
     }
   };
 
+  const updateComponentState = (name, file) => {
+    setChangedFiles((prevState) => ({
+      ...prevState,
+      [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
+    }));
+  };
+
   const onInputChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
@@ -596,10 +603,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
       switch (name) {
         case 'Favicon16x16':
           if (width === 16 && height === 16 && isFileTypeIsPng) {
-            setChangedFiles((prevState) => ({
-              ...prevState,
-              [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
-            }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be png with size 16x16', { variant: 'error', persist: true });
           }
@@ -607,10 +611,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
 
         case 'Favicon32x32':
           if (width === 32 && height === 32 && isFileTypeIsPng) {
-            setChangedFiles((prevState) => ({
-              ...prevState,
-              [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
-            }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be png with size 32x32', { variant: 'error' });
           }
@@ -618,10 +619,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
 
         case 'Favicon48x48':
           if (width === 48 && height === 48 && isFileTypeIsPng) {
-            setChangedFiles((prevState) => ({
-              ...prevState,
-              [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
-            }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be png with size 48x48', { variant: 'error' });
           }
@@ -629,10 +627,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
 
         case 'Favicon96x96':
           if (width === 96 && height === 96 && isFileTypeIsPng) {
-            setChangedFiles((prevState) => ({
-              ...prevState,
-              [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
-            }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be png with size 96x96', { variant: 'error' });
           }
@@ -640,30 +635,21 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
 
         case 'LogoH30':
           if (height >= 30) {
-            setChangedFiles((prevState) => ({
-              ...prevState,
-              [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
-            }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
           break;
         case 'LogoH60':
           if (height >= 30) {
-            setChangedFiles((prevState) => ({
-              ...prevState,
-              [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
-            }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
           break;
         case 'LogoH90':
           if (height >= 30) {
-            setChangedFiles((prevState) => ({
-              ...prevState,
-              [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
-            }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
