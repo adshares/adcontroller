@@ -737,7 +737,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
     },
     validation: {
       email: ['email'],
-      wallet: ['wallet'],
+      wallet: ['wallet: ADS | BSC'],
     },
   });
   const [role, setRole] = useState({ initialState: user?.roles || [], currentState: user?.roles || [] });
@@ -857,7 +857,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
           <TextField
             fullWidth
             margin="dense"
-            label="Wallet address"
+            label="ADS | BSC wallet address"
             size="small"
             name={'wallet'}
             value={form.fields.wallet}

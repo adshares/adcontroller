@@ -41,8 +41,16 @@ const testEmail = (value) => {
   };
 };
 
-const testWallet = (value) => {
-  const isValid = validateAddress(value) || new RegExp(/^0x[0-9a-f]{40}$/, 'i').test(value);
+const testADSWallet = (value) => {
+  const isValid = validateAddress(value);
+  return {
+    isValid,
+    helperText: isValid ? '' : 'Field must be valid wallet address',
+  };
+};
+
+const testBSCWallet = (value) => {
+  const isValid = new RegExp(/^0x[0-9a-f]{40}$/, 'i').test(value);
   return {
     isValid,
     helperText: isValid ? '' : 'Field must be valid wallet address',
@@ -89,7 +97,10 @@ const validate = (targetName, targetValue, validationOptions) => {
   const validationResult = {};
 
   const validateValue = (option, value) => {
-    switch (option) {
+    const rule = option.split(':')[0];
+    const types = option.split(':')[1];
+
+    switch (rule) {
       case 'required':
         return testRequired(value);
 
@@ -103,7 +114,18 @@ const validate = (targetName, targetValue, validationOptions) => {
         return value ? testUrl(value) : validValueResult;
 
       case 'wallet':
-        return value ? testWallet(value) : validValueResult;
+        if (types) {
+          const setOfValidationsResults = types.split('|').map((type) => validateValue(type.trim(), targetValue));
+          const isValidValueExist = setOfValidationsResults.some((result) => result.isValid);
+          return isValidValueExist ? validValueResult : setOfValidationsResults.find((result) => !result.isValid);
+        }
+        return value ? testADSWallet(value) : validValueResult;
+
+      case 'ADS':
+        return value ? testADSWallet(value) : validValueResult;
+
+      case 'BSC':
+        return value ? testBSCWallet(value) : validValueResult;
 
       case 'walletSecret':
         return value ? testWalletSecret(value) : validValueResult;
