@@ -42,7 +42,7 @@ const testEmail = (value) => {
 };
 
 const testWallet = (value) => {
-  const isValid = validateAddress(value);
+  const isValid = validateAddress(value) || new RegExp(/^0x[0-9a-f]{40}$/, 'i').test(value);
   return {
     isValid,
     helperText: isValid ? '' : 'Field must be valid wallet address',

@@ -165,6 +165,13 @@ export default function UsersList() {
   const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
 
+  const refetchWithoutCursor = () => {
+    setQueryConfig((prevState) => ({ ...prevState, cursor: null }));
+    if (!queryConfig.cursor) {
+      refetch();
+    }
+  };
+
   const handleTableChanges = (event) => {
     const createOrderByParams = (params) => {
       const entries = Object.entries(params);
@@ -299,12 +306,11 @@ export default function UsersList() {
               showFirstButton: true,
               showLastButton: true,
             }}
-            defaultFilterBy={queryConfig.filter}
             customFiltersEl={[FilterByEmail, FilterByRole, FilterByEmailStatus, FilterByAccountStatus]}
           />
         </CardContent>
       </Card>
-      <UserDialog mode="add" open={addUserDialogOpen} setOpen={setAddUserDialogOpen} actions={{ refetch }} />
+      <UserDialog mode="add" open={addUserDialogOpen} setOpen={setAddUserDialogOpen} actions={{ refetch: refetchWithoutCursor }} />
     </>
   );
 }
@@ -731,7 +737,15 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
   const possibleRoles = ['moderator', 'agency', 'advertiser', 'publisher'];
   const dispatch = useDispatch();
   const form = useForm({
-    initialFields: { email: user?.email || '', wallet: user?.connectedWallet.address || '', network: user?.connectedWallet.network || '' },
+    initialFields: {
+      email: user?.email || '',
+      wallet: user?.connectedWallet.address || '',
+      network: user?.connectedWallet.network || '',
+    },
+    validation: {
+      email: ['email'],
+      wallet: ['wallet'],
+    },
   });
   const [role, setRole] = useState({ initialState: user?.roles || [], currentState: user?.roles || [] });
   const [forcePasswordChange, setForcePasswordChange] = useState(false);
@@ -744,6 +758,11 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
   const handleRolePick = (e) => {
     const { value } = e.target;
     setRole((prevState) => ({ ...prevState, currentState: typeof value === 'string' ? value.split(',') : value }));
+  };
+
+  const resetForm = () => {
+    form.resetForm();
+    setRole({ initialState: user?.roles || [], currentState: user?.roles || [] });
   };
 
   const onConfirmClick = async () => {
@@ -759,7 +778,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
         actions.refetch();
         setOpen(false);
         setInfoDialogOpen(true);
-        form.resetForm();
+        resetForm();
       }
     }
     if (user) {
@@ -775,14 +794,14 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
       if (response.data && response.data.message === 'OK') {
         dispatch(editUserReducer(response.data));
         setOpen(false);
-        form.resetForm();
+        resetForm();
       }
     }
   };
 
   const onCloseClick = () => {
     setOpen(false);
-    form.resetForm();
+    resetForm();
   };
 
   return (
@@ -799,6 +818,8 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
             value={form.fields.email}
             onFocus={form.setTouched}
             onChange={form.onChange}
+            error={!form.errorObj.email.isValid}
+            helperText={form.errorObj.email.helperText}
           />
           <Collapse in={form.fields.email.length > 0}>
             <FormControlLabel
@@ -849,6 +870,8 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
             value={form.fields.wallet}
             onChange={form.onChange}
             onFocus={form.setTouched}
+            error={!form.errorObj.wallet.isValid}
+            helperText={form.errorObj.wallet.helperText}
           />
         </DialogContent>
         <DialogActions>
@@ -859,6 +882,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
             disabled={
               (form.fields.wallet ? !!form.fields.wallet && !form.fields.network : !form.fields.email) ||
               !(form.isFormWasChanged || isRoleWasChanged) ||
+              !form.isFormValid ||
               addUserPending ||
               editUserPending
             }
