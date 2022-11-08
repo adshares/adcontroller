@@ -15,47 +15,7 @@ const monitoringSlice = createSlice({
   name: 'monitoringSlice',
   initialState,
   reducers: {
-    confirmUserReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    switchToModeratorReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    switchToAgencyReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    switchToRegularReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    denyAdvertisingReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    grantAdvertisingReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    denyPublishingReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    grantPublishingReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    editUserReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    banUserReducer: (state, { payload }) => {
-      const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
-      state.monitoringData.users.data[userIdx] = payload.data;
-    },
-    unbanUserReducer: (state, { payload }) => {
+    updateUserDataReducer: (state, { payload }) => {
       const userIdx = state.monitoringData.users.data.findIndex((user) => user.id === payload.data.id);
       state.monitoringData.users.data[userIdx] = payload.data;
     },
@@ -76,18 +36,6 @@ const monitoringSlice = createSlice({
   },
 });
 
-export const {
-  confirmUserReducer,
-  switchToModeratorReducer,
-  switchToAgencyReducer,
-  switchToRegularReducer,
-  denyAdvertisingReducer,
-  grantAdvertisingReducer,
-  denyPublishingReducer,
-  grantPublishingReducer,
-  editUserReducer,
-  banUserReducer,
-  unbanUserReducer,
-} = monitoringSlice.actions;
+export const { updateUserDataReducer } = monitoringSlice.actions;
 
 export default monitoringSlice.reducer;

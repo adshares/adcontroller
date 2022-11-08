@@ -17,19 +17,7 @@ import {
   useSwitchToRegularMutation,
   useUnbanUserMutation,
 } from '../../redux/monitoring/monitoringApi';
-import {
-  banUserReducer,
-  confirmUserReducer,
-  denyAdvertisingReducer,
-  denyPublishingReducer,
-  editUserReducer,
-  grantAdvertisingReducer,
-  grantPublishingReducer,
-  switchToAgencyReducer,
-  switchToModeratorReducer,
-  switchToRegularReducer,
-  unbanUserReducer,
-} from '../../redux/monitoring/monitoringSlice';
+import { updateUserDataReducer } from '../../redux/monitoring/monitoringSlice';
 import { useDebounce, useForm, useSkipFirstRenderEffect } from '../../hooks';
 import { compareArrays, formatMoney } from '../../utils/helpers';
 import TableData from '../../Components/TableData/TableData';
@@ -366,63 +354,63 @@ const UserActionsMenu = ({ user, actions }) => {
   const handleConfirmUser = async (id) => {
     const response = await confirmUser(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(confirmUserReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
   const handleSwitchToModerator = async (id) => {
     const response = await switchToModerator(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(switchToModeratorReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
   const handleSwitchToAgency = async (id) => {
     const response = await switchToAgency(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(switchToAgencyReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
   const handleSwitchToRegular = async (id) => {
     const response = await switchToRegular(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(switchToRegularReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
   const handleDenyAdvertising = async (id) => {
     const response = await denyAdvertising(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(denyAdvertisingReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
   const handleGrantAdvertising = async (id) => {
     const response = await grantAdvertising(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(grantAdvertisingReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
   const handleDenyPublishing = async (id) => {
     const response = await denyPublishing(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(denyPublishingReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
   const handleGrantPublishing = async (id) => {
     const response = await grantPublishing(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(grantPublishingReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
   const handleBanUser = async (id) => {
     const response = await banUser({ id, reason: banReason });
     if (response.data && response.data.message === 'OK') {
-      dispatch(banUserReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
       setBanReason('');
     }
   };
@@ -430,7 +418,7 @@ const UserActionsMenu = ({ user, actions }) => {
   const handleUnbanUser = async (id) => {
     const response = await unbanUser(id);
     if (response.data && response.data.message === 'OK') {
-      dispatch(unbanUserReducer(response.data));
+      dispatch(updateUserDataReducer(response.data));
     }
   };
 
@@ -785,7 +773,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
       };
       const response = await editUser({ id: user.id, body });
       if (response.data && response.data.message === 'OK') {
-        dispatch(editUserReducer(response.data));
+        dispatch(updateUserDataReducer(response.data));
         setOpen(false);
         resetForm();
       }
