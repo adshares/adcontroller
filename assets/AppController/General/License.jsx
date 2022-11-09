@@ -59,7 +59,7 @@ function License() {
   };
 
   return (
-    <Card className={`${commonStyles.card}`}>
+    <Card className={`${commonStyles.card}`} width="mainContainer">
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader
           title="License"

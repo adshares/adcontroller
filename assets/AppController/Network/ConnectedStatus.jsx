@@ -140,6 +140,7 @@ export default function ConnectedStatus() {
         height: 'calc(100vh - 8rem)',
         maxWidth: 'calc(100vw - 21rem)',
       }}
+      width="full"
     >
       <CardHeader title="Connected status" />
       <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
@@ -149,7 +150,12 @@ export default function ConnectedStatus() {
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
           defaultSortBy="name" //(must be same of cell id)
-          paginationParams={{ limit: queryConfig.limit, count: response?.total || 0, showFirstButton: true, showLastButton: true }}
+          paginationParams={{
+            limit: queryConfig.limit,
+            count: response?.total || 0,
+            showFirstButton: true,
+            showLastButton: true,
+          }}
         />
       </CardContent>
     </Card>

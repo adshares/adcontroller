@@ -58,7 +58,7 @@ function Commissions() {
 
   return (
     <>
-      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
+      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`} sx={{ maxWidth: '1280px' }}>
         <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
           <CardHeader title="Advertiser commission" titleTypographyProps={{ align: 'center' }} />
           <CardContent>
@@ -149,7 +149,7 @@ function Commissions() {
         </Card>
       </Box>
 
-      <Card className={`${commonStyles.card}`}>
+      <Card className={`${commonStyles.card}`} width="mainContainer">
         <CardHeader title="Refund program" />
         <FormControlLabel
           label="Enable refund program"

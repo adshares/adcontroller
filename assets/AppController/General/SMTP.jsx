@@ -51,7 +51,7 @@ export default function SMTP() {
   };
 
   return (
-    <Card className={`${commonStyles.card}`}>
+    <Card className={`${commonStyles.card}`} width="mainContainer">
       <CardHeader title="SMTP configuration" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter} `}>

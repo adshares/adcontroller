@@ -1,17 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithGlobalErrorHandler } from '../apiBaseQuery';
-
-const parseParamsEntries = (entries) => {
-  const paramsEntries = [];
-  entries.forEach((entry) => {
-    if (Array.isArray(entry[1])) {
-      entry[1].map((paramValue) => [`${entry[0]}[]`, paramValue]).forEach((entry) => paramsEntries.push(entry));
-      return;
-    }
-    paramsEntries.push(entry);
-  });
-  return paramsEntries;
-};
+import queryString from 'query-string';
 
 export const monitoringApi = createApi({
   reducerPath: 'monitoringApi',
@@ -19,40 +8,144 @@ export const monitoringApi = createApi({
   endpoints: (builder) => ({
     getWalletMonitoring: builder.query({
       query: () => ({
-        url: '/api/monitoring/wallet',
+        url: '/api/wallet',
         method: 'GET',
       }),
     }),
     getConnectedHosts: builder.query({
       query: (queryConfig) => {
-        const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
-        const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
+        const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
         return {
-          url: `/api/monitoring/hosts`,
-          params: urlQueryParams,
+          url: `/api/hosts?${queryParams}`,
           method: 'GET',
         };
       },
     }),
     resetHostConnectionError: builder.mutation({
       query: ({ id }) => ({
-        url: `/api/monitoring/hosts/${id}/reset`,
+        url: `/api/hosts/${id}/reset`,
         method: 'PATCH',
       }),
     }),
     getEvents: builder.query({
       query: (queryConfig) => {
-        const entries = Object.entries(queryConfig).filter((entry) => Boolean(entry[1])); // [['param', 'vale']]
-        const urlQueryParams = new URLSearchParams(parseParamsEntries(entries));
+        const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
         return {
-          url: '/api/monitoring/events',
-          params: urlQueryParams,
+          url: `/api/events?${queryParams}`,
           method: 'GET',
         };
       },
     }),
+    getUsersList: builder.query({
+      query: (queryConfig) => {
+        const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
+        return {
+          url: `/api/users?${queryParams}`,
+          method: 'GET',
+        };
+      },
+    }),
+    confirmUser: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/confirm`,
+        method: 'PATCH',
+      }),
+    }),
+    switchToModerator: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/switchToModerator`,
+        method: 'PATCH',
+      }),
+    }),
+    switchToAgency: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/switchToAgency`,
+        method: 'PATCH',
+      }),
+    }),
+    switchToRegular: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/switchToRegular`,
+        method: 'PATCH',
+      }),
+    }),
+    denyAdvertising: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/denyAdvertising`,
+        method: 'PATCH',
+      }),
+    }),
+    grantAdvertising: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/grantAdvertising`,
+        method: 'PATCH',
+      }),
+    }),
+    denyPublishing: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/denyPublishing`,
+        method: 'PATCH',
+      }),
+    }),
+    grantPublishing: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/grantPublishing`,
+        method: 'PATCH',
+      }),
+    }),
+    banUser: builder.mutation({
+      query: ({ id, reason }) => ({
+        url: `/api/users/${id}/ban`,
+        method: 'PATCH',
+        body: { reason },
+      }),
+    }),
+    unbanUser: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/unban`,
+        method: 'PATCH',
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}`,
+        method: 'DELETE',
+      }),
+    }),
+    addUser: builder.mutation({
+      query: (body) => ({
+        url: `/api/users`,
+        method: 'POST',
+        body,
+      }),
+    }),
+    editUser: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/api/users/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetWalletMonitoringQuery, useGetConnectedHostsQuery, useResetHostConnectionErrorMutation, useGetEventsQuery } =
-  monitoringApi;
+export const {
+  useGetWalletMonitoringQuery,
+  useGetConnectedHostsQuery,
+  useResetHostConnectionErrorMutation,
+  useGetEventsQuery,
+  useGetUsersListQuery,
+  useConfirmUserMutation,
+  useSwitchToModeratorMutation,
+  useSwitchToAgencyMutation,
+  useSwitchToRegularMutation,
+  useDenyAdvertisingMutation,
+  useGrantAdvertisingMutation,
+  useDenyPublishingMutation,
+  useGrantPublishingMutation,
+  useBanUserMutation,
+  useUnbanUserMutation,
+  useDeleteUserMutation,
+  useAddUserMutation,
+  useEditUserMutation,
+} = monitoringApi;

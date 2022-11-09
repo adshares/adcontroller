@@ -125,7 +125,7 @@ const RegistrationModeCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader
         title="Registration mode"
         subheader="Set whether registration is to be available to the public, by invitation or only by a moderator."
@@ -309,7 +309,7 @@ const AutoWithdrawalCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Auto withdrawal" subheader="Set minimum thresholds for automatic withdrawals." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>

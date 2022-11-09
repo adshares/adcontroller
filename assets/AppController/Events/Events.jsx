@@ -1,7 +1,24 @@
 import React, { useMemo, useState } from 'react';
 import { useGetEventsQuery } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
-import { Card, CardContent, CardHeader, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
 
 const headCells = [
@@ -32,18 +49,18 @@ const headCells = [
     id: 'properties',
     label: 'Properties',
     cellWidth: '15rem',
-    alignContent: 'left',
+    alignContent: 'center',
   },
 ];
 
 export default function Events() {
   const [queryConfig, setQueryConfig] = useState({
-    limit: 5,
+    limit: 10,
     cursor: null,
     page: 1,
-    types: null,
-    from: null,
-    to: null,
+    'filter[type]': null,
+    'filter[createdAt][from]': null,
+    'filter[createdAt][to]': null,
   });
   const { data: response, isFetching } = useGetEventsQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
@@ -53,17 +70,13 @@ export default function Events() {
       id: event.id,
       type: event.type,
       createdAt: new Date(event.createdAt).toLocaleString(),
-      properties: (
-        <Typography component="pre" variant="body2" sx={{ backgroundColor: 'lightgrey', padding: 1, borderRadius: 1 }}>
-          {JSON.stringify(event.properties, null, 2)}
-        </Typography>
-      ),
+      properties: <PropertiesDialog data={event} />,
     }));
   }, [response]);
 
   const handleTableChanges = (event) => {
-    const fromDate = event.filterBy.dateRange?.createdAt?.from || null;
-    const toDate = event.filterBy.dateRange?.createdAt?.to || null;
+    const fromDate = event.tableFilters.dateRange?.createdAt?.from || null;
+    const toDate = event.tableFilters.dateRange?.createdAt?.to || null;
 
     const formatDate = (date) => {
       if (!date) {
@@ -74,12 +87,12 @@ export default function Events() {
 
     setQueryConfig((prevState) => ({
       ...prevState,
-      cursor: response?.cursor || null,
+      cursor: event.page === 1 ? null : response.cursor,
       page: event.page,
       limit: event.rowsPerPage,
-      types: event.filterBy.select?.type || null,
-      from: formatDate(fromDate),
-      to: formatDate(toDate),
+      'filter[type]': event.tableFilters.select?.type || null,
+      'filter[createdAt][from]': formatDate(fromDate),
+      'filter[createdAt][to]': formatDate(toDate),
     }));
   };
 
@@ -90,6 +103,7 @@ export default function Events() {
         height: 'calc(100vh - 8rem)',
         maxWidth: 'calc(100vw - 21rem)',
       }}
+      width="full"
     >
       <CardHeader title="Events" />
       <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
@@ -99,9 +113,63 @@ export default function Events() {
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
           defaultSortBy="type"
-          paginationParams={{ limit: queryConfig.limit, count: response?.total || 0, showFirstButton: true, showLastButton: true }}
+          paginationParams={{
+            limit: queryConfig.limit,
+            count: response?.total || 0,
+            showFirstButton: true,
+            showLastButton: true,
+          }}
         />
       </CardContent>
     </Card>
   );
 }
+
+const PropertiesDialog = ({ data }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button variant="text" onClick={() => setOpen(true)}>
+        Details
+      </Button>
+      <Dialog fullWidth maxWidth="sm" open={open} onClose={() => setOpen(false)}>
+        <DialogTitle component="div" className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignCenter}`}>
+          <Typography variant="h6">Details</Typography>
+          <IconButton onClick={() => setOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="none" align="center" sx={{ pt: 1, pb: 1 }}>
+                  Type
+                </TableCell>
+                <TableCell padding="none" align="center" sx={{ pt: 1, pb: 1 }}>
+                  Date of occurrence
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell padding="none" align="center" sx={{ pt: 1, pb: 1 }}>
+                  {data.type}
+                </TableCell>
+                <TableCell padding="none" align="center" sx={{ pt: 1, pb: 1 }}>
+                  {new Date(data.createdAt).toLocaleString()}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+
+          <Box sx={{ backgroundColor: '#f6f6f6', padding: 1, borderRadius: 1, maxHeight: '400px', overflow: 'auto' }}>
+            <Typography component="pre" variant="body2">
+              {JSON.stringify(data.properties, null, 2)}
+            </Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
