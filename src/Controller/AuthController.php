@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\AppConfig;
+use App\Repository\ConfigurationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,8 +22,7 @@ class AuthController extends AbstractController
 
     public function __construct(
         private readonly string $adServerBaseUri,
-        private readonly string $oauthClientId,
-        private readonly string $oauthClientSecret,
+        private readonly ConfigurationRepository $repository,
         private readonly HttpClientInterface $httpClient,
         private readonly RequestStack $requestStack,
     ) {
@@ -38,8 +39,9 @@ class AuthController extends AbstractController
             $this->requestStack->getSession()->set('referer', $referer);
         }
 
+        $clientId = $this->repository->fetchValueByEnum(AppConfig::OAuthClientId);
         $query = http_build_query([
-            'client_id' => $this->oauthClientId,
+            'client_id' => $clientId,
             'redirect_uri' => $this->getRedirectUri(),
             'response_type' => 'code',
             'scope' => '',
@@ -56,9 +58,14 @@ class AuthController extends AbstractController
         if (strlen($state) > 0 && $state !== $request->get('state')) {
             throw new UnprocessableEntityHttpException('Invalid state');
         }
+        $credentials = $this->repository->fetchValuesByNames(
+            AppConfig::MODULE,
+            [AppConfig::OAuthClientId->name, AppConfig::OAuthClientSecret->name],
+            true
+        );
         $body = [
-            'client_id' => $this->oauthClientId,
-            'client_secret' => $this->oauthClientSecret,
+            'client_id' => $credentials[AppConfig::OAuthClientId->name],
+            'client_secret' => $credentials[AppConfig::OAuthClientSecret->name],
             'code' => urldecode($request->get('code')),
             'grant_type' => 'authorization_code',
             'redirect_uri' => $this->getRedirectUri(),

@@ -29,6 +29,7 @@ class ConfigurationRepository extends ServiceEntityRepository
         AdClassifyConfig::ApiKeySecret,
         AdServerConfig::LicenseKey,
         AdServerConfig::WalletSecretKey,
+        AppConfig::OAuthClientSecret,
         GeneralConfig::SmtpPassword,
     ];
 
