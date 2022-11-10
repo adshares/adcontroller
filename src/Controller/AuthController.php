@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AuthController extends AbstractController
@@ -39,7 +40,7 @@ class AuthController extends AbstractController
 
         $query = http_build_query([
             'client_id' => $this->oauthClientId,
-            'redirect_uri' => $this->getRedirectUri($request),
+            'redirect_uri' => $this->getRedirectUri(),
             'response_type' => 'code',
             'scope' => '',
             'state' => $state,
@@ -60,7 +61,7 @@ class AuthController extends AbstractController
             'client_secret' => $this->oauthClientSecret,
             'code' => urldecode($request->get('code')),
             'grant_type' => 'authorization_code',
-            'redirect_uri' => $this->getRedirectUri($request),
+            'redirect_uri' => $this->getRedirectUri(),
         ];
         $response = $this->httpClient->request('POST', $this->adServerBaseUri . self::OAUTH_TOKEN, ['body' => $body]);
         $accessToken = $response->toArray()['access_token'];
@@ -70,10 +71,8 @@ class AuthController extends AbstractController
         return new RedirectResponse($referer);
     }
 
-    private function getRedirectUri(Request $request): string
+    private function getRedirectUri(): string
     {
-        $uri = $request->getUri();
-        $path = $request->getPathInfo();
-        return substr($uri, 0, strpos($uri, $path)) . $this->generateUrl('oauth_callback');
+        return $this->generateUrl('oauth_callback', [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 }
