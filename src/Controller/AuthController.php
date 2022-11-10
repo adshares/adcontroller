@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -14,9 +13,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AuthController extends AbstractController
 {
-    private const OAUTH_AUTHORIZE = '/oauth/authorize';
+    private const DEFAULT_REDIRECT = '/';
+    private const OAUTH_AUTHORIZE = '/auth/authorize';
     private const OAUTH_TOKEN = '/oauth/token';
-    private const PANEL_REDIRECT_PATH = '/login';
 
     public function __construct(
         private readonly string $adServerBaseUri,
@@ -34,6 +33,10 @@ class AuthController extends AbstractController
         $state = substr(base64_encode($bytes), 0, 32);
         $this->requestStack->getSession()->set('state', $state);
 
+        if ($referer = $request->headers->get('Referer')) {
+            $this->requestStack->getSession()->set('referer', $referer);
+        }
+
         $query = http_build_query([
             'client_id' => $this->oauthClientId,
             'redirect_uri' => $this->getRedirectUri($request),
@@ -45,8 +48,8 @@ class AuthController extends AbstractController
         return new RedirectResponse($this->adServerBaseUri . self::OAUTH_AUTHORIZE . '?' . $query);
     }
 
-    #[Route('/oauth/token', name: 'oauth_token', methods: ['GET'])]
-    public function oauthToken(Request $request): Response
+    #[Route('/oauth/callback', name: 'oauth_callback', methods: ['GET'])]
+    public function oauthCallback(Request $request): Response
     {
         $state = $this->requestStack->getSession()->get('state', '');
         if (strlen($state) > 0 && $state !== $request->get('state')) {
@@ -60,14 +63,17 @@ class AuthController extends AbstractController
             'redirect_uri' => $this->getRedirectUri($request),
         ];
         $response = $this->httpClient->request('POST', $this->adServerBaseUri . self::OAUTH_TOKEN, ['body' => $body]);
+        $accessToken = $response->toArray()['access_token'];
+        $this->requestStack->getSession()->set('accessToken', $accessToken);
 
-        return new JsonResponse($response->toArray());
+        $referer = $this->requestStack->getSession()->get('referer') ?? self::DEFAULT_REDIRECT;
+        return new RedirectResponse($referer);
     }
 
     private function getRedirectUri(Request $request): string
     {
         $uri = $request->getUri();
         $path = $request->getPathInfo();
-        return substr($uri, 0, strpos($uri, $path)) . self::PANEL_REDIRECT_PATH;
+        return substr($uri, 0, strpos($uri, $path)) . $this->generateUrl('oauth_callback');
     }
 }
