@@ -26,7 +26,7 @@ class SessionAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request): ?bool
     {
-        return null !== $request->cookies->get('PHPSESSID');
+        return true;
     }
 
     public function authenticate(Request $request): Passport
