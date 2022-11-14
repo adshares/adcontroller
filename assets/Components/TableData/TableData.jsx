@@ -1,7 +1,6 @@
 import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Chip,
-  Collapse,
   InputAdornment,
   List,
   ListItem,
@@ -27,12 +26,14 @@ import {
   Select,
   Checkbox,
   Button,
+  Tooltip,
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
@@ -40,20 +41,6 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
-
-const descendingOrderComparator = (a, b, orderBy) => {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-};
-
-const getOrderComparator = (order, orderBy) => {
-  return order === 'desc' ? (a, b) => descendingOrderComparator(a, b, orderBy) : (a, b) => -descendingOrderComparator(a, b, orderBy);
-};
 
 const sortByModel = (model, property) => (a, b) => {
   let ai = model.indexOf(a[property]);
@@ -63,17 +50,6 @@ const sortByModel = (model, property) => (a, b) => {
   return ai - bi;
 };
 
-const filterFn = (arr, [head, query]) =>
-  arr.filter((el) => (el[head] ? el[head].toString().toLowerCase().includes(query.toString().toLowerCase()) : true));
-
-const multiFilterFn = (arr, filterBy) => {
-  let result = [...arr];
-  Object.keys(filterBy).forEach((prop) => {
-    result = filterFn(result, [prop, filterBy[prop]]);
-  });
-  return result;
-};
-
 const renderSkeletons = (columns, rowsPerPage) => {
   const rows = [];
 
@@ -81,7 +57,16 @@ const renderSkeletons = (columns, rowsPerPage) => {
     rows.push(
       <TableRow key={i}>
         {columns.map((name) => (
-          <TableCell key={`${name.id}-${i}`}>
+          <TableCell
+            key={`${name.id}-${i}`}
+            sx={{
+              pl: 1,
+              pr: 1,
+              pt: 0.5,
+              pb: 0.5,
+              backgroundColor: 'background.paper',
+            }}
+          >
             <Skeleton animation="wave" variant="text" />
           </TableCell>
         ))}
@@ -93,15 +78,17 @@ const renderSkeletons = (columns, rowsPerPage) => {
 
 const FilteringInformationBox = ({
   headCells,
-  filterBy,
+  tableFilters,
+  customFilters,
   onRequestFilterByText,
   onRequestFilterByRange,
   onRequestFilterByDateRange,
   onRequestFilterBySelect,
+  onRequestCustomFilter,
+  onRequestResetFilters,
+  customFiltersEl,
 }) => {
-  const [showFilters, setShowFilters] = useState(false);
-
-  const handleDelete = (opt, property) => {
+  const handleChipDelete = (opt, property) => {
     const { name, prop, el } = property;
     switch (opt) {
       case 'byText':
@@ -133,7 +120,7 @@ const FilteringInformationBox = ({
       case 'bySelect':
         const bySelectEventSlice = {
           target: {
-            value: filterBy.select ? filterBy.select[prop].filter((val) => val !== el) : [],
+            value: tableFilters.select ? tableFilters.select[prop].filter((val) => val !== el) : [],
           },
         };
         onRequestFilterBySelect(bySelectEventSlice, prop);
@@ -144,12 +131,8 @@ const FilteringInformationBox = ({
     }
   };
 
-  const createFilterHandler = (event) => {
-    onRequestFilterByText(event, 'all');
-  };
-
-  const chipsByText = filterBy.text
-    ? Object.keys(filterBy.text)
+  const chipsByText = tableFilters.text
+    ? Object.keys(tableFilters.text)
         .map((filterName) => {
           const head = headCells.find((el) => el.id === filterName);
           return (
@@ -158,8 +141,8 @@ const FilteringInformationBox = ({
                 <Chip
                   sx={{ margin: 0.5 }}
                   size="small"
-                  onDelete={() => handleDelete('byText', { prop: filterName })}
-                  label={`${head.label}: ${filterBy.text[filterName]}`}
+                  onDelete={() => handleChipDelete('byText', { prop: filterName })}
+                  label={`${head.label}: ${tableFilters.text[filterName]}`}
                 />
               </ListItem>
             )
@@ -168,27 +151,27 @@ const FilteringInformationBox = ({
         .filter(Boolean)
     : [];
 
-  const chipsByRange = filterBy.range
-    ? Object.keys(filterBy.range)
+  const chipsByRange = tableFilters.range
+    ? Object.keys(tableFilters.range)
         .map((filterName) => {
           const head = headCells.find((el) => el.id === filterName);
           return (
             head && (
               <ListItem disableGutters disablePadding sx={{ display: 'inline' }} key={filterName}>
-                {filterBy.range[filterName]?.min && (
+                {tableFilters.range[filterName]?.min && (
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
-                    onDelete={() => handleDelete('byRange', { prop: filterName, name: 'min' })}
-                    label={`${head.label} min: ${filterBy.range[filterName]?.min}`}
+                    onDelete={() => handleChipDelete('byRange', { prop: filterName, name: 'min' })}
+                    label={`${head.label} min: ${tableFilters.range[filterName]?.min}`}
                   />
                 )}
-                {filterBy.range[filterName]?.max && (
+                {tableFilters.range[filterName]?.max && (
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
-                    onDelete={() => handleDelete('byRange', { prop: filterName, name: 'max' })}
-                    label={`${head.label} max: ${filterBy.range[filterName]?.max}`}
+                    onDelete={() => handleChipDelete('byRange', { prop: filterName, name: 'max' })}
+                    label={`${head.label} max: ${tableFilters.range[filterName]?.max}`}
                   />
                 )}
               </ListItem>
@@ -198,27 +181,27 @@ const FilteringInformationBox = ({
         .filter(Boolean)
     : [];
 
-  const chipsByDateRange = filterBy.dateRange
-    ? Object.keys(filterBy.dateRange)
+  const chipsByDateRange = tableFilters.dateRange
+    ? Object.keys(tableFilters.dateRange)
         .map((filterName) => {
           const head = headCells.find((el) => el.id === filterName);
           return (
             head && (
               <ListItem disableGutters disablePadding sx={{ display: 'inline' }} key={filterName}>
-                {filterBy.dateRange[filterName]?.from && (
+                {tableFilters.dateRange[filterName]?.from && (
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
-                    onDelete={() => handleDelete('byDateRange', { prop: filterName, name: 'from' })}
-                    label={`${head.label} from: ${filterBy.dateRange[filterName]?.from.toLocaleString()}`}
+                    onDelete={() => handleChipDelete('byDateRange', { prop: filterName, name: 'from' })}
+                    label={`${head.label} from: ${tableFilters.dateRange[filterName]?.from.toLocaleString()}`}
                   />
                 )}
-                {filterBy.dateRange[filterName]?.to && (
+                {tableFilters.dateRange[filterName]?.to && (
                   <Chip
                     sx={{ margin: 0.5 }}
                     size="small"
-                    onDelete={() => handleDelete('byDateRange', { prop: filterName, name: 'to' })}
-                    label={`${head.label} to: ${filterBy.dateRange[filterName]?.to.toLocaleString()}`}
+                    onDelete={() => handleChipDelete('byDateRange', { prop: filterName, name: 'to' })}
+                    label={`${head.label} to: ${tableFilters.dateRange[filterName]?.to.toLocaleString()}`}
                   />
                 )}
               </ListItem>
@@ -228,19 +211,19 @@ const FilteringInformationBox = ({
         .filter(Boolean)
     : [];
 
-  const chipsBySelect = filterBy.select
-    ? Object.keys(filterBy.select)
+  const chipsBySelect = tableFilters.select
+    ? Object.keys(tableFilters.select)
         .map((filterName) => {
           const head = headCells.find((el) => el.id === filterName);
           return (
             head &&
-            filterBy.select[filterName].length &&
-            filterBy.select[filterName].map((el) => (
+            tableFilters.select[filterName].length &&
+            tableFilters.select[filterName].map((el) => (
               <ListItem disableGutters disablePadding sx={{ display: 'inline' }} dense key={filterName + el}>
                 <Chip
                   sx={{ margin: 0.5 }}
                   size="small"
-                  onDelete={() => handleDelete('bySelect', { prop: filterName, el })}
+                  onDelete={() => handleChipDelete('bySelect', { prop: filterName, el })}
                   label={`${head.label}: ${el}`}
                 />
               </ListItem>
@@ -251,25 +234,23 @@ const FilteringInformationBox = ({
     : [];
 
   return (
-    <Box>
-      <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-        <Typography variant="h6">Filters</Typography>
-        <IconButton onClick={() => setShowFilters((prevState) => !prevState)}>
-          <FilterListIcon />
-        </IconButton>
-        <Collapse in={showFilters} timeout="auto">
-          <TextField
-            name="filterQuery"
-            label="Filter all"
-            fullWidth
-            variant="outlined"
-            size="small"
-            margin="none"
-            onChange={createFilterHandler}
-            inputProps={{ autoComplete: 'off' }}
-          />
-        </Collapse>
-      </Box>
+    <>
+      {customFiltersEl.length > 0 && (
+        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignCenter}`}>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 1 }}>
+            <FilterListIcon />
+            <Typography variant="h6">Filter list:</Typography>
+          </Box>
+          {customFiltersEl.map((FilterElement, idx) => (
+            <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} customFilters={customFilters} />
+          ))}
+          <IconButton disabled={Object.keys(customFilters).length === 0} color="error" onClick={onRequestResetFilters}>
+            <Tooltip title="Reset filters">
+              <FilterListOffIcon />
+            </Tooltip>
+          </IconButton>
+        </Box>
+      )}
       {!!chipsByText.length && (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
           <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
@@ -302,7 +283,7 @@ const FilteringInformationBox = ({
           <List>{chipsBySelect}</List>
         </Box>
       )}
-    </Box>
+    </>
   );
 };
 
@@ -318,9 +299,11 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
   };
   return (
     <>
-      <IconButton sx={sxButton} size="small" onClick={handleOpenMenu}>
-        <MoreVertIcon fontSize="small" />
-      </IconButton>
+      <Tooltip title="Column options">
+        <IconButton sx={sxButton} size="small" onClick={handleOpenMenu}>
+          <MoreVertIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -336,7 +319,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
       >
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('text') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByText', handleClose)}>
-            <FilterListIcon color="primary" />
+            <FilterListIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by text
             </Typography>
@@ -345,7 +328,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('range') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByRange', handleClose)}>
-            <NumbersIcon color="primary" />
+            <NumbersIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by range
             </Typography>
@@ -354,7 +337,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('select') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterBySelect', handleClose)}>
-            <LibraryAddCheckIcon color="primary" />
+            <LibraryAddCheckIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by select
             </Typography>
@@ -363,7 +346,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('date') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByDate', handleClose)}>
-            <CalendarMonthIcon color="primary" />
+            <CalendarMonthIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by date range
             </Typography>
@@ -374,14 +357,14 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {columnsPinnedToLeft.includes(cellOptions.id) ? (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'unpin', handleClose)}>
-            <PushPinOutlinedIcon color="primary" />
+            <PushPinOutlinedIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Unpin
             </Typography>
           </MenuItem>
         ) : (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'pinToLeft', handleClose)}>
-            <PushPinIcon color="primary" />
+            <PushPinIcon color="action" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Pin to left
             </Typography>
@@ -395,10 +378,9 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 const EnhancedTableHead = ({
   headCells,
   cellsWithFilterableBySelectValues,
-  order,
-  orderBy,
+  multiSortParams,
   onRequestSort,
-  filterBy,
+  tableFilters,
   pinnedToLeft,
   onRequestFilterByText,
   onRequestFilterByRange,
@@ -426,10 +408,7 @@ const EnhancedTableHead = ({
       {},
     ),
   );
-  const [showFilterBySelectInput, setShowFilterBySelectInput] = useState(
-    headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}),
-  );
-  const [showFilterByDateInput, setShowFilterByDateInput] = useState(
+  const [showFilterByDateRangeInput, setShowFilterByDateRangeInput] = useState(
     headCells.reduce(
       (acc, head) => ({
         ...acc,
@@ -437,6 +416,9 @@ const EnhancedTableHead = ({
       }),
       {},
     ),
+  );
+  const [showFilterBySelectInput, setShowFilterBySelectInput] = useState(
+    headCells.reduce((acc, head) => ({ ...acc, [head.id]: false }), {}),
   );
   const [showColumnSubmenu, setShowColumnSubmenu] = useState(null);
   const headCellsRefs = useRef([]);
@@ -478,7 +460,7 @@ const EnhancedTableHead = ({
   };
 
   const toggleShowFilterByDate = (prop) => {
-    setShowFilterByDateInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
+    setShowFilterByDateRangeInput((prevState) => ({ ...prevState, [prop]: !prevState[prop] }));
   };
 
   const handleMenuItemClick = (column, option, closeSubmenu) => {
@@ -532,7 +514,6 @@ const EnhancedTableHead = ({
             return (
               <TableCell
                 ref={headCellsRefs.current[index]}
-                padding="none"
                 align="center"
                 sx={{
                   ...(columnsPinnedToLeftIds.includes(headCell.id)
@@ -560,7 +541,6 @@ const EnhancedTableHead = ({
                 id={headCell.id}
                 onMouseEnter={() => setShowColumnSubmenu(headCell.id)}
                 onMouseLeave={() => setShowColumnSubmenu(null)}
-                sortDirection={headCell.sortable ? (orderBy === headCell.id ? order : false) : undefined}
               >
                 <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyCenter}`}>
                   {!headCell.disableCellSubmenu && (
@@ -573,13 +553,32 @@ const EnhancedTableHead = ({
                   )}
 
                   {headCell.sortable ? (
-                    <TableSortLabel
-                      active={orderBy === headCell.id}
-                      direction={orderBy === headCell.id ? order : 'asc'}
-                      onClick={createSortHandler(headCell.id)}
-                    >
-                      {headCell.label}
-                    </TableSortLabel>
+                    <>
+                      <TableSortLabel
+                        active={multiSortParams.hasOwnProperty(headCell.id)}
+                        direction={multiSortParams[headCell.id] ? multiSortParams[headCell.id] : 'asc'}
+                        onClick={createSortHandler(headCell.id)}
+                        sx={{
+                          '&.MuiTableSortLabel-root.Mui-active': {
+                            '& .MuiTableSortLabel-icon': {
+                              color: 'primary.main',
+                            },
+                          },
+                          '&::after': {
+                            content:
+                              multiSortParams.hasOwnProperty(headCell.id) && Object.keys(multiSortParams).length > 1
+                                ? `'${Object.keys(multiSortParams).indexOf(headCell.id) + 1}'`
+                                : '""',
+                            position: 'relative',
+                            bottom: '-5px',
+                            left: '-5px',
+                            color: 'primary.main',
+                          },
+                        }}
+                      >
+                        {headCell.label}
+                      </TableSortLabel>
+                    </>
                   ) : (
                     headCell.label
                   )}
@@ -602,7 +601,7 @@ const EnhancedTableHead = ({
                     <Typography variant="body1">Filter {headCell.label} by text</Typography>
                     <TextField
                       autoFocus
-                      value={(filterBy.text && filterBy.text[headCell.id]) || ''}
+                      value={(tableFilters.text && tableFilters.text[headCell.id]) || ''}
                       name={headCell.id}
                       fullWidth
                       variant="standard"
@@ -640,7 +639,7 @@ const EnhancedTableHead = ({
                       <TextField
                         sx={{ mr: 1 }}
                         autoFocus
-                        value={(filterBy.range && filterBy.range[headCell.id]?.min) || ''}
+                        value={(tableFilters.range && tableFilters.range[headCell.id]?.min) || ''}
                         name="min"
                         variant="standard"
                         size="small"
@@ -654,7 +653,7 @@ const EnhancedTableHead = ({
                       />
                       <TextField
                         name="max"
-                        value={(filterBy.range && filterBy.range[headCell.id]?.max) || ''}
+                        value={(tableFilters.range && tableFilters.range[headCell.id]?.max) || ''}
                         variant="standard"
                         size="small"
                         margin="none"
@@ -671,7 +670,7 @@ const EnhancedTableHead = ({
 
                 <Popover
                   anchorEl={headCellsRefs.current?.find((ref) => ref.current?.id === headCell.id)?.current}
-                  open={showFilterByDateInput[headCell.id]}
+                  open={showFilterByDateRangeInput[headCell.id]}
                   onClose={() => toggleShowFilterByDate(headCell.id)}
                   anchorOrigin={{
                     vertical: 'bottom',
@@ -686,7 +685,7 @@ const EnhancedTableHead = ({
                     <Typography variant="body1">Filter {headCell.label} by range</Typography>
                     <FilterByDateRange
                       createFilterByDateRangeHandler={createFilterByDateRangeHandler(headCell.id)}
-                      initialState={filterBy.dateRange && filterBy.dateRange[headCell.id]}
+                      initialState={tableFilters.dateRange && tableFilters.dateRange[headCell.id]}
                     />
                   </Box>
                 </Popover>
@@ -712,14 +711,14 @@ const EnhancedTableHead = ({
                         labelId={headCell.id}
                         multiple
                         label={`Filter ${headCell.label} by select`}
-                        value={filterBy.select ? filterBy.select[headCell.id] || [] : []}
+                        value={tableFilters.select ? tableFilters.select[headCell.id] || [] : []}
                         onChange={createFilterBySelectHandler(headCell.id)}
                         renderValue={(selected) => selected.join(', ')}
                         onClose={() => toggleShowFilterBySelect(headCell.id)}
                       >
                         {cellsWithFilterableBySelectValues[headCell.id]?.map((value) => (
                           <MenuItem key={headCell.id + value} value={value}>
-                            <Checkbox checked={filterBy.select ? filterBy.select[headCell.id]?.indexOf(value) > -1 : false} />
+                            <Checkbox checked={tableFilters.select ? tableFilters.select[headCell.id]?.indexOf(value) > -1 : false} />
                             {value}
                           </MenuItem>
                         ))}
@@ -736,23 +735,29 @@ const EnhancedTableHead = ({
   );
 };
 
-export default function TableData({ defaultSortBy, headCells, rows, onTableChange, isDataLoading, padding = 'normal', paginationParams }) {
-  const initColumnPosition = headCells.map((cell) => cell.id);
+export default function TableData({
+  multiSort = false,
+  defaultOrderBy = undefined,
+  defaultFilterBy = undefined,
+  headCells,
+  rows,
+  onTableChange,
+  isDataLoading,
+  padding = 'normal',
+  paginationParams,
+  customFiltersEl = [],
+}) {
+  const initColumnPosition = [...headCells.map((cell) => cell.id)];
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState(
-    defaultSortBy && headCells.map((cell) => cell.id).includes(defaultSortBy)
-      ? headCells.find((cell) => cell.id === defaultSortBy)?.id
-      : headCells[0].id,
-  );
-  const [filterBy, setFilterBy] = useState({});
+  const [orderBy, setOrderBy] = useState(defaultOrderBy || {});
+  const [tableFilters, setTableFilters] = useState(defaultFilterBy || {});
+  const [customFilters, setCustomFilters] = useState(defaultFilterBy || {});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
 
   const columns = useMemo(() => [...headCells], [headCells]);
-  const filteredRows = useMemo(() => multiFilterFn(rows, filterBy), [filterBy, rows]);
 
   const columnsPinnedToLeftWidth = useMemo(
     () =>
@@ -780,22 +785,29 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
 
   useEffect(() => {
     onTableChange({
-      order,
       orderBy,
-      filterBy,
+      tableFilters,
+      customFilters,
       page: page + 1,
       rowsPerPage,
     });
-  }, [order, orderBy, page, filterBy, rowsPerPage]);
+  }, [orderBy, page, tableFilters, customFilters, rowsPerPage]);
 
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+    setOrderBy((prevState) => {
+      const newSortParams = {
+        ...(multiSort ? prevState : {}),
+        [property]: prevState[property] === 'asc' ? 'desc' : 'asc',
+      };
+      if (prevState[property] === 'desc') {
+        delete newSortParams[property];
+      }
+      return newSortParams;
+    });
   };
 
   const handleRequestFilterByText = (event, property) => {
-    setFilterBy((prevState) => {
+    setTableFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         text: {
@@ -815,7 +827,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   };
 
   const handleRequestFilterByRange = (event, property) => {
-    setFilterBy((prevState) => {
+    setTableFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         range: {
@@ -843,7 +855,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   };
 
   const handleRequestFilterByDateRange = (event, property) => {
-    setFilterBy((prevState) => {
+    setTableFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         dateRange: {
@@ -867,7 +879,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
   };
 
   const handleRequestFilterBySelect = (event, property) => {
-    setFilterBy((prevState) => {
+    setTableFilters((prevState) => {
       const filterQueries = {
         ...prevState,
         select: {
@@ -884,6 +896,28 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
       }
       return filterQueries;
     });
+    setPage(0);
+  };
+
+  const handleRequestCustomFilter = (entries) => {
+    setCustomFilters((prevState) => {
+      const filterQueries = {
+        ...prevState,
+        ...entries,
+      };
+      Object.entries(entries).forEach((entry) => {
+        if (entry[1] === null) {
+          delete filterQueries[entry[0]];
+        }
+      });
+
+      return filterQueries;
+    });
+    setPage(0);
+  };
+
+  const resetFilters = () => {
+    setCustomFilters({});
     setPage(0);
   };
 
@@ -911,18 +945,22 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
         onRequestFilterByRange={handleRequestFilterByRange}
         onRequestFilterByDateRange={handleRequestFilterByDateRange}
         onRequestFilterBySelect={handleRequestFilterBySelect}
+        onRequestCustomFilter={handleRequestCustomFilter}
+        onRequestResetFilters={resetFilters}
         headCells={columns}
-        filterBy={filterBy}
-        setFilterBy={setFilterBy}
+        tableFilters={tableFilters}
+        customFilters={customFilters}
+        setFilterBy={setTableFilters}
+        customFiltersEl={customFiltersEl}
       />
       <TableContainer>
         <Table stickyHeader padding={padding}>
           <EnhancedTableHead
             headCells={columns}
             cellsWithFilterableBySelectValues={cellsWithFilterableBySelectValues}
-            order={order}
-            orderBy={orderBy}
-            filterBy={filterBy}
+            multiSortParams={orderBy}
+            tableFilters={tableFilters}
+            customFilters={customFilters}
             onRequestSort={handleRequestSort}
             onRequestFilterByText={handleRequestFilterByText}
             onRequestFilterByRange={handleRequestFilterByRange}
@@ -934,7 +972,7 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
           />
           <TableBody>
             {!isDataLoading
-              ? filteredRows.sort(getOrderComparator(order, orderBy)).map((row) => (
+              ? rows.map((row) => (
                   <TableRow hover tabIndex={-1} key={row.id}>
                     {columns
                       .sort(sortByModel(initColumnPosition, 'id'))
@@ -962,6 +1000,8 @@ export default function TableData({ defaultSortBy, headCells, rows, onTableChang
                                 : {}),
                               pl: 1,
                               pr: 1,
+                              pt: 0.5,
+                              pb: 0.5,
                               backgroundColor: 'background.paper',
                             }}
                             key={`${cell.id}-${row.id}`}
@@ -1020,7 +1060,10 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler, initialState = { fr
   const onPickerChange = (name) => (newValue, string) => {
     setDateState((prevState) => ({
       ...prevState,
-      [name]: { value: newValue, string: string || (dayjs(newValue).isValid() ? dayjs(newValue).format('DD-MM-YYYY HH:mm') : null) },
+      [name]: {
+        value: newValue,
+        string: string || (dayjs(newValue).isValid() ? dayjs(newValue).format('DD-MM-YYYY HH:mm') : null),
+      },
     }));
   };
 

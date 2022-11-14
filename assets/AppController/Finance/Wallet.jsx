@@ -39,7 +39,7 @@ const WalletSettingsCard = () => {
   const walletForm = useForm({
     initialFields: { WalletAddress: '', WalletSecretKey: '' },
     validation: {
-      WalletAddress: ['required', 'wallet'],
+      WalletAddress: ['required', 'ADSWallet'],
       WalletSecretKey: ['required', 'walletSecret'],
     },
   });
@@ -109,7 +109,7 @@ const WalletSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="Hot wallet" />
         <IconButton type="button" onClick={toggleEditMode}>
@@ -217,19 +217,19 @@ const WalletSettingsCard = () => {
 };
 
 const WalletStatusCard = () => {
-  const monitoringData = useSelector(monitoringSelectors.getMonitoringData);
+  const monitoringWalletInfo = useSelector(monitoringSelectors.getMonitoringWalletInfo);
   useGetWalletMonitoringQuery([], {
     pollingInterval: 3000,
   });
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Ad server balance" />
       <CardContent>
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Total balance:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
-            {formatMoney(monitoringData.wallet.balance, 5)} ADS
+            {formatMoney(monitoringWalletInfo.balance, 5)} ADS
           </Typography>
         </Box>
         <Typography variant="body2">
@@ -241,7 +241,7 @@ const WalletStatusCard = () => {
         <Box className={commonStyles.flex}>
           <Typography variant="h6">Unused bonuses:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
-            {formatMoney(monitoringData.wallet.unusedBonuses, 5)} ADS
+            {formatMoney(monitoringWalletInfo.unusedBonuses, 5)} ADS
           </Typography>
         </Box>
         <Typography variant="body2">
@@ -265,7 +265,7 @@ const ColdWalletSettingsCard = () => {
       ColdWalletAddress: appData.AdServer.ColdWalletAddress,
     },
     validation: {
-      ColdWalletAddress: ['required', 'wallet'],
+      ColdWalletAddress: ['required', 'ADSWallet'],
       HotWalletMinValue: ['number'],
       HotWalletMaxValue: ['number'],
     },
@@ -290,7 +290,7 @@ const ColdWalletSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Cold wallet" />
       <FormControlLabel
         sx={{ pl: 2 }}

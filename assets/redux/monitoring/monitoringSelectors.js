@@ -1,7 +1,9 @@
-const getMonitoringData = (state) => state.monitoringSlice.monitoringData;
+const getMonitoringWalletInfo = (state) => state.monitoringSlice.monitoringData.wallet;
+const getUsers = (state) => state.monitoringSlice.monitoringData.users;
 
 const monitoringSelectors = {
-  getMonitoringData,
+  getMonitoringWalletInfo,
+  getUsers,
 };
 
 export default monitoringSelectors;

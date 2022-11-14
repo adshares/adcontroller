@@ -42,7 +42,7 @@ const PrivacyCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Privacy policy" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
@@ -93,7 +93,7 @@ const TermAndConditionCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Terms and conditions" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>

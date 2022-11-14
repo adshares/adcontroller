@@ -52,7 +52,7 @@ const SiteOptions = () => {
     }
   };
   return (
-    <Card className={`${commonStyles.card}`}>
+    <Card className={`${commonStyles.card}`} width="mainContainer">
       <CardHeader title="Site options" subheader="Set banner availability and classification." />
       <CardContent>
         <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceEvenly} ${commonStyles.alignStart}`}>
@@ -121,7 +121,7 @@ const ZoneOptions = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Banner options" subheader="Set banner limitations" />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>

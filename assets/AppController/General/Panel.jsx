@@ -92,8 +92,8 @@ const PlaceholdersCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
-      <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata." />
+    <Card className={commonStyles.card} width="mainContainer">
+      <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
       <CardContent>
         <Box component="form" onChange={(e) => form.onChange(e)} onFocus={(e) => form.setTouched(e)}>
           <TextField
@@ -191,13 +191,13 @@ const RebrandingCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
-      <CardHeader title="Panel assets" subheader="Change or add the ad server panel assets." />
+    <Card className={commonStyles.card} width="mainContainer">
+      <CardHeader title="Rebranding" subheader="Customize the ad server panel." />
       <TabContext value={activeTab}>
         <CardContent>
           <TabList onChange={handleTabChange}>
-            <Tab label="Built-in assets" value="requiredAssets" sx={{ padding: 0 }} />
-            <Tab label="Custom assets" value="additionalAssets" />
+            <Tab label="Required assets" value="requiredAssets" sx={{ padding: 0 }} />
+            <Tab label="Additional assets" value="additionalAssets" />
           </TabList>
         </CardContent>
         <TabPanel value="requiredAssets" sx={{ padding: 0 }}>
@@ -277,7 +277,7 @@ const AdditionalAssets = ({ rejectedAssets }) => {
     const file = files[0];
     const isFileIsImage = file && file.type.split('/')[0] === 'image';
     if (!isFileIsImage) {
-      enqueueSnackbar('The file must be an image.', { variant: 'error' });
+      enqueueSnackbar('File must be image', { variant: 'error' });
       return;
     }
     const renameFile = (originalFile, newName) =>
@@ -287,7 +287,12 @@ const AdditionalAssets = ({ rejectedAssets }) => {
       });
 
     const newFile = renameFile(file, name);
-    const newFileObject = { name: newFile.name, action: 'change', file: newFile, preview: URL.createObjectURL(newFile) };
+    const newFileObject = {
+      name: newFile.name,
+      action: 'change',
+      file: newFile,
+      preview: URL.createObjectURL(newFile),
+    };
 
     setChangedFiles((prevState) => {
       const existingChangedFile = prevState.find((fileObj) => fileObj.name === newFile.name);
@@ -491,12 +496,12 @@ const AdditionalAssets = ({ rejectedAssets }) => {
                         <Typography variant="body2" noWrap>
                           {img.name}
                         </Typography>
-                        {!img.isImage && <Typography color="error">The file must be an image.</Typography>}
+                        {!img.isImage && <Typography color="error">File must be image</Typography>}
                         {img.isImage && !img.isNameValid && (
-                          <Typography color="error">The file name cannot contain blank characters.</Typography>
+                          <Typography color="error">File name cannot contain blank characters</Typography>
                         )}
                         {img.isImage && img.isNameValid && img.isNameExistOnList && (
-                          <Typography color="error">Uploading will overwrite an existing file.</Typography>
+                          <Typography color="error">File with this name already exist. Uploading will overwrite it</Typography>
                         )}
                       </Box>
                     </TableCell>
@@ -563,6 +568,13 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
     }
   };
 
+  const updateComponentState = (name, file) => {
+    setChangedFiles((prevState) => ({
+      ...prevState,
+      [name]: { file, preview: URL.createObjectURL(file), action: 'change' },
+    }));
+  };
+
   const onInputChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
@@ -570,7 +582,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
     const isFileTypeIsPng = file && file.type.split('/')[1] === 'png';
 
     if (!isFileIsImage) {
-      enqueueSnackbar('The file must be an image.', { variant: 'error' });
+      enqueueSnackbar('File must be image', { variant: 'error' });
       return;
     }
 
@@ -591,7 +603,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
       switch (name) {
         case 'Favicon16x16':
           if (width === 16 && height === 16 && isFileTypeIsPng) {
-            setChangedFiles((prevState) => ({ ...prevState, [name]: { file, preview: URL.createObjectURL(file), action: 'change' } }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be png with size 16x16', { variant: 'error', persist: true });
           }
@@ -599,7 +611,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
 
         case 'Favicon32x32':
           if (width === 32 && height === 32 && isFileTypeIsPng) {
-            setChangedFiles((prevState) => ({ ...prevState, [name]: { file, preview: URL.createObjectURL(file), action: 'change' } }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be png with size 32x32', { variant: 'error' });
           }
@@ -607,7 +619,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
 
         case 'Favicon48x48':
           if (width === 48 && height === 48 && isFileTypeIsPng) {
-            setChangedFiles((prevState) => ({ ...prevState, [name]: { file, preview: URL.createObjectURL(file), action: 'change' } }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be png with size 48x48', { variant: 'error' });
           }
@@ -615,7 +627,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
 
         case 'Favicon96x96':
           if (width === 96 && height === 96 && isFileTypeIsPng) {
-            setChangedFiles((prevState) => ({ ...prevState, [name]: { file, preview: URL.createObjectURL(file), action: 'change' } }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be png with size 96x96', { variant: 'error' });
           }
@@ -623,21 +635,21 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
 
         case 'LogoH30':
           if (height >= 30) {
-            setChangedFiles((prevState) => ({ ...prevState, [name]: { file, preview: URL.createObjectURL(file), action: 'change' } }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
           break;
         case 'LogoH60':
           if (height >= 30) {
-            setChangedFiles((prevState) => ({ ...prevState, [name]: { file, preview: URL.createObjectURL(file), action: 'change' } }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
           break;
         case 'LogoH90':
           if (height >= 30) {
-            setChangedFiles((prevState) => ({ ...prevState, [name]: { file, preview: URL.createObjectURL(file), action: 'change' } }));
+            updateComponentState(name, file);
           } else {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }

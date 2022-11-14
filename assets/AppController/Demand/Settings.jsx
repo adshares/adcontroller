@@ -74,7 +74,7 @@ const CampaignSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Campaign options" subheader="Set minimum campaign spend." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
@@ -186,7 +186,7 @@ const BannerSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Ad options" subheader="Set an ad file size limit." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
@@ -308,7 +308,7 @@ const RejectedDomainsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card className={commonStyles.card} width="mainContainer">
       <CardHeader
         title="Rejected domains"
         subheader="Set domains on which campaigns will not be displayed. All subdomains will be rejected."

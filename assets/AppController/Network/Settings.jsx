@@ -168,7 +168,7 @@ export default function Settings() {
   };
 
   return (
-    <Card className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
+    <Card className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`} width="mainContainer">
       <CardHeader
         title="AdServer's inventory"
         subheader="Set which ad servers your ad server can sync with. By default, it syncs with all available ad servers."
