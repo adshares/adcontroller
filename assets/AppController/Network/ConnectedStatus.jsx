@@ -137,8 +137,8 @@ export default function ConnectedStatus() {
     <Card
       className={`${commonStyles.card}`}
       sx={{
-        height: 'calc(100vh - 8rem)',
-        maxWidth: 'calc(100vw - 21rem)',
+        height: 'calc(100vh - 9rem)',
+        // maxWidth: 'calc(100vw - 21rem)',
       }}
       width="full"
     >

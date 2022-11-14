@@ -235,10 +235,10 @@ function AppController() {
   }, [token, isDataSynchronized]);
 
   return (
-    <>
-      <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
-      <Box component="main" className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
-        <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
+    <Box className={`${commonStyles.flex}`}>
+      <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
+      <Box className={`${commonStyles.flex} ${commonStyles.flexColumn}`} sx={{ width: '100%' }}>
+        <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
         <AppWindow>
           <SynchronizationDialog
             isSyncInProgress={isSyncInProgress}
@@ -275,7 +275,7 @@ function AppController() {
           )}
         </AppWindow>
       </Box>
-    </>
+    </Box>
   );
 }
 

@@ -258,8 +258,7 @@ export default function UsersList() {
       <Card
         className={`${commonStyles.card}`}
         sx={{
-          height: 'calc(100vh - 8rem)',
-          maxWidth: 'calc(100vw - 21rem)',
+          height: 'calc(100vh - 9rem)',
         }}
         width="full"
       >

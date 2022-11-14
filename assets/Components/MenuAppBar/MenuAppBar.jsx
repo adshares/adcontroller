@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAppLogout } from '../../redux/auth/authSlice';
-import { AppBar, IconButton, Link, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Divider, IconButton, Link, Menu, MenuItem, Toolbar } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import configSelectors from '../../redux/config/configSelectors';
@@ -25,18 +25,15 @@ export default function MenuAppBar({ showProtectedOptions, showSideMenu, toggleS
   };
 
   return (
-    <AppBar position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar position="sticky" color="grayBg" sx={{ boxShadow: 'none' }}>
       <Toolbar>
         {showProtectedOptions && showSideMenuIcon && (
           <IconButton size="large" color="inherit" onClick={() => toggleSideMenu(!showSideMenu)}>
             <MenuIcon />
           </IconButton>
         )}
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Adshares - AdController
-        </Typography>
         {showProtectedOptions && (
-          <>
+          <Box sx={{ ml: 'auto' }}>
             <Link href={appData.AdPanel.Url} color="inherit" underline="hover" variant="button">
               Back to AdPanel
             </Link>
@@ -58,9 +55,10 @@ export default function MenuAppBar({ showProtectedOptions, showSideMenu, toggleS
             >
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
-          </>
+          </Box>
         )}
       </Toolbar>
+      <Divider />
     </AppBar>
   );
 }
