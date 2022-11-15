@@ -33,6 +33,10 @@
     justify-content: space-around;
   }
 
+  &.justifyFlexStart {
+    justify-content: flex-start;
+  }
+
   &.justifyFlexEnd {
     justify-content: flex-end;
   }

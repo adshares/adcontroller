@@ -47,13 +47,13 @@ import {
   Typography,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import EmailIcon from '@mui/icons-material/Email';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import BlockIcon from '@mui/icons-material/Block';
+import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
+import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import HelpIcon from '@mui/icons-material/Help';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import ListItemText from '@mui/material/ListItemText';
 
@@ -62,16 +62,16 @@ const headCells = [
     id: 'status',
     label: (
       <Tooltip title="Status">
-        <ContentPasteIcon size="small" color="action" />
+        <AssignmentTurnedInOutlinedIcon size="small" color="black" />
       </Tooltip>
     ),
-    cellWidth: '4.5rem',
+    cellWidth: '5rem',
     alignContent: 'left',
   },
   {
     id: 'email',
-    label: 'Email',
-    cellWidth: '15rem',
+    label: 'E-mail',
+    cellWidth: '18rem',
     alignContent: 'left',
     sortable: true,
   },
@@ -79,57 +79,59 @@ const headCells = [
   {
     id: 'connectedWallet',
     label: 'Wallet',
-    cellWidth: '10rem',
-    alignContent: 'center',
+    cellWidth: '13rem',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'walletBalance',
     label: 'Wallet balance',
     cellWidth: '9rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'bonusBalance',
     label: 'Bonus balance',
     cellWidth: '9rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'role',
     label: 'Role',
     cellWidth: '9rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
   {
     id: 'campaignCount',
     label: 'Campaigns',
     cellWidth: '9rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'siteCount',
     label: 'Sites',
     cellWidth: '7rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'lastActiveAt',
     label: 'Last activity',
     cellWidth: '8.5rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'actions',
     label: (
-      <Tooltip title="Actions">
-        <ManageAccountsIcon size="small" color="action" />
-      </Tooltip>
+      <Box sx={{ width: '100%' }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <Tooltip title="Actions">
+          <MenuIcon size="small" color="black" />
+        </Tooltip>
+      </Box>
     ),
     cellWidth: '4.5rem',
     alignContent: 'center',
@@ -214,7 +216,7 @@ export default function UsersList() {
     if (wallet.length > 18) {
       return (
         <Tooltip title={wallet}>
-          <Typography variant="body1">{wallet.slice(0, 15) + '...'}</Typography>
+          <Typography variant="body2">{wallet.slice(0, 15) + '...'}</Typography>
         </Tooltip>
       );
     }
@@ -226,16 +228,16 @@ export default function UsersList() {
       ? users.data.map((user) => ({
           id: user.id,
           status: (
-            <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+            <Box className={`${commonStyles.flex} ${commonStyles.flexWrap}`}>
               <Tooltip title={user.emailConfirmed ? 'Email confirmed' : 'Email unconfirmed'}>
-                <EmailIcon sx={{ fontSize: 14 }} color={user.emailConfirmed ? 'success' : 'error'} />
+                <MailOutlineOutlinedIcon sx={{ fontSize: 14 }} color={user.emailConfirmed ? 'success' : 'error'} />
               </Tooltip>
               <Tooltip title={user.adminConfirmed ? 'Account confirmed' : 'Account unconfirmed'}>
-                <CheckBoxIcon sx={{ fontSize: 14 }} color={user.adminConfirmed ? 'success' : 'error'} />
+                <CheckBoxOutlinedIcon sx={{ fontSize: 14 }} color={user.adminConfirmed ? 'success' : 'error'} />
               </Tooltip>
               {user.isBanned && (
                 <Tooltip title={`Banned user. Reason: ${user.banReason}`}>
-                  <BlockIcon sx={{ fontSize: 14 }} color="error" />
+                  <CancelOutlinedIcon sx={{ fontSize: 14 }} color="error" />
                 </Tooltip>
               )}
             </Box>
@@ -263,12 +265,18 @@ export default function UsersList() {
         width="full"
       >
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
-          <CardHeader title="Users" />
+          <CardHeader
+            titleTypographyProps={{
+              component: 'h2',
+              variant: 'h2',
+            }}
+            title="Users"
+          />
           <Button
             onClick={() => setAddUserDialogOpen((prevState) => !prevState)}
             variant="contained"
             sx={{ mr: 2 }}
-            endIcon={<PersonAddAltIcon />}
+            startIcon={<PersonAddOutlinedIcon />}
           >
             Add user
           </Button>
@@ -438,7 +446,7 @@ const UserActionsMenu = ({ user, actions }) => {
   return (
     <>
       <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen}>
-        {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
+        {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" color="black" />}
       </IconButton>
       <Menu
         variant="menu"
@@ -920,17 +928,10 @@ const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
   }, [customFilters.query]);
 
   return (
-    <TextField
-      size="small"
-      sx={{ mr: 2 }}
-      margin="dense"
-      name="query"
-      label="By email or domain"
-      variant="outlined"
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-      inputProps={{ autoComplete: 'off' }}
-    />
+    <FormControl sx={{ mr: 3 }} customvariant="highLabel">
+      <InputLabel id="filterByQueryLabel">By email or domain</InputLabel>
+      <OutlinedInput name="query" value={query} onChange={(e) => setQuery(e.target.value)} inputProps={{ autoComplete: 'off' }} />
+    </FormControl>
   );
 };
 
@@ -940,13 +941,12 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl size="small" sx={{ minWidth: '9rem', mr: 2 }} margin="dense">
+    <FormControl sx={{ minWidth: '10rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByRoleLabel">By user's role</InputLabel>
       <Select
         labelId="filterByRoleLabel"
         id="filterByRoleSelect"
         value={customFilters.role || ''}
-        label="By user's role"
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -975,13 +975,12 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl size="small" sx={{ minWidth: '11.5rem', mr: 2 }} margin="dense">
+    <FormControl sx={{ minWidth: '13rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByEmailStatusLabel">By email status</InputLabel>
       <Select
         labelId="filterByEmailStatusLabel"
         id="filterByEmailStatusSelect"
         value={customFilters.hasOwnProperty('emailConfirmed') ? customFilters.emailConfirmed : ''}
-        label="By email status"
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -1007,13 +1006,12 @@ const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl size="small" sx={{ minWidth: '12.5rem', mr: 2 }} margin="dense">
+    <FormControl sx={{ minWidth: '14.5rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByAccountStatusLabel">By account status</InputLabel>
       <Select
         labelId="filterByAccountStatusLabel"
         id="filterByEmailStatusSelect"
         value={customFilters.hasOwnProperty('adminConfirmed') ? customFilters.adminConfirmed : ''}
-        label="By account status"
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
