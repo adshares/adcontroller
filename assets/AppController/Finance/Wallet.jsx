@@ -19,6 +19,7 @@ import {
   Checkbox,
   Collapse,
   FormControlLabel,
+  Grid,
   IconButton,
   TextField,
   Tooltip,
@@ -28,6 +29,31 @@ import HelpIcon from '@mui/icons-material/Help';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
+
+export default function Wallet() {
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={6}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <WalletStatusCard />
+          </Grid>
+        </Grid>
+      </Grid>
+
+      <Grid item xs={6}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <WalletSettingsCard />
+          </Grid>
+          <Grid item xs={12}>
+            <ColdWalletSettingsCard />
+          </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
+  );
+}
 
 const WalletSettingsCard = () => {
   const appData = useSelector(configSelectors.getAppData);
@@ -390,15 +416,3 @@ const ColdWalletSettingsCard = () => {
     </Card>
   );
 };
-
-function Wallet() {
-  return (
-    <>
-      <WalletStatusCard />
-      <WalletSettingsCard />
-      <ColdWalletSettingsCard />
-    </>
-  );
-}
-
-export default Wallet;

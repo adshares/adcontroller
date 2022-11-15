@@ -4,15 +4,19 @@ import configSelectors from '../../redux/config/configSelectors';
 import { useSetBaseInformationMutation, useSetCrmNotificationsConfigMutation } from '../../redux/config/configApi';
 import { changeBaseInformation, changeCrmNotificationsInformation } from '../../redux/config/configSlice';
 import { useCreateNotification, useForm } from '../../hooks';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, TextField } from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Base() {
   return (
-    <>
-      <BaseInformationCard />
-      <CRMNotificationsCard />
-    </>
+    <Grid container spacing={3}>
+      <Grid item xs={6}>
+        <BaseInformationCard />
+      </Grid>
+      <Grid item xs={6}>
+        <CRMNotificationsCard />
+      </Grid>
+    </Grid>
   );
 }
 

@@ -152,25 +152,25 @@ const theme = createTheme({
           padding: '9px 16px 16px 16px',
         },
       },
-      variants: [
-        {
-          props: {
-            width: 'mainContainer',
-          },
-          style: {
-            width: '100%',
-            maxWidth: '1280px',
-          },
-        },
-        {
-          props: {
-            width: 'full',
-          },
-          style: {
-            width: '100%',
-          },
-        },
-      ],
+      // variants: [
+      //   {
+      //     props: {
+      //       width: 'mainContainer',
+      //     },
+      //     style: {
+      //       width: 'calc((100% - 12px) / 2)',
+      //       maxWidth: '1280px',
+      //     },
+      //   },
+      //   {
+      //     props: {
+      //       width: 'full',
+      //     },
+      //     style: {
+      //       width: '100%',
+      //     },
+      //   },
+      // ],
     },
     MuiOutlinedInput: {
       styleOverrides: {

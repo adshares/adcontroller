@@ -23,6 +23,7 @@ import {
   CardHeader,
   FormControl,
   FormHelperText,
+  Grid,
   InputAdornment,
   InputLabel,
   OutlinedInput,
@@ -31,11 +32,26 @@ import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
   return (
-    <>
-      <CampaignSettingsCard />
-      <BannerSettingsCard />
-      <RejectedDomainsCard />
-    </>
+    <Grid container spacing={3}>
+      <Grid item xs={6}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <CampaignSettingsCard />
+          </Grid>
+          <Grid item xs={12}>
+            <RejectedDomainsCard />
+          </Grid>
+        </Grid>
+      </Grid>
+
+      <Grid item xs={6}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <BannerSettingsCard />
+          </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
   );
 }
 
@@ -186,7 +202,7 @@ const BannerSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card width="mainContainer">
       <CardHeader title="Ad options" subheader="Set an ad file size limit." />
 
       <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
@@ -308,7 +324,7 @@ const RejectedDomainsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card width="mainContainer">
       <CardHeader
         title="Rejected domains"
         subheader="Set domains on which campaigns will not be displayed. All subdomains will be rejected."

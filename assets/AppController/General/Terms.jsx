@@ -4,16 +4,20 @@ import configSelectors from '../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../hooks';
 import { useSetRegulationsConfigMutation } from '../../redux/config/configApi';
 import { changeRegulationsInformation } from '../../redux/config/configSlice';
-import { Box, Button, Card, CardActions, CardContent, CardHeader } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
 import CollapsibleTextarea from '../../Components/CollapsibleTextarea/CollapsibleTextarea';
 
 export default function Terms() {
   return (
-    <>
-      <PrivacyCard />
-      <TermAndConditionCard />
-    </>
+    <Grid container spacing={3}>
+      <Grid item xs={6}>
+        <PrivacyCard />
+      </Grid>
+      <Grid item xs={6}>
+        <TermAndConditionCard />
+      </Grid>
+    </Grid>
   );
 }
 

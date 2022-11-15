@@ -19,6 +19,7 @@ import {
   FormControlLabel,
   FormHelperText,
   FormLabel,
+  Grid,
   Icon,
   InputAdornment,
   InputLabel,
@@ -34,10 +35,14 @@ import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTo
 
 export default function Settings() {
   return (
-    <>
-      <RegistrationModeCard />
-      <AutoWithdrawalCard />
-    </>
+    <Grid container spacing={3}>
+      <Grid item xs={6}>
+        <RegistrationModeCard />
+      </Grid>
+      <Grid item xs={6}>
+        <AutoWithdrawalCard />
+      </Grid>
+    </Grid>
   );
 }
 

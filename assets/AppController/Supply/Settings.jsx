@@ -16,6 +16,7 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Grid,
   Radio,
   RadioGroup,
   TextField,
@@ -24,10 +25,14 @@ import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
   return (
-    <>
-      <SiteOptions />
-      <ZoneOptions />
-    </>
+    <Grid container spacing={3}>
+      <Grid item xs={6}>
+        <SiteOptions />
+      </Grid>
+      <Grid item xs={6}>
+        <ZoneOptions />
+      </Grid>
+    </Grid>
   );
 }
 
