@@ -69,16 +69,16 @@ const theme = createTheme({
       white: white,
     },
     error: {
-      main: '#d32f2f',
-      light: '#ef5350',
-      dark: '#c62828',
-      contrastText: '#fff',
+      main: sunset,
+      // light: failBg,
+      // dark: '#c62828',
+      // contrastText: '#fff',
     },
     warning: {
-      main: '#ed6c02',
-      light: '#ff9800',
-      dark: '#e65100',
-      contrastText: '#fff',
+      main: sun,
+      // light: warningBg,
+      // dark: '#e65100',
+      // contrastText: '#fff',
     },
     info: {
       main: '#0288d1',
@@ -87,10 +87,10 @@ const theme = createTheme({
       contrastText: '#fff',
     },
     success: {
-      main: '#2e7d32',
-      light: '#4caf50',
-      dark: '#1b5e20',
-      contrastText: '#fff',
+      main: freshGrass,
+      // light: '#4caf50',
+      // dark: '#1b5e20',
+      // contrastText: '#fff',
     },
     text: {
       primary: black,
@@ -125,12 +125,33 @@ const theme = createTheme({
           backgroundColor: '#DFDFDF',
           '@font-face': {
             fontFamily: 'Montserrat',
-            src: `local('Montserrat'), url(${Montserrat}) format('woff2')`,
+            fontStyle: 'normal',
+            fontDisplay: 'swap',
+            src: `local('Montserrat'), url(${Montserrat})`,
+            fontWeight: 400,
           },
         },
       },
     },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          minWidth: '150px',
+          padding: '8px 20px',
+          textTransform: 'none',
+          fontVariationSettings: '"wght" 600',
+          fontSize: '20px',
+          letterSpacing: '0.055em',
+          lineHeight: '1.5',
+        },
+      },
+    },
     MuiCard: {
+      styleOverrides: {
+        root: {
+          padding: '9px 16px 16px 16px',
+        },
+      },
       variants: [
         {
           props: {
@@ -151,51 +172,95 @@ const theme = createTheme({
         },
       ],
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          '& fieldset': {
+            borderColor: black,
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: blue + '!important',
+          },
+        },
+      },
+    },
+    MuiFormControl: {
+      variants: [
+        {
+          props: {
+            customvariant: 'highLabel',
+          },
+          style: {
+            '& .MuiInputLabel-root': {
+              '&.Mui-focused': {
+                color: black,
+                transform: 'translate(14px, -27px) scale(0.75)',
+              },
+              '&.MuiInputLabel-shrink': {
+                transform: 'translate(14px, -27px) scale(0.75)',
+              },
+            },
+
+            marginTop: '28px',
+            marginBottom: '8px',
+          },
+        },
+      ],
+    },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          border: '1px solid ' + blue,
+          // boxShadow: 'none',
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          '&.MuiTableCell-root': {
+            borderColor: disableBg,
+          },
+          '&.MuiTableCell-head': {
+            fontSize: '16px',
+            lineHeight: 1.5,
+          },
+          '&.MuiTableCell-body': {
+            fontSize: '12px',
+            lineHeight: 1.5,
+          },
+        },
+      },
+    },
+    MuiTableSortLabel: {
+      styleOverrides: {
+        root: {
+          '&:hover > .MuiTableSortLabel-icon': {
+            opacity: 1,
+          },
+          '&.Mui-active > .MuiTableSortLabel-icon': {
+            color: blue,
+          },
+        },
+      },
+    },
   },
   typography: {
     htmlFontSize: 16,
     fontFamily: '"Montserrat", sans-serif',
     fontSize: 14,
-    fontWeightLight: 300,
-    fontWeightRegular: 400,
-    fontWeightMedium: 500,
-    fontWeightBold: 700,
-    h1: {
-      fontWeight: 300,
-      fontSize: '6rem',
-      lineHeight: 1.167,
-      letterSpacing: '-0.01562em',
-    },
     h2: {
-      fontWeight: 300,
-      fontSize: '3.75rem',
+      fontVariationSettings: '"wght" 700',
+      fontSize: '32px',
       lineHeight: 1.2,
-      letterSpacing: '-0.00833em',
+      letterSpacing: 0,
     },
     h3: {
-      fontWeight: 400,
-      fontSize: '3rem',
-      lineHeight: 1.167,
-      letterSpacing: '0em',
+      fontVariationSettings: '"wght" 600',
+      fontSize: '24px',
+      lineHeight: 1.2,
+      letterSpacing: 0,
     },
-    // h4: {
-    //   fontWeight: 400,
-    //   fontSize: '2.125rem',
-    //   lineHeight: 1.235,
-    //   letterSpacing: '0.00735em',
-    // },
-    // h5: {
-    //   fontWeight: 700,
-    //   fontSize: '32px',
-    //   lineHeight: 1.334,
-    //   letterSpacing: '0em',
-    // },
-    // h6: {
-    //   fontWeight: 500,
-    //   fontSize: '1.25rem',
-    //   lineHeight: 1.6,
-    //   letterSpacing: '0.0075em',
-    // },
     subtitle1: {
       fontWeight: 400,
       fontSize: '1rem',

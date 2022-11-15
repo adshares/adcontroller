@@ -122,10 +122,17 @@ const getMappedMenuItems = (items) => {
                   color: 'white',
                 })}
               </ListItemIcon>
-              <Typography sx={{ color: 'white.main' }}>{item.name}</Typography>
+              <Typography sx={{ color: 'white.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
             </AccordionSummary>
             <AccordionDetails
-              sx={{ backgroundColor: 'deep.main', boxShadow: 'inset 0px 4px 4px rgba(0, 0, 0, 0.25)', pl: 0, pr: 0, pt: 1, pb: 1 }}
+              sx={{
+                backgroundColor: 'deep.main',
+                boxShadow: 'inset 0px 4px 4px rgba(0, 0, 0, 0.25)',
+                pl: 0,
+                pr: 0,
+                pt: 1,
+                pb: 1,
+              }}
             >
               <List disablePadding>
                 {item.children.map((children) => (
@@ -147,6 +154,7 @@ const getMappedMenuItems = (items) => {
                         sx: {
                           color: children.path === location.pathname ? 'blue.main' : 'white.main',
                           margin: 0,
+                          fontVariationSettings: '"wght" 500',
                         },
                       }}
                     />
@@ -173,6 +181,7 @@ const getMappedMenuItems = (items) => {
                 sx: {
                   color: item.path === location.pathname ? 'blue.main' : 'white.main',
                   margin: 0,
+                  fontVariationSettings: '"wght" 600',
                 },
               }}
             />

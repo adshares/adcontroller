@@ -32,7 +32,7 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
@@ -41,6 +41,7 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
+import { left } from 'core-js/internals/array-reduce';
 
 const sortByModel = (model, property) => (a, b) => {
   let ai = model.indexOf(a[property]);
@@ -236,15 +237,22 @@ const FilteringInformationBox = ({
   return (
     <>
       {customFiltersEl.length > 0 && (
-        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignCenter}`}>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 1 }}>
-            <FilterListIcon />
-            <Typography variant="h6">Filter list:</Typography>
+        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignCenter}`} sx={{ mt: -3.5, mb: 3 }}>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 2.5, mt: 3.5, mb: 1 }}>
+            <FilterAltOutlinedIcon sx={{ mr: 1 }} />
+            <Typography variant="h3" component="h3">
+              Filter:
+            </Typography>
           </Box>
           {customFiltersEl.map((FilterElement, idx) => (
             <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} customFilters={customFilters} />
           ))}
-          <IconButton disabled={Object.keys(customFilters).length === 0} color="error" onClick={onRequestResetFilters}>
+          <IconButton
+            disabled={Object.keys(customFilters).length === 0}
+            color="error"
+            onClick={onRequestResetFilters}
+            sx={{ mt: 3.5, mb: 1 }}
+          >
             <Tooltip title="Reset filters">
               <FilterListOffIcon />
             </Tooltip>
@@ -301,7 +309,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
     <>
       <Tooltip title="Column options">
         <IconButton sx={sxButton} size="small" onClick={handleOpenMenu}>
-          <MoreVertIcon fontSize="small" />
+          <MoreVertIcon fontSize="small" color="black" />
         </IconButton>
       </Tooltip>
       <Menu
@@ -319,7 +327,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
       >
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('text') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByText', handleClose)}>
-            <FilterListIcon color="action" />
+            <FilterListIcon color="black" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by text
             </Typography>
@@ -328,7 +336,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('range') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByRange', handleClose)}>
-            <NumbersIcon color="action" />
+            <NumbersIcon color="black" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by range
             </Typography>
@@ -337,7 +345,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('select') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterBySelect', handleClose)}>
-            <LibraryAddCheckIcon color="action" />
+            <LibraryAddCheckIcon color="black" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by select
             </Typography>
@@ -346,7 +354,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('date') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByDate', handleClose)}>
-            <CalendarMonthIcon color="action" />
+            <CalendarMonthIcon color="black" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by date range
             </Typography>
@@ -357,14 +365,14 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {columnsPinnedToLeft.includes(cellOptions.id) ? (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'unpin', handleClose)}>
-            <PushPinOutlinedIcon color="action" />
+            <PushPinOutlinedIcon color="black" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Unpin
             </Typography>
           </MenuItem>
         ) : (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'pinToLeft', handleClose)}>
-            <PushPinIcon color="action" />
+            <PushPinIcon color="black" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Pin to left
             </Typography>
@@ -514,7 +522,7 @@ const EnhancedTableHead = ({
             return (
               <TableCell
                 ref={headCellsRefs.current[index]}
-                align="center"
+                align={headCell.alignContent || 'left'}
                 sx={{
                   ...(columnsPinnedToLeftIds.includes(headCell.id)
                     ? {
@@ -542,7 +550,19 @@ const EnhancedTableHead = ({
                 onMouseEnter={() => setShowColumnSubmenu(headCell.id)}
                 onMouseLeave={() => setShowColumnSubmenu(null)}
               >
-                <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyCenter}`}>
+                <Box
+                  className={`${commonStyles.flex} ${commonStyles.alignCenter} 
+                  ${
+                    headCell.alignContent
+                      ? (headCell.alignContent === 'center' && commonStyles.justifyCenter) ||
+                        (headCell.alignContent === 'left' && commonStyles.justifyFlexStart) ||
+                        (headCell.alignContent === 'right' && commonStyles.justifyFlexEnd)
+                      : ''
+                  }`}
+                  sx={{
+                    ...(headCell.alignContent ? headCell.alignContent === 'right' && !headCell.sortable && { pl: 1, pr: 5 } : {}),
+                  }}
+                >
                   {!headCell.disableCellSubmenu && (
                     <ColumnSubMenu
                       cellOptions={headCell}
@@ -559,11 +579,6 @@ const EnhancedTableHead = ({
                         direction={multiSortParams[headCell.id] ? multiSortParams[headCell.id] : 'asc'}
                         onClick={createSortHandler(headCell.id)}
                         sx={{
-                          '&.MuiTableSortLabel-root.Mui-active': {
-                            '& .MuiTableSortLabel-icon': {
-                              color: 'primary.main',
-                            },
-                          },
                           '&::after': {
                             content:
                               multiSortParams.hasOwnProperty(headCell.id) && Object.keys(multiSortParams).length > 1
@@ -572,7 +587,7 @@ const EnhancedTableHead = ({
                             position: 'relative',
                             bottom: '-5px',
                             left: '-5px',
-                            color: 'primary.main',
+                            color: 'blue.main',
                           },
                         }}
                       >
@@ -611,7 +626,7 @@ const EnhancedTableHead = ({
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <FilterListIcon />
+                            <FilterAltOutlinedIcon />
                           </InputAdornment>
                         ),
                       }}
@@ -998,11 +1013,17 @@ export default function TableData({
                               ...(index === columns.length - 1 && cell.pinToRight
                                 ? { position: 'sticky', right: 0, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
                                 : {}),
+
                               pl: 1,
                               pr: 1,
                               pt: 0.5,
                               pb: 0.5,
                               backgroundColor: 'background.paper',
+                              ...(cell.alignContent
+                                ? (cell.alignContent === 'center' && { pl: 1, pr: 1 }) ||
+                                  (cell.alignContent === 'left' && { pl: cell.disableCellSubmenu ? 1 : 5, pr: 1 }) ||
+                                  (cell.alignContent === 'right' && { pl: 1, pr: 5 })
+                                : {}),
                             }}
                             key={`${cell.id}-${row.id}`}
                           >
