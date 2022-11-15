@@ -149,37 +149,29 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
+          padding: '9px 22px 22px 22px',
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
           padding: '9px 16px 16px 16px',
         },
       },
-      // variants: [
-      //   {
-      //     props: {
-      //       width: 'mainContainer',
-      //     },
-      //     style: {
-      //       width: 'calc((100% - 12px) / 2)',
-      //       maxWidth: '1280px',
-      //     },
-      //   },
-      //   {
-      //     props: {
-      //       width: 'full',
-      //     },
-      //     style: {
-      //       width: '100%',
-      //     },
-      //   },
-      // ],
+    },
+    MuiCardActions: {
+      styleOverrides: {
+        root: {
+          padding: '16px',
+        },
+      },
     },
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
           '& fieldset': {
             borderColor: black,
-          },
-          '&.Mui-focused fieldset': {
-            borderColor: blue + '!important',
           },
         },
       },
@@ -191,6 +183,12 @@ const theme = createTheme({
             customvariant: 'highLabel',
           },
           style: {
+            '& .MuiOutlinedInput-notchedOutline': {
+              top: 0,
+            },
+            '& .MuiOutlinedInput-notchedOutline > legend': {
+              display: 'none',
+            },
             '& .MuiInputLabel-root': {
               '&.Mui-focused': {
                 color: black,
@@ -210,7 +208,7 @@ const theme = createTheme({
     MuiPopover: {
       styleOverrides: {
         paper: {
-          border: '1px solid ' + blue,
+          border: `1px solid ${blue}`,
           // boxShadow: 'none',
         },
       },

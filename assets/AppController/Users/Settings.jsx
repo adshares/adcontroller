@@ -130,132 +130,134 @@ const RegistrationModeCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card>
       <CardHeader
+        titleTypographyProps={{
+          component: 'h2',
+          variant: 'h2',
+        }}
         title="Registration mode"
         subheader="Set whether registration is to be available to the public, by invitation or only by a moderator."
       />
-      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={commonStyles.halfCard}>
+      <CardContent>
+        <FormControl>
+          <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
+            Default user's role:
+          </FormLabel>
+          <RadioGroup row value={RegistrationMode} onChange={handleSelectChange}>
+            <FormControlLabelWithTooltip value="public" control={<Radio />} label="Public" tooltip="Anyone can register." />
+            <FormControlLabelWithTooltip
+              value="restricted"
+              control={<Radio />}
+              label="Restricted"
+              tooltip="Registration requires an invitation link."
+            />
+            <FormControlLabelWithTooltip
+              value="private"
+              control={<Radio />}
+              label="Private"
+              tooltip="Only the moderator can add new users."
+            />
+          </RadioGroup>
+        </FormControl>
+        <Collapse in={RegistrationMode === 'restricted'} timeout="auto">
+          <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+            <TextField
+              sx={{ mb: 3 }}
+              color="secondary"
+              customvariant="highLabel"
+              fullWidth
+              variant="outlined"
+              margin="dense"
+              label="Advertiser apply form URL"
+              name="AdvertiserApplyFormUrl"
+              error={form.touchedFields.AdvertiserApplyFormUrl && !form.errorObj.AdvertiserApplyFormUrl.isValid}
+              helperText={form.touchedFields.AdvertiserApplyFormUrl && form.errorObj.AdvertiserApplyFormUrl.helperText}
+              value={form.fields.AdvertiserApplyFormUrl}
+              inputProps={{ autoComplete: 'off' }}
+            />
+            <TextField
+              color="secondary"
+              customvariant="highLabel"
+              fullWidth
+              variant="outlined"
+              margin="dense"
+              label="Publisher apply form URL"
+              name="PublisherApplyFormUrl"
+              error={form.touchedFields.PublisherApplyFormUrl && !form.errorObj.PublisherApplyFormUrl.isValid}
+              helperText={form.touchedFields.PublisherApplyFormUrl && form.errorObj.PublisherApplyFormUrl.helperText}
+              value={form.fields.PublisherApplyFormUrl}
+              inputProps={{ autoComplete: 'off' }}
+            />
+          </Box>
+        </Collapse>
+
+        <Collapse in={RegistrationMode !== 'private'} timeout="auto">
+          <FormControl>
+            <FormControlLabel
+              label="E-mail verification required"
+              control={
+                <Checkbox checked={EmailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
+              }
+            />
+          </FormControl>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <FormControl margin="none">
+              <FormControlLabel
+                label="Auto account confirmation"
+                control={
+                  <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
+                }
+              />
+            </FormControl>
+            <Tooltip title="Accounts will not require confirmation by a moderator.">
+              <Icon>
+                <HelpIcon color="primary" />
+              </Icon>
+            </Tooltip>
+          </Box>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <FormControl margin="none">
+              <FormControlLabel
+                label="Auto registration allowed"
+                control={
+                  <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
+                }
+              />
+            </FormControl>
+            <Tooltip title="Accounts will be set up the first time the banner is displayed, without prior registration.">
+              <Icon>
+                <HelpIcon color="primary" />
+              </Icon>
+            </Tooltip>
+          </Box>
+        </Collapse>
+
+        <Collapse in={RegistrationMode !== 'private'} timeout="auto">
           <FormControl sx={{ mt: 1 }}>
             <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
               Default user's role:
             </FormLabel>
-            <RadioGroup row value={RegistrationMode} onChange={handleSelectChange}>
-              <FormControlLabelWithTooltip value="public" control={<Radio />} label="Public" tooltip="Anyone can register." />
-              <FormControlLabelWithTooltip
-                value="restricted"
-                control={<Radio />}
-                label="Restricted"
-                tooltip="Registration requires an invitation link."
-              />
-              <FormControlLabelWithTooltip
-                value="private"
-                control={<Radio />}
-                label="Private"
-                tooltip="Only the moderator can add new users."
-              />
+            <RadioGroup
+              row
+              value={(() => {
+                if (DefaultUserRoles.length === 2) {
+                  return 'both';
+                }
+                return DefaultUserRoles[0];
+              })()}
+              onChange={handleRolesChange}
+            >
+              <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
+              <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
+              <FormControlLabel value="both" control={<Radio />} label="Advertiser & Publisher" />
             </RadioGroup>
           </FormControl>
-          <Collapse in={RegistrationMode === 'restricted'} timeout="auto">
-            <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                size="small"
-                margin="dense"
-                label="Advertiser apply form URL"
-                name="AdvertiserApplyFormUrl"
-                error={form.touchedFields.AdvertiserApplyFormUrl && !form.errorObj.AdvertiserApplyFormUrl.isValid}
-                helperText={form.touchedFields.AdvertiserApplyFormUrl && form.errorObj.AdvertiserApplyFormUrl.helperText}
-                value={form.fields.AdvertiserApplyFormUrl}
-                inputProps={{ autoComplete: 'off' }}
-              />
-              <TextField
-                fullWidth
-                variant="outlined"
-                size="small"
-                margin="dense"
-                label="Publisher apply form URL"
-                name="PublisherApplyFormUrl"
-                error={form.touchedFields.PublisherApplyFormUrl && !form.errorObj.PublisherApplyFormUrl.isValid}
-                helperText={form.touchedFields.PublisherApplyFormUrl && form.errorObj.PublisherApplyFormUrl.helperText}
-                value={form.fields.PublisherApplyFormUrl}
-                inputProps={{ autoComplete: 'off' }}
-              />
-            </Box>
-          </Collapse>
+        </Collapse>
 
-          <Collapse in={RegistrationMode !== 'private'} timeout="auto">
-            <FormControl>
-              <FormControlLabel
-                label="E-mail verification required"
-                control={
-                  <Checkbox checked={EmailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
-                }
-              />
-            </FormControl>
-            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              <FormControl margin="none">
-                <FormControlLabel
-                  label="Auto account confirmation"
-                  control={
-                    <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
-                  }
-                />
-              </FormControl>
-              <Tooltip title="Accounts will not require confirmation by a moderator.">
-                <Icon>
-                  <HelpIcon color="primary" />
-                </Icon>
-              </Tooltip>
-            </Box>
-            <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              <FormControl margin="none">
-                <FormControlLabel
-                  label="Auto registration allowed"
-                  control={
-                    <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
-                  }
-                />
-              </FormControl>
-              <Tooltip title="Accounts will be set up the first time the banner is displayed, without prior registration.">
-                <Icon>
-                  <HelpIcon color="primary" />
-                </Icon>
-              </Tooltip>
-            </Box>
-          </Collapse>
-
-          <Collapse in={RegistrationMode !== 'private'} timeout="auto">
-            <FormControl sx={{ mt: 1 }}>
-              <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
-                Default user's role:
-              </FormLabel>
-              <RadioGroup
-                row
-                value={(() => {
-                  if (DefaultUserRoles.length === 2) {
-                    return 'both';
-                  }
-                  return DefaultUserRoles[0];
-                })()}
-                onChange={handleRolesChange}
-              >
-                <FormControlLabel value="advertiser" control={<Radio />} label="Advertiser" />
-                <FormControlLabel value="publisher" control={<Radio />} label="Publisher" />
-                <FormControlLabel value="both" control={<Radio />} label="Advertiser & Publisher" />
-              </RadioGroup>
-            </FormControl>
-          </Collapse>
-
-          <Collapse
-            in={RegistrationMode !== 'private' && AutoRegistrationEnabled && !DefaultUserRoles.includes('publisher')}
-            timeout="auto"
-          >
-            <Alert severity="warning">Automatic registration requires the publisher role.</Alert>
-          </Collapse>
-        </Box>
+        <Collapse in={RegistrationMode !== 'private' && AutoRegistrationEnabled && !DefaultUserRoles.includes('publisher')} timeout="auto">
+          <Alert severity="warning">Automatic registration requires the publisher role.</Alert>
+        </Collapse>
       </CardContent>
 
       <CardActions>

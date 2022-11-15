@@ -930,7 +930,13 @@ const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
   return (
     <FormControl sx={{ mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByQueryLabel">By email or domain</InputLabel>
-      <OutlinedInput name="query" value={query} onChange={(e) => setQuery(e.target.value)} inputProps={{ autoComplete: 'off' }} />
+      <OutlinedInput
+        color="secondary"
+        name="query"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        inputProps={{ autoComplete: 'off' }}
+      />
     </FormControl>
   );
 };
@@ -944,6 +950,7 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
     <FormControl sx={{ minWidth: '10rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByRoleLabel">By user's role</InputLabel>
       <Select
+        color="secondary"
         labelId="filterByRoleLabel"
         id="filterByRoleSelect"
         value={customFilters.role || ''}
@@ -978,6 +985,7 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
     <FormControl sx={{ minWidth: '13rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByEmailStatusLabel">By email status</InputLabel>
       <Select
+        color="secondary"
         labelId="filterByEmailStatusLabel"
         id="filterByEmailStatusSelect"
         value={customFilters.hasOwnProperty('emailConfirmed') ? customFilters.emailConfirmed : ''}
@@ -1009,6 +1017,7 @@ const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
     <FormControl sx={{ minWidth: '14.5rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByAccountStatusLabel">By account status</InputLabel>
       <Select
+        color="secondary"
         labelId="filterByAccountStatusLabel"
         id="filterByEmailStatusSelect"
         value={customFilters.hasOwnProperty('adminConfirmed') ? customFilters.adminConfirmed : ''}
