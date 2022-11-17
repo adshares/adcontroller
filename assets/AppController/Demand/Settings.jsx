@@ -28,7 +28,6 @@ import {
   InputLabel,
   OutlinedInput,
 } from '@mui/material';
-import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
   return (
@@ -39,7 +38,7 @@ export default function Settings() {
             <CampaignSettingsCard />
           </Grid>
           <Grid item xs={12}>
-            <RejectedDomainsCard />
+            <BannerSettingsCard />
           </Grid>
         </Grid>
       </Grid>
@@ -47,7 +46,7 @@ export default function Settings() {
       <Grid item xs={6}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <BannerSettingsCard />
+            <RejectedDomainsCard />
           </Grid>
         </Grid>
       </Grid>
@@ -90,25 +89,24 @@ const CampaignSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card>
       <CardHeader title="Campaign options" subheader="Set minimum campaign spend." />
 
-      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box
-          component="form"
-          onChange={form.onChange}
-          onFocus={form.setTouched}
-          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
-        >
-          <FormControl error={form.touchedFields.CampaignMinBudget && !form.errorObj.CampaignMinBudget.isValid} margin="dense">
+      <CardContent>
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+          <FormControl
+            fullWidth
+            error={form.touchedFields.CampaignMinBudget && !form.errorObj.CampaignMinBudget.isValid}
+            customvariant="highLabel"
+            sx={{ mb: 3 }}
+          >
             <InputLabel htmlFor="CampaignMinBudget">Minimal campaign budget</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="CampaignMinBudget"
               name="CampaignMinBudget"
-              size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              label="Minimal campaign budget"
               value={setDecimalPlaces(form.fields.CampaignMinBudget, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -117,15 +115,19 @@ const CampaignSettingsCard = () => {
             </FormHelperText>
           </FormControl>
 
-          <FormControl error={form.touchedFields.CampaignMinCpa && !form.errorObj.CampaignMinCpa.isValid} margin="dense">
+          <FormControl
+            fullWidth
+            error={form.touchedFields.CampaignMinCpa && !form.errorObj.CampaignMinCpa.isValid}
+            customvariant="highLabel"
+            sx={{ mb: 3 }}
+          >
             <InputLabel htmlFor="CampaignMinCpa">Minimal campaign CPA</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="CampaignMinCpa"
               name="CampaignMinCpa"
-              size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              label="Minimal campaign CPA"
               value={setDecimalPlaces(form.fields.CampaignMinCpa, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -134,15 +136,18 @@ const CampaignSettingsCard = () => {
             </FormHelperText>
           </FormControl>
 
-          <FormControl error={form.touchedFields.CampaignMinCpm && !form.errorObj.CampaignMinCpm.isValid} margin="dense">
+          <FormControl
+            fullWidth
+            error={form.touchedFields.CampaignMinCpm && !form.errorObj.CampaignMinCpm.isValid}
+            customvariant="highLabel"
+          >
             <InputLabel htmlFor="CampaignMinCpm">Minimal campaign CPM</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="CampaignMinCpm"
               name="CampaignMinCpm"
-              size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              label="Minimal campaign CPM"
               value={setDecimalPlaces(form.fields.CampaignMinCpm, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -154,11 +159,9 @@ const CampaignSettingsCard = () => {
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
-            Save
-          </Button>
-        </Box>
+        <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
+          Save
+        </Button>
       </CardActions>
     </Card>
   );
@@ -202,25 +205,24 @@ const BannerSettingsCard = () => {
   };
 
   return (
-    <Card width="mainContainer">
+    <Card>
       <CardHeader title="Ad options" subheader="Set an ad file size limit." />
 
-      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box
-          component="form"
-          onChange={form.onChange}
-          onFocus={form.setTouched}
-          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
-        >
-          <FormControl error={form.touchedFields.UploadLimitImage && !form.errorObj.UploadLimitImage.isValid} margin="dense">
+      <CardContent>
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+          <FormControl
+            sx={{ mb: 3 }}
+            fullWidth
+            error={form.touchedFields.UploadLimitImage && !form.errorObj.UploadLimitImage.isValid}
+            customvariant={'highLabel'}
+          >
             <InputLabel htmlFor="UploadLimitImage">Image file size limit</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="UploadLimitImage"
               name="UploadLimitImage"
-              size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="Image file size limit"
               value={form.fields.UploadLimitImage}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -229,15 +231,19 @@ const BannerSettingsCard = () => {
             </FormHelperText>
           </FormControl>
 
-          <FormControl error={form.touchedFields.UploadLimitVideo && !form.errorObj.UploadLimitVideo.isValid} margin="dense">
+          <FormControl
+            sx={{ mb: 3 }}
+            fullWidth
+            error={form.touchedFields.UploadLimitVideo && !form.errorObj.UploadLimitVideo.isValid}
+            customvariant={'highLabel'}
+          >
             <InputLabel htmlFor="UploadLimitVideo">Video file size limit</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="UploadLimitVideo"
               name="UploadLimitVideo"
-              size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="Video file size limit"
               value={form.fields.UploadLimitVideo}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -246,15 +252,19 @@ const BannerSettingsCard = () => {
             </FormHelperText>
           </FormControl>
 
-          <FormControl error={form.touchedFields.UploadLimitModel && !form.errorObj.UploadLimitModel.isValid} margin="dense">
+          <FormControl
+            sx={{ mb: 3 }}
+            fullWidth
+            error={form.touchedFields.UploadLimitModel && !form.errorObj.UploadLimitModel.isValid}
+            customvariant={'highLabel'}
+          >
             <InputLabel htmlFor="UploadLimitModel">3D model file size limit</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="UploadLimitModel"
               name="UploadLimitModel"
-              size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="3D model file size limit"
               value={form.fields.UploadLimitModel}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -263,15 +273,14 @@ const BannerSettingsCard = () => {
             </FormHelperText>
           </FormControl>
 
-          <FormControl margin="dense">
+          <FormControl fullWidth customvariant={'highLabel'}>
             <InputLabel htmlFor="UploadLimitZip">HTML file size limit</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="UploadLimitZip"
               name="UploadLimitZip"
-              size="small"
               type="number"
               endAdornment={<InputAdornment position="end">MB</InputAdornment>}
-              label="HTML file size limit"
               value={form.fields.UploadLimitZip}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -283,11 +292,9 @@ const BannerSettingsCard = () => {
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
-            Save
-          </Button>
-        </Box>
+        <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
+          Save
+        </Button>
       </CardActions>
     </Card>
   );
@@ -324,7 +331,7 @@ const RejectedDomainsCard = () => {
   };
 
   return (
-    <Card width="mainContainer">
+    <Card sx={{ maxHeight: '100%' }}>
       <CardHeader
         title="Rejected domains"
         subheader="Set domains on which campaigns will not be displayed. All subdomains will be rejected."
@@ -338,11 +345,9 @@ const RejectedDomainsCard = () => {
         />
       </CardContent>
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={isLoading || !isListWasChanged || !isListValid} type="button" variant="contained" onClick={onSaveClick}>
-            Save
-          </Button>
-        </Box>
+        <Button disabled={isLoading || !isListWasChanged || !isListValid} type="button" variant="contained" onClick={onSaveClick}>
+          Save
+        </Button>
       </CardActions>
     </Card>
   );

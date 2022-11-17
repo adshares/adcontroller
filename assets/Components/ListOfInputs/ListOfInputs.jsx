@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { validateAddress } from '@adshares/ads';
-import { Box, Button, Collapse, IconButton, InputAdornment, List, ListItem, TextField } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { Box, Button, Collapse, IconButton, List, ListItem, TextField } from '@mui/material';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import { compareArrays } from '../../utils/helpers';
 
@@ -124,33 +124,31 @@ const useCreateFields = (initialList, type) => {
       }
 
       inputs.push(
-        <ListItem disableGutters disablePadding key={index}>
+        <ListItem disableGutters disablePadding key={index} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
           <TextField
+            color="secondary"
+            sx={{ mt: 3 }}
             fullWidth
             variant="outlined"
-            size="small"
-            margin="dense"
             error={isValidationError}
             helperText={validationResult.helperText}
             name={`${index}`}
             value={list[index] || ''}
             onChange={(e) => handleChange(e, index)}
             onBlur={(e) => formatValueOnBlur(e, index)}
-            InputProps={
-              index === list.length
-                ? undefined
-                : {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton type="button" onClick={() => onRemoveClick(index)}>
-                          <CloseIcon color="error" />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }
-            }
             inputProps={{ autoComplete: 'off' }}
           />
+          <IconButton
+            color="error"
+            sx={{
+              mt: 3,
+              ml: 2,
+              visibility: index === list.length ? 'hidden' : 'visible',
+            }}
+            onClick={() => onRemoveClick(index)}
+          >
+            <DeleteOutlineOutlinedIcon />
+          </IconButton>
         </ListItem>,
       );
     }
@@ -193,8 +191,8 @@ function ListOfInputs({ initialList = null, fieldsHandler, listName = undefined,
     <Box className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
       <Collapse in={!bulkAdding} timeout="auto">
         <Box className={`${commonStyles.card}`}>
-          <Button type="button" variant="text" onClick={() => setBulkAdding((prevState) => !prevState)}>
-            Bulk adding
+          <Button variant="text" onClick={() => setBulkAdding((prevState) => !prevState)}>
+            BULK ADDING
           </Button>
         </Box>
 
@@ -203,8 +201,8 @@ function ListOfInputs({ initialList = null, fieldsHandler, listName = undefined,
 
       <Collapse in={bulkAdding} timeout="auto">
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`}>
-          <TextField value={textareaValue} multiline rows={8} onChange={onTextareaChange} inputRef={textAreaRef} />
-          <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+          <TextField color="secondary" value={textareaValue} multiline rows={8} onChange={onTextareaChange} inputRef={textAreaRef} />
+          <Box sx={{ mt: 2 }} className={`${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
             <Button type="button" variant="contained" sx={{ mr: 1 }} onClick={onTextAreaSaveClick} disabled={!textareaValue}>
               Paste
             </Button>

@@ -20,7 +20,7 @@ const headCells = [
     id: 'status',
     label: 'Status',
     cellWidth: '6rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
   {
     id: 'url',
@@ -38,26 +38,25 @@ const headCells = [
     id: 'lastSync',
     label: 'Last synchronization',
     cellWidth: '10rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
   {
     id: 'campaigns',
     label: 'Campaigns',
     cellWidth: '8rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
   {
     id: 'sites',
     label: 'Sites',
     cellWidth: '8rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
   {
     id: 'countOfError',
     label: 'Count of connection error',
     cellWidth: '8rem',
-    alignContent: 'center',
-    // pinToRight: true,
+    alignContent: 'left',
   },
 ];
 
@@ -102,11 +101,11 @@ export default function ConnectedStatus() {
           </Tooltip>
         )),
       countOfError: (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyCenter}`}>
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyFlexStart}`}>
           <Typography variant="body2">{host.connectionErrorCount}</Typography>
           {Number(host.connectionErrorCount) > 0 && (
             <Tooltip title="Reset counter">
-              <IconButton size="small" color="primary" onClick={() => onResetCounterClick(host.id)}>
+              <IconButton sx={{ ml: 2 }} size="small" color="secondary" onClick={() => onResetCounterClick(host.id)}>
                 <RestartAltOutlinedIcon />
               </IconButton>
             </Tooltip>
@@ -124,7 +123,6 @@ export default function ConnectedStatus() {
   };
 
   const handleTableChanges = (event) => {
-    console.log(event);
     setQueryConfig((prevState) => ({
       ...prevState,
       cursor: response?.cursor || null,
@@ -138,7 +136,6 @@ export default function ConnectedStatus() {
       className={`${commonStyles.card}`}
       sx={{
         height: 'calc(100vh - 9rem)',
-        // maxWidth: 'calc(100vw - 21rem)',
       }}
       width="full"
     >

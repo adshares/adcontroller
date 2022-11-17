@@ -6,7 +6,6 @@ import { changeInventoryWhitelistInformation } from '../../redux/config/configSl
 import { useCreateNotification } from '../../hooks';
 import ListOfInputs from '../../Components/ListOfInputs/ListOfInputs';
 import {
-  Box,
   Button,
   Card,
   CardActions,
@@ -17,10 +16,10 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Grid,
   Radio,
   RadioGroup,
 } from '@mui/material';
-import commonStyles from '../../styles/commonStyles.scss';
 import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTooltip/FormControlLabelWithTooltip';
 
 export default function Settings() {
@@ -168,112 +167,115 @@ export default function Settings() {
   };
 
   return (
-    <Card className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexColumn}`} width="mainContainer">
+    <Card>
       <CardHeader
         title="AdServer's inventory"
         subheader="Set which ad servers your ad server can sync with. By default, it syncs with all available ad servers."
       />
-      <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-        <CardContent sx={{ pt: 0, pb: 0 }}>
-          <FormControl>
-            <FormLabel focused={false}>Ad server's inventory visibility</FormLabel>
-            <RadioGroup row value={serverType} onChange={handleServerTypeChange}>
-              <FormControlLabelWithTooltip
-                value="public"
-                control={<Radio />}
-                label="Public"
-                tooltip="The ad server will synchronize with all other ad servers."
-              />
-              <FormControlLabelWithTooltip
-                value="restricted"
-                control={<Radio />}
-                label="Restricted"
-                tooltip="The ad server will only synchronize with listed as servers."
-              />
-              <FormControlLabelWithTooltip
-                value="private"
-                control={<Radio />}
-                label="Private"
-                tooltip="The ad server will not synchronize with any other ad server."
-              />
-            </RadioGroup>
-          </FormControl>
-        </CardContent>
-      </Box>
-
-      <Collapse in={serverType === 'restricted'} timeout="auto" sx={{ overflow: 'auto' }}>
-        <CardContent>
-          <CardActions sx={{ paddingX: 0 }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={separateList.current}
-                  onChange={() => setSeparateList((prevState) => ({ ...prevState, current: !prevState.current }))}
-                />
-              }
-              label="Separate lists for inventory import and export"
+      <CardContent>
+        <FormControl>
+          <FormLabel focused={false}>Ad server's inventory visibility</FormLabel>
+          <RadioGroup row value={serverType} onChange={handleServerTypeChange}>
+            <FormControlLabelWithTooltip
+              value="public"
+              control={<Radio />}
+              label="Public"
+              tooltip="The ad server will synchronize with all other ad servers."
             />
-          </CardActions>
-          <Collapse in={!separateList.current} timeout="auto">
-            <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-              <Card className={`${commonStyles.halfCard}`} raised>
-                <CardHeader title="Ad server addresses" subheader={'Synchronization will be limited to the following ad servers only.'} />
-                <CardContent>
-                  <ListOfInputs
-                    initialList={appData.AdServer.InventoryWhitelist}
-                    fieldsHandler={fieldsHandler}
-                    listName="InventoryWhitelist"
-                    type="wallet"
-                    maxHeight="calc(100vh - 40rem)"
-                  />
-                </CardContent>
-              </Card>
-            </Box>
+            <FormControlLabelWithTooltip
+              value="restricted"
+              control={<Radio />}
+              label="Restricted"
+              tooltip="The ad server will only synchronize with listed as servers."
+            />
+            <FormControlLabelWithTooltip
+              value="private"
+              control={<Radio />}
+              label="Private"
+              tooltip="The ad server will not synchronize with any other ad server."
+            />
+          </RadioGroup>
+        </FormControl>
+
+        <Collapse in={serverType === 'restricted'} timeout="auto" sx={{ mt: 2 }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={separateList.current}
+                onChange={() => setSeparateList((prevState) => ({ ...prevState, current: !prevState.current }))}
+              />
+            }
+            label="Separate lists for inventory import and export"
+          />
+          <Collapse in={!separateList.current} timeout="auto" sx={{ mt: 3 }}>
+            <Card customvariant="outlined">
+              <CardHeader
+                titleTypographyProps={{ component: 'h3', variant: 'h3' }}
+                subheaderTypographyProps={{ variant: 'body2' }}
+                title="Ad server addresses"
+                subheader={'Synchronization will be limited to the following ad servers only.'}
+              />
+              <CardContent>
+                <ListOfInputs
+                  initialList={appData.AdServer.InventoryWhitelist}
+                  fieldsHandler={fieldsHandler}
+                  listName="InventoryWhitelist"
+                  type="wallet"
+                  maxHeight="calc(100vh - 45rem)"
+                />
+              </CardContent>
+            </Card>
           </Collapse>
 
           <Collapse in={separateList.current} timeout="auto">
-            <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
-              <Card className={`${commonStyles.halfCard}`} raised>
-                <CardHeader
-                  title="Demand ad server addresses"
-                  subheader={'Inventory import will be limited to the following ad servers only.'}
-                />
-                <CardContent>
-                  <ListOfInputs
-                    initialList={appData.AdServer.InventoryImportWhitelist}
-                    fieldsHandler={fieldsHandler}
-                    listName="InventoryImportWhitelist"
-                    type="wallet"
-                    maxHeight="calc(100vh - 40rem)"
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Card customvariant="outlined">
+                  <CardHeader
+                    titleTypographyProps={{ component: 'h3', variant: 'h3' }}
+                    subheaderTypographyProps={{ variant: 'body2' }}
+                    title="Demand ad server addresses"
+                    subheader={'Inventory import will be limited to the following ad servers only.'}
                   />
-                </CardContent>
-              </Card>
+                  <CardContent>
+                    <ListOfInputs
+                      initialList={appData.AdServer.InventoryImportWhitelist}
+                      fieldsHandler={fieldsHandler}
+                      listName="InventoryImportWhitelist"
+                      type="wallet"
+                      maxHeight="calc(100vh - 45rem)"
+                    />
+                  </CardContent>
+                </Card>
+              </Grid>
 
-              <Card className={`${commonStyles.halfCard}`} raised>
-                <CardHeader
-                  title="Supply ad servers addresses"
-                  subheader={'Inventory export will be limited to the following ad servers only.'}
-                />
-                <CardContent>
-                  <ListOfInputs
-                    initialList={appData.AdServer.InventoryExportWhitelist}
-                    fieldsHandler={fieldsHandler}
-                    listName="InventoryExportWhitelist"
-                    type="wallet"
-                    maxHeight="calc(100vh - 40rem)"
+              <Grid item xs={6}>
+                <Card customvariant="outlined">
+                  <CardHeader
+                    titleTypographyProps={{ component: 'h3', variant: 'h3' }}
+                    subheaderTypographyProps={{ variant: 'body2' }}
+                    title="Supply ad servers addresses"
+                    subheader={'Inventory export will be limited to the following ad servers only.'}
                   />
-                </CardContent>
-              </Card>
-            </Box>
+                  <CardContent>
+                    <ListOfInputs
+                      initialList={appData.AdServer.InventoryExportWhitelist}
+                      fieldsHandler={fieldsHandler}
+                      listName="InventoryExportWhitelist"
+                      type="wallet"
+                      maxHeight="calc(100vh - 45rem)"
+                    />
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
           </Collapse>
-        </CardContent>
-      </Collapse>
+        </Collapse>
+      </CardContent>
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={isLoading || checkIsButtonDisabled()} type="button" variant="contained" onClick={onSaveClick}>
-            Save
-          </Button>
-        </Box>
+        <Button disabled={isLoading || checkIsButtonDisabled()} type="button" variant="contained" onClick={onSaveClick}>
+          Save
+        </Button>
       </CardActions>
     </Card>
   );

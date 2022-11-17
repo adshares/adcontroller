@@ -51,6 +51,8 @@ const PrivacyCard = () => {
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <CollapsibleTextarea
+            customvariant="highLabel"
+            color="secondary"
             collapsible
             value={form.fields.PrivacyPolicy}
             name="PrivacyPolicy"
@@ -102,6 +104,8 @@ const TermAndConditionCard = () => {
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <CollapsibleTextarea
+            customvariant="highLabel"
+            color="secondary"
             collapsible
             value={form.fields.Terms}
             name="Terms"

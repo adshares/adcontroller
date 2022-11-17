@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAppLogout } from '../../redux/auth/authSlice';
 import { AppBar, Box, Divider, IconButton, Link, Menu, MenuItem, Toolbar } from '@mui/material';
-import { AccountCircle } from '@mui/icons-material';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import configSelectors from '../../redux/config/configSelectors';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function MenuAppBar({ showProtectedOptions, showSideMenu, toggleSideMenu, showSideMenuIcon = false }) {
   const appData = useSelector(configSelectors.getAppData);
@@ -33,12 +34,12 @@ export default function MenuAppBar({ showProtectedOptions, showSideMenu, toggleS
           </IconButton>
         )}
         {showProtectedOptions && (
-          <Box sx={{ ml: 'auto' }}>
-            <Link href={appData.AdPanel.Url} color="inherit" underline="hover" variant="button">
-              Back to AdPanel
+          <Box sx={{ ml: 'auto' }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Link href={appData.AdPanel.Url} color="inherit" underline="hover">
+              BACK TO ADPANEL
             </Link>
             <IconButton size="large" onClick={handleMenu} color="inherit">
-              <AccountCircle />
+              <AccountCircleOutlinedIcon />
             </IconButton>
             <Menu
               open={!!anchorEl}

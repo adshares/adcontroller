@@ -20,17 +20,13 @@ import {
   FormHelperText,
   FormLabel,
   Grid,
-  Icon,
   InputAdornment,
   InputLabel,
   OutlinedInput,
   Radio,
   RadioGroup,
   TextField,
-  Tooltip,
 } from '@mui/material';
-import commonStyles from '../../styles/commonStyles.scss';
-import HelpIcon from '@mui/icons-material/Help';
 import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTooltip/FormControlLabelWithTooltip';
 
 export default function Settings() {
@@ -132,15 +128,11 @@ const RegistrationModeCard = () => {
   return (
     <Card>
       <CardHeader
-        titleTypographyProps={{
-          component: 'h2',
-          variant: 'h2',
-        }}
         title="Registration mode"
         subheader="Set whether registration is to be available to the public, by invitation or only by a moderator."
       />
       <CardContent>
-        <FormControl>
+        <FormControl fullWidth>
           <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
             Default user's role:
           </FormLabel>
@@ -177,6 +169,7 @@ const RegistrationModeCard = () => {
               inputProps={{ autoComplete: 'off' }}
             />
             <TextField
+              sx={{ mb: 3 }}
               color="secondary"
               customvariant="highLabel"
               fullWidth
@@ -192,7 +185,7 @@ const RegistrationModeCard = () => {
           </Box>
         </Collapse>
 
-        <Collapse in={RegistrationMode !== 'private'} timeout="auto">
+        <Collapse in={RegistrationMode !== 'private'} timeout="auto" sx={{ mt: 2 }}>
           <FormControl>
             <FormControlLabel
               label="E-mail verification required"
@@ -201,40 +194,28 @@ const RegistrationModeCard = () => {
               }
             />
           </FormControl>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-            <FormControl margin="none">
-              <FormControlLabel
-                label="Auto account confirmation"
-                control={
-                  <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
-                }
-              />
-            </FormControl>
-            <Tooltip title="Accounts will not require confirmation by a moderator.">
-              <Icon>
-                <HelpIcon color="primary" />
-              </Icon>
-            </Tooltip>
-          </Box>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-            <FormControl margin="none">
-              <FormControlLabel
-                label="Auto registration allowed"
-                control={
-                  <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
-                }
-              />
-            </FormControl>
-            <Tooltip title="Accounts will be set up the first time the banner is displayed, without prior registration.">
-              <Icon>
-                <HelpIcon color="primary" />
-              </Icon>
-            </Tooltip>
-          </Box>
+          <FormControl margin="none">
+            <FormControlLabelWithTooltip
+              control={
+                <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
+              }
+              label="Auto account confirmation"
+              tooltip="Accounts will not require confirmation by a moderator."
+            />
+          </FormControl>
+          <FormControl margin="none">
+            <FormControlLabelWithTooltip
+              control={
+                <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
+              }
+              label="Auto registration allowed"
+              tooltip="Accounts will be set up the first time the banner is displayed, without prior registration."
+            />
+          </FormControl>
         </Collapse>
 
-        <Collapse in={RegistrationMode !== 'private'} timeout="auto">
-          <FormControl sx={{ mt: 1 }}>
+        <Collapse in={RegistrationMode !== 'private'} timeout="auto" sx={{ mt: 2 }}>
+          <FormControl>
             <FormLabel focused={false} sx={{ whiteSpace: 'nowrap' }}>
               Default user's role:
             </FormLabel>
@@ -261,24 +242,22 @@ const RegistrationModeCard = () => {
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button
-            disabled={
-              isLoading ||
-              (appData.AdServer.RegistrationMode === RegistrationMode &&
-                appData.AdServer.EmailVerificationRequired === EmailVerificationRequired &&
-                appData.AdServer.AutoConfirmationEnabled === AutoConfirmationEnabled &&
-                appData.AdServer.AutoRegistrationEnabled === AutoRegistrationEnabled &&
-                compareArrays(appData.AdServer.DefaultUserRoles, DefaultUserRoles) &&
-                (RegistrationMode === 'restricted' ? !form.isFormValid || !form.isFormWasChanged : true))
-            }
-            onClick={onSaveClick}
-            variant="contained"
-            type="button"
-          >
-            Save
-          </Button>
-        </Box>
+        <Button
+          disabled={
+            isLoading ||
+            (appData.AdServer.RegistrationMode === RegistrationMode &&
+              appData.AdServer.EmailVerificationRequired === EmailVerificationRequired &&
+              appData.AdServer.AutoConfirmationEnabled === AutoConfirmationEnabled &&
+              appData.AdServer.AutoRegistrationEnabled === AutoRegistrationEnabled &&
+              compareArrays(appData.AdServer.DefaultUserRoles, DefaultUserRoles) &&
+              (RegistrationMode === 'restricted' ? !form.isFormValid || !form.isFormWasChanged : true))
+          }
+          onClick={onSaveClick}
+          variant="contained"
+          type="button"
+        >
+          Save
+        </Button>
       </CardActions>
     </Card>
   );
@@ -316,25 +295,24 @@ const AutoWithdrawalCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card>
       <CardHeader title="Auto withdrawal" subheader="Set minimum thresholds for automatic withdrawals." />
 
-      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box
-          component="form"
-          onChange={form.onChange}
-          onFocus={form.setTouched}
-          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
-        >
-          <FormControl error={form.touchedFields.AutoWithdrawalLimitAds && !form.errorObj.AutoWithdrawalLimitAds.isValid} margin="dense">
+      <CardContent>
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+          <FormControl
+            fullWidth
+            error={form.touchedFields.AutoWithdrawalLimitAds && !form.errorObj.AutoWithdrawalLimitAds.isValid}
+            customvariant="highLabel"
+            sx={{ mb: 3 }}
+          >
             <InputLabel htmlFor="AutoWithdrawalLimitAds">ADS minimum withdrawal</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="AutoWithdrawalLimitAds"
               name="AutoWithdrawalLimitAds"
-              size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              label="ADS minimum withdrawal"
               value={setDecimalPlaces(form.fields.AutoWithdrawalLimitAds, 4)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -342,15 +320,18 @@ const AutoWithdrawalCard = () => {
               {form.touchedFields.AutoWithdrawalLimitAds && form.errorObj.AutoWithdrawalLimitAds.helperText}
             </FormHelperText>
           </FormControl>
-          <FormControl error={form.touchedFields.AutoWithdrawalLimitBsc && !form.errorObj.AutoWithdrawalLimitBsc.isValid} margin="dense">
+          <FormControl
+            fullWidth
+            error={form.touchedFields.AutoWithdrawalLimitBsc && !form.errorObj.AutoWithdrawalLimitBsc.isValid}
+            customvariant="highLabel"
+          >
             <InputLabel htmlFor="AutoWithdrawalLimitBsc">BSC minimum withdrawal</InputLabel>
             <OutlinedInput
+              color="secondary"
               id="AutoWithdrawalLimitBsc"
               name="AutoWithdrawalLimitBsc"
-              size="small"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              label="BSC minimum withdrawal"
               value={setDecimalPlaces(form.fields.AutoWithdrawalLimitBsc, 4)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
@@ -362,16 +343,9 @@ const AutoWithdrawalCard = () => {
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button
-            disabled={isLoading || !form.isFormWasChanged || !form.isFormValid}
-            onClick={onSaveClick}
-            variant="contained"
-            type="button"
-          >
-            Save
-          </Button>
-        </Box>
+        <Button disabled={isLoading || !form.isFormWasChanged || !form.isFormValid} onClick={onSaveClick} variant="contained" type="button">
+          Save
+        </Button>
       </CardActions>
     </Card>
   );

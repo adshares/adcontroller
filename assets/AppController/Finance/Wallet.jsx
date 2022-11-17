@@ -25,7 +25,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import HelpIcon from '@mui/icons-material/Help';
+import InfoIcon from '@mui/icons-material/Info';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
@@ -135,7 +135,7 @@ const WalletSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card>
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="Hot wallet" />
         <IconButton type="button" onClick={toggleEditMode}>
@@ -145,24 +145,15 @@ const WalletSettingsCard = () => {
       <CardContent>
         <>
           <Collapse in={!editMode} timeout="auto">
-            <Box className={`${commonStyles.flex}`}>
-              <Typography variant="h6">Wallet address:</Typography>
-              <Typography variant="h6" sx={{ ml: 1 }}>
-                {appData.AdServer.WalletAddress}
-              </Typography>
-            </Box>
+            <Typography variant="h3">
+              Wallet address: <Typography variant="b800">{appData.AdServer.WalletAddress} ADS</Typography>
+            </Typography>
           </Collapse>
           <Collapse in={editMode} timeout="auto" unmountOnExit>
-            <Box
-              sx={{ marginLeft: 'auto', marginRight: 'auto' }}
-              className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn}`}
-              component="form"
-              onChange={walletForm.onChange}
-              onFocus={walletForm.setTouched}
-            >
+            <Box component="form" onChange={walletForm.onChange} onFocus={walletForm.setTouched}>
               <TextField
-                size="small"
-                margin="dense"
+                fullWidth
+                customvariant="highLabel"
                 name="WalletAddress"
                 label="Wallet address"
                 error={walletForm.touchedFields.WalletAddress && !walletForm.errorObj.WalletAddress.isValid}
@@ -173,8 +164,8 @@ const WalletSettingsCard = () => {
               />
 
               <TextField
-                size="small"
-                margin="dense"
+                fullWidth
+                customvariant="highLabel"
                 name="WalletSecretKey"
                 label="Secret key"
                 error={walletForm.touchedFields.WalletSecretKey && !walletForm.errorObj.WalletSecretKey.isValid}
@@ -192,16 +183,10 @@ const WalletSettingsCard = () => {
               {isNodeVerification ? (
                 <Spinner />
               ) : (
-                <Box
-                  sx={{ marginLeft: 'auto', marginRight: 'auto' }}
-                  className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn}`}
-                  component="form"
-                  onChange={nodeForm.onChange}
-                  onFocus={nodeForm.setTouched}
-                >
+                <Box component="form" onChange={nodeForm.onChange} onFocus={nodeForm.setTouched}>
                   <TextField
-                    size="small"
-                    margin="dense"
+                    fullWidth
+                    customvariant="highLabel"
                     name="WalletNodeHost"
                     label="Node host"
                     error={nodeForm.touchedFields.WalletNodeHost && !nodeForm.errorObj.WalletNodeHost.isValid}
@@ -212,8 +197,8 @@ const WalletSettingsCard = () => {
                   />
 
                   <TextField
-                    size="small"
-                    margin="dense"
+                    fullWidth
+                    customvariant="highLabel"
                     name="WalletNodePort"
                     label="Node port"
                     error={nodeForm.touchedFields.WalletNodePort && !nodeForm.errorObj.WalletNodePort.isValid}
@@ -252,25 +237,19 @@ const WalletStatusCard = () => {
     <Card className={commonStyles.card} width="mainContainer">
       <CardHeader title="Ad server balance" />
       <CardContent>
-        <Box className={commonStyles.flex}>
-          <Typography variant="h6">Total balance:</Typography>
-          <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
-            {formatMoney(monitoringWalletInfo.balance, 5)} ADS
-          </Typography>
-        </Box>
-        <Typography variant="body2">
-          Total balance of all user accounts. This amount should be at least equal to the sum of funds accumulated in hot and cold wallets.
-          <strong>The amount exceeding this value is the operator's profit</strong>.
+        <Typography variant="h3">
+          Total balance: <Typography variant="b800">{formatMoney(monitoringWalletInfo.balance, 5)} ADS</Typography>
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          Total balance of all user accounts. This amount should be at least equal to the sum of funds accumulated in hot and cold wallets.{' '}
+          <Typography variant="b600">The amount exceeding this value is the operator's profit</Typography>.
         </Typography>
       </CardContent>
-      <CardContent>
-        <Box className={commonStyles.flex}>
-          <Typography variant="h6">Unused bonuses:</Typography>
-          <Typography variant="h6" sx={{ fontWeight: 600, ml: 1 }}>
-            {formatMoney(monitoringWalletInfo.unusedBonuses, 5)} ADS
-          </Typography>
-        </Box>
-        <Typography variant="body2">
+      <CardContent sx={{ mt: 6.5 }}>
+        <Typography variant="h3">
+          Unused bonuses: <Typography variant="b800">{formatMoney(monitoringWalletInfo.unusedBonuses, 5)} ADS</Typography>
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
           The total amount of all bonuses that have been added to user accounts but have not yet been used up.
         </Typography>
       </CardContent>
@@ -316,25 +295,21 @@ const ColdWalletSettingsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card>
       <CardHeader title="Cold wallet" />
-      <FormControlLabel
-        sx={{ pl: 2 }}
-        label="Enable cold wallet"
-        control={<Checkbox checked={ColdWalletIsActive} onChange={() => setColdWalletIsActive((prevState) => !prevState)} />}
-      />
 
-      <Collapse in={ColdWalletIsActive} timeout="auto">
-        <CardContent>
-          <Box
-            className={`${commonStyles.flex} ${commonStyles.justifySpaceAround} ${commonStyles.alignStart}`}
-            component="form"
-            onChange={form.onChange}
-            onFocus={form.setTouched}
-          >
-            <Box className={`${commonStyles.flex}`}>
+      <CardContent>
+        <FormControlLabel
+          label="Enable cold wallet"
+          control={<Checkbox checked={ColdWalletIsActive} onChange={() => setColdWalletIsActive((prevState) => !prevState)} />}
+        />
+        <Collapse in={ColdWalletIsActive} timeout="auto">
+          <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+            <Box className={`${commonStyles.flex} ${commonStyles.alignBaseline}`}>
               <TextField
-                size="small"
+                sx={{ mb: 3 }}
+                fullWidth
+                customvariant="highLabel"
                 name="HotWalletMinValue"
                 label="Min threshold value"
                 error={form.touchedFields.HotWalletMinValue && !form.errorObj.HotWalletMinValue.isValid}
@@ -343,24 +318,26 @@ const ColdWalletSettingsCard = () => {
                 type="number"
                 inputProps={{ autoComplete: 'off', min: 0 }}
               />
-              <Box sx={{ height: '40px', ml: 0.5 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-                <Typography sx={{ ml: 1 }} variant="body1">
+              <Box className={`${commonStyles.flex}`}>
+                <Typography sx={{ ml: 2 }} variant="b800">
                   ADS
                 </Typography>
                 <Tooltip
+                  sx={{ ml: 2 }}
                   title={
-                    // eslint-disable-next-line max-len
                     'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail.'
                   }
                 >
-                  <HelpIcon color="primary" />
+                  <InfoIcon color="secondary" />
                 </Tooltip>
               </Box>
             </Box>
 
-            <Box className={`${commonStyles.flex}`}>
+            <Box className={`${commonStyles.flex} ${commonStyles.alignBaseline}`}>
               <TextField
-                size="small"
+                sx={{ mb: 3 }}
+                fullWidth
+                customvariant="highLabel"
                 name="HotWalletMaxValue"
                 label="Max threshold value"
                 error={form.touchedFields.HotWalletMaxValue && !form.errorObj.HotWalletMaxValue.isValid}
@@ -369,36 +346,35 @@ const ColdWalletSettingsCard = () => {
                 type="number"
                 inputProps={{ autoComplete: 'off', min: 0 }}
               />
-              <Box sx={{ height: '40px', ml: 0.5 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-                <Typography sx={{ ml: 1 }} variant="body1">
+              <Box className={`${commonStyles.flex}`}>
+                <Typography sx={{ ml: 2 }} variant="b800">
                   ADS
                 </Typography>
                 <Tooltip
+                  sx={{ ml: 2 }}
                   title={
-                    // eslint-disable-next-line max-len
                     'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
                   }
                 >
-                  <HelpIcon color="primary" />
+                  <InfoIcon color="secondary" />
                 </Tooltip>
               </Box>
             </Box>
 
-            <Box className={`${commonStyles.flex}`}>
-              <TextField
-                size="small"
-                name="ColdWalletAddress"
-                label="Cold wallet address"
-                error={form.touchedFields.ColdWalletAddress && !form.errorObj.ColdWalletAddress.isValid}
-                helperText={form.touchedFields.ColdWalletAddress && form.errorObj.ColdWalletAddress.helperText}
-                value={form.fields.ColdWalletAddress}
-                type="text"
-                inputProps={{ autoComplete: 'off' }}
-              />
-            </Box>
+            <TextField
+              fullWidth
+              customvariant="highLabel"
+              name="ColdWalletAddress"
+              label="Cold wallet address"
+              error={form.touchedFields.ColdWalletAddress && !form.errorObj.ColdWalletAddress.isValid}
+              helperText={form.touchedFields.ColdWalletAddress && form.errorObj.ColdWalletAddress.helperText}
+              value={form.fields.ColdWalletAddress}
+              type="text"
+              inputProps={{ autoComplete: 'off' }}
+            />
           </Box>
-        </CardContent>
-      </Collapse>
+        </Collapse>
+      </CardContent>
       <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
           <Button

@@ -57,22 +57,18 @@ const BaseInformationCard = () => {
   };
 
   return (
-    <Card className={`${commonStyles.card}`} width="mainContainer">
+    <Card>
       <CardHeader title="Base information" />
 
-      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box
-          component="form"
-          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
-          onChange={form.onChange}
-          onFocus={form.setTouched}
-        >
+      <CardContent>
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <TextField
+            sx={{ mb: 3 }}
             fullWidth
-            margin="dense"
-            size="small"
+            customvariant="highLabel"
             name="Name"
             variant="outlined"
+            color="secondary"
             label="Adserver's name"
             error={form.changedFields.Name && !form.errorObj.Name.isValid}
             helperText={form.changedFields.Name && form.errorObj.Name.helperText}
@@ -81,10 +77,11 @@ const BaseInformationCard = () => {
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
+            sx={{ mb: 3 }}
             fullWidth
-            margin="dense"
-            size="small"
+            customvariant="highLabel"
             name="TechnicalEmail"
+            color="secondary"
             variant="outlined"
             label="Technical email"
             error={form.changedFields.TechnicalEmail && !form.errorObj.TechnicalEmail.isValid}
@@ -94,10 +91,11 @@ const BaseInformationCard = () => {
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
+            sx={{ mb: 3 }}
             fullWidth
-            margin="dense"
-            size="small"
+            customvariant="highLabel"
             name="SupportEmail"
+            color="secondary"
             variant="outlined"
             label="Support email"
             error={form.changedFields.SupportEmail && !form.errorObj.SupportEmail.isValid}
@@ -107,10 +105,11 @@ const BaseInformationCard = () => {
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
+            sx={{ mb: 3 }}
             fullWidth
-            margin="dense"
-            size="small"
+            customvariant="highLabel"
             name="SupportChat"
+            color="secondary"
             variant="outlined"
             label="Support chat"
             error={form.changedFields.SupportChat && !form.errorObj.SupportChat.isValid}
@@ -121,9 +120,9 @@ const BaseInformationCard = () => {
           />
           <TextField
             fullWidth
-            margin="dense"
-            size="small"
+            customvariant="highLabel"
             name="SupportTelegram"
+            color="secondary"
             variant="outlined"
             label="Support telegram"
             error={form.changedFields.SupportTelegram && !form.errorObj.SupportTelegram.isValid}
@@ -136,16 +135,9 @@ const BaseInformationCard = () => {
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button
-            disabled={!form.isFormWasChanged || isLoading || !form.isFormValid}
-            type="button"
-            variant="contained"
-            onClick={onSaveClick}
-          >
-            Save
-          </Button>
-        </Box>
+        <Button disabled={!form.isFormWasChanged || isLoading || !form.isFormValid} type="button" variant="contained" onClick={onSaveClick}>
+          Save
+        </Button>
       </CardActions>
     </Card>
   );
@@ -192,18 +184,14 @@ const CRMNotificationsCard = () => {
         subheader="Set up email addresses for sending notifications. The message will be sent each time the event occurs."
       />
 
-      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box
-          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
-          component="form"
-          onChange={form.onChange}
-          onFocus={form.setTouched}
-        >
+      <CardContent>
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <TextField
+            sx={{ mb: 3 }}
             fullWidth
-            margin="dense"
+            customvariant="highLabel"
+            color="secondary"
             variant="outlined"
-            size="small"
             label="Email address on campaign created"
             name="CrmMailAddressOnCampaignCreated"
             error={form.changedFields.CrmMailAddressOnCampaignCreated && !form.errorObj.CrmMailAddressOnCampaignCreated.isValid}
@@ -212,10 +200,11 @@ const CRMNotificationsCard = () => {
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
+            sx={{ mb: 3 }}
             fullWidth
-            margin="dense"
+            customvariant="highLabel"
+            color="secondary"
             variant="outlined"
-            size="small"
             label="Email address on site added"
             name="CrmMailAddressOnSiteAdded"
             error={form.changedFields.CrmMailAddressOnSiteAdded && !form.errorObj.CrmMailAddressOnSiteAdded.isValid}
@@ -225,9 +214,9 @@ const CRMNotificationsCard = () => {
           />
           <TextField
             fullWidth
-            margin="dense"
+            customvariant="highLabel"
+            color="secondary"
             variant="outlined"
-            size="small"
             label="Email address on user registered"
             name="CrmMailAddressOnUserRegistered"
             error={form.changedFields.CrmMailAddressOnUserRegistered && !form.errorObj.CrmMailAddressOnUserRegistered.isValid}
@@ -239,16 +228,9 @@ const CRMNotificationsCard = () => {
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button
-            disabled={!form.isFormWasChanged || isLoading || !form.isFormValid}
-            type="button"
-            variant="contained"
-            onClick={onSaveClick}
-          >
-            Save
-          </Button>
-        </Box>
+        <Button disabled={!form.isFormWasChanged || isLoading || !form.isFormValid} type="button" variant="contained" onClick={onSaveClick}>
+          Save
+        </Button>
       </CardActions>
     </Card>
   );

@@ -560,7 +560,13 @@ const EnhancedTableHead = ({
                       : ''
                   }`}
                   sx={{
-                    ...(headCell.alignContent ? headCell.alignContent === 'right' && !headCell.sortable && { pl: 1, pr: 5 } : {}),
+                    ...(headCell.alignContent
+                      ? headCell.alignContent === 'right' &&
+                        !headCell.sortable && {
+                          pl: 1,
+                          pr: 5,
+                        }
+                      : {}),
                   }}
                 >
                   {!headCell.disableCellSubmenu && (

@@ -803,9 +803,9 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
         <DialogContent>
           <TextField
             fullWidth
-            margin="dense"
+            customvariant="highLabel"
+            color="secondary"
             label="Email"
-            size="small"
             name="email"
             value={form.fields.email}
             onFocus={form.setTouched}
@@ -819,7 +819,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
               control={<Checkbox checked={forcePasswordChange} onChange={() => setForcePasswordChange((prevState) => !prevState)} />}
             />
           </Collapse>
-          <FormControl fullWidth size="small" margin="dense">
+          <FormControl fullWidth customvariant="highLabel" color="secondary">
             <InputLabel id="rolesPickerLabel">Roles</InputLabel>
             <Select
               labelId="rolesPickerLabel"
@@ -838,12 +838,11 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size="small" margin="dense">
+          <FormControl fullWidth customvariant="highLabel" color="secondary">
             <InputLabel id="networkLabel">Network</InputLabel>
             <Select
               labelId="networkLabel"
               id="networkSelect"
-              label="Network"
               name="network"
               value={form.fields.network}
               onFocus={form.setTouched}
@@ -855,9 +854,9 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
           </FormControl>
           <TextField
             fullWidth
-            margin="dense"
+            customvariant="highLabel"
+            color="secondary"
             label="ADS | BSC wallet address"
-            size="small"
             name={'wallet'}
             value={form.fields.wallet}
             onChange={form.onChange}

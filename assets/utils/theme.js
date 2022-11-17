@@ -18,7 +18,6 @@ const freshGrass = '#19AD42';
 const successBg = '#8DEBC8';
 
 const theme = createTheme({
-  // spacing: 4,
   direction: 'ltr',
   palette: {
     mode: 'light',
@@ -26,13 +25,13 @@ const theme = createTheme({
       main: navy,
       dark: deep,
       light: '#336370FF',
-      contrastText: '#fff',
+      contrastText: white,
     },
     secondary: {
       main: blue,
       light: sky,
       dark: '#699CA7FF',
-      contrastText: black,
+      contrastText: white,
     },
     grayBg: {
       main: grayBg,
@@ -56,12 +55,15 @@ const theme = createTheme({
       main: white,
     },
     sunset: {
+      light: failBg,
       main: sunset,
     },
     sun: {
+      light: warningBg,
       main: sun,
     },
     freshGrass: {
+      light: successBg,
       main: freshGrass,
     },
     common: {
@@ -70,27 +72,15 @@ const theme = createTheme({
     },
     error: {
       main: sunset,
-      // light: failBg,
-      // dark: '#c62828',
-      // contrastText: '#fff',
     },
     warning: {
       main: sun,
-      // light: warningBg,
-      // dark: '#e65100',
-      // contrastText: '#fff',
     },
     info: {
-      main: '#0288d1',
-      light: '#03a9f4',
-      dark: '#01579b',
-      contrastText: '#fff',
+      main: blue,
     },
     success: {
       main: freshGrass,
-      // light: '#4caf50',
-      // dark: '#1b5e20',
-      // contrastText: '#fff',
     },
     text: {
       primary: black,
@@ -105,17 +95,8 @@ const theme = createTheme({
       disableBg,
     },
     action: {
-      active: 'rgba(0, 0, 0, 0.54)',
-      hover: 'rgba(0, 0, 0, 0.04)',
-      hoverOpacity: 0.04,
-      selected: 'rgba(0, 0, 0, 0.08)',
-      selectedOpacity: 0.08,
-      disabled: 'rgba(0, 0, 0, 0.26)',
-      disabledBackground: 'rgba(0, 0, 0, 0.12)',
-      disabledOpacity: 0.38,
-      focus: 'rgba(0, 0, 0, 0.12)',
-      focusOpacity: 0.12,
-      activatedOpacity: 0.12,
+      disabled: white,
+      disabledBackground: '#809EA6',
     },
   },
   components: {
@@ -138,11 +119,28 @@ const theme = createTheme({
         root: {
           minWidth: '150px',
           padding: '8px 20px',
-          textTransform: 'none',
-          fontVariationSettings: '"wght" 600',
-          fontSize: '20px',
-          letterSpacing: '0.055em',
-          lineHeight: '1.5',
+        },
+      },
+      variants: [
+        {
+          props: {
+            variant: 'text',
+          },
+          style: {
+            fontSize: '14px',
+            fontVariationSettings: '"wght" 400',
+            letterSpacing: '0.055em',
+            textDecoration: 'underline',
+          },
+        },
+      ],
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          '&.Mui-disabled': {
+            color: '#809EA6',
+          },
         },
       },
     },
@@ -150,6 +148,32 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           padding: '9px 22px 22px 22px',
+        },
+      },
+      variants: [
+        {
+          props: {
+            customvariant: 'outlined',
+          },
+          style: {
+            boxShadow: 'none',
+            border: `1px solid ${disableBg}`,
+          },
+        },
+      ],
+    },
+    MuiCardHeader: {
+      defaultProps: {
+        titleTypographyProps: {
+          component: 'h2',
+          variant: 'h2',
+        },
+      },
+      styleOverrides: {
+        root: {
+          '& .MuiCardHeader-subheader': {
+            marginTop: '8px',
+          },
         },
       },
     },
@@ -163,7 +187,15 @@ const theme = createTheme({
     MuiCardActions: {
       styleOverrides: {
         root: {
-          padding: '16px',
+          padding: '16px 16px',
+          justifyContent: 'flex-end',
+        },
+      },
+    },
+    MuiFormControlLabel: {
+      styleOverrides: {
+        root: {
+          marginRight: '38px',
         },
       },
     },
@@ -192,10 +224,10 @@ const theme = createTheme({
             '& .MuiInputLabel-root': {
               '&.Mui-focused': {
                 color: black,
-                transform: 'translate(14px, -27px) scale(0.75)',
+                transform: 'translate(14px, -20px) scale(0.75)',
               },
               '&.MuiInputLabel-shrink': {
-                transform: 'translate(14px, -27px) scale(0.75)',
+                transform: 'translate(14px, -20px) scale(0.75)',
               },
             },
 
@@ -210,6 +242,27 @@ const theme = createTheme({
         paper: {
           border: `1px solid ${blue}`,
           // boxShadow: 'none',
+        },
+      },
+    },
+    MuiSlider: {
+      styleOverrides: {
+        root: {
+          '& .MuiSlider-rail': {
+            color: disableBg,
+            height: '15px',
+            borderRadius: '5px',
+          },
+          '& .MuiSlider-track ': {
+            height: '15px',
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+          },
+          '& .MuiSlider-thumb': {
+            height: '25px',
+            width: '5px',
+            borderRadius: 0,
+          },
         },
       },
     },
@@ -242,6 +295,72 @@ const theme = createTheme({
         },
       },
     },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          alignItems: 'center',
+          '&.MuiAlert-standardWarning': {
+            backgroundColor: warningBg,
+            color: sun,
+          },
+          '&.MuiAlert-standardError': {
+            backgroundColor: failBg,
+            color: sunset,
+          },
+          '&.MuiAlert-standardSuccess': {
+            backgroundColor: successBg,
+            color: freshGrass,
+          },
+        },
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          overflow: 'initial',
+          '& .MuiTabs-scroller': {
+            overflow: 'initial !important',
+          },
+          '& .MuiTabs-indicator': {
+            backgroundColor: white,
+            transition: 'none',
+            height: '3px',
+            bottom: '-2px',
+          },
+          '& .MuiTab-root': {
+            padding: '7px 34px',
+            border: `1px solid ${disableBg}`,
+            borderBottom: 0,
+            borderTopRightRadius: '15px',
+            borderTopLeftRadius: '15px',
+            overflow: 'none',
+
+            '&.Mui-selected': {
+              color: blue,
+            },
+          },
+        },
+      },
+    },
+    MuiTabPanel: {
+      styleOverrides: {
+        root: {
+          border: `1px solid ${disableBg}`,
+          borderRadius: '15px',
+          borderTopLeftRadius: 0,
+          padding: '38px',
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        root: {
+          '& .MuiDialog-paper': {
+            padding: '9px 22px 30px 22px',
+          },
+        },
+      },
+    },
   },
   typography: {
     htmlFontSize: 16,
@@ -259,49 +378,42 @@ const theme = createTheme({
       lineHeight: 1.2,
       letterSpacing: 0,
     },
-    subtitle1: {
-      fontWeight: 400,
-      fontSize: '1rem',
-      lineHeight: 1.75,
-      letterSpacing: '0.00938em',
-    },
-    subtitle2: {
-      fontWeight: 500,
-      fontSize: '0.875rem',
-      lineHeight: 1.57,
-      letterSpacing: '0.00714em',
-    },
     body1: {
       fontWeight: 400,
-      fontSize: '1rem',
+      fontSize: '16px',
       lineHeight: 1.5,
       letterSpacing: '0.00938em',
     },
     body2: {
       fontWeight: 400,
-      fontSize: '0.875rem',
+      fontSize: '14px',
       lineHeight: 1.5,
       letterSpacing: '0.01071em',
     },
     button: {
-      fontWeight: 500,
-      fontSize: '0.875rem',
-      lineHeight: 1.75,
-      letterSpacing: '0.02857em',
-      textTransform: 'uppercase',
+      textTransform: 'none',
+      fontVariationSettings: '"wght" 600',
+      fontSize: '20px',
+      letterSpacing: '0.055em',
+      lineHeight: '1.5',
     },
-    caption: {
-      fontWeight: 400,
-      fontSize: '0.75rem',
-      lineHeight: 1.66,
-      letterSpacing: '0.03333em',
+    alert: {
+      fontVariationSettings: '"wght" 700',
+      fontSize: '16px',
+      letterSpacing: '0.055em',
+      lineHeight: '1.1',
     },
-    overline: {
-      fontWeight: 400,
-      fontSize: '0.75rem',
-      lineHeight: 2.66,
-      letterSpacing: '0.08333em',
-      textTransform: 'uppercase',
+    tableAssetsText: {
+      fontSize: '20px',
+      fontVariationSettings: '"wght" 500',
+      lineHeight: 1.5,
+    },
+
+    b600: {
+      fontVariationSettings: '"wght" 600',
+    },
+    b800: {
+      fontVariationSettings: '"wght" 800',
     },
   },
   breakpoints: {
