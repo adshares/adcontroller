@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import apiService from '../../../utils/apiService';
-import styles from './styles.scss';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
 import { useForm, useCreateNotification } from '../../../hooks';
+import commonStyles from '../../../styles/commonStyles.scss';
 
 const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -90,99 +90,101 @@ const SMTP = ({ handleNextStep, handlePrevStep, step }) => {
       {editMode && (
         <>
           {!isDataRequired && (
-            <Box className={styles.editButtonThumb}>
+            <Box className={`${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
               <Button onClick={() => setEditMode(false)} type="button">
                 Cancel
               </Button>
             </Box>
           )}
-          <Box className={styles.container}>
-            <Box
-              className={styles.formBlock}
-              component="form"
-              onChange={smtpForm.onChange}
-              onFocus={smtpForm.setTouched}
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <TextField
-                className={styles.textField}
-                error={smtpForm.touchedFields.SmtpHost && !smtpForm.errorObj.SmtpHost.isValid}
-                helperText={smtpForm.touchedFields.SmtpHost && smtpForm.errorObj.SmtpHost.helperText}
-                name="SmtpHost"
-                value={smtpForm.fields.SmtpHost}
-                label="SMTP host"
-                size="small"
-                type="text"
-                fullWidth
-                inputProps={{ autoComplete: 'off' }}
-              />
-              <TextField
-                className={styles.textField}
-                error={smtpForm.touchedFields.SmtpPort && !smtpForm.errorObj.SmtpPort.isValid}
-                helperText={smtpForm.touchedFields.SmtpPort && smtpForm.errorObj.SmtpPort.helperText}
-                name="SmtpPort"
-                value={smtpForm.fields.SmtpPort}
-                label="SMTP port"
-                size="small"
-                type="text"
-                fullWidth
-                inputProps={{ autoComplete: 'off' }}
-              />
-              <TextField
-                className={styles.textField}
-                error={smtpForm.touchedFields.SmtpSender && !smtpForm.errorObj.SmtpSender.isValid}
-                helperText={smtpForm.touchedFields.SmtpSender && smtpForm.errorObj.SmtpSender.helperText}
-                name="SmtpSender"
-                value={smtpForm.fields.SmtpSender}
-                label="SMTP sender"
-                size="small"
-                type="text"
-                fullWidth
-                inputProps={{ autoComplete: 'off' }}
-              />
-              <TextField
-                className={styles.textField}
-                error={smtpForm.touchedFields.SmtpUsername && !smtpForm.errorObj.SmtpUsername.isValid}
-                helperText={smtpForm.touchedFields.SmtpUsername && smtpForm.errorObj.SmtpUsername.helperText}
-                name="SmtpUsername"
-                value={smtpForm.fields.SmtpUsername}
-                label="SMTP username"
-                size="small"
-                type="text"
-                fullWidth
-                inputProps={{ autoComplete: 'off' }}
-              />
-            </Box>
-            <Box
-              className={styles.formBlock}
-              component="form"
-              onChange={(e) => {
-                passwordForm.onChange(e);
-                if (!e.target.value.includes('↹')) {
-                  setPasswordTouched(true);
-                }
-              }}
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <TextField
-                className={styles.textField}
-                value={editMode && isDataRequired ? passwordForm.fields.SmtpPassword : undefined}
-                defaultValue={editMode && !isDataRequired && !isEmptyPassword ? '↹↹↹↹↹↹↹↹' : undefined}
-                name="SmtpPassword"
-                size="small"
-                label="New password"
-                type="password"
-                fullWidth
-                inputProps={{ autoComplete: 'off' }}
-              />
-            </Box>
+          <Box
+            sx={{ width: '380px' }}
+            component="form"
+            onChange={smtpForm.onChange}
+            onFocus={smtpForm.setTouched}
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <TextField
+              customvariant="highLabel"
+              color="secondary"
+              sx={{ mb: 3 }}
+              error={smtpForm.touchedFields.SmtpHost && !smtpForm.errorObj.SmtpHost.isValid}
+              helperText={smtpForm.touchedFields.SmtpHost && smtpForm.errorObj.SmtpHost.helperText}
+              name="SmtpHost"
+              value={smtpForm.fields.SmtpHost}
+              label="SMTP host"
+              type="text"
+              fullWidth
+              inputProps={{ autoComplete: 'off' }}
+            />
+            <TextField
+              customvariant="highLabel"
+              color="secondary"
+              sx={{ mb: 3 }}
+              error={smtpForm.touchedFields.SmtpPort && !smtpForm.errorObj.SmtpPort.isValid}
+              helperText={smtpForm.touchedFields.SmtpPort && smtpForm.errorObj.SmtpPort.helperText}
+              name="SmtpPort"
+              value={smtpForm.fields.SmtpPort}
+              label="SMTP port"
+              type="text"
+              fullWidth
+              inputProps={{ autoComplete: 'off' }}
+            />
+            <TextField
+              customvariant="highLabel"
+              color="secondary"
+              sx={{ mb: 3 }}
+              error={smtpForm.touchedFields.SmtpSender && !smtpForm.errorObj.SmtpSender.isValid}
+              helperText={smtpForm.touchedFields.SmtpSender && smtpForm.errorObj.SmtpSender.helperText}
+              name="SmtpSender"
+              value={smtpForm.fields.SmtpSender}
+              label="SMTP sender"
+              type="text"
+              fullWidth
+              inputProps={{ autoComplete: 'off' }}
+            />
+            <TextField
+              customvariant="highLabel"
+              color="secondary"
+              sx={{ mb: 3 }}
+              error={smtpForm.touchedFields.SmtpUsername && !smtpForm.errorObj.SmtpUsername.isValid}
+              helperText={smtpForm.touchedFields.SmtpUsername && smtpForm.errorObj.SmtpUsername.helperText}
+              name="SmtpUsername"
+              value={smtpForm.fields.SmtpUsername}
+              label="SMTP username"
+              type="text"
+              fullWidth
+              inputProps={{ autoComplete: 'off' }}
+            />
+          </Box>
+          <Box
+            sx={{ width: '380px' }}
+            component="form"
+            onChange={(e) => {
+              passwordForm.onChange(e);
+              if (!e.target.value.includes('↹')) {
+                setPasswordTouched(true);
+              }
+            }}
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <TextField
+              customvariant="highLabel"
+              color="secondary"
+              value={editMode && isDataRequired ? passwordForm.fields.SmtpPassword : undefined}
+              defaultValue={editMode && !isDataRequired && !isEmptyPassword ? '↹↹↹↹↹↹↹↹' : undefined}
+              name="SmtpPassword"
+              label="New password"
+              type="password"
+              fullWidth
+              inputProps={{ autoComplete: 'off' }}
+            />
           </Box>
         </>
       )}
 
       {!editMode && (
         <>
-          <Box className={styles.editButtonThumb}>
+          <Box className={`${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
             <Button onClick={() => setEditMode(true)} type="button">
               Edit
             </Button>
@@ -200,20 +202,36 @@ const InfoTable = ({ stepData }) => (
   <Table>
     <TableBody>
       <TableRow>
-        <TableCell align="left">SMTP host</TableCell>
-        <TableCell align="left">{stepData.SmtpHost}</TableCell>
+        <TableCell align="left">
+          <Typography variant="tableAssetsText">SMTP host</Typography>
+        </TableCell>
+        <TableCell align="left">
+          <Typography variant="tableAssetsText">{stepData.SmtpHost}</Typography>
+        </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell align="left">SMTP port</TableCell>
-        <TableCell align="left">{stepData.SmtpPort}</TableCell>
+        <TableCell align="left">
+          <Typography variant="tableAssetsText">SMTP port</Typography>
+        </TableCell>
+        <TableCell align="left">
+          <Typography variant="tableAssetsText">{stepData.SmtpPort}</Typography>
+        </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell align="left">SMTP sender</TableCell>
-        <TableCell align="left">{stepData.SmtpSender}</TableCell>
+        <TableCell align="left">
+          <Typography variant="tableAssetsText">SMTP sender</Typography>
+        </TableCell>
+        <TableCell align="left">
+          <Typography variant="tableAssetsText">{stepData.SmtpSender}</Typography>
+        </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell align="left">SMTP username</TableCell>
-        <TableCell align="left">{stepData.SmtpUsername}</TableCell>
+        <TableCell align="left">
+          <Typography variant="tableAssetsText">SMTP username</Typography>
+        </TableCell>
+        <TableCell align="left">
+          <Typography variant="tableAssetsText">{stepData.SmtpUsername}</Typography>
+        </TableCell>
       </TableRow>
     </TableBody>
   </Table>

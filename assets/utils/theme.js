@@ -452,6 +452,9 @@ const theme = createTheme({
     b800: {
       fontVariationSettings: '"wght" 800',
     },
+    b900: {
+      fontVariationSettings: '"wght" 900',
+    },
   },
   breakpoints: {
     keys: ['xs', 'sm', 'md', 'lg', 'xl'],

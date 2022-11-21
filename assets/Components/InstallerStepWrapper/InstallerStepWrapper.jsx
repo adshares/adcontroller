@@ -30,10 +30,12 @@ const InstallerStepWrapper = ({
   }, [alert]);
 
   return (
-    <Card className={styles.container}>
+    <Card sx={{ pt: 1.75, pl: 8, pb: 8.5, pr: 11.75 }} className={styles.container}>
       <CardHeader title={title} />
 
-      <CardContent className={styles.content}>{dataLoading ? <Spinner /> : children}</CardContent>
+      <CardContent sx={{ pt: 4 }} className={styles.content}>
+        {dataLoading ? <Spinner /> : children}
+      </CardContent>
 
       <Box className={styles.cardFooter}>
         <Collapse in={openAlert} className={styles.alert}>
