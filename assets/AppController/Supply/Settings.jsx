@@ -16,7 +16,6 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Grid,
   Radio,
   RadioGroup,
   TextField,
@@ -24,18 +23,14 @@ import {
 
 export default function Settings() {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <SiteOptions />
-      </Grid>
-      <Grid item xs={6}>
-        <ZoneOptions />
-      </Grid>
-    </Grid>
+    <>
+      <SiteOptions />
+      <ZoneOptions sx={{ mt: 3 }} />
+    </>
   );
 }
 
-const SiteOptions = () => {
+const SiteOptions = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const [setSiteOptionsConfig, { isLoading }] = useSetSiteOptionsConfigMutation();
   const dispatch = useDispatch();
@@ -56,17 +51,18 @@ const SiteOptions = () => {
     }
   };
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader title="Site options" subheader="Set banner availability and classification." />
       <CardContent>
         <FormControlLabel
+          sx={{ display: 'block', mb: 3, ml: -1.5 }}
           label="Require banner acceptance by default"
           control={
             <Checkbox checked={SiteAcceptBannersManually} onChange={() => setSiteAcceptBannersManually((prevState) => !prevState)} />
           }
         />
 
-        <FormControl sx={{ mt: 2 }}>
+        <FormControl>
           <FormLabel focused={false}>Visibility of banners for classification</FormLabel>
           <RadioGroup value={SiteClassifierLocalBanners} onChange={(e) => setSiteClassifierLocalBanners(e.target.value)}>
             <FormControlLabel value="all-by-default" control={<Radio />} label="Default from all servers" />
@@ -94,7 +90,7 @@ const SiteOptions = () => {
   );
 };
 
-const ZoneOptions = () => {
+const ZoneOptions = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const [setZoneOptionsConfig, { isLoading }] = useSetZoneOptionsConfigMutation();
   const dispatch = useDispatch();
@@ -121,7 +117,7 @@ const ZoneOptions = () => {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader title="Banner options" subheader="Set banner limitations" />
 
       <CardContent>

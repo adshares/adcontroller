@@ -49,12 +49,12 @@ export default function Panel() {
   return (
     <>
       <PlaceholdersCard />
-      <RebrandingCard />
+      <RebrandingCard sx={{ mt: 3 }} />
     </>
   );
 }
 
-const PlaceholdersCard = () => {
+const PlaceholdersCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setPlaceholdersConfig, { isLoading }] = useSetPlaceholdersConfigMutation();
@@ -91,7 +91,7 @@ const PlaceholdersCard = () => {
   };
 
   return (
-    <Card width="mainContainer">
+    <Card {...props}>
       <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
       <CardContent>
         <Box component="form" onChange={(e) => form.onChange(e)} onFocus={(e) => form.setTouched(e)}>
@@ -184,7 +184,7 @@ const PlaceholdersCard = () => {
   );
 };
 
-const RebrandingCard = () => {
+const RebrandingCard = (props) => {
   const [activeTab, setActiveTab] = React.useState('requiredAssets');
   const [saveButton, setSaveButton] = React.useState({});
   const requiredFavicons = ['Favicon16x16', 'Favicon32x32', 'Favicon48x48', 'Favicon96x96'];
@@ -201,7 +201,7 @@ const RebrandingCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card {...props}>
       <CardHeader title="Rebranding" subheader="Customize the ad server panel." />
       <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
         <TabContext value={activeTab}>
@@ -406,15 +406,11 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
                       />
                     )}
                   </TableCell>
-                  <TableCell width="35%" align="left">
+                  <TableCell width="27%" align="left">
                     <Box>
-                      <Typography variant="body2" noWrap>
-                        Name: {img.fileName}
-                      </Typography>
-                      <Typography variant="body2" noWrap>
-                        Added: {new Date(img.createdAt).toLocaleDateString()}
-                      </Typography>
-                      <Typography variant="body2" noWrap>
+                      <Typography variant="body2">Name: {img.fileName}</Typography>
+                      <Typography variant="body2">Added: {new Date(img.createdAt).toLocaleDateString()}</Typography>
+                      <Typography variant="body2">
                         Changed:{' '}
                         {isImgWasEdited ? (
                           <Typography component="span" variant="body2" color="error">
@@ -426,7 +422,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell width="50%" align="left">
+                  <TableCell width="58%" align="left">
                     <Typography variant="tableAssetsText" sx={{ overflowWrap: 'anywhere' }}>
                       {img.url}
                     </Typography>
@@ -710,7 +706,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                       />
                     )}
                   </TableCell>
-                  <TableCell align="left" width="40%">
+                  <TableCell align="left" width="35%">
                     <Typography variant="tableAssetsText">
                       {width}x{height}{' '}
                       {changedFiles.hasOwnProperty(id) && (
@@ -720,7 +716,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                       )}
                     </Typography>
                   </TableCell>
-                  <TableCell align="left" width="15%">
+                  <TableCell align="left" width="20%">
                     <Tooltip title="Change image">
                       <IconButton component="label" color="secondary">
                         <CreateOutlinedIcon />
@@ -774,7 +770,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                       />
                     )}
                   </TableCell>
-                  <TableCell align="left" width="40%">
+                  <TableCell align="left" width="35%">
                     <Typography variant="tableAssetsText" color="white.main">
                       Min height {height}{' '}
                       {changedFiles.hasOwnProperty(id) && (
@@ -784,7 +780,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                       )}
                     </Typography>
                   </TableCell>
-                  <TableCell align="left" width="15%">
+                  <TableCell align="left" width="20%">
                     <Tooltip title="Change image">
                       <IconButton component="label" color="secondary">
                         <CreateOutlinedIcon />

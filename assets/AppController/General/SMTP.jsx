@@ -50,7 +50,7 @@ export default function SMTP() {
   };
 
   return (
-    <Card>
+    <Card sx={{ justifySelf: 'center' }}>
       <CardHeader title="SMTP configuration" />
 
       <CardContent>

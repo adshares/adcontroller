@@ -23,7 +23,6 @@ import {
   CardHeader,
   FormControl,
   FormHelperText,
-  Grid,
   InputAdornment,
   InputLabel,
   OutlinedInput,
@@ -31,30 +30,15 @@ import {
 
 export default function Settings() {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <CampaignSettingsCard />
-          </Grid>
-          <Grid item xs={12}>
-            <BannerSettingsCard />
-          </Grid>
-        </Grid>
-      </Grid>
-
-      <Grid item xs={6}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <RejectedDomainsCard />
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
+    <>
+      <CampaignSettingsCard />
+      <BannerSettingsCard sx={{ mt: 3 }} />
+      <RejectedDomainsCard sx={{ mt: 3 }} />
+    </>
   );
 }
 
-const CampaignSettingsCard = () => {
+const CampaignSettingsCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setCampaignSettingsConfig, { isLoading }] = useSetCampaignSettingsConfigMutation();
@@ -89,7 +73,7 @@ const CampaignSettingsCard = () => {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader title="Campaign options" subheader="Set minimum campaign spend." />
 
       <CardContent>
@@ -167,7 +151,7 @@ const CampaignSettingsCard = () => {
   );
 };
 
-const BannerSettingsCard = () => {
+const BannerSettingsCard = (props) => {
   const megabyteInBytes = 1024 * 1024;
   const appData = useSelector(configSelectors.getAppData);
   const [setBannerSettingsConfig, { isLoading }] = useSetBannerSettingsConfigMutation();
@@ -205,7 +189,7 @@ const BannerSettingsCard = () => {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader title="Ad options" subheader="Set an ad file size limit." />
 
       <CardContent>
@@ -300,7 +284,7 @@ const BannerSettingsCard = () => {
   );
 };
 
-const RejectedDomainsCard = () => {
+const RejectedDomainsCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setRejectedDomainsSettings, { isLoading }] = useSetRejectedDomainsSettingsConfigMutation();
@@ -331,7 +315,7 @@ const RejectedDomainsCard = () => {
   };
 
   return (
-    <Card sx={{ maxHeight: '100%' }}>
+    <Card {...props}>
       <CardHeader
         title="Rejected domains"
         subheader="Set domains on which campaigns will not be displayed. All subdomains will be rejected."

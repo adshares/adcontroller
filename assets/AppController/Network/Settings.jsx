@@ -23,6 +23,10 @@ import {
 import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTooltip/FormControlLabelWithTooltip';
 
 export default function Settings() {
+  return <NetworkSettingsCard />;
+}
+
+function NetworkSettingsCard(props) {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setInventoryWhitelistConfig, { isLoading }] = useSetInventoryWhitelistConfigMutation();
@@ -167,7 +171,7 @@ export default function Settings() {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader
         title="AdServer's inventory"
         subheader="Set which ad servers your ad server can sync with. By default, it syncs with all available ad servers."
@@ -221,7 +225,7 @@ export default function Settings() {
                   fieldsHandler={fieldsHandler}
                   listName="InventoryWhitelist"
                   type="wallet"
-                  maxHeight="calc(100vh - 45rem)"
+                  maxHeight="calc(100vh - 46rem)"
                 />
               </CardContent>
             </Card>
@@ -243,7 +247,7 @@ export default function Settings() {
                       fieldsHandler={fieldsHandler}
                       listName="InventoryImportWhitelist"
                       type="wallet"
-                      maxHeight="calc(100vh - 45rem)"
+                      maxHeight="calc(100vh - 47rem)"
                     />
                   </CardContent>
                 </Card>
@@ -263,7 +267,7 @@ export default function Settings() {
                       fieldsHandler={fieldsHandler}
                       listName="InventoryExportWhitelist"
                       type="wallet"
-                      maxHeight="calc(100vh - 45rem)"
+                      maxHeight="calc(100vh - 47rem)"
                     />
                   </CardContent>
                 </Card>

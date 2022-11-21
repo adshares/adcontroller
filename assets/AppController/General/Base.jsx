@@ -4,23 +4,18 @@ import configSelectors from '../../redux/config/configSelectors';
 import { useSetBaseInformationMutation, useSetCrmNotificationsConfigMutation } from '../../redux/config/configApi';
 import { changeBaseInformation, changeCrmNotificationsInformation } from '../../redux/config/configSlice';
 import { useCreateNotification, useForm } from '../../hooks';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, TextField } from '@mui/material';
-import commonStyles from '../../styles/commonStyles.scss';
+import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
 
 export default function Base() {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <BaseInformationCard />
-      </Grid>
-      <Grid item xs={6}>
-        <CRMNotificationsCard />
-      </Grid>
-    </Grid>
+    <>
+      <BaseInformationCard />
+      <CRMNotificationsCard sx={{ mt: 3 }} />
+    </>
   );
 }
 
-const BaseInformationCard = () => {
+const BaseInformationCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setBaseInformation, { isLoading }] = useSetBaseInformationMutation();
@@ -57,7 +52,7 @@ const BaseInformationCard = () => {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader title="Base information" />
 
       <CardContent>
@@ -143,7 +138,7 @@ const BaseInformationCard = () => {
   );
 };
 
-const CRMNotificationsCard = () => {
+const CRMNotificationsCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const form = useForm({
@@ -178,7 +173,7 @@ const CRMNotificationsCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card {...props}>
       <CardHeader
         title="CRM notifications"
         subheader="Set up email addresses for sending notifications. The message will be sent each time the event occurs."

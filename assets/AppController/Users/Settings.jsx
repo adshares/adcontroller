@@ -17,9 +17,9 @@ import {
   Collapse,
   FormControl,
   FormControlLabel,
+  FormGroup,
   FormHelperText,
   FormLabel,
-  Grid,
   InputAdornment,
   InputLabel,
   OutlinedInput,
@@ -31,18 +31,14 @@ import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTo
 
 export default function Settings() {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <RegistrationModeCard />
-      </Grid>
-      <Grid item xs={6}>
-        <AutoWithdrawalCard />
-      </Grid>
-    </Grid>
+    <>
+      <RegistrationModeCard />
+      <AutoWithdrawalCard sx={{ mt: 3 }} />
+    </>
   );
 }
 
-const RegistrationModeCard = () => {
+const RegistrationModeCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setRegistrationModeConfig, { isLoading }] = useSetRegistrationModeConfigMutation();
@@ -126,7 +122,7 @@ const RegistrationModeCard = () => {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader
         title="Registration mode"
         subheader="Set whether registration is to be available to the public, by invitation or only by a moderator."
@@ -186,15 +182,13 @@ const RegistrationModeCard = () => {
         </Collapse>
 
         <Collapse in={RegistrationMode !== 'private'} timeout="auto" sx={{ mt: 2 }}>
-          <FormControl>
+          <FormGroup>
             <FormControlLabel
               label="E-mail verification required"
               control={
                 <Checkbox checked={EmailVerificationRequired} onChange={() => setEmailVerificationRequired((prevState) => !prevState)} />
               }
             />
-          </FormControl>
-          <FormControl margin="none">
             <FormControlLabelWithTooltip
               control={
                 <Checkbox checked={AutoConfirmationEnabled} onChange={() => setAutoConfirmationEnabled((prevState) => !prevState)} />
@@ -202,8 +196,6 @@ const RegistrationModeCard = () => {
               label="Auto account confirmation"
               tooltip="Accounts will not require confirmation by a moderator."
             />
-          </FormControl>
-          <FormControl margin="none">
             <FormControlLabelWithTooltip
               control={
                 <Checkbox checked={AutoRegistrationEnabled} onChange={() => setAutoRegistrationEnabled((prevState) => !prevState)} />
@@ -211,7 +203,7 @@ const RegistrationModeCard = () => {
               label="Auto registration allowed"
               tooltip="Accounts will be set up the first time the banner is displayed, without prior registration."
             />
-          </FormControl>
+          </FormGroup>
         </Collapse>
 
         <Collapse in={RegistrationMode !== 'private'} timeout="auto" sx={{ mt: 2 }}>
@@ -263,7 +255,7 @@ const RegistrationModeCard = () => {
   );
 };
 
-const AutoWithdrawalCard = () => {
+const AutoWithdrawalCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setAutoWithdrawalConfig, { isLoading }] = useSetAutoWithdrawalConfigMutation();
@@ -295,7 +287,7 @@ const AutoWithdrawalCard = () => {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader title="Auto withdrawal" subheader="Set minimum thresholds for automatic withdrawals." />
 
       <CardContent>

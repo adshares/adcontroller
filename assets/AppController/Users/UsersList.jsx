@@ -52,7 +52,7 @@ import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurned
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import HelpIcon from '@mui/icons-material/Help';
+import InfoIcon from '@mui/icons-material/Info';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import ListItemText from '@mui/material/ListItemText';
@@ -617,13 +617,14 @@ const UserActionsMenu = ({ user, actions }) => {
                 Reason of ban
               </Typography>
               <Tooltip title="Reason will be displayed to the banned user">
-                <HelpIcon color="primary" sx={{ fontSize: 20 }} />
+                <InfoIcon color="secondary" sx={{ fontSize: 20 }} />
               </Tooltip>
             </Box>
             <TextField
+              customvariant="highLabel"
+              color="secondary"
               multiline
               fullWidth
-              margin="dense"
               label="Reason"
               rows={4}
               value={banReason}
@@ -651,19 +652,19 @@ const UserActionsMenu = ({ user, actions }) => {
 
       {unbanUserDialog && (
         <Dialog fullWidth maxWidth="xs" open={unbanUserDialog} onClose={() => setUnbanUserDialog((prevState) => !prevState)}>
-          <DialogTitle align="center">Confirm</DialogTitle>
+          <DialogTitle>Confirm</DialogTitle>
           <DialogContent>
-            <Typography align="center" variant="body1" sx={{ color: 'success.main' }}>
+            <Typography variant="body1" sx={{ color: 'success.main' }}>
               Do you want unban user {user.email}?
             </Typography>
-            <Typography align="center" variant="body1" sx={{ color: 'error.main' }}>
+            <Typography variant="body1" sx={{ color: 'error.main' }}>
               <Typography component="span" variant="body1" sx={{ fontWeight: 700, mr: 1 }}>
                 Reason of ban:
               </Typography>
               {user.banReason}
             </Typography>
           </DialogContent>
-          <DialogActions className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+          <DialogActions>
             <Button variant="outlined" onClick={() => setUnbanUserDialog((prevState) => !prevState)}>
               No
             </Button>
@@ -684,10 +685,8 @@ const UserActionsMenu = ({ user, actions }) => {
       {deleteUserDialog && (
         <Dialog open={deleteUserDialog} onClose={() => setDeleteUserDialog((prevState) => !prevState)}>
           <DialogTitle component="div">
-            <Typography align="center" variant="h6">
-              Do you want delete this user?
-            </Typography>
-            <Typography align="center" variant="body1" sx={{ color: 'grey.600' }}>
+            <Typography variant="h6">Do you want delete this user?</Typography>
+            <Typography variant="body1" sx={{ color: 'grey.600' }}>
               {user.email}
             </Typography>
           </DialogTitle>
@@ -698,7 +697,7 @@ const UserActionsMenu = ({ user, actions }) => {
             />
           </DialogContent>
           <DialogActions>
-            <Button variant="outlined" onClick={() => setBanUserDialog((prevState) => !prevState)}>
+            <Button variant="outlined" onClick={() => setDeleteUserDialog((prevState) => !prevState)}>
               Close
             </Button>
             <Button

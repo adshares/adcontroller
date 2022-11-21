@@ -4,24 +4,20 @@ import configSelectors from '../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../hooks';
 import { useSetRegulationsConfigMutation } from '../../redux/config/configApi';
 import { changeRegulationsInformation } from '../../redux/config/configSlice';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, CardHeader } from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
 import CollapsibleTextarea from '../../Components/CollapsibleTextarea/CollapsibleTextarea';
 
 export default function Terms() {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <PrivacyCard />
-      </Grid>
-      <Grid item xs={6}>
-        <TermAndConditionCard />
-      </Grid>
-    </Grid>
+    <>
+      <PrivacyCard />
+      <TermAndConditionCard sx={{ mt: 3 }} />
+    </>
   );
 }
 
-const PrivacyCard = () => {
+const PrivacyCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setRegulationsConfig, { isLoading }] = useSetRegulationsConfigMutation();
@@ -46,7 +42,7 @@ const PrivacyCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card {...props}>
       <CardHeader title="Privacy policy" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
@@ -74,7 +70,7 @@ const PrivacyCard = () => {
   );
 };
 
-const TermAndConditionCard = () => {
+const TermAndConditionCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setRegulationsConfig, { isLoading }] = useSetRegulationsConfigMutation();
@@ -99,7 +95,7 @@ const TermAndConditionCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card {...props}>
       <CardHeader title="Terms and conditions" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>

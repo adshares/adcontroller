@@ -100,9 +100,9 @@ export default function Events() {
     <Card
       className={`${commonStyles.card}`}
       sx={{
+        justifySelf: 'center',
         height: 'calc(100vh - 9rem)',
       }}
-      width="full"
     >
       <CardHeader title="Events" />
       <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
@@ -128,7 +128,11 @@ const PropertiesDialog = ({ data }) => {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button sx={{ padding: 0, minWidth: 'auto', '&:hover': { backgroundColor: 'inherit' } }} variant="text" onClick={() => setOpen(true)}>
+      <Button
+        sx={{ padding: 0, minWidth: 'auto', boxShadow: 'none', '&:hover': { backgroundColor: 'inherit' } }}
+        variant="text"
+        onClick={() => setOpen(true)}
+      >
         Details
       </Button>
       <Dialog fullWidth maxWidth="sm" open={open} onClose={() => setOpen(false)}>

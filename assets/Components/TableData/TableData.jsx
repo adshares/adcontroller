@@ -41,7 +41,6 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
-import { left } from 'core-js/internals/array-reduce';
 
 const sortByModel = (model, property) => (a, b) => {
   let ai = model.indexOf(a[property]);
@@ -927,7 +926,7 @@ export default function TableData({
         ...entries,
       };
       Object.entries(entries).forEach((entry) => {
-        if (entry[1] === null) {
+        if (entry[1] === null || entry[1] === '') {
           delete filterQueries[entry[0]];
         }
       });

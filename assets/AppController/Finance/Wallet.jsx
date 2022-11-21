@@ -19,7 +19,6 @@ import {
   Checkbox,
   Collapse,
   FormControlLabel,
-  Grid,
   IconButton,
   TextField,
   Tooltip,
@@ -32,30 +31,15 @@ import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Wallet() {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <WalletStatusCard />
-          </Grid>
-        </Grid>
-      </Grid>
-
-      <Grid item xs={6}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <WalletSettingsCard />
-          </Grid>
-          <Grid item xs={12}>
-            <ColdWalletSettingsCard />
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
+    <>
+      <WalletStatusCard />
+      <WalletSettingsCard sx={{ mt: 3 }} />
+      <ColdWalletSettingsCard sx={{ mt: 3 }} />
+    </>
   );
 }
 
-const WalletSettingsCard = () => {
+const WalletSettingsCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [getWalletNode, { isFetching: isNodeVerification }] = useGetWalletNodeMutation();
@@ -135,7 +119,7 @@ const WalletSettingsCard = () => {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="Hot wallet" />
         <IconButton type="button" onClick={toggleEditMode}>
@@ -227,14 +211,14 @@ const WalletSettingsCard = () => {
   );
 };
 
-const WalletStatusCard = () => {
+const WalletStatusCard = (props) => {
   const monitoringWalletInfo = useSelector(monitoringSelectors.getMonitoringWalletInfo);
   useGetWalletMonitoringQuery([], {
     pollingInterval: 3000,
   });
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card {...props}>
       <CardHeader title="Ad server balance" />
       <CardContent>
         <Typography variant="h3">
@@ -257,7 +241,7 @@ const WalletStatusCard = () => {
   );
 };
 
-const ColdWalletSettingsCard = () => {
+const ColdWalletSettingsCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setColdWalletConfig, { isLoading }] = useSetColdWalletConfigMutation();
@@ -295,7 +279,7 @@ const ColdWalletSettingsCard = () => {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader title="Cold wallet" />
 
       <CardContent>
