@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export default function NotFoundView() {
   const navigate = useNavigate();
   const onButtonClick = () => {
-    navigate('/login');
+    navigate('/');
   };
   return (
     <>
