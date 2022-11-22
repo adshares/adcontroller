@@ -16,6 +16,9 @@ security:
         info:
             pattern: ^/info
             security: false
+        create_account:
+            pattern: ^/api/accounts$
+            security: false
         api:
             pattern: ^/api
             stateless: true
