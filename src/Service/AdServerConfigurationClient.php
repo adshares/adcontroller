@@ -194,7 +194,10 @@ class AdServerConfigurationClient
 
     public function storePlaceholders(array $data): array
     {
-        return $this->patchData($this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS), self::mapPlaceholderDataToAdServerFormat($data));
+        return $this->patchData(
+            $this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS),
+            self::mapPlaceholderDataToAdServerFormat($data),
+        );
     }
 
     public function resetHostConnectionError(int $hostId): array
