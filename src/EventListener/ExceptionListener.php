@@ -2,6 +2,8 @@
 
 namespace App\EventListener;
 
+use App\Entity\Enum\AdPanelConfig;
+use App\Repository\ConfigurationRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,8 +16,10 @@ class ExceptionListener implements EventSubscriberInterface
 {
     private const HEADER_JSON_CONTENT = 'application/json';
 
-    public function __construct(private readonly LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly ConfigurationRepository $configurationRepository,
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
     public function onKernelException(ExceptionEvent $event)
@@ -28,13 +32,17 @@ class ExceptionListener implements EventSubscriberInterface
             self::HEADER_JSON_CONTENT === $request->headers->get('Content-Type')
         ) {
             if ($exception instanceof HttpExceptionInterface) {
+                $statusCode = $exception->getStatusCode();
+                $headers = $exception->getHeaders();
+                if (Response::HTTP_FORBIDDEN === $statusCode) {
+                    $headers['Location'] = $this->configurationRepository->fetchValueByEnum(AdPanelConfig::Url)
+                        ?? $request->getSchemeAndHttpHost();
+                }
                 $response = new JsonResponse([
                     'message' => $exception->getMessage(),
-                    'code' => $exception->getStatusCode(),
+                    'code' => $statusCode,
                     'data' => [],
-                ]);
-                $response->setStatusCode($exception->getStatusCode());
-                $response->headers->replace($exception->getHeaders());
+                ], $statusCode, $headers);
             } else {
                 $this->logger->error(
                     sprintf('Kernel exception %d (%s)', $exception->getCode(), $exception->getMessage())
@@ -43,8 +51,7 @@ class ExceptionListener implements EventSubscriberInterface
                     'message' => 'Internal Server Error',
                     'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
                     'data' => [],
-                ]);
-                $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $response->headers->set('Content-Type', self::HEADER_JSON_CONTENT);
