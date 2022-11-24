@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import globalNotificationsSlice from './globalNotifications/globalNotificationsSlice';
+import { authApi } from './auth/authApi';
 import authSlice from './auth/authSlice';
 import { configApi } from './config/configApi';
 import configSlice from './config/configSlice';
@@ -12,6 +13,7 @@ export const store = configureStore({
   reducer: {
     globalNotificationsSlice: globalNotificationsSlice,
 
+    [authApi.reducerPath]: authApi.reducer,
     authSlice: authSlice,
 
     [synchronizationApi.reducerPath]: synchronizationApi.reducer,
@@ -25,6 +27,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
+      authApi.middleware,
       configApi.middleware,
       monitoringApi.middleware,
       synchronizationApi.middleware,

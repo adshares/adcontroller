@@ -1,13 +1,7 @@
-import React, { useEffect } from 'react';
-import Spinner from '../Spinner/Spinner';
+import React from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
 
-const PrivateRoute = ({ children, isLoggedIn }) => {
-  useEffect(() => {
-    if (!isLoggedIn) {
-      window.open('/oauth/redirect', '_self');
-      localStorage.removeItem('lastSync');
-    }
-  }, [isLoggedIn]);
-  return isLoggedIn ? children : <Spinner />;
+const PrivateRoute = ({ isLoggedIn, available }) => {
+  return isLoggedIn && available ? <Outlet /> : <Navigate to="/" />;
 };
 export default PrivateRoute;
