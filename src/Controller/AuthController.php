@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\AppConfig;
 use App\Repository\ConfigurationRepository;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -76,6 +78,20 @@ class AuthController extends AbstractController
 
         $referer = $this->requestStack->getSession()->get('referer') ?? self::DEFAULT_REDIRECT;
         return new RedirectResponse($referer);
+    }
+
+    #[Route('/oauth/logout', name: 'oauth_logout', methods: ['GET'])]
+    public function oauthLogout(
+        ConfigurationRepository $configurationRepository,
+        JWTTokenManagerInterface $jwtManager,
+        Request $request,
+    ): Response {
+//        $accessToken = $this->requestStack->getSession()->get('accessToken');
+//        $payload = $jwtManager->parse($accessToken);
+
+        $this->requestStack->getSession()->invalidate();
+        $url = $configurationRepository->fetchValueByEnum(AdPanelConfig::Url) ?? $request->getSchemeAndHttpHost();
+        return new RedirectResponse($url);
     }
 
     private function getRedirectUri(): string
