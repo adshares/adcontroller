@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setAppLogout } from '../../redux/auth/authSlice';
+import { useSelector } from 'react-redux';
+import { logoutRedirect } from '../../utils/helpers';
+import configSelectors from '../../redux/config/configSelectors';
 import { AppBar, IconButton, Link, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
-import configSelectors from '../../redux/config/configSelectors';
 
-export default function MenuAppBar({ showProtectedOptions, showSideMenu, toggleSideMenu, showSideMenuIcon = false }) {
+export default function MenuAppBar({ showProtectedOptions = false, showSideMenu, toggleSideMenu, showSideMenuIcon = false }) {
   const appData = useSelector(configSelectors.getAppData);
-  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleMenu = (event) => {
@@ -20,8 +19,7 @@ export default function MenuAppBar({ showProtectedOptions, showSideMenu, toggleS
   };
 
   const handleLogout = () => {
-    dispatch(setAppLogout());
-    handleMenuClose();
+    logoutRedirect();
   };
 
   return (
@@ -37,9 +35,11 @@ export default function MenuAppBar({ showProtectedOptions, showSideMenu, toggleS
         </Typography>
         {showProtectedOptions && (
           <>
-            <Link href={appData.AdPanel.Url} color="inherit" underline="hover" variant="button">
-              Back to AdPanel
-            </Link>
+            {appData.AdPanel.Url && (
+              <Link href={appData.AdPanel.Url} color="inherit" underline="hover" variant="button">
+                Back to AdPanel
+              </Link>
+            )}
             <IconButton size="large" onClick={handleMenu} color="inherit">
               <AccountCircle />
             </IconButton>

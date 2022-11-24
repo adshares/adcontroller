@@ -1,3 +1,12 @@
+import configuration from '../controllerConfig/configuration';
+
+function loginRedirect() {
+  window.open(configuration.loginRedirectUrl, '_self');
+}
+function logoutRedirect() {
+  window.open(configuration.logoutRedirectUrl, '_self');
+}
+
 function adsToClicks(amount) {
   if (typeof amount === 'number') {
     amount = amount.toFixed(12);
@@ -68,4 +77,4 @@ function compareArrays(array1, array2) {
   return true;
 }
 
-export { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces, formatMoney, compareArrays };
+export { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces, formatMoney, compareArrays, loginRedirect, logoutRedirect };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Alert, Box } from '@mui/material';
+import { Alert } from '@mui/material';
 import apiService from '../utils/apiService';
 import Base from './InstallerSteps/Base/Base';
 import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
@@ -15,9 +15,11 @@ import SMTP from './InstallerSteps/SMTP/SMTP';
 import Status from './InstallerSteps/Status/Status';
 import InstallerStepWrapper from '../Components/InstallerStepWrapper/InstallerStepWrapper';
 import Spinner from '../Components/Spinner/Spinner';
-import commonStyles from '../styles/commonStyles.scss';
 import { useSelector } from 'react-redux';
 import authSelectors from '../redux/auth/authSelectors';
+import { useGetCurrentUserQuery } from '../redux/auth/authApi';
+import ForbiddenView from '../Components/NotFound/ForbiddenView';
+import { loginRedirect } from '../utils/helpers';
 
 const installerSteps = [
   {
@@ -53,15 +55,25 @@ const installerSteps = [
 ];
 
 export default function AppInstaller() {
+  const { isLoading: isUserChecking } = useGetCurrentUserQuery();
   const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
+  const currentUser = useSelector(authSelectors.getUser);
   const [isLoading, setIsLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(null);
   const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
 
   useEffect(() => {
-    getCurrentStep();
+    if (!isLoggedIn) {
+      loginRedirect();
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (currentUser.name) {
+      getCurrentStep();
+    }
     setIsLoading(false);
-  }, []);
+  }, [currentUser]);
 
   const getCurrentStep = async () => {
     try {
@@ -86,31 +98,37 @@ export default function AppInstaller() {
   return (
     !isLoading && (
       <>
-        <MenuAppBar showProtectedOptions={isLoggedIn} showIcon={isLoggedIn} />
-        <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <MenuAppBar />
+        {isUserChecking && <Spinner />}
+
+        {!isUserChecking && (
           <AppWindow>
-            <PrivateRoute isLoggedIn={isLoggedIn}>
+            {!isUserChecking && !currentUser.name && isLoggedIn && <ForbiddenView />}
+
+            {currentUser.name && (
               <Routes>
-                <Route
-                  path="steps/*"
-                  element={
-                    currentStep ? (
-                      <MultiStep currentStep={currentStep} steps={installerSteps} />
-                    ) : alert.message ? (
-                      <InstallerStepWrapper disabledNext hideBackButton hideNextButton>
-                        <Alert severity={alert.type}>{`${alert.title}: ${alert.message}`}</Alert>
-                      </InstallerStepWrapper>
-                    ) : (
-                      <Spinner />
-                    )
-                  }
-                />
-                <Route path="*" element={<NotFoundView />} />
-                <Route path="/" element={<Navigate to="steps" />} />
+                <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name} />}>
+                  <Route
+                    path="steps/*"
+                    element={
+                      currentStep ? (
+                        <MultiStep currentStep={currentStep} steps={installerSteps} />
+                      ) : alert.message ? (
+                        <InstallerStepWrapper disabledNext hideBackButton hideNextButton>
+                          <Alert severity={alert.type}>{`${alert.title}: ${alert.message}`}</Alert>
+                        </InstallerStepWrapper>
+                      ) : (
+                        <Spinner />
+                      )
+                    }
+                  />
+                  <Route path="*" element={<NotFoundView />} />
+                  <Route path="/" element={<Navigate to="steps" />} />
+                </Route>
               </Routes>
-            </PrivateRoute>
+            )}
           </AppWindow>
-        </Box>
+        )}
       </>
     )
   );

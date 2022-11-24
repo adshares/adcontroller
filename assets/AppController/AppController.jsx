@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { loginRedirect } from '../utils/helpers';
 import authSelectors from '../redux/auth/authSelectors';
 import synchronizationSelectors from '../redux/synchronization/synchronizationSelectors';
+import { useGetCurrentUserQuery } from '../redux/auth/authApi';
 import { useLazySynchronizeConfigQuery } from '../redux/synchronization/synchronizationApi';
 import { useLazyGetAppConfigQuery } from '../redux/config/configApi';
 import Spinner from '../Components/Spinner/Spinner';
@@ -11,6 +13,7 @@ import PrivateRoute from '../Components/Routes/PrivateRoute';
 import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
 import AppWindow from '../Components/AppWindow/AppWindow';
 import NotFoundView from '../Components/NotFound/NotFoundView';
+import ForbiddenView from '../Components/NotFound/ForbiddenView';
 import SideMenu from '../Components/SideMenu/SideMenu';
 import Wallet from './Finance/Wallet';
 import Commissions from './Finance/Commissions';
@@ -191,61 +194,82 @@ const getAppPages = (appModules) => {
 };
 
 function AppController() {
+  const { isLoading: isUserChecking } = useGetCurrentUserQuery();
   const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
+  const currentUser = useSelector(authSelectors.getUser);
   const { isSynchronizationRequired, isDataSynchronized, changedModules } = useSelector(synchronizationSelectors.getSynchronizationData);
-  const [isAppInit, setAppInit] = useState(false);
   const [showSideMenu, toggleSideMenu] = useState(true);
   const pages = getAppPages(appModules);
   const [synchronizeConfig, { isFetching: isSyncInProgress }] = useLazySynchronizeConfigQuery();
-  const [getAppConfig, { isFetching: isAppDataLoading }] = useLazyGetAppConfigQuery();
+  const [getAppConfig, { isFetching: isAppDataLoading, isSuccess: isAppDataLoadingSuccess }] = useLazyGetAppConfigQuery();
 
   useEffect(() => {
-    if (isSynchronizationRequired) {
+    if (!isLoggedIn) {
+      loginRedirect();
+      localStorage.removeItem('lastSync');
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (isSynchronizationRequired && currentUser.name) {
       synchronizeConfig();
     }
-  }, [isSynchronizationRequired]);
+  }, [isSynchronizationRequired, currentUser]);
 
   useEffect(() => {
-    if (isDataSynchronized) {
+    if (isDataSynchronized && currentUser.name) {
       getAppConfig();
-      setAppInit(true);
     }
-  }, [isDataSynchronized]);
+  }, [isDataSynchronized, currentUser]);
 
   return (
     <>
-      <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
-      <Box component="main" className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
-        <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
-        <AppWindow>
-          <SynchronizationDialog
-            isSyncInProgress={isSyncInProgress}
-            isSynchronizationRequired={isSynchronizationRequired}
-            isDataSynchronized={isDataSynchronized}
-            changedModules={changedModules}
-          />
+      <MenuAppBar
+        showProtectedOptions={isLoggedIn}
+        showSideMenu={showSideMenu}
+        toggleSideMenu={toggleSideMenu}
+        showSideMenuIcon={!!currentUser.name}
+      />
+      <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
+        {isUserChecking && <Spinner />}
+        <SideMenu
+          enableSideMenu={isLoggedIn && !!currentUser.name}
+          showSideMenu={showSideMenu}
+          toggleSideMenu={toggleSideMenu}
+          menuItems={appModules}
+        />
+        {!isUserChecking && (
+          <AppWindow>
+            {!isUserChecking && !currentUser.name && isLoggedIn && <ForbiddenView />}
+            <SynchronizationDialog
+              isSyncInProgress={isSyncInProgress}
+              isSynchronizationRequired={isSynchronizationRequired}
+              isDataSynchronized={isDataSynchronized}
+              changedModules={changedModules}
+            />
 
-          {isAppDataLoading && (
-            <Dialog open={isAppDataLoading}>
-              <DialogTitle>App data loading</DialogTitle>
+            {isAppDataLoading && (
+              <Dialog open={isAppDataLoading}>
+                <DialogTitle>App data loading</DialogTitle>
 
-              <DialogContent>
-                <Spinner />
-              </DialogContent>
-            </Dialog>
-          )}
+                <DialogContent>
+                  <Spinner />
+                </DialogContent>
+              </Dialog>
+            )}
 
-          <PrivateRoute isLoggedIn={isLoggedIn}>
-            {isAppInit && isDataSynchronized && !isAppDataLoading && !isSyncInProgress && (
+            {isLoggedIn && isAppDataLoadingSuccess && isDataSynchronized && !isAppDataLoading && !isSyncInProgress && (
               <Routes>
-                {pages}
-                <Route path="*" element={<NotFoundView />} />
-                <Route path="/" element={<Navigate to="/base" />} />
-                <Route path="/steps/*" element={<Navigate to="/base" />} />
+                <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name} />}>
+                  {pages}
+                  <Route path="/" element={<Navigate to="/base" />} />
+                  <Route path="*" element={<NotFoundView />} />
+                  <Route path="/steps/*" element={<Navigate to="/base" />} />
+                </Route>
               </Routes>
             )}
-          </PrivateRoute>
-        </AppWindow>
+          </AppWindow>
+        )}
       </Box>
     </>
   );
