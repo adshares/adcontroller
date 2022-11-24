@@ -19,6 +19,7 @@ import { useSelector } from 'react-redux';
 import authSelectors from '../redux/auth/authSelectors';
 import { useGetCurrentUserQuery } from '../redux/auth/authApi';
 import ForbiddenView from '../Components/NotFound/ForbiddenView';
+import { loginRedirect } from '../utils/helpers';
 
 const installerSteps = [
   {
@@ -63,7 +64,7 @@ export default function AppInstaller() {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      window.open('/oauth/redirect', '_self');
+      loginRedirect();
     }
   }, [isLoggedIn]);
 

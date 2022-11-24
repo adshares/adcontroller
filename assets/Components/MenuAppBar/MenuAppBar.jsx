@@ -20,7 +20,6 @@ export default function MenuAppBar({ showProtectedOptions = false, showSideMenu,
 
   const handleLogout = () => {
     logoutRedirect();
-    handleMenuClose();
   };
 
   return (

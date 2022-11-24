@@ -2,11 +2,10 @@ import React from 'react';
 import { Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-export default function NotFoundView({ redirectTo = undefined }) {
+export default function NotFoundView() {
   const navigate = useNavigate();
   const onButtonClick = () => {
-    console.log(redirectTo);
-    !!redirectTo ? (window.location.href = redirectTo) : navigate('/');
+    navigate('/');
   };
   return (
     <>

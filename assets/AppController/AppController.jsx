@@ -198,11 +198,10 @@ function AppController() {
   const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
   const currentUser = useSelector(authSelectors.getUser);
   const { isSynchronizationRequired, isDataSynchronized, changedModules } = useSelector(synchronizationSelectors.getSynchronizationData);
-  const [isAppInit, setAppInit] = useState(false);
   const [showSideMenu, toggleSideMenu] = useState(true);
   const pages = getAppPages(appModules);
   const [synchronizeConfig, { isFetching: isSyncInProgress }] = useLazySynchronizeConfigQuery();
-  const [getAppConfig, { isFetching: isAppDataLoading }] = useLazyGetAppConfigQuery();
+  const [getAppConfig, { isFetching: isAppDataLoading, isSuccess: isAppDataLoadingSuccess }] = useLazyGetAppConfigQuery();
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -220,7 +219,6 @@ function AppController() {
   useEffect(() => {
     if (isDataSynchronized && currentUser.name) {
       getAppConfig();
-      setAppInit(true);
     }
   }, [isDataSynchronized, currentUser]);
 
@@ -260,7 +258,7 @@ function AppController() {
               </Dialog>
             )}
 
-            {isLoggedIn && isAppInit && isDataSynchronized && !isAppDataLoading && !isSyncInProgress && (
+            {isLoggedIn && isAppDataLoadingSuccess && isDataSynchronized && !isAppDataLoading && !isSyncInProgress && (
               <Routes>
                 <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name} />}>
                   {pages}
