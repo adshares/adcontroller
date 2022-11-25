@@ -683,7 +683,13 @@ const UserActionsMenu = ({ user, actions }) => {
       )}
 
       {deleteUserDialog && (
-        <Dialog open={deleteUserDialog} onClose={() => setDeleteUserDialog((prevState) => !prevState)}>
+        <Dialog
+          open={deleteUserDialog}
+          onClose={() => {
+            setDeleteUserDialog((prevState) => !prevState);
+            setDeletionConfirmed(false);
+          }}
+        >
           <DialogTitle component="div">
             <Typography variant="h6">Do you want delete this user?</Typography>
             <Typography variant="body1" sx={{ color: 'grey.600' }}>
@@ -797,7 +803,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
 
   return (
     <>
-      <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen((prevState) => !prevState)}>
+      <Dialog fullWidth maxWidth="xs" open={open} onClose={() => onCloseClick()}>
         <DialogTitle>{mode === 'add' ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
         <DialogContent>
           <TextField
