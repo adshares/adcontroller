@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - User list
+- OAuth 2
 ### Changed
 - Controller passes 4xx status code
+- Authorization token on backend
 
 ## [1.1.0] - 2022-10-26
 ### Added
