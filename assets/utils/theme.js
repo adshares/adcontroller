@@ -284,7 +284,6 @@ const theme = createTheme({
       styleOverrides: {
         paper: {
           border: `1px solid ${blue}`,
-          // boxShadow: 'none',
         },
       },
     },
@@ -342,6 +341,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           alignItems: 'center',
+          fontSize: '16px',
+          fontVariationSettings: '"wght" 700',
           '&.MuiAlert-standardWarning': {
             backgroundColor: warningBg,
             color: sun,
