@@ -6,6 +6,7 @@ use App\Entity\Enum\AdPanelConfig;
 use App\Entity\Enum\AppConfig;
 use App\Repository\ConfigurationRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,17 +15,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AuthController extends AbstractController
 {
     private const DEFAULT_REDIRECT = '/';
     private const OAUTH_AUTHORIZE = '/auth/authorize';
-    private const OAUTH_TOKEN = '/oauth/token';
+    private const OAUTH_FETCH_TOKEN = '/oauth/token';
+    private const OAUTH_REVOKE_TOKEN = '/oauth/tokens/';
 
     public function __construct(
         private readonly string $adServerBaseUri,
         private readonly ConfigurationRepository $repository,
+        private readonly LoggerInterface $logger,
         private readonly HttpClientInterface $httpClient,
         private readonly RequestStack $requestStack,
     ) {
@@ -72,7 +76,11 @@ class AuthController extends AbstractController
             'grant_type' => 'authorization_code',
             'redirect_uri' => $this->getRedirectUri(),
         ];
-        $response = $this->httpClient->request('POST', $this->adServerBaseUri . self::OAUTH_TOKEN, ['body' => $body]);
+        $response = $this->httpClient->request(
+            'POST',
+            $this->adServerBaseUri . self::OAUTH_FETCH_TOKEN,
+            ['body' => $body],
+        );
         $accessToken = $response->toArray()['access_token'];
         $this->requestStack->getSession()->set('accessToken', $accessToken);
 
@@ -86,12 +94,37 @@ class AuthController extends AbstractController
         JWTTokenManagerInterface $jwtManager,
         Request $request,
     ): Response {
-//        $accessToken = $this->requestStack->getSession()->get('accessToken');
-//        $payload = $jwtManager->parse($accessToken);
+        if (null !== ($accessToken = $this->requestStack->getSession()->get('accessToken'))) {
+            $payload = $jwtManager->parse($accessToken);
+
+            try {
+                $response = $this->httpClient->request(
+                    'DELETE',
+                    $this->buildRevokeTokenUri($payload['jti']),
+                    [
+                        'headers' => [
+                            'Accept' => 'application/json',
+                            'Authorization' => 'Bearer ' . $this->requestStack->getSession()->get('accessToken'),
+                        ],
+                    ],
+                );
+                $code = $response->getStatusCode();
+                if (Response::HTTP_NO_CONTENT !== $code) {
+                    $this->logger->error(sprintf('Token revoke failed: (AdServer HTTP %d)', $code));
+                }
+            } catch (TransportExceptionInterface $exception) {
+                $this->logger->error(sprintf('Token revoke failed: (%s)', $exception->getMessage()));
+            }
+        }
 
         $this->requestStack->getSession()->invalidate();
         $url = $configurationRepository->fetchValueByEnum(AdPanelConfig::Url) ?? $request->getSchemeAndHttpHost();
         return new RedirectResponse($url);
+    }
+
+    private function buildRevokeTokenUri(string $tokenId): string
+    {
+        return $this->adServerBaseUri . self::OAUTH_REVOKE_TOKEN . $tokenId;
     }
 
     private function getRedirectUri(): string
