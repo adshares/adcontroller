@@ -52,6 +52,15 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     ...closedMixin(theme),
     '& .MuiDrawer-paper': closedMixin(theme),
   }),
+  '& .MuiDrawer-paper::-webkit-scrollbar': {
+    backgroundColor: theme.palette.deep.dark,
+    width: '8px',
+    borderRadius: '10px',
+  },
+  '& .MuiDrawer-paper::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.palette.blue.main,
+    borderRadius: '10px',
+  },
 }));
 
 const Accordion = styled(MuiAccordion, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme }) => ({
