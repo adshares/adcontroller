@@ -129,6 +129,10 @@ const theme = createTheme({
           minWidth: '150px',
           padding: '8px 20px',
           boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
+          '&.Mui-disabled': {
+            cursor: 'not-allowed',
+            pointerEvents: 'fill',
+          },
           '&:hover': {
             boxShadow: 'none',
           },
@@ -157,6 +161,8 @@ const theme = createTheme({
         root: {
           '&.Mui-disabled': {
             color: '#809EA6',
+            cursor: 'not-allowed',
+            pointerEvents: 'fill',
           },
         },
       },

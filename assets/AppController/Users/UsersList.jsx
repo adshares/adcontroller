@@ -445,8 +445,8 @@ const UserActionsMenu = ({ user, actions }) => {
 
   return (
     <>
-      <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen}>
-        {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" color="black" />}
+      <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen} color="black">
+        {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
       </IconButton>
       <Menu
         variant="menu"
