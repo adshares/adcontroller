@@ -238,7 +238,7 @@ function AppController() {
   return (
     <Box className={`${commonStyles.flex}`}>
       <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
-      <Box className={`${commonStyles.flex} ${commonStyles.flexColumn}`} sx={{ flexGrow: 1, width: 'calc(100% - 292px)' }}>
+      <Box sx={{ flexGrow: 1, width: 'calc(100% - 292px)' }}>
         <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
         <AppWindow>
           <SynchronizationDialog
