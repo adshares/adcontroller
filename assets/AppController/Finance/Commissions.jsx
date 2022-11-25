@@ -87,7 +87,7 @@ function Commissions() {
                 color="secondary"
                 name="OperatorTxFee"
                 type="number"
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                startAdornment={<InputAdornment position="start">%</InputAdornment>}
                 value={setDecimalPlaces(form.fields.OperatorTxFee, 2)}
                 onChange={form.onChange}
                 onFocus={form.setTouched}
@@ -125,7 +125,7 @@ function Commissions() {
                 color="secondary"
                 name="OperatorRxFee"
                 type="number"
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                startAdornment={<InputAdornment position="start">%</InputAdornment>}
                 value={setDecimalPlaces(form.fields.OperatorRxFee, 2)}
                 onChange={form.onChange}
                 onFocus={form.setTouched}
@@ -167,7 +167,7 @@ function Commissions() {
                 color="secondary"
                 name="ReferralRefundCommission"
                 type="number"
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                startAdornment={<InputAdornment position="start">%</InputAdornment>}
                 value={setDecimalPlaces(form.fields.ReferralRefundCommission, 2)}
                 onChange={form.onChange}
                 onFocus={form.setTouched}
