@@ -373,7 +373,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
   };
 
   return (
-    <>
+    <Box sx={{ height: '862px', overflow: 'auto' }}>
       <Button variant="contained" component="label">
         <FileUploadIcon />
         Upload
@@ -529,7 +529,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
           </DialogActions>
         </Dialog>
       )}
-    </>
+    </Box>
   );
 };
 
@@ -677,7 +677,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
   };
 
   return (
-    <>
+    <Box sx={{ height: '862px', overflow: 'auto' }}>
       <Box>
         <Typography variant="h3" component="h3">
           Favicons
@@ -806,6 +806,6 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
           </TableBody>
         </Table>
       </Box>
-    </>
+    </Box>
   );
 };
