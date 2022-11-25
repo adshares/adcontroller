@@ -62,10 +62,7 @@ function Commissions() {
   return (
     <>
       <Box sx={{ maxWidth: '1060px', display: 'flex' }}>
-        <Card
-          sx={{ height: '100%', mr: 2 }}
-          className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}
-        >
+        <Card sx={{ mr: 2 }} className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
           <CardHeader
             title="Advertiser commission"
             subheader="Set a commission that will be subtracted from event payments. It will be a part of your income."
