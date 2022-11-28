@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import {
@@ -29,7 +29,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableRow,
   TextField,
   Tooltip,
@@ -37,7 +36,7 @@ import {
 } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useSnackbar } from 'notistack';
-import EditIcon from '@mui/icons-material/Edit';
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import RestoreIcon from '@mui/icons-material/Restore';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -50,12 +49,12 @@ export default function Panel() {
   return (
     <>
       <PlaceholdersCard />
-      <RebrandingCard />
+      <RebrandingCard sx={{ mt: 3 }} />
     </>
   );
 }
 
-const PlaceholdersCard = () => {
+const PlaceholdersCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setPlaceholdersConfig, { isLoading }] = useSetPlaceholdersConfigMutation();
@@ -92,87 +91,135 @@ const PlaceholdersCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card} width="mainContainer">
+    <Card {...props}>
       <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
       <CardContent>
         <Box component="form" onChange={(e) => form.onChange(e)} onFocus={(e) => form.setTouched(e)}>
           <TextField
+            sx={{ mb: 3 }}
             value={form.fields.PlaceholderIndexTitle}
+            color="secondary"
+            customvariant="highLabel"
             name="PlaceholderIndexTitle"
             label="Title"
-            size="small"
-            margin="dense"
             fullWidth
           />
           <CollapsibleTextarea
             collapsible
             value={form.fields.PlaceholderIndexDescription}
+            sx={{ mb: 3 }}
+            color="secondary"
+            customvariant="highLabel"
             name="PlaceholderIndexDescription"
             label="Description"
             multiline
             rows={8}
-            margin="dense"
             fullWidth
-            size="small"
           />
           <TextField
             value={form.fields.PlaceholderIndexKeywords}
+            sx={{ mb: 3 }}
+            color="secondary"
+            customvariant="highLabel"
             name="PlaceholderIndexKeywords"
             label="Keywords"
-            size="small"
-            margin="dense"
             fullWidth
           />
           <CollapsibleTextarea
             collapsible
             value={form.fields.PlaceholderIndexMetaTags}
+            sx={{ mb: 3 }}
+            color="secondary"
+            customvariant="highLabel"
             name="PlaceholderIndexMetaTags"
             label="Custom meta tags"
             multiline
             rows={8}
-            margin="dense"
             fullWidth
-            size="small"
           />
           <CollapsibleTextarea
             collapsible
             value={form.fields.PlaceholderRobotsTxt}
+            sx={{ mb: 3 }}
+            color="secondary"
+            customvariant="highLabel"
             name="PlaceholderRobotsTxt"
             label="robots.txt"
             multiline
             rows={8}
-            margin="dense"
             fullWidth
-            size="small"
           />
           <CollapsibleTextarea
             collapsible
             value={form.fields.PlaceholderLoginInfo}
+            sx={{ mb: 3 }}
+            color="secondary"
+            customvariant="highLabel"
             name="PlaceholderLoginInfo"
             label="Login page info (HTML)"
             multiline
             rows={20}
-            margin="dense"
             fullWidth
-            size="small"
           />
           <CollapsibleTextarea
             collapsible
             value={form.fields.PlaceholderStyleCss}
+            color="secondary"
+            customvariant="highLabel"
             name="PlaceholderStyleCss"
             label="AdPanel styles (CSS)"
             multiline
             rows={20}
-            margin="dense"
             fullWidth
-            size="small"
           />
         </Box>
       </CardContent>
 
       <CardActions>
+        <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
+          Save
+        </Button>
+      </CardActions>
+    </Card>
+  );
+};
+
+const RebrandingCard = (props) => {
+  const [activeTab, setActiveTab] = React.useState('requiredAssets');
+  const [saveButton, setSaveButton] = React.useState({});
+  const requiredFavicons = ['Favicon16x16', 'Favicon32x32', 'Favicon48x48', 'Favicon96x96'];
+  const requiredLogos = ['LogoH30', 'LogoH60', 'LogoH90'];
+
+  const handleTabChange = (e, newActiveTab) => {
+    setActiveTab(newActiveTab);
+  };
+
+  const setBtnConfig = (conf) => {
+    if (conf.tab === activeTab) {
+      setSaveButton(conf);
+    }
+  };
+
+  return (
+    <Card {...props}>
+      <CardHeader title="Rebranding" subheader="Customize the ad server panel." />
+      <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
+        <TabContext value={activeTab}>
+          <TabList onChange={handleTabChange}>
+            <Tab label="Required assets" value="requiredAssets" />
+            <Tab label="Additional assets" value="additionalAssets" />
+          </TabList>
+          <TabPanel value="requiredAssets">
+            <RequiredAssetsTable actions={{ setBtnConfig }} requiredFavicons={requiredFavicons} requiredLogos={requiredLogos} />
+          </TabPanel>
+          <TabPanel value="additionalAssets">
+            <AdditionalAssets actions={{ setBtnConfig }} rejectedAssets={[...requiredLogos, ...requiredFavicons]} />
+          </TabPanel>
+        </TabContext>
+      </CardContent>
+      <CardActions>
         <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
+          <Button variant="contained" type="button" disabled={saveButton.disabled} onClick={saveButton.onSaveClick}>
             Save
           </Button>
         </Box>
@@ -181,37 +228,7 @@ const PlaceholdersCard = () => {
   );
 };
 
-const RebrandingCard = () => {
-  const [activeTab, setActiveTab] = React.useState('requiredAssets');
-  const requiredFavicons = ['Favicon16x16', 'Favicon32x32', 'Favicon48x48', 'Favicon96x96'];
-  const requiredLogos = ['LogoH30', 'LogoH60', 'LogoH90'];
-
-  const handleTabChange = (e, newActiveTab) => {
-    setActiveTab(newActiveTab);
-  };
-
-  return (
-    <Card className={commonStyles.card} width="mainContainer">
-      <CardHeader title="Rebranding" subheader="Customize the ad server panel." />
-      <TabContext value={activeTab}>
-        <CardContent>
-          <TabList onChange={handleTabChange}>
-            <Tab label="Required assets" value="requiredAssets" sx={{ padding: 0 }} />
-            <Tab label="Additional assets" value="additionalAssets" />
-          </TabList>
-        </CardContent>
-        <TabPanel value="requiredAssets" sx={{ padding: 0 }}>
-          <RequiredAssetsTable requiredFavicons={requiredFavicons} requiredLogos={requiredLogos} />
-        </TabPanel>
-        <TabPanel value="additionalAssets" sx={{ padding: 0 }}>
-          <AdditionalAssets rejectedAssets={[...requiredLogos, ...requiredFavicons]} />
-        </TabPanel>
-      </TabContext>
-    </Card>
-  );
-};
-
-const AdditionalAssets = ({ rejectedAssets }) => {
+const AdditionalAssets = ({ rejectedAssets, actions }) => {
   const { data, refetch, isFetching } = useGetPanelAssetsQuery();
   const [uploadAssets] = useUploadPanelAssetsMutation();
   const [deleteAssets] = useDeletePanelAssetsMutation();
@@ -220,6 +237,14 @@ const AdditionalAssets = ({ rejectedAssets }) => {
   const [changedFiles, setChangedFiles] = useState([]);
   const { createSuccessNotification } = useCreateNotification();
   const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    actions.setBtnConfig({
+      tab: 'additionalAssets',
+      disabled: !changedFiles.length,
+      onSaveClick,
+    });
+  }, [changedFiles]);
 
   const assets = useMemo(
     () => (data && data.message === 'OK' ? data.data.assets.filter((img) => !rejectedAssets.includes(img.fileId)) : []),
@@ -348,152 +373,122 @@ const AdditionalAssets = ({ rejectedAssets }) => {
   };
 
   return (
-    <>
-      <CardContent>
-        <Button variant="contained" component="label">
-          <FileUploadIcon />
-          Upload
-          <input hidden accept="image/*" type="file" multiple onChange={handleUploadInputChange} />
-        </Button>
-      </CardContent>
+    <Box sx={{ height: '862px', overflow: 'auto' }}>
+      <Button variant="contained" component="label">
+        <FileUploadIcon />
+        Upload
+        <input hidden accept="image/*" type="file" multiple onChange={handleUploadInputChange} />
+      </Button>
+      {isFetching && <Spinner />}
 
-      <CardContent>
-        {isFetching && <Spinner />}
+      {!isFetching && !assets.length && (
+        <Typography variant="body1" align="left">
+          No assets added
+        </Typography>
+      )}
 
-        {!isFetching && !assets.length && (
-          <Typography variant="body1" align="center">
-            No assets added
-          </Typography>
-        )}
-
-        {!isFetching && !!assets.length && (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell width="10%" align="center" padding="none">
-                  File
-                </TableCell>
-                <TableCell width="30%" align="center" padding="none">
-                  Info
-                </TableCell>
-                <TableCell width="50%" align="center" padding="none">
-                  URL
-                </TableCell>
-                <TableCell width="10%" align="center" padding="none">
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {assets.map((img) => {
-                const isImgWasEdited = changedFiles.findIndex((obj) => obj.name === img.fileName) >= 0;
-                const editedImgObj = changedFiles.find((file) => file.name === img.fileName);
-                return (
-                  <TableRow key={img.fileId}>
-                    <TableCell width="10%" align="center">
-                      {isImgWasEdited && editedImgObj.action === 'delete' ? (
-                        <RemoveCircleOutlineOutlinedIcon color="error" />
-                      ) : (
-                        <Box
-                          component="img"
-                          height="40px"
-                          src={isImgWasEdited ? editedImgObj.preview : `${configuration.baseUrl}/assets/panel/${img.fileId}?${Date.now()}`}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell width="30%" align="left">
-                      <Box display="grid">
-                        <Typography variant="body2" noWrap>
-                          Name: {img.fileName}
-                        </Typography>
-                        <Typography variant="body2" noWrap>
-                          Added: {new Date(img.createdAt).toLocaleDateString()}
-                        </Typography>
-                        <Typography variant="body2" noWrap>
-                          Changed:
-                          {isImgWasEdited ? (
-                            <Typography sx={{ ml: 0.5 }} component="span" variant="body2" color="error">
-                              Pending for save
-                            </Typography>
-                          ) : (
-                            new Date(img.updatedAt).toLocaleDateString()
-                          )}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell width="50%" align="left">
-                      <Typography variant="body2" sx={{ overflowWrap: 'anywhere' }}>
-                        {img.url}
+      {!isFetching && !!assets.length && (
+        <Table sx={{ mt: 3 }}>
+          <TableBody>
+            {assets.map((img) => {
+              const isImgWasEdited = changedFiles.findIndex((obj) => obj.name === img.fileName) >= 0;
+              const editedImgObj = changedFiles.find((file) => file.name === img.fileName);
+              return (
+                <TableRow key={img.fileId}>
+                  <TableCell width="10%" align="left">
+                    {isImgWasEdited && editedImgObj.action === 'delete' ? (
+                      <RemoveCircleOutlineOutlinedIcon color="error" />
+                    ) : (
+                      <Box
+                        component="img"
+                        height="40px"
+                        src={isImgWasEdited ? editedImgObj.preview : `${configuration.baseUrl}/assets/panel/${img.fileId}?${Date.now()}`}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell width="27%" align="left">
+                    <Box>
+                      <Typography variant="body2">Name: {img.fileName}</Typography>
+                      <Typography variant="body2">Added: {new Date(img.createdAt).toLocaleDateString()}</Typography>
+                      <Typography variant="body2">
+                        Changed:{' '}
+                        {isImgWasEdited ? (
+                          <Typography component="span" variant="body2" color="error">
+                            pending for save
+                          </Typography>
+                        ) : (
+                          new Date(img.updatedAt).toLocaleDateString()
+                        )}
                       </Typography>
-                    </TableCell>
-                    <TableCell width="10%" align="center">
-                      <Box className={`${commonStyles.flex}`}>
-                        <Tooltip
-                          onClose={() => setTimeout(() => setUrlCopied(false), 100)}
-                          title={urlWasCopied ? 'URL was copied' : 'Copy URL'}
+                    </Box>
+                  </TableCell>
+                  <TableCell width="58%" align="left">
+                    <Typography variant="tableText1" sx={{ overflowWrap: 'anywhere' }}>
+                      {img.url}
+                    </Typography>
+                  </TableCell>
+                  <TableCell width="5%" align="left">
+                    <Box className={`${commonStyles.flex}`}>
+                      <Tooltip
+                        onClose={() => setTimeout(() => setUrlCopied(false), 100)}
+                        title={urlWasCopied ? 'URL was copied' : 'Copy URL'}
+                      >
+                        <IconButton
+                          size="small"
+                          color="freshGrass"
+                          onClick={() => {
+                            setUrlCopied(true);
+                            return navigator.clipboard.writeText(img.url);
+                          }}
                         >
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => {
-                              setUrlCopied(true);
-                              return navigator.clipboard.writeText(img.url);
-                            }}
-                          >
-                            <ContentCopyIcon />
-                          </IconButton>
-                        </Tooltip>
-
-                        <Tooltip title="Change file" component="label">
-                          <IconButton size="small" color="primary">
-                            <EditIcon />
-                            <input hidden accept="image/*" type="file" name={img.fileId} onChange={handleEditFileInputChange} />
-                          </IconButton>
-                        </Tooltip>
-
-                        <Tooltip title="Delete file">
-                          <IconButton size="small" color="error" onClick={onDeleteFileClick(img.fileId)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-
-                        <IconButton disabled={!isImgWasEdited} size="small" color="primary" onClick={onUndoClick(img.fileId)}>
-                          <Tooltip title="Undo changes">
-                            <UndoIcon />
-                          </Tooltip>
+                          <ContentCopyIcon />
                         </IconButton>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
+                      </Tooltip>
 
-      <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={!changedFiles.length} onClick={onSaveClick} variant="contained" type="button">
-            Save
-          </Button>
-        </Box>
-      </CardActions>
+                      <Tooltip title="Change file" component="label">
+                        <IconButton size="small" color="secondary">
+                          <CreateOutlinedIcon />
+                          <input hidden accept="image/*" type="file" name={img.fileId} onChange={handleEditFileInputChange} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                    <Box className={`${commonStyles.flex}`}>
+                      <Tooltip title="Delete file">
+                        <IconButton size="small" color="error" onClick={onDeleteFileClick(img.fileId)}>
+                          <RemoveCircleOutlineOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
+
+                      <IconButton disabled={!isImgWasEdited} size="small" color="black" onClick={onUndoClick(img.fileId)}>
+                        <Tooltip title="Undo changes">
+                          <UndoIcon />
+                        </Tooltip>
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      )}
 
       {waitingForUploadFiles.length > 0 && (
         <Dialog fullWidth maxWidth="md" open={waitingForUploadFiles.length > 0} onClose={() => setWaitingForUploadFiles([])}>
-          <DialogTitle>Selected files</DialogTitle>
+          <DialogTitle component="div">
+            <Typography variant="h3">Selected files</Typography>
+          </DialogTitle>
           <DialogContent>
             <Table>
               <TableBody>
                 {waitingForUploadFiles.map((img) => (
                   <TableRow key={img.name}>
-                    <TableCell width="20%">
+                    <TableCell width="10%">
                       <Box component="img" height="40px" src={URL.createObjectURL(img.file)}></Box>
                     </TableCell>
-                    <TableCell width="50%" align="center">
+                    <TableCell width="85%" align="left">
                       <Box display="grid">
-                        <Typography variant="body2" noWrap>
+                        <Typography variant="tableText1" noWrap>
                           {img.name}
                         </Typography>
                         {!img.isImage && <Typography color="error">File must be image</Typography>}
@@ -505,7 +500,7 @@ const AdditionalAssets = ({ rejectedAssets }) => {
                         )}
                       </Box>
                     </TableCell>
-                    <TableCell width="20%">
+                    <TableCell width="5%">
                       <Tooltip title="Remove file">
                         <IconButton
                           color="primary"
@@ -534,16 +529,24 @@ const AdditionalAssets = ({ rejectedAssets }) => {
           </DialogActions>
         </Dialog>
       )}
-    </>
+    </Box>
   );
 };
 
-const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
+const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
   const [uploadAssets, { isLoading }] = useUploadPanelAssetsMutation();
   const [deleteAssets] = useDeletePanelAssetsMutation();
   const [changedFiles, setChangedFiles] = useState({});
   const { enqueueSnackbar } = useSnackbar();
   const { createSuccessNotification } = useCreateNotification();
+
+  useEffect(() => {
+    actions.setBtnConfig({
+      tab: 'requiredAssets',
+      disabled: isLoading || Object.keys(changedFiles).length === 0,
+      onSaveClick,
+    });
+  }, [isLoading, changedFiles]);
 
   const onSaveClick = async () => {
     const changedImages = Object.keys(changedFiles).filter((file) => changedFiles[file].action === 'change');
@@ -674,134 +677,135 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos }) => {
   };
 
   return (
-    <>
-      <CardContent>
-        <Box className={commonStyles.card}>
-          <Typography variant="h6">Favicons</Typography>
-          <Typography variant="body2">You can add png files with sizes 16x16, 32x32, 48x48 and 96x96</Typography>
-          <Table>
-            <TableBody>
-              {requiredFavicons.map((id) => {
-                const width = id.match(/(\d+)/)[0];
-                const height = id.match(/(\d+)/)[1];
-                return (
-                  <TableRow key={id}>
-                    <TableCell width="40%">
-                      {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
-                        <SvgIcon sx={{ fontSize: height + 'px' }}>
-                          <RestoreIcon color="error" />
-                        </SvgIcon>
-                      ) : (
-                        <Box
-                          component="img"
-                          src={changedFiles[id]?.preview || `${configuration.baseUrl}/assets/panel/${id}?${Date.now()}`}
-                          height={height + 'px'}
-                          width={width + 'px'}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell align="center" width="20%">
-                      <Typography variant="body1">
-                        {width}x{height}
-                      </Typography>
+    <Box sx={{ height: '862px', overflow: 'auto' }}>
+      <Box>
+        <Typography variant="h3" component="h3">
+          Favicons
+        </Typography>
+        <Typography sx={{ mt: 1 }} variant="body2">
+          You can add png files with sizes 16x16, 32x32, 48x48 and 96x96
+        </Typography>
+        <Table sx={{ mt: 3 }}>
+          <TableBody>
+            {requiredFavicons.map((id) => {
+              const width = id.match(/(\d+)/)[0];
+              const height = id.match(/(\d+)/)[1];
+              return (
+                <TableRow key={id}>
+                  <TableCell width="45%">
+                    {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
+                      <SvgIcon sx={{ fontSize: height + 'px' }}>
+                        <RestoreIcon color="error" />
+                      </SvgIcon>
+                    ) : (
+                      <Box
+                        component="img"
+                        src={changedFiles[id]?.preview || `${configuration.baseUrl}/assets/panel/${id}?${Date.now()}`}
+                        height={height + 'px'}
+                        width={width + 'px'}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="left" width="35%">
+                    <Typography variant="tableText1">
+                      {width}x{height}{' '}
                       {changedFiles.hasOwnProperty(id) && (
                         <Typography component="span" variant="body2" color="error">
-                          Pending for save
+                          pending for save
                         </Typography>
                       )}
-                    </TableCell>
-                    <TableCell align="center" width="40%">
-                      <Tooltip title="Change image">
-                        <IconButton component="label" color="primary">
-                          <EditIcon />
-                          <input hidden accept="image/*" type="file" name={id} onChange={onInputChange} />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Restore default image">
-                        <IconButton component="label" color="error" onClick={onRestoreDefaultClick(id)}>
-                          <RestoreIcon />
-                        </IconButton>
-                      </Tooltip>
-
-                      <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="primary" onClick={onUndoClick(id)}>
-                        <Tooltip title="Undo changes">
-                          <UndoIcon />
-                        </Tooltip>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left" width="20%">
+                    <Tooltip title="Change image">
+                      <IconButton component="label" color="secondary">
+                        <CreateOutlinedIcon />
+                        <input hidden accept="image/*" type="file" name={id} onChange={onInputChange} />
                       </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
+                    </Tooltip>
 
-        <Box className={commonStyles.card}>
-          <Typography variant="h6">Logos</Typography>
-          <Typography variant="body2">You can add png files with minimal height 30 px and optional @2x and @3x</Typography>
-          <Table sx={{ mt: 1 }}>
-            <TableBody>
-              {requiredLogos.map((id) => {
-                const height = id.match(/(\d+)/)[0];
-                return (
-                  <TableRow key={id}>
-                    <TableCell width="40%" sx={{ backgroundColor: 'primary.main' }}>
-                      {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
-                        <SvgIcon sx={{ fontSize: height + 'px' }}>
-                          <RestoreIcon color="error" />
-                        </SvgIcon>
-                      ) : (
-                        <Box
-                          component="img"
-                          src={changedFiles[id]?.preview || `${configuration.baseUrl}/assets/panel/${id}?${Date.now()}`}
-                          height={height + 'px'}
-                          maxWidth="100%"
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell align="center" width="20%">
-                      <Typography variant="body1">Min height {height}</Typography>
+                    <Tooltip title="Restore default image">
+                      <IconButton component="label" color="error" onClick={onRestoreDefaultClick(id)}>
+                        <RestoreIcon />
+                      </IconButton>
+                    </Tooltip>
+
+                    <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="black" onClick={onUndoClick(id)}>
+                      <Tooltip title="Undo changes">
+                        <UndoIcon />
+                      </Tooltip>
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </Box>
+
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h3" component="h3">
+          Logos
+        </Typography>
+        <Typography sx={{ mt: 1 }} variant="body2">
+          You can add png files with minimal height 30 px and optional @2x and @3x
+        </Typography>
+        <Table sx={{ mt: 3, backgroundColor: 'primary.main' }}>
+          <TableBody>
+            {requiredLogos.map((id) => {
+              const height = id.match(/(\d+)/)[0];
+              return (
+                <TableRow key={id}>
+                  <TableCell width="45%">
+                    {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
+                      <SvgIcon sx={{ fontSize: height + 'px' }}>
+                        <RestoreIcon color="error" />
+                      </SvgIcon>
+                    ) : (
+                      <Box
+                        component="img"
+                        src={changedFiles[id]?.preview || `${configuration.baseUrl}/assets/panel/${id}?${Date.now()}`}
+                        height={height + 'px'}
+                        maxWidth="100%"
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="left" width="35%">
+                    <Typography variant="tableText1" color="white.main">
+                      Min height {height}{' '}
                       {changedFiles.hasOwnProperty(id) && (
-                        <Typography component="span" variant="body2" color="error">
-                          Pending for save
+                        <Typography component="span" variant="body2" color="error.main">
+                          pending for save
                         </Typography>
                       )}
-                    </TableCell>
-                    <TableCell align="center" width="40%">
-                      <Tooltip title="Change image">
-                        <IconButton component="label" color="primary">
-                          <EditIcon />
-                          <input hidden accept="image/*" type="file" name={id} onChange={onInputChange} />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Restore default image">
-                        <IconButton component="label" color="error" onClick={onRestoreDefaultClick(id)}>
-                          <RestoreIcon />
-                        </IconButton>
-                      </Tooltip>
-
-                      <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="primary" onClick={onUndoClick(id)}>
-                        <Tooltip title="Undo changes">
-                          <UndoIcon />
-                        </Tooltip>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left" width="20%">
+                    <Tooltip title="Change image">
+                      <IconButton component="label" color="secondary">
+                        <CreateOutlinedIcon />
+                        <input hidden accept="image/*" type="file" name={id} onChange={onInputChange} />
                       </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
-      </CardContent>
-      <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button disabled={isLoading || Object.keys(changedFiles).length === 0} onClick={onSaveClick} variant="contained" type="button">
-            Save
-          </Button>
-        </Box>
-      </CardActions>
-    </>
+                    </Tooltip>
+
+                    <Tooltip title="Restore default image">
+                      <IconButton component="label" color="error" onClick={onRestoreDefaultClick(id)}>
+                        <RestoreIcon />
+                      </IconButton>
+                    </Tooltip>
+
+                    <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="white" onClick={onUndoClick(id)}>
+                      <Tooltip title="Undo changes">
+                        <UndoIcon />
+                      </Tooltip>
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </Box>
+    </Box>
   );
 };

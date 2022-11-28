@@ -13,51 +13,50 @@ const headCells = [
   {
     id: 'name',
     label: 'Name',
-    cellWidth: '10rem',
+    cellWidth: '13rem',
     alignContent: 'left',
   },
   {
     id: 'status',
     label: 'Status',
     cellWidth: '6rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
   {
     id: 'url',
     label: 'URL',
-    cellWidth: '12rem',
+    cellWidth: '10rem',
     alignContent: 'left',
   },
   {
     id: 'wallet',
     label: 'Wallet',
-    cellWidth: '10rem',
+    cellWidth: '13rem',
     alignContent: 'left',
   },
   {
     id: 'lastSync',
     label: 'Last synchronization',
-    cellWidth: '10rem',
-    alignContent: 'center',
+    cellWidth: '12rem',
+    alignContent: 'left',
   },
   {
     id: 'campaigns',
     label: 'Campaigns',
-    cellWidth: '8rem',
-    alignContent: 'center',
+    cellWidth: '9rem',
+    alignContent: 'left',
   },
   {
     id: 'sites',
     label: 'Sites',
     cellWidth: '8rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
   {
     id: 'countOfError',
     label: 'Count of connection error',
     cellWidth: '8rem',
-    alignContent: 'center',
-    // pinToRight: true,
+    alignContent: 'left',
   },
 ];
 
@@ -75,7 +74,11 @@ export default function ConnectedStatus() {
     return hosts.map((host) => ({
       id: host.id,
       name: host.name,
-      url: host.url,
+      url: (
+        <Typography variant="tableText2" sx={{ overflowWrap: 'anywhere' }}>
+          {host.url}
+        </Typography>
+      ),
       wallet: host.walletAddress,
       lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
       campaigns: host.campaignCount,
@@ -102,11 +105,11 @@ export default function ConnectedStatus() {
           </Tooltip>
         )),
       countOfError: (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyCenter}`}>
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyFlexStart}`}>
           <Typography variant="body2">{host.connectionErrorCount}</Typography>
           {Number(host.connectionErrorCount) > 0 && (
             <Tooltip title="Reset counter">
-              <IconButton size="small" color="primary" onClick={() => onResetCounterClick(host.id)}>
+              <IconButton sx={{ ml: 2 }} size="small" color="secondary" onClick={() => onResetCounterClick(host.id)}>
                 <RestartAltOutlinedIcon />
               </IconButton>
             </Tooltip>
@@ -124,7 +127,6 @@ export default function ConnectedStatus() {
   };
 
   const handleTableChanges = (event) => {
-    console.log(event);
     setQueryConfig((prevState) => ({
       ...prevState,
       cursor: response?.cursor || null,
@@ -137,8 +139,7 @@ export default function ConnectedStatus() {
     <Card
       className={`${commonStyles.card}`}
       sx={{
-        height: 'calc(100vh - 8rem)',
-        maxWidth: 'calc(100vw - 21rem)',
+        height: 'calc(100vh - 9rem)',
       }}
       width="full"
     >

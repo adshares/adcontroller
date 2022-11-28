@@ -33,37 +33,38 @@ import Events from './Events/Events';
 import UsersList from './Users/UsersList';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 import PercentIcon from '@mui/icons-material/Percent';
-import SettingsIcon from '@mui/icons-material/Settings';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import InfoIcon from '@mui/icons-material/Info';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
-import PeopleIcon from '@mui/icons-material/People';
-import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
-import EmailIcon from '@mui/icons-material/Email';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
+import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import commonStyles from '../styles/commonStyles.scss';
 
 const appModules = [
   {
     name: 'Users',
-    icon: PeopleIcon,
+    icon: PeopleAltOutlinedIcon,
     children: [
       {
         name: 'List of users',
         path: '/users/list',
         component: UsersList,
-        icon: PeopleIcon,
+        icon: FormatListBulletedOutlinedIcon,
       },
       {
         name: 'Settings',
         path: '/users/settings',
         component: UsersSettings,
-        icon: SettingsIcon,
+        icon: SettingsOutlinedIcon,
       },
     ],
   },
@@ -75,7 +76,7 @@ const appModules = [
         name: 'Settings',
         path: '/demand/settings',
         component: DemandSettings,
-        icon: SettingsIcon,
+        icon: SettingsOutlinedIcon,
       },
     ],
   },
@@ -88,7 +89,7 @@ const appModules = [
         name: 'Settings',
         path: '/supply/settings',
         component: SupplySettings,
-        icon: SettingsIcon,
+        icon: SettingsOutlinedIcon,
       },
     ],
   },
@@ -100,7 +101,7 @@ const appModules = [
         name: 'Settings',
         path: '/network/settings',
         component: NetworkSettings,
-        icon: SettingsIcon,
+        icon: SettingsOutlinedIcon,
       },
       {
         name: 'Connected status',
@@ -112,13 +113,13 @@ const appModules = [
   },
   {
     name: 'Finance',
-    icon: AccountBalanceIcon,
+    icon: AttachMoneyOutlinedIcon,
     children: [
       {
         name: 'Wallet',
         path: '/finance/wallet',
         component: Wallet,
-        icon: AccountBalanceWalletIcon,
+        icon: AccountBalanceWalletOutlinedIcon,
       },
       {
         name: 'Commissions',
@@ -130,25 +131,25 @@ const appModules = [
   },
   {
     name: 'General',
-    icon: SettingsIcon,
+    icon: SettingsOutlinedIcon,
     children: [
       {
         name: 'Base',
         path: '/base',
         component: Base,
-        icon: InfoIcon,
+        icon: InfoOutlinedIcon,
       },
       {
         name: 'SMTP',
         path: '/smtp',
         component: SMTP,
-        icon: EmailIcon,
+        icon: EmailOutlinedIcon,
       },
       {
         name: 'License',
         path: '/license',
         component: License,
-        icon: VpnKeyIcon,
+        icon: VpnKeyOutlinedIcon,
       },
       {
         name: 'Panel',
@@ -160,7 +161,7 @@ const appModules = [
         name: 'Privacy & Terms',
         path: '/terms',
         component: Terms,
-        icon: PrivacyTipIcon,
+        icon: PrivacyTipOutlinedIcon,
       },
     ],
   },
@@ -235,10 +236,10 @@ function AppController() {
   }, [token, isDataSynchronized]);
 
   return (
-    <>
-      <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
-      <Box component="main" className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
-        <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
+    <Box className={`${commonStyles.flex}`}>
+      <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
+      <Box sx={{ flexGrow: 1, width: 'calc(100% - 292px)' }}>
+        <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
         <AppWindow>
           <SynchronizationDialog
             isSyncInProgress={isSyncInProgress}
@@ -275,7 +276,7 @@ function AppController() {
           )}
         </AppWindow>
       </Box>
-    </>
+    </Box>
   );
 }
 

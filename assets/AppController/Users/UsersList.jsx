@@ -47,13 +47,13 @@ import {
   Typography,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import EmailIcon from '@mui/icons-material/Email';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import BlockIcon from '@mui/icons-material/Block';
-import HelpIcon from '@mui/icons-material/Help';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
+import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import InfoIcon from '@mui/icons-material/Info';
+import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import ListItemText from '@mui/material/ListItemText';
 
@@ -62,16 +62,16 @@ const headCells = [
     id: 'status',
     label: (
       <Tooltip title="Status">
-        <ContentPasteIcon size="small" color="action" />
+        <AssignmentTurnedInOutlinedIcon size="small" color="black" />
       </Tooltip>
     ),
-    cellWidth: '4.5rem',
+    cellWidth: '5rem',
     alignContent: 'left',
   },
   {
     id: 'email',
-    label: 'Email',
-    cellWidth: '15rem',
+    label: 'E-mail',
+    cellWidth: '18rem',
     alignContent: 'left',
     sortable: true,
   },
@@ -79,57 +79,59 @@ const headCells = [
   {
     id: 'connectedWallet',
     label: 'Wallet',
-    cellWidth: '10rem',
-    alignContent: 'center',
+    cellWidth: '13rem',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'walletBalance',
     label: 'Wallet balance',
     cellWidth: '9rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'bonusBalance',
     label: 'Bonus balance',
     cellWidth: '9rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'role',
     label: 'Role',
     cellWidth: '9rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
   {
     id: 'campaignCount',
     label: 'Campaigns',
     cellWidth: '9rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'siteCount',
     label: 'Sites',
     cellWidth: '7rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'lastActiveAt',
     label: 'Last activity',
     cellWidth: '8.5rem',
-    alignContent: 'center',
+    alignContent: 'left',
     sortable: true,
   },
   {
     id: 'actions',
     label: (
-      <Tooltip title="Actions">
-        <ManageAccountsIcon size="small" color="action" />
-      </Tooltip>
+      <Box sx={{ width: '100%' }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+        <Tooltip title="Actions">
+          <MenuIcon size="small" color="black" />
+        </Tooltip>
+      </Box>
     ),
     cellWidth: '4.5rem',
     alignContent: 'center',
@@ -214,7 +216,7 @@ export default function UsersList() {
     if (wallet.length > 18) {
       return (
         <Tooltip title={wallet}>
-          <Typography variant="body1">{wallet.slice(0, 15) + '...'}</Typography>
+          <Typography variant="body2">{wallet.slice(0, 15) + '...'}</Typography>
         </Tooltip>
       );
     }
@@ -226,16 +228,16 @@ export default function UsersList() {
       ? users.data.map((user) => ({
           id: user.id,
           status: (
-            <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+            <Box className={`${commonStyles.flex} ${commonStyles.flexWrap}`}>
               <Tooltip title={user.emailConfirmed ? 'Email confirmed' : 'Email unconfirmed'}>
-                <EmailIcon sx={{ fontSize: 14 }} color={user.emailConfirmed ? 'success' : 'error'} />
+                <MailOutlineOutlinedIcon sx={{ fontSize: 14 }} color={user.emailConfirmed ? 'success' : 'error'} />
               </Tooltip>
               <Tooltip title={user.adminConfirmed ? 'Account confirmed' : 'Account unconfirmed'}>
-                <CheckBoxIcon sx={{ fontSize: 14 }} color={user.adminConfirmed ? 'success' : 'error'} />
+                <CheckBoxOutlinedIcon sx={{ fontSize: 14 }} color={user.adminConfirmed ? 'success' : 'error'} />
               </Tooltip>
               {user.isBanned && (
                 <Tooltip title={`Banned user. Reason: ${user.banReason}`}>
-                  <BlockIcon sx={{ fontSize: 14 }} color="error" />
+                  <CancelOutlinedIcon sx={{ fontSize: 14 }} color="error" />
                 </Tooltip>
               )}
             </Box>
@@ -258,18 +260,23 @@ export default function UsersList() {
       <Card
         className={`${commonStyles.card}`}
         sx={{
-          height: 'calc(100vh - 8rem)',
-          maxWidth: 'calc(100vw - 21rem)',
+          height: 'calc(100vh - 9rem)',
         }}
         width="full"
       >
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
-          <CardHeader title="Users" />
+          <CardHeader
+            titleTypographyProps={{
+              component: 'h2',
+              variant: 'h2',
+            }}
+            title="Users"
+          />
           <Button
             onClick={() => setAddUserDialogOpen((prevState) => !prevState)}
             variant="contained"
             sx={{ mr: 2 }}
-            endIcon={<PersonAddAltIcon />}
+            startIcon={<PersonAddOutlinedIcon />}
           >
             Add user
           </Button>
@@ -438,7 +445,7 @@ const UserActionsMenu = ({ user, actions }) => {
 
   return (
     <>
-      <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen}>
+      <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen} color="black">
         {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
       </IconButton>
       <Menu
@@ -610,13 +617,14 @@ const UserActionsMenu = ({ user, actions }) => {
                 Reason of ban
               </Typography>
               <Tooltip title="Reason will be displayed to the banned user">
-                <HelpIcon color="primary" sx={{ fontSize: 20 }} />
+                <InfoIcon color="secondary" sx={{ fontSize: 20 }} />
               </Tooltip>
             </Box>
             <TextField
+              customvariant="highLabel"
+              color="secondary"
               multiline
               fullWidth
-              margin="dense"
               label="Reason"
               rows={4}
               value={banReason}
@@ -644,19 +652,19 @@ const UserActionsMenu = ({ user, actions }) => {
 
       {unbanUserDialog && (
         <Dialog fullWidth maxWidth="xs" open={unbanUserDialog} onClose={() => setUnbanUserDialog((prevState) => !prevState)}>
-          <DialogTitle align="center">Confirm</DialogTitle>
+          <DialogTitle>Confirm</DialogTitle>
           <DialogContent>
-            <Typography align="center" variant="body1" sx={{ color: 'success.main' }}>
+            <Typography variant="body1" sx={{ color: 'success.main' }}>
               Do you want unban user {user.email}?
             </Typography>
-            <Typography align="center" variant="body1" sx={{ color: 'error.main' }}>
+            <Typography variant="body1" sx={{ color: 'error.main' }}>
               <Typography component="span" variant="body1" sx={{ fontWeight: 700, mr: 1 }}>
                 Reason of ban:
               </Typography>
               {user.banReason}
             </Typography>
           </DialogContent>
-          <DialogActions className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+          <DialogActions>
             <Button variant="outlined" onClick={() => setUnbanUserDialog((prevState) => !prevState)}>
               No
             </Button>
@@ -675,12 +683,16 @@ const UserActionsMenu = ({ user, actions }) => {
       )}
 
       {deleteUserDialog && (
-        <Dialog open={deleteUserDialog} onClose={() => setDeleteUserDialog((prevState) => !prevState)}>
+        <Dialog
+          open={deleteUserDialog}
+          onClose={() => {
+            setDeleteUserDialog((prevState) => !prevState);
+            setDeletionConfirmed(false);
+          }}
+        >
           <DialogTitle component="div">
-            <Typography align="center" variant="h6">
-              Do you want delete this user?
-            </Typography>
-            <Typography align="center" variant="body1" sx={{ color: 'grey.600' }}>
+            <Typography variant="h6">Do you want delete this user?</Typography>
+            <Typography variant="body1" sx={{ color: 'grey.600' }}>
               {user.email}
             </Typography>
           </DialogTitle>
@@ -691,7 +703,7 @@ const UserActionsMenu = ({ user, actions }) => {
             />
           </DialogContent>
           <DialogActions>
-            <Button variant="outlined" onClick={() => setBanUserDialog((prevState) => !prevState)}>
+            <Button variant="outlined" onClick={() => setDeleteUserDialog((prevState) => !prevState)}>
               Close
             </Button>
             <Button
@@ -791,14 +803,14 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
 
   return (
     <>
-      <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen((prevState) => !prevState)}>
+      <Dialog fullWidth maxWidth="xs" open={open} onClose={() => onCloseClick()}>
         <DialogTitle>{mode === 'add' ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
-            margin="dense"
+            customvariant="highLabel"
+            color="secondary"
             label="Email"
-            size="small"
             name="email"
             value={form.fields.email}
             onFocus={form.setTouched}
@@ -812,7 +824,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
               control={<Checkbox checked={forcePasswordChange} onChange={() => setForcePasswordChange((prevState) => !prevState)} />}
             />
           </Collapse>
-          <FormControl fullWidth size="small" margin="dense">
+          <FormControl fullWidth customvariant="highLabel" color="secondary">
             <InputLabel id="rolesPickerLabel">Roles</InputLabel>
             <Select
               labelId="rolesPickerLabel"
@@ -831,12 +843,11 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size="small" margin="dense">
+          <FormControl fullWidth customvariant="highLabel" color="secondary">
             <InputLabel id="networkLabel">Network</InputLabel>
             <Select
               labelId="networkLabel"
               id="networkSelect"
-              label="Network"
               name="network"
               value={form.fields.network}
               onFocus={form.setTouched}
@@ -848,9 +859,9 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
           </FormControl>
           <TextField
             fullWidth
-            margin="dense"
+            customvariant="highLabel"
+            color="secondary"
             label="ADS | BSC wallet address"
-            size="small"
             name={'wallet'}
             value={form.fields.wallet}
             onChange={form.onChange}
@@ -921,17 +932,16 @@ const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
   }, [customFilters.query]);
 
   return (
-    <TextField
-      size="small"
-      sx={{ mr: 2 }}
-      margin="dense"
-      name="query"
-      label="By email or domain"
-      variant="outlined"
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-      inputProps={{ autoComplete: 'off' }}
-    />
+    <FormControl sx={{ mr: 3 }} customvariant="highLabel">
+      <InputLabel id="filterByQueryLabel">By email or domain</InputLabel>
+      <OutlinedInput
+        color="secondary"
+        name="query"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        inputProps={{ autoComplete: 'off' }}
+      />
+    </FormControl>
   );
 };
 
@@ -941,13 +951,13 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl size="small" sx={{ minWidth: '9rem', mr: 2 }} margin="dense">
+    <FormControl sx={{ minWidth: '10rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByRoleLabel">By user's role</InputLabel>
       <Select
+        color="secondary"
         labelId="filterByRoleLabel"
         id="filterByRoleSelect"
         value={customFilters.role || ''}
-        label="By user's role"
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -976,13 +986,13 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl size="small" sx={{ minWidth: '11.5rem', mr: 2 }} margin="dense">
+    <FormControl sx={{ minWidth: '13rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByEmailStatusLabel">By email status</InputLabel>
       <Select
+        color="secondary"
         labelId="filterByEmailStatusLabel"
         id="filterByEmailStatusSelect"
         value={customFilters.hasOwnProperty('emailConfirmed') ? customFilters.emailConfirmed : ''}
-        label="By email status"
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -1008,13 +1018,13 @@ const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl size="small" sx={{ minWidth: '12.5rem', mr: 2 }} margin="dense">
+    <FormControl sx={{ minWidth: '14.5rem', mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByAccountStatusLabel">By account status</InputLabel>
       <Select
+        color="secondary"
         labelId="filterByAccountStatusLabel"
         id="filterByEmailStatusSelect"
         value={customFilters.hasOwnProperty('adminConfirmed') ? customFilters.adminConfirmed : ''}
-        label="By account status"
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
