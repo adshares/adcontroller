@@ -175,34 +175,34 @@ function InfoTable({ stepData }) {
       <TableBody>
         <TableRow>
           <TableCell align="left">
-            <Typography variant="tableAssetsText">Adserver's name</Typography>{' '}
+            <Typography variant="tableText1">Adserver's name</Typography>{' '}
           </TableCell>
           <TableCell align="left">
-            <Typography variant="tableAssetsText">{stepData.Name}</Typography>
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align="left">
-            <Typography variant="tableAssetsText">Adserver's domain</Typography>
-          </TableCell>
-          <TableCell align="left">
-            <Typography variant="tableAssetsText">{stepData.Domain}</Typography>
+            <Typography variant="tableText1">{stepData.Name}</Typography>
           </TableCell>
         </TableRow>
         <TableRow>
           <TableCell align="left">
-            <Typography variant="tableAssetsText">Support email</Typography>
+            <Typography variant="tableText1">Adserver's domain</Typography>
           </TableCell>
           <TableCell align="left">
-            <Typography variant="tableAssetsText">{stepData.SupportEmail}</Typography>
+            <Typography variant="tableText1">{stepData.Domain}</Typography>
           </TableCell>
         </TableRow>
         <TableRow>
           <TableCell align="left">
-            <Typography variant="tableAssetsText">Technical email</Typography>
+            <Typography variant="tableText1">Support email</Typography>
           </TableCell>
           <TableCell align="left">
-            <Typography variant="tableAssetsText">{stepData.TechnicalEmail}</Typography>
+            <Typography variant="tableText1">{stepData.SupportEmail}</Typography>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell align="left">
+            <Typography variant="tableText1">Technical email</Typography>
+          </TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">{stepData.TechnicalEmail}</Typography>
           </TableCell>
         </TableRow>
       </TableBody>

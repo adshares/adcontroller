@@ -123,6 +123,40 @@ const theme = createTheme({
         },
       },
     },
+    MuiTableContainer: {
+      styleOverrides: {
+        root: {
+          '&::-webkit-scrollbar': {
+            backgroundColor: 'transparent',
+            width: '8px',
+            height: '8px',
+            borderRadius: '10px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: `${navy}50`,
+            width: '8px',
+            borderRadius: '10px',
+          },
+        },
+      },
+    },
+    MuiList: {
+      styleOverrides: {
+        root: {
+          '&::-webkit-scrollbar': {
+            backgroundColor: 'transparent',
+            width: '8px',
+            height: '8px',
+            borderRadius: '10px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: `${navy}50`,
+            width: '8px',
+            borderRadius: '10px',
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -447,9 +481,13 @@ const theme = createTheme({
       letterSpacing: '0.055em',
       lineHeight: '1.1',
     },
-    tableAssetsText: {
+    tableText1: {
       fontSize: '20px',
       fontVariationSettings: '"wght" 500',
+      lineHeight: 1.5,
+    },
+    tableText2: {
+      fontSize: '12px',
       lineHeight: 1.5,
     },
 

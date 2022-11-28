@@ -160,42 +160,42 @@ const InfoTable = ({ stepData }) => (
     <TableBody>
       <TableRow>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">License owner</Typography>
+          <Typography variant="tableText1">License owner</Typography>
         </TableCell>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">{stepData.Owner}</Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell align="left">
-          <Typography variant="tableAssetsText">License type</Typography>
-        </TableCell>
-        <TableCell align="left">
-          <Typography variant="tableAssetsText">{stepData.Type}</Typography>
+          <Typography variant="tableText1">{stepData.Owner}</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">License expiration date</Typography>
+          <Typography variant="tableText1">License type</Typography>
         </TableCell>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">{stepData.DateEnd.replace('T', ' ').slice(0, stepData.DateEnd.length - 6)}</Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell align="left">
-          <Typography variant="tableAssetsText">Fixed fee</Typography>
-        </TableCell>
-        <TableCell align="left">
-          <Typography variant="tableAssetsText">{stepData.FixedFee} ADS</Typography>
+          <Typography variant="tableText1">{stepData.Type}</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">Supply fee / Demand fee</Typography>
+          <Typography variant="tableText1">License expiration date</Typography>
         </TableCell>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">
+          <Typography variant="tableText1">{stepData.DateEnd.replace('T', ' ').slice(0, stepData.DateEnd.length - 6)}</Typography>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">
+          <Typography variant="tableText1">Fixed fee</Typography>
+        </TableCell>
+        <TableCell align="left">
+          <Typography variant="tableText1">{stepData.FixedFee} ADS</Typography>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">
+          <Typography variant="tableText1">Supply fee / Demand fee</Typography>
+        </TableCell>
+        <TableCell align="left">
+          <Typography variant="tableText1">
             {stepData.SupplyFee * 100}% / {stepData.DemandFee * 100}%
           </Typography>
         </TableCell>

@@ -217,10 +217,10 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
           <TableBody>
             <TableRow>
               <TableCell align="center">
-                <Typography variant="tableAssetsText">ADS account address</Typography>
+                <Typography variant="tableText1">ADS account address</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="tableAssetsText">{walletForm.fields.WalletAddress}</Typography>
+                <Typography variant="tableText1">{walletForm.fields.WalletAddress}</Typography>
               </TableCell>
             </TableRow>
           </TableBody>

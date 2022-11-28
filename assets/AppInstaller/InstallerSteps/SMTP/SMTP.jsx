@@ -203,34 +203,34 @@ const InfoTable = ({ stepData }) => (
     <TableBody>
       <TableRow>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">SMTP host</Typography>
+          <Typography variant="tableText1">SMTP host</Typography>
         </TableCell>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">{stepData.SmtpHost}</Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell align="left">
-          <Typography variant="tableAssetsText">SMTP port</Typography>
-        </TableCell>
-        <TableCell align="left">
-          <Typography variant="tableAssetsText">{stepData.SmtpPort}</Typography>
+          <Typography variant="tableText1">{stepData.SmtpHost}</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">SMTP sender</Typography>
+          <Typography variant="tableText1">SMTP port</Typography>
         </TableCell>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">{stepData.SmtpSender}</Typography>
+          <Typography variant="tableText1">{stepData.SmtpPort}</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">SMTP username</Typography>
+          <Typography variant="tableText1">SMTP sender</Typography>
         </TableCell>
         <TableCell align="left">
-          <Typography variant="tableAssetsText">{stepData.SmtpUsername}</Typography>
+          <Typography variant="tableText1">{stepData.SmtpSender}</Typography>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell align="left">
+          <Typography variant="tableText1">SMTP username</Typography>
+        </TableCell>
+        <TableCell align="left">
+          <Typography variant="tableText1">{stepData.SmtpUsername}</Typography>
         </TableCell>
       </TableRow>
     </TableBody>

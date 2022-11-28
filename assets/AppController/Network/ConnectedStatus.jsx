@@ -13,7 +13,7 @@ const headCells = [
   {
     id: 'name',
     label: 'Name',
-    cellWidth: '10rem',
+    cellWidth: '13rem',
     alignContent: 'left',
   },
   {
@@ -25,25 +25,25 @@ const headCells = [
   {
     id: 'url',
     label: 'URL',
-    cellWidth: '12rem',
+    cellWidth: '10rem',
     alignContent: 'left',
   },
   {
     id: 'wallet',
     label: 'Wallet',
-    cellWidth: '10rem',
+    cellWidth: '13rem',
     alignContent: 'left',
   },
   {
     id: 'lastSync',
     label: 'Last synchronization',
-    cellWidth: '10rem',
+    cellWidth: '12rem',
     alignContent: 'left',
   },
   {
     id: 'campaigns',
     label: 'Campaigns',
-    cellWidth: '8rem',
+    cellWidth: '9rem',
     alignContent: 'left',
   },
   {
@@ -74,7 +74,11 @@ export default function ConnectedStatus() {
     return hosts.map((host) => ({
       id: host.id,
       name: host.name,
-      url: host.url,
+      url: (
+        <Typography variant="tableText2" sx={{ overflowWrap: 'anywhere' }}>
+          {host.url}
+        </Typography>
+      ),
       wallet: host.walletAddress,
       lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
       campaigns: host.campaignCount,

@@ -106,13 +106,13 @@ function Status({ handlePrevStep, step }) {
           <TableBody>
             <TableRow>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adserver.module}</Typography>
+                <Typography variant="tableText1">{stepData.adserver.module}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adserver.version}</Typography>
+                <Typography variant="tableText1">{stepData.adserver.version}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adserver.url}</Typography>
+                <Typography variant="tableText1">{stepData.adserver.url}</Typography>
               </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adserver.code}>
@@ -122,13 +122,13 @@ function Status({ handlePrevStep, step }) {
             </TableRow>
             <TableRow>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adpanel.module}</Typography>
+                <Typography variant="tableText1">{stepData.adpanel.module}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adpanel.version}</Typography>
+                <Typography variant="tableText1">{stepData.adpanel.version}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adpanel.url}</Typography>
+                <Typography variant="tableText1">{stepData.adpanel.url}</Typography>
               </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adpanel.code}>
@@ -138,13 +138,13 @@ function Status({ handlePrevStep, step }) {
             </TableRow>
             <TableRow>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.aduser.module}</Typography>
+                <Typography variant="tableText1">{stepData.aduser.module}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.aduser.version}</Typography>
+                <Typography variant="tableText1">{stepData.aduser.version}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.aduser.url}</Typography>
+                <Typography variant="tableText1">{stepData.aduser.url}</Typography>
               </TableCell>
               <TableCell>
                 <Tooltip title={stepData.aduser.code}>
@@ -154,13 +154,13 @@ function Status({ handlePrevStep, step }) {
             </TableRow>
             <TableRow>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adselect.module}</Typography>
+                <Typography variant="tableText1">{stepData.adselect.module}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adselect.version}</Typography>
+                <Typography variant="tableText1">{stepData.adselect.version}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adselect.url}</Typography>
+                <Typography variant="tableText1">{stepData.adselect.url}</Typography>
               </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adselect.code}>
@@ -170,13 +170,13 @@ function Status({ handlePrevStep, step }) {
             </TableRow>
             <TableRow>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adclassify.module}</Typography>
+                <Typography variant="tableText1">{stepData.adclassify.module}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adclassify.version}</Typography>
+                <Typography variant="tableText1">{stepData.adclassify.version}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adclassify.url}</Typography>
+                <Typography variant="tableText1">{stepData.adclassify.url}</Typography>
               </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adclassify.code}>
@@ -186,13 +186,13 @@ function Status({ handlePrevStep, step }) {
             </TableRow>
             <TableRow>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adpay.module}</Typography>
+                <Typography variant="tableText1">{stepData.adpay.module}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adpay.version}</Typography>
+                <Typography variant="tableText1">{stepData.adpay.version}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData.adpay.url}</Typography>
+                <Typography variant="tableText1">{stepData.adpay.url}</Typography>
               </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adpay.code}>
@@ -202,13 +202,13 @@ function Status({ handlePrevStep, step }) {
             </TableRow>
             <TableRow>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData['main.js'].module}</Typography>
+                <Typography variant="tableText1">{stepData['main.js'].module}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData['main.js'].version}</Typography>
+                <Typography variant="tableText1">{stepData['main.js'].version}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableAssetsText">{stepData['main.js'].url}</Typography>
+                <Typography variant="tableText1">{stepData['main.js'].url}</Typography>
               </TableCell>
               <TableCell>
                 <Tooltip title={stepData['main.js'].code}>

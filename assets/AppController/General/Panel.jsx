@@ -423,7 +423,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
                     </Box>
                   </TableCell>
                   <TableCell width="58%" align="left">
-                    <Typography variant="tableAssetsText" sx={{ overflowWrap: 'anywhere' }}>
+                    <Typography variant="tableText1" sx={{ overflowWrap: 'anywhere' }}>
                       {img.url}
                     </Typography>
                   </TableCell>
@@ -488,7 +488,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
                     </TableCell>
                     <TableCell width="85%" align="left">
                       <Box display="grid">
-                        <Typography variant="tableAssetsText" noWrap>
+                        <Typography variant="tableText1" noWrap>
                           {img.name}
                         </Typography>
                         {!img.isImage && <Typography color="error">File must be image</Typography>}
@@ -707,7 +707,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableAssetsText">
+                    <Typography variant="tableText1">
                       {width}x{height}{' '}
                       {changedFiles.hasOwnProperty(id) && (
                         <Typography component="span" variant="body2" color="error">
@@ -771,7 +771,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableAssetsText" color="white.main">
+                    <Typography variant="tableText1" color="white.main">
                       Min height {height}{' '}
                       {changedFiles.hasOwnProperty(id) && (
                         <Typography component="span" variant="body2" color="error.main">
