@@ -427,6 +427,19 @@ const theme = createTheme({
           borderRadius: '15px',
           borderTopLeftRadius: 0,
           padding: '38px',
+          '& .MuiBox-root': {
+            '&::-webkit-scrollbar': {
+              backgroundColor: 'transparent',
+              width: '8px',
+              height: '8px',
+              borderRadius: '10px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: `${navy}50`,
+              width: '8px',
+              borderRadius: '10px',
+            },
+          },
         },
       },
     },
