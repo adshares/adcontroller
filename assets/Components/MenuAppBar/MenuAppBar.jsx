@@ -5,6 +5,8 @@ import configSelectors from '../../redux/config/configSelectors';
 import { AppBar, IconButton, Link, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
+import commonStyles from '../../styles/commonStyles.scss';
+import Icon from '../Icon/Icon';
 
 export default function MenuAppBar({ showProtectedOptions = false, showSideMenu, toggleSideMenu, showSideMenuIcon = false }) {
   const appData = useSelector(configSelectors.getAppData);
@@ -23,16 +25,38 @@ export default function MenuAppBar({ showProtectedOptions = false, showSideMenu,
   };
 
   return (
-    <AppBar position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar position="sticky" color="grayBg" sx={{ boxShadow: 'none' }}>
       <Toolbar>
+        {!showProtectedOptions && (
+          <>
+            <Box sx={{ marginRight: 'auto', marginLeft: 'auto' }}>
+              <Icon
+                name="logo"
+                sx={{
+                  width: 32,
+                  height: 32,
+                  color: 'white.black',
+                }}
+              />
+              <Icon
+                name="adSharesText"
+                sx={{
+                  ml: 1,
+                  mb: 1,
+                  width: 79,
+                  height: 9,
+                  color: 'white.black',
+                }}
+              />
+            </Box>
+          </>
+        )}
+        {showProtectedOptions && !showSideMenuIcon && <Typography variant="h3">Installer</Typography>}
         {showProtectedOptions && showSideMenuIcon && (
           <IconButton size="large" color="inherit" onClick={() => toggleSideMenu(!showSideMenu)}>
             <MenuIcon />
           </IconButton>
         )}
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Adshares - AdController
-        </Typography>
         {showProtectedOptions && (
           <>
             {appData.AdPanel.Url && (
@@ -41,7 +65,7 @@ export default function MenuAppBar({ showProtectedOptions = false, showSideMenu,
               </Link>
             )}
             <IconButton size="large" onClick={handleMenu} color="inherit">
-              <AccountCircle />
+              <AccountCircleOutlinedIcon />
             </IconButton>
             <Menu
               open={!!anchorEl}

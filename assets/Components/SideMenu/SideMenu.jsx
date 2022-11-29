@@ -4,7 +4,6 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAccordion from '@mui/material/Accordion';
-import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
@@ -12,10 +11,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { AccordionDetails, Typography } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { AccordionDetails, AccordionSummary, Typography } from '@mui/material';
+import Icon from '../Icon/Icon';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import commonStyles from '../../styles/commonStyles.scss';
 
-const drawerWidth = 256;
+const drawerWidth = 292;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -40,7 +41,7 @@ const closedMixin = (theme) => ({
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
   width: drawerWidth,
-  // flexShrink: 0,
+  flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
   ...(open && {
@@ -51,21 +52,20 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     ...closedMixin(theme),
     '& .MuiDrawer-paper': closedMixin(theme),
   }),
+  '& .MuiDrawer-paper::-webkit-scrollbar': {
+    backgroundColor: theme.palette.deep.dark,
+    width: '8px',
+    borderRadius: '10px',
+  },
+  '& .MuiDrawer-paper::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.palette.blue.main,
+    borderRadius: '10px',
+  },
 }));
 
 const Accordion = styled(MuiAccordion, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme }) => ({
   '&': {
     boxShadow: 'none',
-  },
-  '& .MuiAccordion-region:before': {
-    content: '""',
-    display: 'block',
-    height: 'calc(100% - 48px)',
-    width: '2px',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    position: 'absolute',
-    left: '14px',
-    borderRadius: '2px',
   },
   flexShrink: 0,
   whiteSpace: 'nowrap',
@@ -78,12 +78,6 @@ const Accordion = styled(MuiAccordion, { shouldForwardProp: (prop) => prop !== '
     ...closedMixin(theme),
     '& .MuiDrawer-paper': closedMixin(theme),
   }),
-}));
-
-const AccordionSummary = styled(MuiAccordionSummary)(() => ({
-  '&:hover': {
-    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-  },
 }));
 
 const getMappedMenuItems = (items) => {
@@ -112,27 +106,97 @@ const getMappedMenuItems = (items) => {
   };
 
   return items.map((item) => {
-    if (item.children) {
-      return (
-        <ListItem key={item.name} disablePadding>
-          <Accordion expanded={expanded.includes(item.name)} onChange={handleChange(item.name)} disableGutters square>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <ListItemIcon>{<item.icon sx={item.rotateIcon && { transform: `rotate(${item.rotateIcon})` }} />}</ListItemIcon>
-              <Typography>{item.name}</Typography>
+    return (
+      <ListItem key={item.name} disablePadding>
+        {item.children ? (
+          <Accordion
+            sx={{ backgroundColor: 'transparent' }}
+            expanded={expanded.includes(item.name)}
+            onChange={handleChange(item.name)}
+            disableGutters
+            square
+          >
+            <AccordionSummary
+              sx={{
+                pl: 3,
+                pr: 3,
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 47, 54, 0.5)',
+                },
+              }}
+              expandIcon={<ArrowDropDownIcon color="white" />}
+            >
+              <ListItemIcon>
+                {React.createElement(item.icon, {
+                  sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
+                  color: 'white',
+                })}
+              </ListItemIcon>
+              <Typography sx={{ color: 'white.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
             </AccordionSummary>
-            <AccordionDetails>
-              <List>{getMappedMenuItems(item.children, navigate)}</List>
+            <AccordionDetails
+              sx={{
+                backgroundColor: 'deep.main',
+                boxShadow: 'inset 0px 4px 4px rgba(0, 0, 0, 0.25)',
+                pl: 0,
+                pr: 0,
+                pt: 1,
+                pb: 1,
+              }}
+            >
+              <List disablePadding>
+                {item.children.map((children) => (
+                  <ListItemButton
+                    key={item.name + children.name}
+                    className={`${commonStyles.flex} ${commonStyles.alignCenter}`}
+                    sx={{ padding: '8px 24px', '&:hover': { backgroundColor: 'rgba(0, 61, 77, 0.5)' } }}
+                    onClick={() => navigate(children.path)}
+                  >
+                    <ListItemIcon>
+                      {React.createElement(children.icon, {
+                        sx: { transform: children.rotateIcon && `rotate(${children.rotateIcon})` },
+                        color: children.path === location.pathname ? 'blue' : 'white',
+                      })}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={children.name}
+                      primaryTypographyProps={{
+                        sx: {
+                          color: children.path === location.pathname ? 'blue.main' : 'white.main',
+                          margin: 0,
+                          fontVariationSettings: '"wght" 500',
+                        },
+                      }}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
             </AccordionDetails>
           </Accordion>
-        </ListItem>
-      );
-    }
-    return (
-      <ListItem key={item.name} disablePadding onClick={() => navigate(item.path)}>
-        <ListItemButton selected={item.path === location.pathname}>
-          <ListItemIcon>{<item.icon sx={item.rotateIcon && { transform: `rotate(${item.rotateIcon})` }} />}</ListItemIcon>
-          <ListItemText primary={item.name} primaryTypographyProps={{ sx: { fontWeight: item.path === location.pathname ? 600 : 400 } }} />
-        </ListItemButton>
+        ) : (
+          <ListItemButton
+            className={`${commonStyles.flex} ${commonStyles.alignCenter}`}
+            sx={{ padding: '8px 24px', '&:hover': { backgroundColor: 'rgba(0, 47, 54, 0.5)' } }}
+            onClick={() => navigate(item.path)}
+          >
+            <ListItemIcon>
+              {React.createElement(item.icon, {
+                sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
+                color: item.path === location.pathname ? 'blue' : 'white',
+              })}
+            </ListItemIcon>
+            <ListItemText
+              primary={item.name}
+              primaryTypographyProps={{
+                sx: {
+                  color: item.path === location.pathname ? 'blue.main' : 'white.main',
+                  margin: 0,
+                  fontVariationSettings: '"wght" 600',
+                },
+              }}
+            />
+          </ListItemButton>
+        )}
       </ListItem>
     );
   });
@@ -143,12 +207,42 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
 
   return (
     enableSideMenu && (
-      <Drawer open={showSideMenu} onClose={() => toggleSideMenu(false)} variant="permanent">
-        <Toolbar />
-        <Box>
-          <List>{items}</List>
-          <Divider />
-        </Box>
+      <Drawer
+        PaperProps={{
+          sx: {
+            backgroundColor: 'navy.main',
+          },
+        }}
+        open={showSideMenu}
+        onClose={() => toggleSideMenu(false)}
+        variant="permanent"
+      >
+        <Toolbar sx={{ pl: 2 }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+          <Box>
+            <Icon
+              name="logo"
+              sx={{
+                width: 32,
+                height: 32,
+                color: 'white.main',
+              }}
+            />
+            {showSideMenu && (
+              <Icon
+                name="adSharesText"
+                sx={{
+                  ml: 1,
+                  mb: 1,
+                  width: 79,
+                  height: 9,
+                  color: 'white.main',
+                }}
+              />
+            )}
+          </Box>
+        </Toolbar>
+        <Divider sx={{ borderColor: 'deep.main' }} />
+        <List disablePadding>{items}</List>
       </Drawer>
     )
   );

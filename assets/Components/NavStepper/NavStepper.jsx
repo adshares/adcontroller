@@ -1,9 +1,31 @@
 import React from 'react';
-import { Box, Step, Stepper, StepButton, Typography } from '@mui/material';
 import { useLocation } from 'react-router-dom';
+import { Stepper, StepButton, Typography } from '@mui/material';
+import MuiStep from '@mui/material/Step';
+import { styled } from '@mui/material/styles';
+
+const Step = styled(MuiStep)(({ theme, disabled, active, current }) => {
+  return {
+    '& .MuiStepLabel-root': {
+      '& .MuiStepLabel-label': {
+        fontVariationSettings: disabled ? '"wght" 400' : '"wght" 900',
+        color: disabled ? '#7b7b7b' : current ? theme.palette.primary.main : 'inherit',
+      },
+      '& circle': {
+        r: 11,
+        fill: disabled ? '#7b7b7b' : current ? theme.palette.primary.main : 'transparent',
+        stroke: active && !current ? theme.palette.black.main : 'transparent',
+      },
+      '& text': {
+        fill: active && !current ? theme.palette.black.main : theme.palette.white.main,
+        stroke: 'none',
+        fontVariationSettings: !current && !disabled ? '"wght" 900' : '"wght" 400',
+      },
+    },
+  };
+});
 
 const NavStepper = ({ steps, unlockedSteps, handleCurrentStep }) => {
-  const completedSteps = unlockedSteps.filter((step) => step.index < unlockedSteps.length).map((step) => step.path);
   const location = useLocation();
 
   const items = steps.map((step) => {
@@ -13,25 +35,19 @@ const NavStepper = ({ steps, unlockedSteps, handleCurrentStep }) => {
         key={step.index}
         disabled={step.index > unlockedSteps.length}
         active={step.index <= unlockedSteps.length}
-        completed={completedSteps.includes(step.path)}
+        current={activeStep ? 1 : 0}
       >
         <StepButton
-          sx={{ textTransform: 'capitalize', padding: '16px', margin: '-16px', borderRadius: '8px' }}
+          sx={{ textTransform: 'uppercase', padding: '16px', margin: '-16px', borderRadius: '8px' }}
           onClick={() => handleCurrentStep(step)}
         >
-          <Typography variant="body2" sx={activeStep ? { fontWeight: 600, color: 'primary.main' } : undefined}>
-            {step.path === 'smtp' ? step.path.toUpperCase() : step.path}
-          </Typography>
+          <Typography variant="body2">{step.path}</Typography>
         </StepButton>
       </Step>
     );
   });
 
-  return (
-    <Box sx={{ width: '100%', mb: 2 }}>
-      <Stepper>{items}</Stepper>
-    </Box>
-  );
+  return <Stepper sx={{ width: '100%', mb: 2 }}>{items}</Stepper>;
 };
 
 export default NavStepper;

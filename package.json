@@ -45,8 +45,8 @@
         "@mui/icons-material": "^5.8.4",
         "@mui/lab": "^5.0.0-alpha.98",
         "@mui/material": "^5.8.3",
-        "@mui/styles": "^5.8.4",
-        "@mui/x-date-pickers": "^5.0.4",
+        "@mui/system": "^5.10.15",
+        "@mui/x-date-pickers": "^5.0.9",
         "@reduxjs/toolkit": "^1.8.3",
         "dayjs": "^1.11.5",
         "notistack": "^2.0.5",
@@ -55,7 +55,6 @@
         "react": "^18.1.0",
         "react-dom": "^18.1.0",
         "react-redux": "^8.0.2",
-        "react-router-dom": "^6.3.0",
-        "redux-persist": "^6.0.0"
+        "react-router-dom": "^6.3.0"
     }
 }

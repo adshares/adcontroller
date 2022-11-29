@@ -43,7 +43,7 @@ class AdServerConfigurationClient
     public const ADUSER_INTERNAL_URL = 'aduserInternalUrl';
     private const ADUSER_SERVE_SUBDOMAIN = 'aduserServeSubdomain';
     public const ADVERTISER_APPLY_FORM_URL = 'advertiserApplyFormUrl';
-    public const ALLOW_ZONE_IN_IFRAME = 'allow_zoneInIframe';
+    public const ALLOW_ZONE_IN_IFRAME = 'allowZoneInIframe';
     public const AUTO_CONFIRMATION_ENABLED = 'autoConfirmationEnabled';
     public const AUTO_REGISTRATION_ENABLED = 'autoRegistrationEnabled';
     public const AUTO_WITHDRAWAL_LIMIT_ADS = 'autoWithdrawalLimitAds';
@@ -111,7 +111,7 @@ class AdServerConfigurationClient
     private const MAIN_JS_BASE_URL = 'mainJsBaseUrl';
     private const MAIN_JS_TLD = 'mainJsTld';
     public const MAX_PAGE_ZONES = 'maxPageZones';
-    private const NETWORK_DATA_CACHE_TTL = 'network_data_cacheTtl';
+    private const NETWORK_DATA_CACHE_TTL = 'networkDataCacheTtl';
     private const NOW_PAYMENTS_API_KEY = 'nowPaymentsApiKey';
     private const NOW_PAYMENTS_CURRENCY = 'nowPaymentsCurrency';
     private const NOW_PAYMENTS_EXCHANGE = 'nowPaymentsExchange';

@@ -1,5 +1,4 @@
 import React from 'react';
-import commonStyles from '../../styles/commonStyles.scss';
 import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
 import { useCreateNotification, useForm } from '../../hooks';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,20 +50,16 @@ export default function SMTP() {
   };
 
   return (
-    <Card className={`${commonStyles.card}`} width="mainContainer">
+    <Card sx={{ justifySelf: 'center' }}>
       <CardHeader title="SMTP configuration" />
 
-      <CardContent className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter} `}>
-        <Box
-          component="form"
-          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
-          onChange={smtpForm.onChange}
-          onFocus={smtpForm.setTouched}
-        >
+      <CardContent>
+        <Box component="form" onChange={smtpForm.onChange} onFocus={smtpForm.setTouched}>
           <TextField
+            sx={{ mb: 3 }}
+            customvariant="highLabel"
+            color="secondary"
             fullWidth
-            margin="dense"
-            size="small"
             name="SmtpHost"
             label="SMTP host"
             error={smtpForm.touchedFields.SmtpHost && !smtpForm.errorObj.SmtpHost.isValid}
@@ -74,9 +69,10 @@ export default function SMTP() {
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
+            sx={{ mb: 3 }}
+            customvariant="highLabel"
+            color="secondary"
             fullWidth
-            margin="dense"
-            size="small"
             error={smtpForm.touchedFields.SmtpPort && !smtpForm.errorObj.SmtpPort.isValid}
             label="SMTP port"
             helperText={smtpForm.touchedFields.SmtpPort && smtpForm.errorObj.SmtpPort.helperText}
@@ -86,9 +82,10 @@ export default function SMTP() {
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
+            sx={{ mb: 3 }}
+            customvariant="highLabel"
+            color="secondary"
             fullWidth
-            margin="dense"
-            size="small"
             name="SmtpSender"
             label="SMTP sender"
             error={smtpForm.touchedFields.SmtpSender && !smtpForm.errorObj.SmtpSender.isValid}
@@ -98,9 +95,10 @@ export default function SMTP() {
             inputProps={{ autoComplete: 'off' }}
           />
           <TextField
+            sx={{ mb: 3 }}
+            customvariant="highLabel"
+            color="secondary"
             fullWidth
-            margin="dense"
-            size="small"
             name="SmtpUsername"
             label="SMTP username"
             error={smtpForm.touchedFields.SmtpUsername && !smtpForm.errorObj.SmtpUsername.isValid}
@@ -110,16 +108,11 @@ export default function SMTP() {
             inputProps={{ autoComplete: 'off' }}
           />
         </Box>
-        <Box
-          component="form"
-          className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}
-          onChange={onPasswordChange}
-          onFocus={passwordForm.setTouched}
-        >
+        <Box component="form" onChange={onPasswordChange} onFocus={passwordForm.setTouched}>
           <TextField
+            customvariant="highLabel"
             fullWidth
-            margin="dense"
-            size="small"
+            color="secondary"
             name="SmtpPassword"
             label="New password"
             type="password"
@@ -130,16 +123,14 @@ export default function SMTP() {
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button
-            disabled={isLoading || ((!smtpForm.isFormWasChanged || !smtpForm.isFormValid) && !passwordForm.isFormWasChanged)}
-            type="button"
-            variant="contained"
-            onClick={onSaveClick}
-          >
-            Save
-          </Button>
-        </Box>
+        <Button
+          disabled={isLoading || ((!smtpForm.isFormWasChanged || !smtpForm.isFormValid) && !passwordForm.isFormWasChanged)}
+          type="button"
+          variant="contained"
+          onClick={onSaveClick}
+        >
+          Save
+        </Button>
       </CardActions>
     </Card>
   );

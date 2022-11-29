@@ -26,7 +26,7 @@ const headCells = [
     id: 'type',
     label: 'Type',
     cellWidth: '15rem',
-    alignContent: 'center',
+    alignContent: 'left',
     filterableBy: ['select'],
     possibleSelectionOptions: [
       'BroadcastSent',
@@ -42,14 +42,14 @@ const headCells = [
     id: 'createdAt',
     label: 'Date of occurrence',
     cellWidth: '15rem',
-    alignContent: 'center',
+    alignContent: 'left',
     filterableBy: ['date'],
   },
   {
     id: 'properties',
     label: 'Properties',
     cellWidth: '15rem',
-    alignContent: 'center',
+    alignContent: 'left',
   },
 ];
 
@@ -100,10 +100,9 @@ export default function Events() {
     <Card
       className={`${commonStyles.card}`}
       sx={{
-        height: 'calc(100vh - 8rem)',
-        maxWidth: 'calc(100vw - 21rem)',
+        justifySelf: 'center',
+        height: 'calc(100vh - 9rem)',
       }}
-      width="full"
     >
       <CardHeader title="Events" />
       <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
@@ -129,7 +128,11 @@ const PropertiesDialog = ({ data }) => {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="text" onClick={() => setOpen(true)}>
+      <Button
+        sx={{ padding: 0, minWidth: 'auto', boxShadow: 'none', '&:hover': { backgroundColor: 'inherit' } }}
+        variant="text"
+        onClick={() => setOpen(true)}
+      >
         Details
       </Button>
       <Dialog fullWidth maxWidth="sm" open={open} onClose={() => setOpen(false)}>
@@ -143,20 +146,20 @@ const PropertiesDialog = ({ data }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="none" align="center" sx={{ pt: 1, pb: 1 }}>
+                <TableCell padding="none" align="left" sx={{ pt: 1, pb: 1 }}>
                   Type
                 </TableCell>
-                <TableCell padding="none" align="center" sx={{ pt: 1, pb: 1 }}>
+                <TableCell padding="none" align="left" sx={{ pt: 1, pb: 1 }}>
                   Date of occurrence
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell padding="none" align="center" sx={{ pt: 1, pb: 1 }}>
+                <TableCell padding="none" align="left" sx={{ pt: 1, pb: 1 }}>
                   {data.type}
                 </TableCell>
-                <TableCell padding="none" align="center" sx={{ pt: 1, pb: 1 }}>
+                <TableCell padding="none" align="left" sx={{ pt: 1, pb: 1 }}>
                   {new Date(data.createdAt).toLocaleString()}
                 </TableCell>
               </TableRow>

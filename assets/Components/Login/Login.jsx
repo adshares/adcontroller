@@ -3,9 +3,8 @@ import { useLoginUserMutation } from '../../redux/auth/authApi';
 import { useDispatch } from 'react-redux';
 import { setAppLogin } from '../../redux/auth/authSlice';
 import { Alert, Box, Button, Card, CardContent, CardHeader, Collapse, IconButton, Link, TextField, Typography } from '@mui/material';
-import styles from './styles.scss';
-import logo from '../../img/logo.png';
 import CloseIcon from '@mui/icons-material/Close';
+import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -58,26 +57,15 @@ export default function Login() {
   };
 
   return (
-    <Card className={styles.container}>
-      <CardContent>
-        <Box
-          component="img"
-          src={logo}
-          height="70px"
-          width="70px"
-          sx={{
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}
-        />
-      </CardContent>
-      <CardHeader title="Please login" titleTypographyProps={{ align: 'center' }} />
+    <Card sx={{ width: '500px', height: 'calc(100vh - 20rem)', minHeight: '450px', padding: '30px 60px', mt: 10 }}>
+      <CardHeader title="Please login" titleTypographyProps={{ align: 'center', variant: 'h3' }} />
 
       <CardContent>
         <Box onSubmit={handleSubmit} component="form">
           <TextField
-            variant="standard"
-            margin="normal"
+            sx={{ mb: 3 }}
+            customvariant="highLabel"
+            color="secondary"
             required
             fullWidth
             type="email"
@@ -86,8 +74,9 @@ export default function Login() {
             onChange={handleInputChange}
           />
           <TextField
-            variant="standard"
-            margin="normal"
+            sx={{ mb: 3 }}
+            customvariant="highLabel"
+            color="secondary"
             required
             fullWidth
             type="password"
@@ -95,11 +84,13 @@ export default function Login() {
             name="password"
             onChange={handleInputChange}
           />
-          <Button type="submit" fullWidth variant="contained" color="primary" disabled={isLoading}>
-            Login
-          </Button>
+          <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
+            <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
+              Login
+            </Button>
+          </Box>
         </Box>
-        <Box className={styles.link}>
+        <Box sx={{ mt: 3 }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
           <Link href="https://web3ads.net/auth/forgotten-password" variant="body1" underline="hover" target="_blank" align="center">
             Forgot password?
           </Link>
