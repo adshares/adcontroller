@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { logoutRedirect } from '../../utils/helpers';
 import configSelectors from '../../redux/config/configSelectors';
-import { AppBar, IconButton, Link, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
-import { AccountCircle } from '@mui/icons-material';
+import { AppBar, Box, Divider, IconButton, Link, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
-import commonStyles from '../../styles/commonStyles.scss';
 import Icon from '../Icon/Icon';
+import commonStyles from '../../styles/commonStyles.scss';
 
-export default function MenuAppBar({ showProtectedOptions = false, showSideMenu, toggleSideMenu, showSideMenuIcon = false }) {
+export default function MenuAppBar({ mode = 'app', showProtectedOptions = false, showSideMenu, toggleSideMenu }) {
   const appData = useSelector(configSelectors.getAppData);
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -51,14 +51,14 @@ export default function MenuAppBar({ showProtectedOptions = false, showSideMenu,
             </Box>
           </>
         )}
-        {showProtectedOptions && !showSideMenuIcon && <Typography variant="h3">Installer</Typography>}
-        {showProtectedOptions && showSideMenuIcon && (
+        {showProtectedOptions && mode === 'installer' && <Typography variant="h3">Installer</Typography>}
+        {showProtectedOptions && mode === 'app' && (
           <IconButton size="large" color="inherit" onClick={() => toggleSideMenu(!showSideMenu)}>
             <MenuIcon />
           </IconButton>
         )}
         {showProtectedOptions && (
-          <>
+          <Box sx={{ ml: 'auto' }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
             {appData.AdPanel.Url && (
               <Link href={appData.AdPanel.Url} color="inherit" underline="hover" variant="button">
                 Back to AdPanel
@@ -82,9 +82,10 @@ export default function MenuAppBar({ showProtectedOptions = false, showSideMenu,
             >
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
-          </>
+          </Box>
         )}
       </Toolbar>
+      <Divider />
     </AppBar>
   );
 }

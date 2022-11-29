@@ -98,7 +98,7 @@ export default function AppInstaller() {
   return (
     !isLoading && (
       <>
-        <MenuAppBar />
+        <MenuAppBar mode="installer" showProtectedOptions={!!currentUser.name} />
         {isUserChecking && <Spinner />}
 
         {!isUserChecking && (

@@ -1,52 +1,52 @@
-import React, { useEffect, useState } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { loginRedirect } from '../utils/helpers'
-import authSelectors from '../redux/auth/authSelectors'
-import synchronizationSelectors from '../redux/synchronization/synchronizationSelectors'
-import { useGetCurrentUserQuery } from '../redux/auth/authApi'
-import { useLazySynchronizeConfigQuery } from '../redux/synchronization/synchronizationApi'
-import { useLazyGetAppConfigQuery } from '../redux/config/configApi'
-import Spinner from '../Components/Spinner/Spinner'
-import SynchronizationDialog from '../Components/SynchronizationDialog/SynchronizationDialog'
-import PrivateRoute from '../Components/Routes/PrivateRoute'
-import MenuAppBar from '../Components/MenuAppBar/MenuAppBar'
-import AppWindow from '../Components/AppWindow/AppWindow'
-import NotFoundView from '../Components/NotFound/NotFoundView'
-import ForbiddenView from '../Components/NotFound/ForbiddenView'
-import SideMenu from '../Components/SideMenu/SideMenu'
-import Wallet from './Finance/Wallet'
-import Commissions from './Finance/Commissions'
-import Base from './General/Base'
-import SMTP from './General/SMTP'
-import License from './General/License'
-import NetworkSettings from './Network/Settings'
-import SupplySettings from './Supply/Settings'
-import DemandSettings from './Demand/Settings'
-import UsersSettings from './Users/Settings'
-import Panel from './General/Panel'
-import Terms from './General/Terms'
-import AdClassifier from './AdClassifier/AdClassifier'
-import ConnectedStatus from './Network/ConnectedStatus'
-import Events from './Events/Events'
-import UsersList from './Users/UsersList'
-import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined'
-import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined'
-import PercentIcon from '@mui/icons-material/Percent'
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import SyncAltIcon from '@mui/icons-material/SyncAlt'
-import TrendingFlatIcon from '@mui/icons-material/TrendingFlat'
-import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'
-import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
-import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined'
-import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined'
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'
-import LanOutlinedIcon from '@mui/icons-material/LanOutlined'
-import commonStyles from '../styles/commonStyles.scss'
+import React, { useEffect, useState } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { loginRedirect } from '../utils/helpers';
+import authSelectors from '../redux/auth/authSelectors';
+import synchronizationSelectors from '../redux/synchronization/synchronizationSelectors';
+import { useGetCurrentUserQuery } from '../redux/auth/authApi';
+import { useLazySynchronizeConfigQuery } from '../redux/synchronization/synchronizationApi';
+import { useLazyGetAppConfigQuery } from '../redux/config/configApi';
+import Spinner from '../Components/Spinner/Spinner';
+import SynchronizationDialog from '../Components/SynchronizationDialog/SynchronizationDialog';
+import PrivateRoute from '../Components/Routes/PrivateRoute';
+import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
+import AppWindow from '../Components/AppWindow/AppWindow';
+import NotFoundView from '../Components/NotFound/NotFoundView';
+import ForbiddenView from '../Components/NotFound/ForbiddenView';
+import SideMenu from '../Components/SideMenu/SideMenu';
+import Wallet from './Finance/Wallet';
+import Commissions from './Finance/Commissions';
+import Base from './General/Base';
+import SMTP from './General/SMTP';
+import License from './General/License';
+import NetworkSettings from './Network/Settings';
+import SupplySettings from './Supply/Settings';
+import DemandSettings from './Demand/Settings';
+import UsersSettings from './Users/Settings';
+import Panel from './General/Panel';
+import Terms from './General/Terms';
+import AdClassifier from './AdClassifier/AdClassifier';
+import ConnectedStatus from './Network/ConnectedStatus';
+import Events from './Events/Events';
+import UsersList from './Users/UsersList';
+import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
+import PercentIcon from '@mui/icons-material/Percent';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
+import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
+import commonStyles from '../styles/commonStyles.scss';
 
 const appModules = [
   {
@@ -176,59 +176,52 @@ const appModules = [
     component: Events,
     icon: DashboardIcon,
   },
-]
+];
 
 const getAppPages = (appModules) => {
   const parseAppModules = (modules) => {
-    const pages = []
+    const pages = [];
     for (let page of modules) {
       if (page.component) {
-        pages.push(<Route key={page.name} path={page.path} element={<page.component/>}/>)
+        pages.push(<Route key={page.name} path={page.path} element={<page.component />} />);
       }
       if (page.children) {
-        pages.push(...parseAppModules(page.children))
+        pages.push(...parseAppModules(page.children));
       }
     }
-    return pages
-  }
-  return parseAppModules(appModules)
-}
+    return pages;
+  };
+  return parseAppModules(appModules);
+};
 
-function AppController () {
-  const { isLoading: isUserChecking } = useGetCurrentUserQuery()
-  const isLoggedIn = useSelector(authSelectors.getIsLoggedIn)
-  const currentUser = useSelector(authSelectors.getUser)
-  const {
-    isSynchronizationRequired,
-    isDataSynchronized,
-    changedModules
-  } = useSelector(synchronizationSelectors.getSynchronizationData)
-  const [showSideMenu, toggleSideMenu] = useState(true)
-  const pages = getAppPages(appModules)
-  const [synchronizeConfig, { isFetching: isSyncInProgress }] = useLazySynchronizeConfigQuery()
-  const [getAppConfig, {
-    isFetching: isAppDataLoading,
-    isSuccess: isAppDataLoadingSuccess
-  }] = useLazyGetAppConfigQuery()
+function AppController() {
+  const { isLoading: isUserChecking } = useGetCurrentUserQuery();
+  const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
+  const currentUser = useSelector(authSelectors.getUser);
+  const { isSynchronizationRequired, isDataSynchronized, changedModules } = useSelector(synchronizationSelectors.getSynchronizationData);
+  const [showSideMenu, toggleSideMenu] = useState(true);
+  const pages = getAppPages(appModules);
+  const [synchronizeConfig, { isFetching: isSyncInProgress }] = useLazySynchronizeConfigQuery();
+  const [getAppConfig, { isFetching: isAppDataLoading, isSuccess: isAppDataLoadingSuccess }] = useLazyGetAppConfigQuery();
 
   useEffect(() => {
     if (!isLoggedIn) {
-      loginRedirect()
-      localStorage.removeItem('lastSync')
+      loginRedirect();
+      localStorage.removeItem('lastSync');
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (isSynchronizationRequired && currentUser.name) {
-      synchronizeConfig()
+      synchronizeConfig();
     }
-  }, [isSynchronizationRequired, currentUser])
+  }, [isSynchronizationRequired, currentUser]);
 
   useEffect(() => {
     if (isDataSynchronized && currentUser.name) {
-      getAppConfig()
+      getAppConfig();
     }
-  }, [isDataSynchronized, currentUser])
+  }, [isDataSynchronized, currentUser]);
 
   return (
     <Box className={`${commonStyles.flex}`}>
@@ -239,15 +232,10 @@ function AppController () {
         menuItems={appModules}
       />
       <Box sx={{ flexGrow: 1, width: 'calc(100% - 292px)' }}>
-        <MenuAppBar
-          showProtectedOptions={isLoggedIn}
-          showSideMenu={showSideMenu}
-          toggleSideMenu={toggleSideMenu}
-          showSideMenuIcon={!!currentUser.name}
-        />
+        <MenuAppBar showProtectedOptions={!!currentUser.name} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} />
         {!isUserChecking && (
           <AppWindow>
-            {!isUserChecking && !currentUser.name && isLoggedIn && <ForbiddenView/>}
+            {!isUserChecking && !currentUser.name && isLoggedIn && <ForbiddenView />}
             <SynchronizationDialog
               isSyncInProgress={isSyncInProgress}
               isSynchronizationRequired={isSynchronizationRequired}
@@ -260,18 +248,18 @@ function AppController () {
                 <DialogTitle>App data loading</DialogTitle>
 
                 <DialogContent>
-                  <Spinner/>
+                  <Spinner />
                 </DialogContent>
               </Dialog>
             )}
 
             {isLoggedIn && isAppDataLoadingSuccess && isDataSynchronized && !isAppDataLoading && !isSyncInProgress && (
               <Routes>
-                <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name}/>}>
+                <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name} />}>
                   {pages}
-                  <Route path="/" element={<Navigate to="/base"/>}/>
-                  <Route path="*" element={<NotFoundView/>}/>
-                  <Route path="/steps/*" element={<Navigate to="/base"/>}/>
+                  <Route path="/" element={<Navigate to="/base" />} />
+                  <Route path="*" element={<NotFoundView />} />
+                  <Route path="/steps/*" element={<Navigate to="/base" />} />
                 </Route>
               </Routes>
             )}
@@ -279,7 +267,7 @@ function AppController () {
         )}
       </Box>
     </Box>
-  )
+  );
 }
 
-export default AppController
+export default AppController;
