@@ -232,7 +232,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
   const { data, refetch, isFetching } = useGetPanelAssetsQuery();
   const [uploadAssets] = useUploadPanelAssetsMutation();
   const [deleteAssets] = useDeletePanelAssetsMutation();
-  const [urlWasCopied, setUrlCopied] = useState(false);
+  const [pathWasCopied, setPathCopied] = useState(false);
   const [waitingForUploadFiles, setWaitingForUploadFiles] = useState([]);
   const [changedFiles, setChangedFiles] = useState([]);
   const { createSuccessNotification } = useCreateNotification();
@@ -393,6 +393,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
             {assets.map((img) => {
               const isImgWasEdited = changedFiles.findIndex((obj) => obj.name === img.fileName) >= 0;
               const editedImgObj = changedFiles.find((file) => file.name === img.fileName);
+              const imgPath = new URL(img.url).pathname;
               return (
                 <TableRow key={img.fileId}>
                   <TableCell width="10%" align="left">
@@ -424,21 +425,21 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
                   </TableCell>
                   <TableCell width="58%" align="left">
                     <Typography variant="tableText1" sx={{ overflowWrap: 'anywhere' }}>
-                      {img.url}
+                      {imgPath}
                     </Typography>
                   </TableCell>
                   <TableCell width="5%" align="left">
                     <Box className={`${commonStyles.flex}`}>
                       <Tooltip
-                        onClose={() => setTimeout(() => setUrlCopied(false), 100)}
-                        title={urlWasCopied ? 'URL was copied' : 'Copy URL'}
+                        onClose={() => setTimeout(() => setPathCopied(false), 100)}
+                        title={pathWasCopied ? 'Path was copied' : 'Copy path'}
                       >
                         <IconButton
                           size="small"
                           color="freshGrass"
                           onClick={() => {
-                            setUrlCopied(true);
-                            return navigator.clipboard.writeText(img.url);
+                            setPathCopied(true);
+                            return navigator.clipboard.writeText(imgPath);
                           }}
                         >
                           <ContentCopyIcon />
