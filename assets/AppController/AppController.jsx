@@ -233,6 +233,7 @@ function AppController() {
       />
       <Box sx={{ flexGrow: 1, width: 'calc(100% - 292px)' }}>
         <MenuAppBar showProtectedOptions={!!currentUser.name} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} />
+        {isUserChecking && <Spinner />}
         {!isUserChecking && (
           <AppWindow>
             {!isUserChecking && !currentUser.name && isLoggedIn && <ForbiddenView />}
