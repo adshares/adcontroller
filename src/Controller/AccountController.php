@@ -6,6 +6,8 @@ use App\Entity\Enum\AppConfig;
 use App\Entity\Enum\AppStateEnum;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerAdminCreator;
+use App\Service\AdServerOAuthClientRegistrar;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +16,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException as ProcessRuntimeException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -23,8 +26,9 @@ class AccountController extends AbstractController
     public function createAccount(
         Request $request,
         AdServerAdminCreator $accountCreator,
+        AdServerOAuthClientRegistrar $clientRegistrar,
         ConfigurationRepository $repository,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
     ): JsonResponse {
         if (null !== $repository->fetchValueByEnum(AppConfig::AppState)) {
             throw new UnprocessableEntityHttpException('Account already created');
@@ -58,6 +62,7 @@ class AccountController extends AbstractController
         $password = $content['password'];
 
         try {
+            $clientRegistrar->register($this->getRedirectUri());
             $accountCreator->create($email, $password);
         } catch (ProcessFailedException | ProcessRuntimeException) {
             throw new UnprocessableEntityHttpException('Account cannot be created');
@@ -65,5 +70,27 @@ class AccountController extends AbstractController
         $repository->insertOrUpdateOne(AppConfig::AppState, AppStateEnum::AdserverAccountCreated->name);
 
         return $this->json(['message' => sprintf('Account %s created', $email)], Response::HTTP_CREATED);
+    }
+
+    #[Route('/api/check', name: 'api_check', methods: ['GET'])]
+    public function check(JWTTokenManagerInterface $jwtManager, Request $request): Response
+    {
+        $accessToken = $request->getSession()->get('accessToken');
+        $payload = $jwtManager->parse($accessToken);
+        $data = [
+            'name' => $payload['username'] ?? 'N/A',
+            'roles' => $payload['roles'] ?? [],
+        ];
+
+        return parent::json([
+            'message' => 'OK',
+            'code' => Response::HTTP_OK,
+            'data' => $data,
+        ]);
+    }
+
+    private function getRedirectUri(): string
+    {
+        return $this->generateUrl('oauth_callback', [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 }

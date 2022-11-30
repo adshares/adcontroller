@@ -1,19 +1,18 @@
 import React from 'react';
 import { Button, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { logoutRedirect } from '../../utils/helpers';
 
-export default function NotFoundView() {
-  const navigate = useNavigate();
+export default function ForbiddenView() {
   const onButtonClick = () => {
-    navigate('/');
+    logoutRedirect();
   };
   return (
     <>
       <Typography variant="h3" component="div">
-        Page not found.
+        Access denied.
       </Typography>
       <Button variant="contained" type="button" onClick={onButtonClick}>
-        Go back
+        Switch user
       </Button>
     </>
   );

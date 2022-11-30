@@ -1,9 +1,9 @@
 const getIsLoggedIn = (state) => state.authSlice.isLoggedIn;
-const getToken = (state) => state.authSlice.token;
+const getUser = (state) => state.authSlice.user;
 
 const authSelectors = {
   getIsLoggedIn,
-  getToken,
+  getUser,
 };
 
 export default authSelectors;

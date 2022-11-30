@@ -18,7 +18,8 @@ class UploadFileLimit
 
     public function getLimit(): ?int
     {
-        if (null === ($nginxLimit = $this->getNginxLimit())
+        if (
+            null === ($nginxLimit = $this->getNginxLimit())
             || null === ($phpLimit = $this->getPhpLimit())
             || null === ($mysqlLimit = $this->getMysqlLimit())
         ) {

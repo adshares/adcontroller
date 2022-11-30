@@ -3,9 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { Alert } from '@mui/material';
 import apiService from '../utils/apiService';
 import Base from './InstallerSteps/Base/Base';
-import Login from '../Components/Login/Login';
 import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
-import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
 import NotFoundView from '../Components/NotFound/NotFoundView';
 import AppWindow from '../Components/AppWindow/AppWindow';
@@ -17,9 +15,11 @@ import SMTP from './InstallerSteps/SMTP/SMTP';
 import Status from './InstallerSteps/Status/Status';
 import InstallerStepWrapper from '../Components/InstallerStepWrapper/InstallerStepWrapper';
 import Spinner from '../Components/Spinner/Spinner';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import authSelectors from '../redux/auth/authSelectors';
-import { checkAppAuth } from '../redux/auth/authSlice';
+import { useGetCurrentUserQuery } from '../redux/auth/authApi';
+import ForbiddenView from '../Components/NotFound/ForbiddenView';
+import { loginRedirect } from '../utils/helpers';
 
 const installerSteps = [
   {
@@ -55,20 +55,25 @@ const installerSteps = [
 ];
 
 export default function AppInstaller() {
-  const token = useSelector(authSelectors.getToken);
-  const dispatch = useDispatch();
+  const { isLoading: isUserChecking } = useGetCurrentUserQuery();
   const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
+  const currentUser = useSelector(authSelectors.getUser);
   const [isLoading, setIsLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(null);
   const [alert, setAlert] = useState({ type: 'error', message: '', title: '' });
 
   useEffect(() => {
-    if (token) {
-      dispatch(checkAppAuth());
+    if (!isLoggedIn) {
+      loginRedirect();
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (currentUser.name) {
       getCurrentStep();
     }
     setIsLoading(false);
-  }, [token]);
+  }, [currentUser]);
 
   const getCurrentStep = async () => {
     try {
@@ -93,37 +98,37 @@ export default function AppInstaller() {
   return (
     !isLoading && (
       <>
-        <MenuAppBar showProtectedOptions={isLoggedIn} showIcon={isLoggedIn} />
-        <AppWindow>
-          <Routes>
-            <Route
-              path="login"
-              element={
-                <PublicRoute restricted isLoggedIn={isLoggedIn} redirectTo="/steps">
-                  <Login />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="steps/*"
-              element={
-                <PrivateRoute isLoggedIn={isLoggedIn}>
-                  {currentStep ? (
-                    <MultiStep currentStep={currentStep} steps={installerSteps} />
-                  ) : alert.message ? (
-                    <InstallerStepWrapper disabledNext hideBackButton hideNextButton>
-                      <Alert severity={alert.type}>{`${alert.title}: ${alert.message}`}</Alert>
-                    </InstallerStepWrapper>
-                  ) : (
-                    <Spinner />
-                  )}
-                </PrivateRoute>
-              }
-            />
-            <Route path="*" element={<NotFoundView />} />
-            <Route path="/" element={<Navigate to="steps" />} />
-          </Routes>
-        </AppWindow>
+        <MenuAppBar mode="installer" showProtectedOptions={!!currentUser.name} />
+        {isUserChecking && <Spinner />}
+
+        {!isUserChecking && (
+          <AppWindow>
+            {!isUserChecking && !currentUser.name && isLoggedIn && <ForbiddenView />}
+
+            {currentUser.name && (
+              <Routes>
+                <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name} />}>
+                  <Route
+                    path="steps/*"
+                    element={
+                      currentStep ? (
+                        <MultiStep currentStep={currentStep} steps={installerSteps} />
+                      ) : alert.message ? (
+                        <InstallerStepWrapper disabledNext hideBackButton hideNextButton>
+                          <Alert severity={alert.type}>{`${alert.title}: ${alert.message}`}</Alert>
+                        </InstallerStepWrapper>
+                      ) : (
+                        <Spinner />
+                      )
+                    }
+                  />
+                  <Route path="*" element={<NotFoundView />} />
+                  <Route path="/" element={<Navigate to="steps" />} />
+                </Route>
+              </Routes>
+            )}
+          </AppWindow>
+        )}
       </>
     )
   );

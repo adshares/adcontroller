@@ -1,9 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
 import globalNotificationsSlice from './globalNotifications/globalNotificationsSlice';
-import authSlice from './auth/authSlice';
 import { authApi } from './auth/authApi';
+import authSlice from './auth/authSlice';
 import { configApi } from './config/configApi';
 import configSlice from './config/configSlice';
 import { monitoringApi } from './monitoring/monitoringApi';
@@ -11,18 +9,12 @@ import monitoringSlice from './monitoring/monitoringSlice';
 import { synchronizationApi } from './synchronization/synchronizationApi';
 import synchronizationSlice from './synchronization/synchronizationSlice';
 
-const authPersistConfig = {
-  key: 'auth',
-  storage,
-  whitelist: ['token'],
-};
-
 export const store = configureStore({
   reducer: {
     globalNotificationsSlice: globalNotificationsSlice,
 
     [authApi.reducerPath]: authApi.reducer,
-    authSlice: persistReducer(authPersistConfig, authSlice),
+    authSlice: authSlice,
 
     [synchronizationApi.reducerPath]: synchronizationApi.reducer,
     synchronizationSlice: synchronizationSlice,
@@ -42,5 +34,3 @@ export const store = configureStore({
     ),
   devTools: process.env.NODE_ENV === 'development',
 });
-
-export const persistor = persistStore(store);

@@ -48,7 +48,11 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
     try {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
-      walletForm.setFields({ ...walletForm.fields, ...response });
+
+      walletForm.setFields({
+        ...walletForm.fields,
+        ...Object.keys(response).reduce((acc, val) => ({ ...acc, [val]: response[val] || '' }), {}),
+      });
       setEditMode(response.DataRequired);
       setDataRequired(response.DataRequired);
       if (response.WalletNodeHost) {

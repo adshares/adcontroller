@@ -32,9 +32,7 @@ class ExceptionListener implements EventSubscriberInterface
                     'message' => $exception->getMessage(),
                     'code' => $exception->getStatusCode(),
                     'data' => [],
-                ]);
-                $response->setStatusCode($exception->getStatusCode());
-                $response->headers->replace($exception->getHeaders());
+                ], $exception->getStatusCode(), $exception->getHeaders());
             } else {
                 $this->logger->error(
                     sprintf('Kernel exception %d (%s)', $exception->getCode(), $exception->getMessage())
@@ -43,8 +41,7 @@ class ExceptionListener implements EventSubscriberInterface
                     'message' => 'Internal Server Error',
                     'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
                     'data' => [],
-                ]);
-                $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $response->headers->set('Content-Type', self::HEADER_JSON_CONTENT);

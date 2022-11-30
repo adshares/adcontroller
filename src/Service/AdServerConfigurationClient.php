@@ -11,8 +11,8 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -166,7 +166,7 @@ class AdServerConfigurationClient
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
-        private readonly TokenStorageInterface $tokenStorage,
+        private readonly RequestStack $requestStack,
         private readonly string $adServerBaseUri
     ) {
     }
@@ -194,7 +194,10 @@ class AdServerConfigurationClient
 
     public function storePlaceholders(array $data): array
     {
-        return $this->patchData($this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS), self::mapPlaceholderDataToAdServerFormat($data));
+        return $this->patchData(
+            $this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS),
+            self::mapPlaceholderDataToAdServerFormat($data),
+        );
     }
 
     public function resetHostConnectionError(int $hostId): array
@@ -232,9 +235,12 @@ class AdServerConfigurationClient
         return sprintf('%s/api/v2/%s', $this->adServerBaseUri, $resource);
     }
 
-    private function getAuthorizationHeader(): string
+    private function getRequestHeaders(): array
     {
-        return 'Bearer ' . $this->tokenStorage->getToken()->getCredentials();
+        return [
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $this->requestStack->getSession()->get('accessToken'),
+        ];
     }
 
     private static function overwriteUriInCaseOfPagination(array $data, Request $request): array
@@ -419,9 +425,7 @@ class AdServerConfigurationClient
             'GET',
             $url,
             [
-                'headers' => [
-                    'Authorization' => $this->getAuthorizationHeader(),
-                ],
+                'headers' => $this->getRequestHeaders(),
                 'query' => $query?->all() ?? [],
             ]
         );
@@ -436,9 +440,7 @@ class AdServerConfigurationClient
             'PATCH',
             $url,
             [
-                'headers' => [
-                    'Authorization' => $this->getAuthorizationHeader(),
-                ],
+                'headers' => $this->getRequestHeaders(),
                 'json' => $data
             ]
         );
@@ -453,9 +455,7 @@ class AdServerConfigurationClient
             'POST',
             $url,
             [
-                'headers' => [
-                    'Authorization' => $this->getAuthorizationHeader(),
-                ],
+                'headers' => $this->getRequestHeaders(),
                 'json' => $data
             ]
         );
@@ -470,9 +470,7 @@ class AdServerConfigurationClient
             'DELETE',
             $url,
             [
-                'headers' => [
-                    'Authorization' => $this->getAuthorizationHeader(),
-                ],
+                'headers' => $this->getRequestHeaders(),
             ]
         );
         $this->checkStatusCode($response);
