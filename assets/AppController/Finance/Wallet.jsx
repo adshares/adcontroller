@@ -302,8 +302,8 @@ const ColdWalletSettingsCard = (props) => {
                 type="number"
                 inputProps={{ autoComplete: 'off', min: 0 }}
               />
-              <Box className={`${commonStyles.flex}`}>
-                <Typography sx={{ ml: 2 }} variant="b800">
+              <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                <Typography sx={{ ml: 2, fontSize: '24px' }} variant="b800">
                   ADS
                 </Typography>
                 <Tooltip
@@ -330,8 +330,8 @@ const ColdWalletSettingsCard = (props) => {
                 type="number"
                 inputProps={{ autoComplete: 'off', min: 0 }}
               />
-              <Box className={`${commonStyles.flex}`}>
-                <Typography sx={{ ml: 2 }} variant="b800">
+              <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                <Typography sx={{ ml: 2, fontSize: '24px' }} variant="b800">
                   ADS
                 </Typography>
                 <Tooltip

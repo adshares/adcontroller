@@ -166,6 +166,7 @@ const theme = createTheme({
           '&.Mui-disabled': {
             cursor: 'not-allowed',
             pointerEvents: 'fill',
+            boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
           },
           '&:hover': {
             boxShadow: 'none',
@@ -208,6 +209,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           padding: '9px 22px 22px 22px',
+          boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
         },
       },
       variants: [
