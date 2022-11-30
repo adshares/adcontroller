@@ -60,8 +60,8 @@ export default function MenuAppBar({ mode = 'app', showProtectedOptions = false,
         {showProtectedOptions && (
           <Box sx={{ ml: 'auto' }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
             {appData.AdPanel.Url && (
-              <Link href={appData.AdPanel.Url} color="inherit" underline="hover" variant="button">
-                Back to AdPanel
+              <Link href={appData.AdPanel.Url} color="inherit" underline="hover" variant="body1">
+                BACK TO ADPANEL
               </Link>
             )}
             <IconButton size="large" onClick={handleMenu} color="inherit">
