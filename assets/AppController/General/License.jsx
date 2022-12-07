@@ -59,7 +59,7 @@ function License() {
   };
 
   return (
-    <Card className={`${commonStyles.card}`}>
+    <Card sx={{ justifySelf: 'center' }}>
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader
           title="License"
@@ -113,30 +113,24 @@ function License() {
 
       <Collapse in={editMode} timeout="auto">
         <CardContent>
-          <Box
-            className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignStart}`}
-            component="form"
-            onChange={form.onChange}
-            onFocus={form.setTouched}
-          >
-            <Box sx={{ mr: 1 }} className={`${commonStyles.halfCard}`}>
-              <TextField
-                error={form.changedFields.LicenseKey && !form.errorObj.LicenseKey.isValid}
-                helperText={form.changedFields.LicenseKey && form.errorObj.LicenseKey.helperText}
-                placeholder="XXX-xxxxxx-xxxxx-xxxxx-xxxx-xxxx"
-                size="small"
-                name="LicenseKey"
-                label="Your license key"
-                value={form.fields.LicenseKey}
-                type="text"
-                fullWidth
-                inputProps={{ autoComplete: 'off' }}
-              />
-            </Box>
-            <Button disabled={!form.isFormValid || setLicenseLoading} type="button" variant="contained" onClick={handleGetLicenseClick}>
-              Get license
-            </Button>
+          <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+            <TextField
+              error={form.changedFields.LicenseKey && !form.errorObj.LicenseKey.isValid}
+              helperText={form.changedFields.LicenseKey && form.errorObj.LicenseKey.helperText}
+              placeholder="XXX-xxxxxx-xxxxx-xxxxx-xxxx-xxxx"
+              name="LicenseKey"
+              label="Your license key"
+              value={form.fields.LicenseKey}
+              type="text"
+              fullWidth
+              customvariant="highLabel"
+              color="secondary"
+              inputProps={{ autoComplete: 'off' }}
+            />
           </Box>
+          <Button disabled={!form.isFormValid || setLicenseLoading} type="button" variant="contained" onClick={handleGetLicenseClick}>
+            Get license
+          </Button>
         </CardContent>
       </Collapse>
     </Card>

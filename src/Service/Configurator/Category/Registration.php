@@ -7,6 +7,7 @@ use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
+use App\ValueObject\Role;
 
 class Registration implements ConfiguratorCategory
 {
@@ -67,7 +68,7 @@ class Registration implements ConfiguratorCategory
             $input[AdServerConfig::DefaultUserRoles->name] =
                 array_unique($input[AdServerConfig::DefaultUserRoles->name]);
             foreach ($input[AdServerConfig::DefaultUserRoles->name] as $item) {
-                if (!in_array($item, ['advertiser', 'publisher'])) {
+                if (!in_array($item, [Role::Advertiser->value, Role::Publisher->value], true)) {
                     throw new InvalidArgumentException(
                         sprintf('Field `%s` must be a list of roles', AdServerConfig::DefaultUserRoles->name)
                     );

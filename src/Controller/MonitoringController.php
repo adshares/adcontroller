@@ -19,13 +19,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/monitoring', name: 'api_monitoring_')]
+#[Route('/api', name: 'api_')]
 class MonitoringController extends AbstractController
 {
     private const ALLOWED_KEYS = [
         'events',
         'hosts',
-        'latest-events',
+        'events/latest',
         'users',
         'wallet',
     ];
@@ -48,13 +48,13 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk([Configuration::LICENSE_DATA => $license->toArray()]);
     }
 
-    #[Route('/{key}', name: 'fetch_by_key', methods: ['GET'])]
+    #[Route('/{key}', name: 'fetch_by_key', requirements: ['key' => '.+'], methods: ['GET'])]
     public function fetch(
         string $key,
         AdServerConfigurationClient $adServerConfigurationClient,
@@ -69,7 +69,7 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($data);
@@ -85,10 +85,61 @@ class MonitoringController extends AbstractController
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($data);
+    }
+
+    #[Route('/users', name: 'add_user', methods: ['POST'])]
+    public function addUser(
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
+        $content = json_decode($request->getContent(), true) ?? [];
+        try {
+            $data = $adServerConfigurationClient->addUser($content);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/users/{userId}', name: 'edit_user', methods: ['PATCH'])]
+    public function editUser(
+        int $userId,
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
+        $content = json_decode($request->getContent(), true) ?? [];
+        try {
+            $data = $adServerConfigurationClient->editUser($userId, $content);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/users/{userId}', name: 'delete_user', methods: ['DELETE'])]
+    public function deleteUser(
+        int $userId,
+        AdServerConfigurationClient $adServerConfigurationClient,
+    ): JsonResponse {
+        try {
+            $adServerConfigurationClient->deleteUser($userId);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+
+        return $this->jsonOk();
     }
 
     #[Route('/users/{userId}/{action}', name: 'patch_user', methods: ['PATCH'])]
@@ -96,13 +147,15 @@ class MonitoringController extends AbstractController
         int $userId,
         string $action,
         AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
     ): JsonResponse {
+        $content = json_decode($request->getContent(), true) ?? [];
         try {
-            $data = $adServerConfigurationClient->patchUser($userId, $action);
+            $data = $adServerConfigurationClient->patchUser($userId, $action, $content);
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
-            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage());
+            $this->rethrowUnexpectedResponseException($exception);
         }
 
         return $this->jsonOk($data);
@@ -119,5 +172,13 @@ class MonitoringController extends AbstractController
         $response['message'] = 'OK';
 
         return parent::json($response);
+    }
+
+    private function rethrowUnexpectedResponseException(UnexpectedResponseException $exception): void
+    {
+        $statusCode = $exception->getCode() >= 400 && $exception->getCode() < 500
+            ? $exception->getCode()
+            : Response::HTTP_BAD_GATEWAY;
+        throw new HttpException($statusCode, $exception->getMessage());
     }
 }

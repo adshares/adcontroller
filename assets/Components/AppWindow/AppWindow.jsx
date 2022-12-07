@@ -8,20 +8,39 @@ import styles from './styles.scss';
 import CloseIcon from '@mui/icons-material/Close';
 import globalNotificationsSelectors from '../../redux/globalNotifications/globalNotificationsSelectors';
 
-const StyledSnackbarProvider = styled(SnackbarProvider)`
-  &.SnackbarContent-root {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    & .SnackbarItem-message {
-      text-align: justify;
-    }
-    & .SnackbarItem-action {
-      margin-right: 0;
-      margin-left: 8px;
-    }
-  }
-`;
+const StyledSnackbarProvider = styled(SnackbarProvider)(({ theme }) => ({
+  '&.SnackbarContent-root': {
+    display: 'flex',
+    flexWrap: 'nowrap',
+    justifyContent: 'space-between',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontVariationSettings: '"wght" 700',
+
+    '&.SnackbarItem-variantError': {
+      backgroundColor: theme.palette.sunset.light,
+      color: theme.palette.sunset.main,
+    },
+
+    '&.SnackbarItem-variantSuccess': {
+      backgroundColor: theme.palette.freshGrass.light,
+      color: theme.palette.freshGrass.main,
+    },
+
+    '&.SnackbarItem-variantWarning': {
+      backgroundColor: theme.palette.sun.light,
+      color: theme.palette.sun.main,
+    },
+
+    '& .SnackbarItem-message': {
+      textAlign: 'justify',
+    },
+    '& .SnackbarItem-action': {
+      marginRight: 0,
+      marginLeft: '8px',
+    },
+  },
+}));
 
 import { useSnackbar } from 'notistack';
 
@@ -66,11 +85,9 @@ export default function AppWindow({ children }) {
         </IconButton>
       )}
     >
-      <Box className={styles.wrapper}>
-        <Box className={styles.container}>
-          {children}
-          <GlobalNotificationsWrapper />
-        </Box>
+      <Box className={styles.container}>
+        {children}
+        <GlobalNotificationsWrapper />
       </Box>
     </StyledSnackbarProvider>
   );

@@ -11,8 +11,8 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -43,7 +43,7 @@ class AdServerConfigurationClient
     public const ADUSER_INTERNAL_URL = 'aduserInternalUrl';
     private const ADUSER_SERVE_SUBDOMAIN = 'aduserServeSubdomain';
     public const ADVERTISER_APPLY_FORM_URL = 'advertiserApplyFormUrl';
-    public const ALLOW_ZONE_IN_IFRAME = 'allow_zoneInIframe';
+    public const ALLOW_ZONE_IN_IFRAME = 'allowZoneInIframe';
     public const AUTO_CONFIRMATION_ENABLED = 'autoConfirmationEnabled';
     public const AUTO_REGISTRATION_ENABLED = 'autoRegistrationEnabled';
     public const AUTO_WITHDRAWAL_LIMIT_ADS = 'autoWithdrawalLimitAds';
@@ -111,7 +111,7 @@ class AdServerConfigurationClient
     private const MAIN_JS_BASE_URL = 'mainJsBaseUrl';
     private const MAIN_JS_TLD = 'mainJsTld';
     public const MAX_PAGE_ZONES = 'maxPageZones';
-    private const NETWORK_DATA_CACHE_TTL = 'network_data_cacheTtl';
+    private const NETWORK_DATA_CACHE_TTL = 'networkDataCacheTtl';
     private const NOW_PAYMENTS_API_KEY = 'nowPaymentsApiKey';
     private const NOW_PAYMENTS_CURRENCY = 'nowPaymentsCurrency';
     private const NOW_PAYMENTS_EXCHANGE = 'nowPaymentsExchange';
@@ -158,70 +158,89 @@ class AdServerConfigurationClient
     // SiteRejectedDomain
     public const REJECTED_DOMAINS = 'rejectedDomains';
 
+    private const RESOURCE_CONFIG = 'config';
+    private const RESOURCE_CONFIG_PLACEHOLDERS = 'config/placeholders';
+    private const RESOURCE_HOSTS = 'hosts';
+    private const RESOURCE_USERS = 'users';
+
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
-        private readonly TokenStorageInterface $tokenStorage,
+        private readonly RequestStack $requestStack,
         private readonly string $adServerBaseUri
     ) {
     }
 
     public function fetch(): array
     {
-        return $this->getData($this->buildConfigUri());
+        return $this->getData($this->buildUri(self::RESOURCE_CONFIG));
     }
 
     public function proxyMonitoringRequest(Request $request, string $resource): array
     {
-        $data = $this->getData($this->buildMonitoringUri($resource), $request->query);
+        $data = $this->getData($this->buildUri($resource), $request->query);
         return self::overwriteUriInCaseOfPagination($data, $request);
     }
 
     public function fetchPlaceholders(): array
     {
-        return $this->getData($this->buildPlaceholdersUri());
+        return $this->getData($this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS));
     }
 
     public function store(array $data): array
     {
-        return $this->patchData($this->buildConfigUri(), self::mapDataToAdServerFormat($data));
+        return $this->patchData($this->buildUri(self::RESOURCE_CONFIG), self::mapDataToAdServerFormat($data));
     }
 
     public function storePlaceholders(array $data): array
     {
-        return $this->patchData($this->buildPlaceholdersUri(), self::mapPlaceholderDataToAdServerFormat($data));
+        return $this->patchData(
+            $this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS),
+            self::mapPlaceholderDataToAdServerFormat($data),
+        );
     }
 
     public function resetHostConnectionError(int $hostId): array
     {
-        $uri = sprintf('%s/%d/reset', $this->buildMonitoringUri('hosts'), $hostId);
+        $uri = sprintf('%s/%d/reset', $this->buildUri(self::RESOURCE_HOSTS), $hostId);
         return $this->patchData($uri, []);
     }
 
-    public function patchUser(int $userId, string $action): array
+    public function addUser(array $data): array
     {
-        $uri = sprintf('%s/%d/%s', $this->buildMonitoringUri('users'), $userId, $action);
-        return $this->patchData($uri, []);
+        $uri = $this->buildUri(self::RESOURCE_USERS);
+        return $this->postData($uri, $data);
     }
 
-    private function buildConfigUri(): string
+    public function editUser(int $userId, array $data): array
     {
-        return sprintf('%s/api/config', $this->adServerBaseUri);
+        $uri = sprintf('%s/%d', $this->buildUri(self::RESOURCE_USERS), $userId);
+        return $this->patchData($uri, $data);
     }
 
-    private function buildMonitoringUri(string $resource): string
+    public function patchUser(int $userId, string $action, array $data): array
     {
-        return sprintf('%s/api/monitoring/%s', $this->adServerBaseUri, $resource);
+        $uri = sprintf('%s/%d/%s', $this->buildUri(self::RESOURCE_USERS), $userId, $action);
+        return $this->patchData($uri, $data);
     }
 
-    private function buildPlaceholdersUri(): string
+    public function deleteUser(int $userId): void
     {
-        return sprintf('%s/api/config/placeholders', $this->adServerBaseUri);
+        $uri = sprintf('%s/%d', $this->buildUri(self::RESOURCE_USERS), $userId);
+        $this->deleteData($uri);
     }
 
-    private function getAuthorizationHeader(): string
+    private function buildUri(string $resource): string
     {
-        return 'Bearer ' . $this->tokenStorage->getToken()->getCredentials();
+        return sprintf('%s/api/v2/%s', $this->adServerBaseUri, $resource);
+    }
+
+    private function getRequestHeaders(): array
+    {
+        return [
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $this->requestStack->getSession()->get('accessToken'),
+        ];
     }
 
     private static function overwriteUriInCaseOfPagination(array $data, Request $request): array
@@ -230,7 +249,7 @@ class AdServerConfigurationClient
             $remoteUri = $data['path'];
             $localUri = strtok($request->getUri(), '?');
             $data['path'] = $localUri;
-            foreach (['nextPageUrl', 'prevPageUrl'] as $urlKey) {
+            foreach (['nextPageUrl', 'prevPageUrl', 'firstPageUrl', 'lastPageUrl'] as $urlKey) {
                 if (isset($data[$urlKey])) {
                     $data[$urlKey] = str_replace($remoteUri, $localUri, $data[$urlKey]);
                 }
@@ -350,13 +369,14 @@ class AdServerConfigurationClient
             throw new ServiceNotPresent('AdServer does not respond');
         }
 
-        if (Response::HTTP_OK !== $statusCode) {
+        if ($statusCode < Response::HTTP_OK || $statusCode >= Response::HTTP_MULTIPLE_CHOICES) {
             if (Response::HTTP_UNPROCESSABLE_ENTITY === $statusCode) {
                 $message = json_decode($response->getContent(false))->message;
-                throw new UnexpectedResponseException($message);
+                throw new UnexpectedResponseException($message, $statusCode);
             }
             throw new UnexpectedResponseException(
-                sprintf('AdServer responded with an invalid code (%d)', $statusCode)
+                sprintf('AdServer responded with an invalid code (%d)', $statusCode),
+                $statusCode,
             );
         }
     }
@@ -364,7 +384,7 @@ class AdServerConfigurationClient
     public function setupAdClassify(string $adClassifyUrl, string $apiKeyName, string $apiKeySecret): void
     {
         $this->patchData(
-            $this->buildConfigUri(),
+            $this->buildUri(self::RESOURCE_CONFIG),
             [
                 self::CLASSIFIER_EXTERNAL_API_KEY_NAME => $apiKeyName,
                 self::CLASSIFIER_EXTERNAL_API_KEY_SECRET => $apiKeySecret,
@@ -375,23 +395,23 @@ class AdServerConfigurationClient
 
     public function setupAdPanel(string $adPanelUrl): void
     {
-        $this->patchData($this->buildConfigUri(), [self::ADPANEL_URL => $adPanelUrl]);
+        $this->patchData($this->buildUri(self::RESOURCE_CONFIG), [self::ADPANEL_URL => $adPanelUrl]);
     }
 
     public function setupAdPay(string $adPayUrl): void
     {
-        $this->patchData($this->buildConfigUri(), [self::ADPAY_URL => $adPayUrl]);
+        $this->patchData($this->buildUri(self::RESOURCE_CONFIG), [self::ADPAY_URL => $adPayUrl]);
     }
 
     public function setupAdSelect(string $adSelectUrl): void
     {
-        $this->patchData($this->buildConfigUri(), [self::ADSELECT_URL => $adSelectUrl]);
+        $this->patchData($this->buildUri(self::RESOURCE_CONFIG), [self::ADSELECT_URL => $adSelectUrl]);
     }
 
     public function setupAdUser(string $adUserUrl, string $adUserInternalUrl): void
     {
         $this->patchData(
-            $this->buildConfigUri(),
+            $this->buildUri(self::RESOURCE_CONFIG),
             [
                 self::ADUSER_BASE_URL => $adUserUrl,
                 self::ADUSER_INTERNAL_URL => $adUserInternalUrl === $adUserUrl ? null : $adUserInternalUrl,
@@ -405,9 +425,7 @@ class AdServerConfigurationClient
             'GET',
             $url,
             [
-                'headers' => [
-                    'Authorization' => $this->getAuthorizationHeader(),
-                ],
+                'headers' => $this->getRequestHeaders(),
                 'query' => $query?->all() ?? [],
             ]
         );
@@ -422,14 +440,39 @@ class AdServerConfigurationClient
             'PATCH',
             $url,
             [
-                'headers' => [
-                    'Authorization' => $this->getAuthorizationHeader(),
-                ],
+                'headers' => $this->getRequestHeaders(),
                 'json' => $data
             ]
         );
         $this->checkStatusCode($response);
 
         return json_decode($response->getContent(), true);
+    }
+
+    private function postData(string $url, array $data): array
+    {
+        $response = $this->httpClient->request(
+            'POST',
+            $url,
+            [
+                'headers' => $this->getRequestHeaders(),
+                'json' => $data
+            ]
+        );
+        $this->checkStatusCode($response);
+
+        return json_decode($response->getContent(), true);
+    }
+
+    private function deleteData(string $url): void
+    {
+        $response = $this->httpClient->request(
+            'DELETE',
+            $url,
+            [
+                'headers' => $this->getRequestHeaders(),
+            ]
+        );
+        $this->checkStatusCode($response);
     }
 }

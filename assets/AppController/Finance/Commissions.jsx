@@ -14,9 +14,12 @@ import {
   CardHeader,
   Checkbox,
   Collapse,
+  FormControl,
   FormControlLabel,
+  FormHelperText,
+  InputAdornment,
+  OutlinedInput,
   Slider,
-  TextField,
   Typography,
 } from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
@@ -58,99 +61,86 @@ function Commissions() {
 
   return (
     <>
-      <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}>
-        <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
-          <CardHeader title="Advertiser commission" titleTypographyProps={{ align: 'center' }} />
+      <Box sx={{ maxWidth: '1060px', display: 'flex' }}>
+        <Card sx={{ mr: 2 }} className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
+          <CardHeader
+            title="Advertiser commission"
+            subheader="Set a commission that will be subtracted from event payments. It will be a part of your income."
+          />
           <CardContent>
-            <Typography variant="body1" align="center">
-              Set a commission that will be subtracted from event payments. It will be a part of your income.
-            </Typography>
-            <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.justifyCenter}`}>
-              <Slider
-                step={0.01}
-                valueLabelDisplay="auto"
-                size="small"
+            <Slider
+              color="secondary"
+              step={0.01}
+              valueLabelDisplay="auto"
+              size="small"
+              name="OperatorTxFee"
+              value={returnNumber(form.fields.OperatorTxFee) || 0}
+              onChange={form.onChange}
+              onFocus={form.setTouched}
+            />
+            <FormControl fullWidth error={form.touchedFields.OperatorTxFee && !form.errorObj.OperatorTxFee.isValid}>
+              <OutlinedInput
+                sx={{ mt: 3.5 }}
+                color="secondary"
                 name="OperatorTxFee"
-                value={returnNumber(form.fields.OperatorTxFee) || 0}
+                type="number"
+                startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                value={setDecimalPlaces(form.fields.OperatorTxFee, 2)}
                 onChange={form.onChange}
                 onFocus={form.setTouched}
+                inputProps={{
+                  min: 0,
+                  max: 100,
+                  step: 0.01,
+                  autoComplete: 'off',
+                }}
               />
-              <Box className={`${commonStyles.flex}`}>
-                <TextField
-                  sx={{ width: '5em' }}
-                  variant="standard"
-                  size="small"
-                  name="OperatorTxFee"
-                  error={form.touchedFields.OperatorTxFee && !form.errorObj.OperatorTxFee.isValid}
-                  helperText={form.touchedFields.OperatorTxFee && form.errorObj.OperatorTxFee.helperText}
-                  value={setDecimalPlaces(form.fields.OperatorTxFee, 2)}
-                  onChange={form.onChange}
-                  onFocus={form.setTouched}
-                  type="number"
-                  inputProps={{
-                    style: { textAlign: 'center' },
-                    min: 0,
-                    max: 100,
-                    step: 0.01,
-                    autoComplete: 'off',
-                  }}
-                />
-                <Typography variant="h6" sx={{ ml: 1 }}>
-                  %
-                </Typography>
-              </Box>
-            </Box>
+              <FormHelperText>{form.touchedFields.OperatorTxFee && form.errorObj.OperatorTxFee.helperText}</FormHelperText>
+            </FormControl>
           </CardContent>
         </Card>
 
-        <Card className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
-          <CardHeader title="Publisher commission" titleTypographyProps={{ align: 'center' }} />
+        <Card className={`${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.justifySpaceBetween}`}>
+          <CardHeader
+            title="Publisher commission"
+            subheader="Set a commission that will be subtracted from publishers’ revenue from ads that were displayed. It will be a part of your income."
+          />
           <CardContent>
-            <Typography variant="body1" align="center">
-              Set a commission that will be subtracted from publishers’ revenue from ads that were displayed. It will be a part of your
-              income.
-            </Typography>
-            <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.justifyCenter}`}>
-              <Slider
-                step={0.01}
-                valueLabelDisplay="auto"
-                size="small"
+            <Slider
+              color="secondary"
+              step={0.01}
+              valueLabelDisplay="auto"
+              size="small"
+              name="OperatorRxFee"
+              value={returnNumber(form.fields.OperatorRxFee) || 0}
+              onChange={form.onChange}
+              onFocus={form.setTouched}
+            />
+            <FormControl fullWidth error={form.touchedFields.OperatorRxFee && !form.errorObj.OperatorRxFee.isValid}>
+              <OutlinedInput
+                sx={{ mt: 3.5 }}
+                color="secondary"
                 name="OperatorRxFee"
-                value={returnNumber(form.fields.OperatorRxFee) || 0}
+                type="number"
+                startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                value={setDecimalPlaces(form.fields.OperatorRxFee, 2)}
                 onChange={form.onChange}
                 onFocus={form.setTouched}
+                inputProps={{
+                  min: 0,
+                  max: 100,
+                  step: 0.01,
+                  autoComplete: 'off',
+                }}
               />
-              <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-                <TextField
-                  sx={{ width: '5em' }}
-                  variant="standard"
-                  size="small"
-                  name="OperatorRxFee"
-                  error={form.touchedFields.OperatorRxFee && !form.errorObj.OperatorRxFee.isValid}
-                  helperText={form.touchedFields.OperatorRxFee && form.errorObj.OperatorRxFee.helperText}
-                  value={setDecimalPlaces(form.fields.OperatorRxFee, 2)}
-                  onChange={form.onChange}
-                  onFocus={form.setTouched}
-                  type="number"
-                  inputProps={{
-                    style: { textAlign: 'center' },
-                    min: 0,
-                    max: 100,
-                    step: 0.01,
-                    autoComplete: 'off',
-                  }}
-                />
-                <Typography variant="h6" sx={{ ml: 1 }}>
-                  %
-                </Typography>
-              </Box>
-            </Box>
+              <FormHelperText>{form.touchedFields.OperatorRxFee && form.errorObj.OperatorRxFee.helperText}</FormHelperText>
+            </FormControl>
           </CardContent>
         </Card>
       </Box>
 
-      <Card className={`${commonStyles.card}`}>
-        <CardHeader title="Refund program" />
+      <Card sx={{ mt: 3 }}>
+        <CardHeader title="Refund program" subheader="Set a commission that will be refund to the program members." />
         <FormControlLabel
           label="Enable refund program"
           sx={{ pl: 2, whiteSpace: 'nowrap' }}
@@ -158,52 +148,47 @@ function Commissions() {
         />
         <Collapse in={ReferralRefundEnabled} timeout="auto">
           <CardContent>
-            <Typography variant="body1" align="center">
-              Set a commission that will be refund to the program members.
-            </Typography>
-            <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.justifyCenter}`}>
-              <Slider
-                step={0.01}
-                valueLabelDisplay="auto"
-                size="small"
+            <Slider
+              color="secondary"
+              step={0.01}
+              valueLabelDisplay="auto"
+              size="small"
+              name="ReferralRefundCommission"
+              value={returnNumber(form.fields.ReferralRefundCommission) || 0}
+              onChange={form.onChange}
+              onFocus={form.setTouched}
+            />
+            <FormControl fullWidth error={form.touchedFields.ReferralRefundCommission && !form.errorObj.ReferralRefundCommission.isValid}>
+              <OutlinedInput
+                sx={{ mt: 3.5 }}
+                color="secondary"
                 name="ReferralRefundCommission"
-                value={returnNumber(form.fields.ReferralRefundCommission) || 0}
+                type="number"
+                startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                value={setDecimalPlaces(form.fields.ReferralRefundCommission, 2)}
                 onChange={form.onChange}
                 onFocus={form.setTouched}
+                inputProps={{
+                  min: 0,
+                  max: 100,
+                  step: 0.01,
+                  autoComplete: 'off',
+                }}
               />
-              <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-                <TextField
-                  sx={{ width: '5em' }}
-                  variant="standard"
-                  size="small"
-                  name="ReferralRefundCommission"
-                  error={form.touchedFields.ReferralRefundCommission && !form.errorObj.ReferralRefundCommission.isValid}
-                  helperText={form.touchedFields.ReferralRefundCommission && form.errorObj.ReferralRefundCommission.helperText}
-                  value={setDecimalPlaces(form.fields.ReferralRefundCommission, 2)}
-                  onChange={form.onChange}
-                  onFocus={form.setTouched}
-                  type="number"
-                  inputProps={{
-                    style: { textAlign: 'center' },
-                    min: 0,
-                    max: 100,
-                    step: 0.01,
-                    autoComplete: 'off',
-                  }}
-                />
-                <Typography variant="h6" sx={{ ml: 1 }}>
-                  %
-                </Typography>
-              </Box>
-            </Box>
+              <FormHelperText>
+                {form.touchedFields.ReferralRefundCommission && form.errorObj.ReferralRefundCommission.helperText}
+              </FormHelperText>
+            </FormControl>
             <Collapse in={Number(form.fields.OperatorRxFee) < Number(form.fields.ReferralRefundCommission)} timeout="auto">
-              <Alert severity="warning">The refund should be no more than the publisher's commission.</Alert>
+              <Alert sx={{ mt: 3 }} severity="warning">
+                <Typography variant="alert">The refund should be no more than the publisher's commission.</Typography>
+              </Alert>
             </Collapse>
           </CardContent>
         </Collapse>
       </Card>
 
-      <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+      <Box sx={{ maxWidth: '1060px' }} className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
         <Button
           disabled={
             (appData.AdServer.ReferralRefundEnabled === ReferralRefundEnabled && !form.isFormWasChanged) || isLoading || !form.isFormValid

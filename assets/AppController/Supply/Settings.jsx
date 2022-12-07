@@ -20,18 +20,17 @@ import {
   RadioGroup,
   TextField,
 } from '@mui/material';
-import commonStyles from '../../styles/commonStyles.scss';
 
 export default function Settings() {
   return (
     <>
       <SiteOptions />
-      <ZoneOptions />
+      <ZoneOptions sx={{ mt: 3 }} />
     </>
   );
 }
 
-const SiteOptions = () => {
+const SiteOptions = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const [setSiteOptionsConfig, { isLoading }] = useSetSiteOptionsConfigMutation();
   const dispatch = useDispatch();
@@ -52,49 +51,46 @@ const SiteOptions = () => {
     }
   };
   return (
-    <Card className={`${commonStyles.card}`}>
+    <Card {...props}>
       <CardHeader title="Site options" subheader="Set banner availability and classification." />
       <CardContent>
-        <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceEvenly} ${commonStyles.alignStart}`}>
-          <FormControlLabel
-            label="Require banner acceptance by default"
-            control={
-              <Checkbox checked={SiteAcceptBannersManually} onChange={() => setSiteAcceptBannersManually((prevState) => !prevState)} />
-            }
-          />
+        <FormControlLabel
+          sx={{ display: 'block', mb: 3, ml: -1.5 }}
+          label="Require banner acceptance by default"
+          control={
+            <Checkbox checked={SiteAcceptBannersManually} onChange={() => setSiteAcceptBannersManually((prevState) => !prevState)} />
+          }
+        />
 
-          <FormControl>
-            <FormLabel focused={false}>Visibility of banners for classification</FormLabel>
-            <RadioGroup value={SiteClassifierLocalBanners} onChange={(e) => setSiteClassifierLocalBanners(e.target.value)}>
-              <FormControlLabel value="all-by-default" control={<Radio />} label="Default from all servers" />
-              <FormControlLabel value="local-by-default" control={<Radio />} label="Default from local server" />
-              <FormControlLabel value="local-only" control={<Radio />} label="Only from local server" />
-            </RadioGroup>
-          </FormControl>
-        </Box>
+        <FormControl>
+          <FormLabel focused={false}>Visibility of banners for classification</FormLabel>
+          <RadioGroup value={SiteClassifierLocalBanners} onChange={(e) => setSiteClassifierLocalBanners(e.target.value)}>
+            <FormControlLabel value="all-by-default" control={<Radio />} label="Default from all servers" />
+            <FormControlLabel value="local-by-default" control={<Radio />} label="Default from local server" />
+            <FormControlLabel value="local-only" control={<Radio />} label="Only from local server" />
+          </RadioGroup>
+        </FormControl>
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button
-            disabled={
-              (appData.AdServer.SiteAcceptBannersManually === SiteAcceptBannersManually &&
-                appData.AdServer.SiteClassifierLocalBanners === SiteClassifierLocalBanners) ||
-              isLoading
-            }
-            type="button"
-            variant="contained"
-            onClick={onSaveClick}
-          >
-            Save
-          </Button>
-        </Box>
+        <Button
+          disabled={
+            (appData.AdServer.SiteAcceptBannersManually === SiteAcceptBannersManually &&
+              appData.AdServer.SiteClassifierLocalBanners === SiteClassifierLocalBanners) ||
+            isLoading
+          }
+          type="button"
+          variant="contained"
+          onClick={onSaveClick}
+        >
+          Save
+        </Button>
       </CardActions>
     </Card>
   );
 };
 
-const ZoneOptions = () => {
+const ZoneOptions = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const [setZoneOptionsConfig, { isLoading }] = useSetZoneOptionsConfigMutation();
   const dispatch = useDispatch();
@@ -121,50 +117,42 @@ const ZoneOptions = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card {...props}>
       <CardHeader title="Banner options" subheader="Set banner limitations" />
 
-      <CardContent className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-        <Box className={`${commonStyles.halfCard} ${commonStyles.flex} ${commonStyles.flexColumn} ${commonStyles.alignCenter}`}>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-            <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
-              <TextField
-                id="MaxPageZones"
-                name="MaxPageZones"
-                size="small"
-                type="number"
-                label="Maximum banners per page"
-                margin="dense"
-                fullWidth
-                value={form.fields.MaxPageZones}
-                error={form.touchedFields.MaxPageZones && !form.errorObj.MaxPageZones.isValid}
-                helperText={form.touchedFields.MaxPageZones && form.errorObj.MaxPageZones.helperText}
-                inputProps={{ autoComplete: 'off', min: 0 }}
-              />
-            </Box>
-          </Box>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-            <FormControl margin="dense">
-              <FormControlLabel
-                label="Allow banners in the iframe"
-                control={<Checkbox checked={AllowZoneInIframe} onChange={() => setAllowZoneInIframe((prevState) => !prevState)} />}
-              />
-            </FormControl>
-          </Box>
+      <CardContent>
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+          <TextField
+            customvariant="highLabel"
+            color="secondary"
+            id="MaxPageZones"
+            name="MaxPageZones"
+            type="number"
+            label="Maximum banners per page"
+            fullWidth
+            value={form.fields.MaxPageZones}
+            error={form.touchedFields.MaxPageZones && !form.errorObj.MaxPageZones.isValid}
+            helperText={form.touchedFields.MaxPageZones && form.errorObj.MaxPageZones.helperText}
+            inputProps={{ autoComplete: 'off', min: 0 }}
+          />
         </Box>
+        <FormControl margin="dense">
+          <FormControlLabel
+            label="Allow banners in the iframe"
+            control={<Checkbox checked={AllowZoneInIframe} onChange={() => setAllowZoneInIframe((prevState) => !prevState)} />}
+          />
+        </FormControl>
       </CardContent>
 
       <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button
-            disabled={isLoading || (appData.AdServer.AllowZoneInIframe === AllowZoneInIframe && !form.isFormWasChanged)}
-            onClick={onSaveClick}
-            variant="contained"
-            type="button"
-          >
-            Save
-          </Button>
-        </Box>
+        <Button
+          disabled={isLoading || !form.isFormValid || (appData.AdServer.AllowZoneInIframe === AllowZoneInIframe && !form.isFormWasChanged)}
+          onClick={onSaveClick}
+          variant="contained"
+          type="button"
+        >
+          Save
+        </Button>
       </CardActions>
     </Card>
   );

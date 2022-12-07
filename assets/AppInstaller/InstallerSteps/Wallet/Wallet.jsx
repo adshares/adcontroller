@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, Collapse, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
-import styles from './styles.scss';
 import { useForm, useSkipFirstRenderEffect } from '../../../hooks';
 import Spinner from '../../../Components/Spinner/Spinner';
 import { validateAddress } from '@adshares/ads';
 import useCreateNotification from '../../../hooks/useCreateNotification';
+import commonStyles from '../../../styles/commonStyles.scss';
 
 function Wallet({ handleNextStep, handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -14,7 +14,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
   const walletForm = useForm({
     initialFields: { WalletAddress: '', WalletSecretKey: '' },
     validation: {
-      WalletAddress: ['required', 'wallet'],
+      WalletAddress: ['required', 'ADSWallet'],
       WalletSecretKey: ['required', 'walletSecret'],
     },
   });
@@ -48,7 +48,11 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
     try {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
-      walletForm.setFields({ ...walletForm.fields, ...response });
+
+      walletForm.setFields({
+        ...walletForm.fields,
+        ...Object.keys(response).reduce((acc, val) => ({ ...acc, [val]: response[val] || '' }), {}),
+      });
       setEditMode(response.DataRequired);
       setDataRequired(response.DataRequired);
       if (response.WalletNodeHost) {
@@ -133,27 +137,22 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
         </a>
         .
       </Typography>
-      <Box className={styles.editButtonThumb}>
-        <Button className={dataRequired ? styles.hidden : styles.visible} onClick={() => setEditMode(!editMode)} type="button">
+      <Box className={`${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+        <Button sx={{ visibility: dataRequired ? 'hidden' : 'visible' }} onClick={() => setEditMode(!editMode)} type="button">
           {editMode ? 'Cancel' : 'Edit'}
         </Button>
       </Box>
       {editMode && (
-        <Box className={styles.container}>
-          <Box
-            component="form"
-            className={styles.formBlock}
-            onChange={walletForm.onChange}
-            onFocus={walletForm.setTouched}
-            onSubmit={(e) => e.preventDefault()}
-          >
+        <Box sx={{ width: '380px' }}>
+          <Box component="form" onChange={walletForm.onChange} onFocus={walletForm.setTouched} onSubmit={(e) => e.preventDefault()}>
             <TextField
-              className={styles.textField}
+              customvariant="highLabel"
+              sx={{ mp: 3 }}
+              color="secondary"
+              fullWidth
               error={walletForm.touchedFields.WalletAddress && !walletForm.errorObj.WalletAddress.isValid}
               helperText={walletForm.touchedFields.WalletAddress && walletForm.errorObj.WalletAddress.helperText}
               value={walletForm.fields.WalletAddress}
-              margin="dense"
-              size="small"
               name="WalletAddress"
               label="ADS account address"
               type="text"
@@ -161,11 +160,13 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
               required
             />
             <TextField
+              customvariant="highLabel"
+              sx={{ mp: 3 }}
+              color="secondary"
+              fullWidth
               error={walletForm.touchedFields.WalletSecretKey && !walletForm.errorObj.WalletSecretKey.isValid}
               helperText={walletForm.touchedFields.WalletSecretKey && walletForm.errorObj.WalletSecretKey.helperText}
               value={walletForm.fields.WalletSecretKey}
-              margin="dense"
-              size="small"
               name="WalletSecretKey"
               label="ADS account secret key"
               type="text"
@@ -173,14 +174,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
               required
             />
           </Box>
-
-          <Box
-            component="form"
-            className={styles.formBlock}
-            onFocus={nodeForm.setTouched}
-            onChange={nodeForm.onChange}
-            onSubmit={(e) => e.preventDefault()}
-          >
+          <Box component="form" onFocus={nodeForm.setTouched} onChange={nodeForm.onChange} onSubmit={(e) => e.preventDefault()}>
             <Collapse
               in={Object.values(nodeForm.fields).some((el) => !!el) && !isKnownNode && walletForm.errorObj.WalletAddress.isValid}
               timeout="auto"
@@ -191,26 +185,25 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
               ) : (
                 <>
                   <TextField
-                    className={styles.textField}
+                    customvariant="highLabel"
+                    sx={{ mp: 3 }}
+                    color="secondary"
                     error={nodeForm.touchedFields.WalletNodeHost && !nodeForm.errorObj.WalletNodeHost.isValid}
                     helperText={nodeForm.touchedFields.WalletNodeHost && nodeForm.errorObj.WalletNodeHost.helperText}
                     value={nodeForm.fields.WalletNodeHost}
                     disabled={!!nodeForm.fields.code}
-                    margin="dense"
-                    size="small"
                     name="WalletNodeHost"
                     label="Wallet node host"
                     fullWidth
                     inputProps={{ autoComplete: 'off' }}
                   />
                   <TextField
-                    className={styles.textField}
+                    customvariant="highLabel"
+                    color="secondary"
                     error={nodeForm.touchedFields.WalletNodePort && !nodeForm.errorObj.WalletNodePort.isValid}
                     helperText={nodeForm.touchedFields.WalletNodePort && nodeForm.errorObj.WalletNodePort.helperText}
                     value={nodeForm.fields.WalletNodePort}
                     disabled={!!nodeForm.fields.code}
-                    margin="dense"
-                    size="small"
                     name="WalletNodePort"
                     label="Wallet node port"
                     fullWidth
@@ -227,8 +220,12 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell align="center">ADS account address</TableCell>
-              <TableCell align="center">{walletForm.fields.WalletAddress}</TableCell>
+              <TableCell align="center">
+                <Typography variant="tableText1">ADS account address</Typography>
+              </TableCell>
+              <TableCell align="center">
+                <Typography variant="tableText1">{walletForm.fields.WalletAddress}</Typography>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>

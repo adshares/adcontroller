@@ -1,11 +1,11 @@
 import React from 'react';
 import { Box, CircularProgress } from '@mui/material';
-import styles from './styles.scss';
+import commonStyles from '../../styles/commonStyles.scss';
 
-const Spinner = () => {
+const Spinner = ({ size = 40 }) => {
   return (
-    <Box className={styles.container}>
-      <CircularProgress />
+    <Box className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}>
+      <CircularProgress size={size} />
     </Box>
   );
 };

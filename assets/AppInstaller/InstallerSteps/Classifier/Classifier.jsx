@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, LinearProgress, TextField, Typography } from '@mui/material';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
-import styles from './styles.scss';
 import { useForm, useCreateNotification } from '../../../hooks';
+import commonStyles from '../../../styles/commonStyles.scss';
 
 function Classifier({ handleNextStep, handlePrevStep, step }) {
   const form = useForm({
@@ -68,55 +68,54 @@ function Classifier({ handleNextStep, handlePrevStep, step }) {
       disabledNext={registrationInProgress || isLoading || (editMode && !form.isFormValid)}
       onBackClick={() => handlePrevStep(step)}
     >
-      <Typography align="center" gutterBottom variant="h6">
+      <Typography align="center" gutterBottom variant="h3">
         Registration in AdClassify
       </Typography>
       <Typography variant="body1" paragraph align="center">
         AdClassify provides data about banners and allow Publishers to effectively filter unwanted content. You can register with the
         adshares community adclassify for free.
       </Typography>
-      <Box className={styles.editButtonThumb}>
+      <Box className={`${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
         <Button onClick={() => setEditMode((prevState) => !prevState)} type="button">
           {editMode ? 'Cancel' : 'Already have an account'}
         </Button>
       </Box>
       {editMode && (
-        <Box className={styles.container}>
+        <>
           <Box
-            className={styles.formBlock}
+            sx={{ width: '380px' }}
             component="form"
             onChange={form.onChange}
             onFocus={form.setTouched}
             onSubmit={(e) => e.preventDefault()}
           >
             <TextField
-              className={styles.textField}
+              sx={{ mb: 3 }}
+              customvariant="highLabel"
+              color="secondary"
               error={form.touchedFields.apiKey && !form.errorObj.apiKey.isValid}
               helperText={form.touchedFields.apiKey && form.errorObj.apiKey.helperText}
-              size="small"
               name="apiKey"
               label="Api key"
-              margin="dense"
               value={form.fields.apiKey}
               type="text"
               fullWidth
               inputProps={{ autoComplete: 'off' }}
             />
             <TextField
-              className={styles.textField}
+              customvariant="highLabel"
+              color="secondary"
               error={form.touchedFields.apiSecret && !form.errorObj.apiSecret.isValid}
               helperText={form.touchedFields.apiSecret && form.errorObj.apiSecret.helperText}
-              size="small"
               name="apiSecret"
               label="Api secret"
-              margin="dense"
               value={form.fields.apiSecret}
               type="text"
               fullWidth
               inputProps={{ autoComplete: 'off' }}
             />
           </Box>
-        </Box>
+        </>
       )}
       {registrationInProgress && (
         <Box sx={{ width: '100%' }}>

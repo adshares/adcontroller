@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Table, TableBody, TableCell, TableRow, TextField } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import { useForm, useCreateNotification } from '../../../hooks';
 import apiService from '../../../utils/apiService';
 import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/InstallerStepWrapper';
-import styles from './styles.scss';
+import commonStyles from '../../../styles/commonStyles.scss';
 
 function Base({ handleNextStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -79,75 +79,79 @@ function Base({ handleNextStep, step }) {
       disabledNext={!form.isFormValid}
       hideBackButton
     >
-      <Box className={styles.editButtonThumb}>
-        <Button className={dataRequired ? styles.hidden : styles.visible} onClick={() => setEditMode(!editMode)} type="button">
-          {editMode ? 'Cancel' : 'Edit'}
+      <Box className={`${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+        <Button sx={{ visibility: dataRequired ? 'hidden' : 'visible' }} onClick={() => setEditMode(!editMode)} type="button">
+          {editMode ? 'CANCEL' : 'EDIT'}
         </Button>
       </Box>
 
       {editMode && (
-        <Box className={styles.container}>
-          <Box
-            className={styles.formBase}
-            component="form"
-            onChange={form.onChange}
-            onFocus={form.setTouched}
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <Box className={styles.formBlock}>
-              <TextField
-                className={styles.textField}
-                error={form.touchedFields.Name && !form.errorObj.Name.isValid}
-                helperText={form.touchedFields.Name && form.errorObj.Name.helperText}
-                size="small"
-                name="Name"
-                label="Adserver's name"
-                value={form.fields.Name}
-                type="text"
-                required
-                inputProps={{ autoComplete: 'off' }}
-              />
-              <TextField
-                className={styles.textField}
-                error={form.touchedFields.Domain && !form.errorObj.Domain.isValid}
-                helperText={form.touchedFields.Domain && form.errorObj.Domain.helperText}
-                size="small"
-                name="Domain"
-                label="Adserver's domain"
-                value={form.fields.Domain}
-                type="text"
-                required
-                inputProps={{ autoComplete: 'off' }}
-              />
-            </Box>
-            <Box className={styles.formBlock}>
-              <TextField
-                className={styles.textField}
-                error={form.touchedFields.SupportEmail && !form.errorObj.SupportEmail.isValid}
-                helperText={form.touchedFields.SupportEmail && form.errorObj.SupportEmail.helperText}
-                size="small"
-                name="SupportEmail"
-                label="Support email"
-                value={form.fields.SupportEmail}
-                type="email"
-                placeholder="support@domain.xyz"
-                required
-                inputProps={{ autoComplete: 'off' }}
-              />
-              <TextField
-                className={styles.textField}
-                error={form.touchedFields.TechnicalEmail && !form.errorObj.TechnicalEmail.isValid}
-                helperText={form.touchedFields.TechnicalEmail && form.errorObj.TechnicalEmail.helperText}
-                size="small"
-                name="TechnicalEmail"
-                label="Technical email"
-                value={form.fields.TechnicalEmail}
-                type="email"
-                placeholder="tech@domain.xyz"
-                required
-                inputProps={{ autoComplete: 'off' }}
-              />
-            </Box>
+        <Box
+          className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween}`}
+          component="form"
+          onChange={form.onChange}
+          onFocus={form.setTouched}
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <Box sx={{ width: '380px' }}>
+            <TextField
+              sx={{ mb: 3 }}
+              customvariant="highLabel"
+              color="secondary"
+              fullWidth
+              error={form.touchedFields.Name && !form.errorObj.Name.isValid}
+              helperText={form.touchedFields.Name && form.errorObj.Name.helperText}
+              name="Name"
+              label="Adserver's name"
+              value={form.fields.Name}
+              type="text"
+              required
+              inputProps={{ autoComplete: 'off' }}
+            />
+            <TextField
+              customvariant="highLabel"
+              color="secondary"
+              fullWidth
+              error={form.touchedFields.Domain && !form.errorObj.Domain.isValid}
+              helperText={form.touchedFields.Domain && form.errorObj.Domain.helperText}
+              name="Domain"
+              label="Adserver's domain"
+              value={form.fields.Domain}
+              type="text"
+              required
+              inputProps={{ autoComplete: 'off' }}
+            />
+          </Box>
+          <Box sx={{ width: '380px' }}>
+            <TextField
+              sx={{ mb: 3 }}
+              customvariant="highLabel"
+              color="secondary"
+              fullWidth
+              error={form.touchedFields.SupportEmail && !form.errorObj.SupportEmail.isValid}
+              helperText={form.touchedFields.SupportEmail && form.errorObj.SupportEmail.helperText}
+              name="SupportEmail"
+              label="Support email"
+              value={form.fields.SupportEmail}
+              type="email"
+              placeholder="support@domain.xyz"
+              required
+              inputProps={{ autoComplete: 'off' }}
+            />
+            <TextField
+              customvariant="highLabel"
+              color="secondary"
+              fullWidth
+              error={form.touchedFields.TechnicalEmail && !form.errorObj.TechnicalEmail.isValid}
+              helperText={form.touchedFields.TechnicalEmail && form.errorObj.TechnicalEmail.helperText}
+              name="TechnicalEmail"
+              label="Technical email"
+              value={form.fields.TechnicalEmail}
+              type="email"
+              placeholder="tech@domain.xyz"
+              required
+              inputProps={{ autoComplete: 'off' }}
+            />
           </Box>
         </Box>
       )}
@@ -170,20 +174,36 @@ function InfoTable({ stepData }) {
     <Table>
       <TableBody>
         <TableRow>
-          <TableCell align="left">Adserver's name</TableCell>
-          <TableCell align="left">{stepData.Name}</TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">Adserver's name</Typography>{' '}
+          </TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">{stepData.Name}</Typography>
+          </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Adserver's domain</TableCell>
-          <TableCell align="left">{stepData.Domain}</TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">Adserver's domain</Typography>
+          </TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">{stepData.Domain}</Typography>
+          </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Support email</TableCell>
-          <TableCell align="left">{stepData.SupportEmail}</TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">Support email</Typography>
+          </TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">{stepData.SupportEmail}</Typography>
+          </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align="left">Technical email</TableCell>
-          <TableCell align="left">{stepData.TechnicalEmail}</TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">Technical email</Typography>
+          </TableCell>
+          <TableCell align="left">
+            <Typography variant="tableText1">{stepData.TechnicalEmail}</Typography>
+          </TableCell>
         </TableRow>
       </TableBody>
     </Table>

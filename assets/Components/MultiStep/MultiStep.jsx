@@ -27,7 +27,7 @@ const MultiStep = ({ currentStep: lastCompletedStep, steps }) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ width: '1060px', maxWidth: '100%', height: '900px' }}>
       <NavStepper steps={steps} unlockedSteps={unlockedSteps} handleCurrentStep={handleCurrentStep} />
       <Routes>
         {unlockedSteps.map((step) => (

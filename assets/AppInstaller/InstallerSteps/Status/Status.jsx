@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Icon, Table, TableBody, TableCell, TableRow, Tooltip } from '@mui/material';
+import { Icon, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import apiService from '../../../utils/apiService';
@@ -105,9 +105,15 @@ function Status({ handlePrevStep, step }) {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell align="left">{stepData.adserver.module}</TableCell>
-              <TableCell align="left">{stepData.adserver.version}</TableCell>
-              <TableCell align="left">{stepData.adserver.url}</TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adserver.module}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adserver.version}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adserver.url}</Typography>
+              </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adserver.code}>
                   <Icon>{stepData.adserver.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
@@ -115,9 +121,15 @@ function Status({ handlePrevStep, step }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell align="left">{stepData.adpanel.module}</TableCell>
-              <TableCell align="left">{stepData.adpanel.version}</TableCell>
-              <TableCell align="left">{stepData.adpanel.url}</TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adpanel.module}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adpanel.version}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adpanel.url}</Typography>
+              </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adpanel.code}>
                   <Icon>{stepData.adpanel.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
@@ -125,9 +137,15 @@ function Status({ handlePrevStep, step }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell align="left">{stepData.aduser.module}</TableCell>
-              <TableCell align="left">{stepData.aduser.version}</TableCell>
-              <TableCell align="left">{stepData.aduser.url}</TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.aduser.module}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.aduser.version}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.aduser.url}</Typography>
+              </TableCell>
               <TableCell>
                 <Tooltip title={stepData.aduser.code}>
                   <Icon>{stepData.aduser.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
@@ -135,9 +153,15 @@ function Status({ handlePrevStep, step }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell align="left">{stepData.adselect.module}</TableCell>
-              <TableCell align="left">{stepData.adselect.version}</TableCell>
-              <TableCell align="left">{stepData.adselect.url}</TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adselect.module}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adselect.version}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adselect.url}</Typography>
+              </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adselect.code}>
                   <Icon>{stepData.adselect.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
@@ -145,9 +169,15 @@ function Status({ handlePrevStep, step }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell align="left">{stepData.adclassify.module}</TableCell>
-              <TableCell align="left">{stepData.adclassify.version}</TableCell>
-              <TableCell align="left">{stepData.adclassify.url}</TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adclassify.module}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adclassify.version}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adclassify.url}</Typography>
+              </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adclassify.code}>
                   <Icon>{stepData.adclassify.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
@@ -155,9 +185,15 @@ function Status({ handlePrevStep, step }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell align="left">{stepData.adpay.module}</TableCell>
-              <TableCell align="left">{stepData.adpay.version}</TableCell>
-              <TableCell align="left">{stepData.adpay.url}</TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adpay.module}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adpay.version}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData.adpay.url}</Typography>
+              </TableCell>
               <TableCell>
                 <Tooltip title={stepData.adpay.code}>
                   <Icon>{stepData.adpay.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
@@ -165,9 +201,15 @@ function Status({ handlePrevStep, step }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell align="left">{stepData['main.js'].module}</TableCell>
-              <TableCell align="left">{stepData['main.js'].version}</TableCell>
-              <TableCell align="left">{stepData['main.js'].url}</TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData['main.js'].module}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData['main.js'].version}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData['main.js'].url}</Typography>
+              </TableCell>
               <TableCell>
                 <Tooltip title={stepData['main.js'].code}>
                   <Icon>{stepData['main.js'].code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>

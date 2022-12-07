@@ -12,12 +12,12 @@ export default function Terms() {
   return (
     <>
       <PrivacyCard />
-      <TermAndConditionCard />
+      <TermAndConditionCard sx={{ mt: 3 }} />
     </>
   );
 }
 
-const PrivacyCard = () => {
+const PrivacyCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setRegulationsConfig, { isLoading }] = useSetRegulationsConfigMutation();
@@ -42,11 +42,13 @@ const PrivacyCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card {...props}>
       <CardHeader title="Privacy policy" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <CollapsibleTextarea
+            customvariant="highLabel"
+            color="secondary"
             collapsible
             value={form.fields.PrivacyPolicy}
             name="PrivacyPolicy"
@@ -68,7 +70,7 @@ const PrivacyCard = () => {
   );
 };
 
-const TermAndConditionCard = () => {
+const TermAndConditionCard = (props) => {
   const appData = useSelector(configSelectors.getAppData);
   const dispatch = useDispatch();
   const [setRegulationsConfig, { isLoading }] = useSetRegulationsConfigMutation();
@@ -93,11 +95,13 @@ const TermAndConditionCard = () => {
   };
 
   return (
-    <Card className={commonStyles.card}>
+    <Card {...props}>
       <CardHeader title="Terms and conditions" />
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
           <CollapsibleTextarea
+            customvariant="highLabel"
+            color="secondary"
             collapsible
             value={form.fields.Terms}
             name="Terms"

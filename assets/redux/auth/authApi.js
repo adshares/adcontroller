@@ -5,14 +5,13 @@ export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: baseQueryWithGlobalErrorHandler,
   endpoints: (builder) => ({
-    loginUser: builder.mutation({
-      query: (userData) => ({
-        url: '/api/login',
-        method: 'POST',
-        body: userData,
+    getCurrentUser: builder.query({
+      query: () => ({
+        url: '/api/check',
+        method: 'GET',
       }),
     }),
   }),
 });
 
-export const { useLoginUserMutation } = authApi;
+export const { useGetCurrentUserQuery } = authApi;

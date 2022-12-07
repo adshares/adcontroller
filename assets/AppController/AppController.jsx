@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { useSkipFirstRenderEffect } from '../hooks';
-import { checkAppAuth } from '../redux/auth/authSlice';
+import { useSelector } from 'react-redux';
+import { loginRedirect } from '../utils/helpers';
 import authSelectors from '../redux/auth/authSelectors';
 import synchronizationSelectors from '../redux/synchronization/synchronizationSelectors';
+import { useGetCurrentUserQuery } from '../redux/auth/authApi';
 import { useLazySynchronizeConfigQuery } from '../redux/synchronization/synchronizationApi';
 import { useLazyGetAppConfigQuery } from '../redux/config/configApi';
 import Spinner from '../Components/Spinner/Spinner';
 import SynchronizationDialog from '../Components/SynchronizationDialog/SynchronizationDialog';
-import PublicRoute from '../Components/Routes/PublicRoute';
 import PrivateRoute from '../Components/Routes/PrivateRoute';
 import MenuAppBar from '../Components/MenuAppBar/MenuAppBar';
 import AppWindow from '../Components/AppWindow/AppWindow';
-import Login from '../Components/Login/Login';
 import NotFoundView from '../Components/NotFound/NotFoundView';
+import ForbiddenView from '../Components/NotFound/ForbiddenView';
 import SideMenu from '../Components/SideMenu/SideMenu';
 import Wallet from './Finance/Wallet';
 import Commissions from './Finance/Commissions';
@@ -28,32 +27,43 @@ import UsersSettings from './Users/Settings';
 import Panel from './General/Panel';
 import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
+import ConnectedServers from './Network/ConnectedServers';
+import Events from './Events/Events';
+import UsersList from './Users/UsersList';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 import PercentIcon from '@mui/icons-material/Percent';
-import SettingsIcon from '@mui/icons-material/Settings';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import InfoIcon from '@mui/icons-material/Info';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
-import PeopleIcon from '@mui/icons-material/People';
-import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
-import EmailIcon from '@mui/icons-material/Email';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
+import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import commonStyles from '../styles/commonStyles.scss';
 
 const appModules = [
   {
     name: 'Users',
-    icon: PeopleIcon,
+    icon: PeopleAltOutlinedIcon,
     children: [
+      {
+        name: 'List of users',
+        path: '/users/list',
+        component: UsersList,
+        icon: FormatListBulletedOutlinedIcon,
+      },
       {
         name: 'Settings',
         path: '/users/settings',
         component: UsersSettings,
-        icon: SettingsIcon,
+        icon: SettingsOutlinedIcon,
       },
     ],
   },
@@ -65,7 +75,7 @@ const appModules = [
         name: 'Settings',
         path: '/demand/settings',
         component: DemandSettings,
-        icon: SettingsIcon,
+        icon: SettingsOutlinedIcon,
       },
     ],
   },
@@ -78,7 +88,7 @@ const appModules = [
         name: 'Settings',
         path: '/supply/settings',
         component: SupplySettings,
-        icon: SettingsIcon,
+        icon: SettingsOutlinedIcon,
       },
     ],
   },
@@ -87,22 +97,28 @@ const appModules = [
     icon: SyncAltIcon,
     children: [
       {
+        name: 'Connected servers',
+        path: '/network/connected-servers',
+        component: ConnectedServers,
+        icon: LanOutlinedIcon,
+      },
+      {
         name: 'Settings',
         path: '/network/settings',
         component: NetworkSettings,
-        icon: SettingsIcon,
+        icon: SettingsOutlinedIcon,
       },
     ],
   },
   {
     name: 'Finance',
-    icon: AccountBalanceIcon,
+    icon: AttachMoneyOutlinedIcon,
     children: [
       {
         name: 'Wallet',
         path: '/finance/wallet',
         component: Wallet,
-        icon: AccountBalanceWalletIcon,
+        icon: AccountBalanceWalletOutlinedIcon,
       },
       {
         name: 'Commissions',
@@ -114,25 +130,25 @@ const appModules = [
   },
   {
     name: 'General',
-    icon: SettingsIcon,
+    icon: SettingsOutlinedIcon,
     children: [
       {
         name: 'Base',
         path: '/base',
         component: Base,
-        icon: InfoIcon,
+        icon: InfoOutlinedIcon,
       },
       {
         name: 'SMTP',
         path: '/smtp',
         component: SMTP,
-        icon: EmailIcon,
+        icon: EmailOutlinedIcon,
       },
       {
         name: 'License',
         path: '/license',
         component: License,
-        icon: VpnKeyIcon,
+        icon: VpnKeyOutlinedIcon,
       },
       {
         name: 'Panel',
@@ -144,7 +160,7 @@ const appModules = [
         name: 'Privacy & Terms',
         path: '/terms',
         component: Terms,
-        icon: PrivacyTipIcon,
+        icon: PrivacyTipOutlinedIcon,
       },
     ],
   },
@@ -154,24 +170,20 @@ const appModules = [
     component: AdClassifier,
     icon: DashboardIcon,
   },
+  {
+    name: 'Events',
+    path: '/events',
+    component: Events,
+    icon: DashboardIcon,
+  },
 ];
 
-const getAppPages = (appModules, isAuthenticate) => {
+const getAppPages = (appModules) => {
   const parseAppModules = (modules) => {
     const pages = [];
     for (let page of modules) {
       if (page.component) {
-        pages.push(
-          <Route
-            key={page.name}
-            path={page.path}
-            element={
-              <PrivateRoute isLoggedIn={isAuthenticate}>
-                <page.component />
-              </PrivateRoute>
-            }
-          />,
-        );
+        pages.push(<Route key={page.name} path={page.path} element={<page.component />} />);
       }
       if (page.children) {
         pages.push(...parseAppModules(page.children));
@@ -183,77 +195,79 @@ const getAppPages = (appModules, isAuthenticate) => {
 };
 
 function AppController() {
-  const token = useSelector(authSelectors.getToken);
+  const { isLoading: isUserChecking } = useGetCurrentUserQuery();
   const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
+  const currentUser = useSelector(authSelectors.getUser);
   const { isSynchronizationRequired, isDataSynchronized, changedModules } = useSelector(synchronizationSelectors.getSynchronizationData);
-  const dispatch = useDispatch();
-  const [isAppInit, setAppInit] = useState(false);
   const [showSideMenu, toggleSideMenu] = useState(true);
-  const pages = getAppPages(appModules, isLoggedIn);
+  const pages = getAppPages(appModules);
   const [synchronizeConfig, { isFetching: isSyncInProgress }] = useLazySynchronizeConfigQuery();
-  const [getAppConfig, { isFetching: isAppDataLoading }] = useLazyGetAppConfigQuery();
+  const [getAppConfig, { isFetching: isAppDataLoading, isSuccess: isAppDataLoadingSuccess }] = useLazyGetAppConfigQuery();
 
   useEffect(() => {
-    if (token) {
-      dispatch(checkAppAuth());
+    if (!isLoggedIn) {
+      loginRedirect();
+      localStorage.removeItem('lastSync');
     }
-    setAppInit(true);
-  }, [token]);
+  }, [isLoggedIn]);
 
-  useSkipFirstRenderEffect(() => {
-    if (token && isSynchronizationRequired) {
+  useEffect(() => {
+    if (isSynchronizationRequired && currentUser.name) {
       synchronizeConfig();
     }
-  }, [token, isSynchronizationRequired]);
+  }, [isSynchronizationRequired, currentUser]);
 
   useEffect(() => {
-    if (token && isDataSynchronized) {
+    if (isDataSynchronized && currentUser.name) {
       getAppConfig();
     }
-  }, [token, isDataSynchronized]);
+  }, [isDataSynchronized, currentUser]);
 
   return (
-    <>
-      <MenuAppBar showProtectedOptions={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} showSideMenuIcon />
-      <Box component="main" className={`${commonStyles.flex} ${commonStyles.justifyCenter}`} sx={{ minHeight: 'calc(100vh - 100px)' }}>
-        <SideMenu enableSideMenu={isLoggedIn} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} menuItems={appModules} />
-        <AppWindow>
-          <SynchronizationDialog
-            isSyncInProgress={isSyncInProgress}
-            isSynchronizationRequired={isSynchronizationRequired}
-            isDataSynchronized={isDataSynchronized}
-            changedModules={changedModules}
-          />
+    <Box className={`${commonStyles.flex}`}>
+      <SideMenu
+        enableSideMenu={isLoggedIn && !!currentUser.name}
+        showSideMenu={showSideMenu}
+        toggleSideMenu={toggleSideMenu}
+        menuItems={appModules}
+      />
+      <Box sx={{ flexGrow: 1, width: 'calc(100% - 292px)' }}>
+        <MenuAppBar showProtectedOptions={!!currentUser.name} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} />
+        {isUserChecking && <Spinner />}
+        {!isUserChecking && (
+          <AppWindow>
+            {!isUserChecking && !currentUser.name && isLoggedIn && <ForbiddenView />}
+            <SynchronizationDialog
+              isSyncInProgress={isSyncInProgress}
+              isSynchronizationRequired={isSynchronizationRequired}
+              isDataSynchronized={isDataSynchronized}
+              changedModules={changedModules}
+            />
 
-          {isAppDataLoading && (
-            <Dialog open={isAppDataLoading}>
-              <DialogTitle>App data loading</DialogTitle>
+            {isAppDataLoading && (
+              <Dialog open={isAppDataLoading}>
+                <DialogTitle>App data loading</DialogTitle>
 
-              <DialogContent>
-                <Spinner />
-              </DialogContent>
-            </Dialog>
-          )}
+                <DialogContent>
+                  <Spinner />
+                </DialogContent>
+              </Dialog>
+            )}
 
-          {isAppInit && isDataSynchronized && !isAppDataLoading && !isSyncInProgress && (
-            <Routes>
-              <Route
-                path="login"
-                element={
-                  <PublicRoute restricted isLoggedIn={isLoggedIn} redirectTo="/base">
-                    <Login />
-                  </PublicRoute>
-                }
-              />
-              {pages}
-              <Route path="*" element={<NotFoundView />} />
-              <Route path="/" element={<Navigate to="/base" />} />
-              <Route path="/steps/*" element={<Navigate to="/base" />} />
-            </Routes>
-          )}
-        </AppWindow>
+            {isLoggedIn && isAppDataLoadingSuccess && isDataSynchronized && !isAppDataLoading && !isSyncInProgress && (
+              <Routes>
+                <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name} />}>
+                  {pages}
+                  <Route path="/" element={<Navigate to="/base" />} />
+                  <Route path="*" element={<NotFoundView />} />
+                  <Route path="/steps/*" element={<Navigate to="/base" />} />
+                </Route>
+              </Routes>
+            )}
+          </AppWindow>
+        )}
       </Box>
-    </>
+    </Box>
   );
 }
 
