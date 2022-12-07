@@ -27,7 +27,7 @@ import UsersSettings from './Users/Settings';
 import Panel from './General/Panel';
 import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
-import ConnectedStatus from './Network/ConnectedStatus';
+import ConnectedServers from './Network/ConnectedServers';
 import Events from './Events/Events';
 import UsersList from './Users/UsersList';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
@@ -97,16 +97,16 @@ const appModules = [
     icon: SyncAltIcon,
     children: [
       {
+        name: 'Connected servers',
+        path: '/network/connected-servers',
+        component: ConnectedServers,
+        icon: LanOutlinedIcon,
+      },
+      {
         name: 'Settings',
         path: '/network/settings',
         component: NetworkSettings,
         icon: SettingsOutlinedIcon,
-      },
-      {
-        name: 'Connected status',
-        path: '/network/connected-status',
-        component: ConnectedStatus,
-        icon: LanOutlinedIcon,
       },
     ],
   },

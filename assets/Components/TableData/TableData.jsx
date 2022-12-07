@@ -1050,7 +1050,7 @@ export default function TableData({
         count={paginationParams.count || rows.length}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        rowsPerPageOptions={[5, 10, 15, 20]}
+        rowsPerPageOptions={[20, 50, 100]}
         showFirstButton={paginationParams.showFirstButton || undefined}
         showLastButton={paginationParams.showLastButton || undefined}
       />

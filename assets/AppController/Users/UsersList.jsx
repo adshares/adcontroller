@@ -142,7 +142,7 @@ const headCells = [
 
 export default function UsersList() {
   const [queryConfig, setQueryConfig] = useState({
-    limit: 10,
+    limit: 20,
     cursor: null,
     page: 1,
     orderBy: null,

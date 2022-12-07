@@ -55,7 +55,7 @@ const headCells = [
 
 export default function Events() {
   const [queryConfig, setQueryConfig] = useState({
-    limit: 10,
+    limit: 20,
     cursor: null,
     page: 1,
     'filter[type]': null,

@@ -54,17 +54,17 @@ const headCells = [
   },
   {
     id: 'countOfError',
-    label: 'Count of connection error',
+    label: 'Errors',
     cellWidth: '8rem',
     alignContent: 'left',
   },
 ];
 
-export default function ConnectedStatus() {
+export default function ConnectedServers() {
   const [queryConfig, setQueryConfig] = useState({
     page: 1,
     cursor: null,
-    limit: 5,
+    limit: 20,
   });
   const [resetHostConnectionError] = useResetHostConnectionErrorMutation();
   const { data: response, isFetching, refetch } = useGetConnectedHostsQuery(queryConfig, { refetchOnMountOrArgChange: true });
@@ -143,7 +143,7 @@ export default function ConnectedStatus() {
       }}
       width="full"
     >
-      <CardHeader title="Connected status" />
+      <CardHeader title="Connected servers" />
       <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
         <TableData
           headCells={headCells} // array of objects {id, label, ...additional params}
