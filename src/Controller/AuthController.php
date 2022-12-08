@@ -20,13 +20,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AuthController extends AbstractController
 {
-    private const DEFAULT_REDIRECT = '/';
     private const OAUTH_AUTHORIZE = '/auth/authorize';
     private const OAUTH_FETCH_TOKEN = '/oauth/token';
     private const OAUTH_REVOKE_TOKEN = '/oauth/tokens/';
 
     public function __construct(
         private readonly string $adServerBaseUri,
+        private readonly string $publicPath,
         private readonly ConfigurationRepository $repository,
         private readonly LoggerInterface $logger,
         private readonly HttpClientInterface $httpClient,
@@ -84,7 +84,7 @@ class AuthController extends AbstractController
         $accessToken = $response->toArray()['access_token'];
         $this->requestStack->getSession()->set('accessToken', $accessToken);
 
-        $referer = $this->requestStack->getSession()->get('referer') ?? self::DEFAULT_REDIRECT;
+        $referer = $this->requestStack->getSession()->get('referer') ?? $this->publicPath;
         return new RedirectResponse($referer);
     }
 
