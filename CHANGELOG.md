@@ -54,7 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.0...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.1...develop
+[1.2.1]: https://github.com/adshares/adcontroller/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/adshares/adcontroller/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/adshares/adcontroller/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/adshares/adcontroller/compare/v1.0.1...v1.0.2
