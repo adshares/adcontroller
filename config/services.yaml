@@ -7,7 +7,7 @@ parameters:
     secure_scheme: '%env(string:SECURE_SCHEME)%'
     app_host: '%env(string:APP_HOST)%'
     app_port: '%env(int:APP_PORT)%'
-    app_path: ''
+    app_path: '/'
     public_host: '%env(default:app_host:string:PUBLIC_HOST)%'
     public_port: '%env(default:app_port:int:PUBLIC_PORT)%'
     public_path: '%env(default:app_path:string:PUBLIC_PATH)%'

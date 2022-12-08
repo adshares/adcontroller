@@ -61,7 +61,7 @@ class AuthController extends AbstractController
     public function oauthCallback(Request $request): Response
     {
         $state = $this->requestStack->getSession()->get('state', '');
-        if (strlen($state) > 0 && $state !== $request->get('state')) {
+        if (empty($state) || $state !== $request->get('state')) {
             throw new UnprocessableEntityHttpException('Invalid state');
         }
         $credentials = $this->repository->fetchValuesByNames(
