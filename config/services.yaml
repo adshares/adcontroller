@@ -3,12 +3,24 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    secure_scheme: '%env(string:SECURE_SCHEME)%'
+    app_host: '%env(string:APP_HOST)%'
+    app_port: '%env(int:APP_PORT)%'
+    app_path: ''
+    public_host: '%env(default:app_host:string:PUBLIC_HOST)%'
+    public_port: '%env(default:app_port:int:PUBLIC_PORT)%'
+    public_path: '%env(default:app_path:string:PUBLIC_PATH)%'
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
+            string $secureScheme: '%secure_scheme%'
+            string $publicHost: '%public_host%'
+            int $publicPort: '%public_port%'
+            string $publicPath: '%public_path%'
             string $buildDirectory: '%kernel.build_dir%'
             string $adClassifyBaseUri: '%env(ADCLASSIFY_BASE_URI)%'
             string $adPanelHomeDirectory: '%env(ADPANEL_HOME_DIRECTORY)%'

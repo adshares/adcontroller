@@ -7,11 +7,12 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import theme from './utils/theme';
 import { BrowserRouter } from 'react-router-dom';
 import AppController from './AppController/AppController';
+import configuration from './controllerConfig/configuration';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <BrowserRouter basename={configuration.basePath}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AppController />

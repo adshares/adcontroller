@@ -43,7 +43,7 @@ const request = async (url, method, withAuthorization = true, _body) => {
 
 const createUser = async (body) => {
   try {
-    await request(`${configuration.baseUrl}/api/accounts`, 'POST', false, body);
+    await request(`${configuration.basePath}/api/accounts`, 'POST', false, body);
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }
@@ -51,7 +51,7 @@ const createUser = async (body) => {
 
 const sendStepData = async (stepName, body) => {
   try {
-    return await request(`${configuration.baseUrl}/api/step/${stepName}`, 'POST', true, body);
+    return await request(`${configuration.basePath}/api/step/${stepName}`, 'POST', true, body);
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }
@@ -59,7 +59,7 @@ const sendStepData = async (stepName, body) => {
 
 const getPrevStep = async () => {
   try {
-    return await request(`${configuration.baseUrl}/api/step`, 'GET', true);
+    return await request(`${configuration.basePath}/api/step`, 'GET', true);
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }
@@ -67,7 +67,7 @@ const getPrevStep = async () => {
 
 const getCurrentStepData = async (stepName) => {
   try {
-    return await request(`${configuration.baseUrl}/api/step/${stepName}`, 'GET', true);
+    return await request(`${configuration.basePath}/api/step/${stepName}`, 'GET', true);
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }
@@ -75,7 +75,7 @@ const getCurrentStepData = async (stepName) => {
 
 const getCommunityLicense = async () => {
   try {
-    return await request(`${configuration.baseUrl}/api/community_license`, 'GET', true);
+    return await request(`${configuration.basePath}/api/community_license`, 'GET', true);
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }
@@ -83,7 +83,7 @@ const getCommunityLicense = async () => {
 
 const getLicenseByKey = async (body) => {
   try {
-    return await request(`${configuration.baseUrl}/api/license_key`, 'POST', true, body);
+    return await request(`${configuration.basePath}/api/license_key`, 'POST', true, body);
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }
@@ -91,7 +91,7 @@ const getLicenseByKey = async (body) => {
 
 const getWalletNodeHost = async (body) => {
   try {
-    return await request(`${configuration.baseUrl}/api/node_host`, 'POST', true, body);
+    return await request(`${configuration.basePath}/api/node_host`, 'POST', true, body);
   } catch (err) {
     throw new HttpError(err.message, err.data);
   }

@@ -1,5 +1,5 @@
 export default {
-  baseUrl: process.env.PUBLIC_URL || '',
+  basePath: process.env.PUBLIC_PATH || '',
   loginRedirectUrl: '/oauth/redirect',
   logoutRedirectUrl: '/oauth/logout',
 };

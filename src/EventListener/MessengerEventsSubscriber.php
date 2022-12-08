@@ -14,7 +14,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsEventListener]
-class MessengerEventsListener implements EventSubscriberInterface
+class MessengerEventsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly LoggerInterface $logger,

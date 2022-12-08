@@ -403,7 +403,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
                       <Box
                         component="img"
                         height="40px"
-                        src={isImgWasEdited ? editedImgObj.preview : `${configuration.baseUrl}/assets/panel/${img.fileId}?${Date.now()}`}
+                        src={isImgWasEdited ? editedImgObj.preview : `${configuration.basePath}/assets/panel/${img.fileId}?${Date.now()}`}
                       />
                     )}
                   </TableCell>
@@ -701,7 +701,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     ) : (
                       <Box
                         component="img"
-                        src={changedFiles[id]?.preview || `${configuration.baseUrl}/assets/panel/${id}?${Date.now()}`}
+                        src={changedFiles[id]?.preview || `${configuration.basePath}/assets/panel/${id}?${Date.now()}`}
                         height={height + 'px'}
                         width={width + 'px'}
                       />
@@ -765,7 +765,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     ) : (
                       <Box
                         component="img"
-                        src={changedFiles[id]?.preview || `${configuration.baseUrl}/assets/panel/${id}?${Date.now()}`}
+                        src={changedFiles[id]?.preview || `${configuration.basePath}/assets/panel/${id}?${Date.now()}`}
                         height={height + 'px'}
                         maxWidth="100%"
                       />

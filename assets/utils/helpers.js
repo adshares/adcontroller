@@ -1,10 +1,10 @@
 import configuration from '../controllerConfig/configuration';
 
 function loginRedirect() {
-  window.open(configuration.loginRedirectUrl, '_self');
+  window.open(configuration.basePath + configuration.loginRedirectUrl, '_self');
 }
 function logoutRedirect() {
-  window.open(configuration.logoutRedirectUrl, '_self');
+  window.open(configuration.basePath + configuration.logoutRedirectUrl, '_self');
 }
 
 function adsToClicks(amount) {

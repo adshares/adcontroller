@@ -18,7 +18,7 @@ dotenv.config({
   path: './.env.local',
 }).parsed;
 
-const path = process.env.PUBLIC_URL || '';
+const path = process.env.PUBLIC_PATH || '';
 const prefix = path.startsWith('/') ? path.substr(1) : path;
 
 Encore

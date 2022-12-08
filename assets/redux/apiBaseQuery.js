@@ -4,7 +4,7 @@ import { setAppLogout } from './auth/authSlice';
 import { setNotification } from './globalNotifications/globalNotificationsSlice';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: configuration.baseUrl,
+  baseUrl: configuration.basePath,
 });
 
 export const baseQueryWithGlobalErrorHandler = async (args, api, extraOptions) => {

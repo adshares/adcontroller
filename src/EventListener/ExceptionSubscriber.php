@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ExceptionListener implements EventSubscriberInterface
+class ExceptionSubscriber implements EventSubscriberInterface
 {
     private const HEADER_JSON_CONTENT = 'application/json';
 
