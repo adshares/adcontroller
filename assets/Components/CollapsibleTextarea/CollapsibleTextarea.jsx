@@ -6,15 +6,15 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 const CollapsibleStyledTextarea = styled(MuiTextField, {
   shouldForwardProp: (propName) => {
-    return propName !== 'collapsible' && propName !== 'focused';
+    return propName !== 'collapsible' && propName !== 'collapsed';
   },
 })(
-  ({ theme, collapsible = false, rows, focused }) =>
+  ({ theme, collapsible = false, rows, collapsed }) =>
     collapsible && {
       '& textarea': {
         cursor: 'auto',
-        height: '23px !important',
-        // overflow: 'hidden',
+        height: collapsed ? `${rows * 23}px !important` : '23px !important',
+        overflow: 'auto',
         transition: theme.transitions.create('height', {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.leavingScreen,
@@ -30,8 +30,6 @@ const CollapsibleStyledTextarea = styled(MuiTextField, {
         },
       },
       '& textarea:focus': {
-        height: `${rows * 23}px !important`,
-        overflow: 'auto',
         transition: theme.transitions.create('height', {
           duration: theme.transitions.duration.enteringScreen,
           easing: theme.transitions.easing.sharp,
@@ -41,7 +39,7 @@ const CollapsibleStyledTextarea = styled(MuiTextField, {
         alignItems: 'flex-start',
       },
       '& .MuiSvgIcon-root ': {
-        transform: focused ? 'rotate(180deg)' : 'rotate(0deg)',
+        transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)',
         transition: theme.transitions.create('transform', {
           duration: theme.transitions.duration.enteringScreen,
           easing: theme.transitions.easing.sharp,
@@ -51,16 +49,29 @@ const CollapsibleStyledTextarea = styled(MuiTextField, {
 );
 
 const CollapsibleTextarea = (props) => {
-  const [focused, setFocused] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
   return props.collapsible ? (
     <CollapsibleStyledTextarea
-      focused={focused}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+      collapsed={collapsed}
+      inputRef={(input) => {
+        if (input != null && collapsed) {
+          input.focus();
+        }
+      }}
+      onFocus={() => {
+        setCollapsed(true);
+      }}
+      onBlur={(e) => {
+        if (e.relatedTarget?.type === 'button') {
+          return;
+        }
+        setCollapsed(false);
+      }}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end" sx={{ mt: 1.5 }}>
-            <KeyboardArrowDownIcon color={focused ? 'primary' : 'grey'} />
+            <KeyboardArrowDownIcon id="toggleCollapsedButton" color={collapsed ? 'primary' : 'grey'} />
           </InputAdornment>
         ),
       }}
