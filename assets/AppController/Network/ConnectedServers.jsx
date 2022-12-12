@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
-import { Box, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardHeader, IconButton, Link, Tooltip, Typography } from '@mui/material';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
@@ -75,9 +75,11 @@ export default function ConnectedServers() {
       id: host.id,
       name: host.name,
       url: (
-        <Typography variant="tableText2" sx={{ overflowWrap: 'anywhere' }}>
-          {host.url}
-        </Typography>
+        <Link href={host.url} target="_blank">
+          <Typography variant="tableText2" sx={{ overflowWrap: 'anywhere' }} color="black.main">
+            {host.url}
+          </Typography>
+        </Link>
       ),
       wallet: host.walletAddress,
       lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
