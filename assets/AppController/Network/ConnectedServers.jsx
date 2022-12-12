@@ -8,6 +8,7 @@ import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
 import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
+import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 
 const headCells = [
   {
@@ -81,7 +82,7 @@ export default function ConnectedServers() {
           </Typography>
         </Link>
       ),
-      wallet: host.walletAddress,
+      wallet: <FormattedWalletAddress wallet={host.walletAddress} />,
       lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
       campaigns: host.campaignCount,
       sites: host.siteCount,

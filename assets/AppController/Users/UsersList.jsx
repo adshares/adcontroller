@@ -56,6 +56,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import ListItemText from '@mui/material/ListItemText';
+import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 
 const headCells = [
   {
@@ -209,20 +210,6 @@ export default function UsersList() {
     [users],
   );
 
-  const parseConnectedWallet = (wallet) => {
-    if (!wallet) {
-      return null;
-    }
-    if (wallet.length > 18) {
-      return (
-        <Tooltip title={wallet}>
-          <Typography variant="body2">{wallet.slice(0, 15) + '...'}</Typography>
-        </Tooltip>
-      );
-    }
-    return wallet;
-  };
-
   const rows = useMemo(() => {
     return users
       ? users.data.map((user) => ({
@@ -243,7 +230,7 @@ export default function UsersList() {
             </Box>
           ),
           email: user.email,
-          connectedWallet: parseConnectedWallet(user.connectedWallet.address),
+          connectedWallet: <FormattedWalletAddress wallet={user.connectedWallet.address} />,
           walletBalance: formatMoney(user.adsharesWallet.walletBalance, 2) + ' ADS',
           bonusBalance: formatMoney(user.adsharesWallet.bonusBalance, 2) + ' ADS',
           role: parseRoles(user.roles),
