@@ -138,15 +138,9 @@ export default function ConnectedServers() {
   };
 
   return (
-    <Card
-      className={`${commonStyles.card}`}
-      sx={{
-        height: 'calc(100vh - 9rem)',
-      }}
-      width="full"
-    >
+    <Card width="full">
       <CardHeader title="Connected servers" />
-      <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
+      <CardContent>
         <TableData
           headCells={headCells} // array of objects {id, label, ...additional params}
           rows={rows} // array of objects { id: (uniq, required), key: (must be same of cell id) value }

@@ -257,13 +257,7 @@ export default function UsersList() {
 
   return (
     <>
-      <Card
-        className={`${commonStyles.card}`}
-        sx={{
-          height: 'calc(100vh - 9rem)',
-        }}
-        width="full"
-      >
+      <Card width="full">
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
           <CardHeader
             titleTypographyProps={{
@@ -281,7 +275,7 @@ export default function UsersList() {
             Add user
           </Button>
         </Box>
-        <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
+        <CardContent>
           <TableData
             headCells={headCells}
             rows={rows}
