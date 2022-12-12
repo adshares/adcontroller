@@ -486,7 +486,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to regular
           </MenuItem>
         )}
-        {!isAdmin && !isAdvertiser && !user.isBanned && (
+        {!isAdmin && !isAdvertiser && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantAdvertising(user.id);
@@ -496,7 +496,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow advertising
           </MenuItem>
         )}
-        {!isAdmin && isAdvertiser && !user.isBanned && (
+        {!isAdmin && isAdvertiser && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyAdvertising(user.id);
@@ -506,7 +506,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Deny advertising
           </MenuItem>
         )}
-        {!isAdmin && !isPublisher && !user.isBanned && (
+        {!isAdmin && !isPublisher && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantPublishing(user.id);
@@ -516,7 +516,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow publishing
           </MenuItem>
         )}
-        {!isAdmin && isPublisher && !user.isBanned && (
+        {!isAdmin && isPublisher && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyPublishing(user.id);
