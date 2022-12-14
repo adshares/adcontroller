@@ -56,6 +56,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import ListItemText from '@mui/material/ListItemText';
+import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import { useSearchParams } from 'react-router-dom';
 import queryString from 'query-string';
 
@@ -231,20 +232,6 @@ export default function UsersList() {
     [users],
   );
 
-  const parseConnectedWallet = (wallet) => {
-    if (!wallet) {
-      return null;
-    }
-    if (wallet.length > 18) {
-      return (
-        <Tooltip title={wallet}>
-          <Typography variant="body2">{wallet.slice(0, 15) + '...'}</Typography>
-        </Tooltip>
-      );
-    }
-    return wallet;
-  };
-
   const rows = useMemo(() => {
     return users
       ? users.data.map((user) => ({
@@ -265,7 +252,7 @@ export default function UsersList() {
             </Box>
           ),
           email: user.email,
-          connectedWallet: parseConnectedWallet(user.connectedWallet.address),
+          connectedWallet: <FormattedWalletAddress wallet={user.connectedWallet.address} />,
           walletBalance: formatMoney(user.adsharesWallet.walletBalance, 2) + ' ADS',
           bonusBalance: formatMoney(user.adsharesWallet.bonusBalance, 2) + ' ADS',
           role: parseRoles(user.roles),
@@ -279,13 +266,7 @@ export default function UsersList() {
 
   return (
     <>
-      <Card
-        className={`${commonStyles.card}`}
-        sx={{
-          height: 'calc(100vh - 9rem)',
-        }}
-        width="full"
-      >
+      <Card width="full">
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
           <CardHeader
             titleTypographyProps={{
@@ -303,7 +284,7 @@ export default function UsersList() {
             Add user
           </Button>
         </Box>
-        <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
+        <CardContent>
           <TableData
             headCells={headCells}
             rows={rows}
@@ -533,7 +514,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to regular
           </MenuItem>
         )}
-        {!isAdmin && !isAdvertiser && !user.isBanned && (
+        {!isAdmin && !isAdvertiser && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantAdvertising(user.id);
@@ -543,7 +524,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow advertising
           </MenuItem>
         )}
-        {!isAdmin && isAdvertiser && !user.isBanned && (
+        {!isAdmin && isAdvertiser && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyAdvertising(user.id);
@@ -553,7 +534,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Deny advertising
           </MenuItem>
         )}
-        {!isAdmin && !isPublisher && !user.isBanned && (
+        {!isAdmin && !isPublisher && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantPublishing(user.id);
@@ -563,7 +544,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow publishing
           </MenuItem>
         )}
-        {!isAdmin && isPublisher && !user.isBanned && (
+        {!isAdmin && isPublisher && !isAgency && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyPublishing(user.id);
