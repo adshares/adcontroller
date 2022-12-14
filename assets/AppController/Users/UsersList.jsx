@@ -9,9 +9,9 @@ import {
   useDenyAdvertisingMutation,
   useDenyPublishingMutation,
   useEditUserMutation,
-  useGetUsersListQuery,
   useGrantAdvertisingMutation,
   useGrantPublishingMutation,
+  useLazyGetUsersListQuery,
   useSwitchToAgencyMutation,
   useSwitchToModeratorMutation,
   useSwitchToRegularMutation,
@@ -56,6 +56,8 @@ import InfoIcon from '@mui/icons-material/Info';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import ListItemText from '@mui/material/ListItemText';
+import { useSearchParams } from 'react-router-dom';
+import queryString from 'query-string';
 
 const headCells = [
   {
@@ -140,25 +142,49 @@ const headCells = [
   },
 ];
 
+const filterObjectByKeys = (obj, keys) => Object.fromEntries(Object.entries(obj).filter(([key]) => keys.includes(key)));
+
 export default function UsersList() {
-  const [queryConfig, setQueryConfig] = useState({
-    limit: 20,
-    cursor: null,
-    page: 1,
-    orderBy: null,
-    'filter[query]': null,
-    'filter[role]': null,
-    'filter[emailConfirmed]': null,
-    'filter[adminConfirmed]': null,
-  });
+  const PAGE = 'page';
+  const LIMIT = 'limit';
+  // const CURSOR = 'cursor';
+  const ORDER_BY = 'orderBy';
+  const FILTER_QUERY = 'filter[query]';
+  const FILTER_ROLE = 'filter[role]';
+  const FILTER_EMAIL_CONFIRMED = 'filter[emailConfirmed]';
+  const FILTER_ADMIN_CONFIRMED = 'filter[adminConfirmed]';
+  const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
+  const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
+  const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [queryConfig, setQueryConfig] = useState(() =>
+    filterObjectByKeys(queryString.parse(searchParams.toString(), { parseNumbers: true, parseBooleans: true }), possibleQueryParams),
+  );
+  const [getUsersList, { isFetching }] = useLazyGetUsersListQuery(queryConfig);
   const users = useSelector(monitoringSelectors.getUsers);
-  const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+
+  useEffect(() => {
+    console.log('bnmbmnbnnmbmnbmbn');
+    setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
+    getUsersList(queryConfig);
+  }, [queryConfig]);
+
+  console.log(queryConfig);
+
+  useEffect(() => {
+    if (!users) {
+      return;
+    }
+    if (queryConfig.page > users.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: users.lastPage }));
+    }
+  }, [users]);
 
   const refetchWithoutCursor = () => {
     setQueryConfig((prevState) => ({ ...prevState, cursor: null }));
     if (!queryConfig.cursor) {
-      refetch();
+      getUsersList(queryConfig);
     }
   };
 
@@ -170,17 +196,13 @@ export default function UsersList() {
       }
       return entries.map((param) => param.join(':')).join(',');
     };
-    setQueryConfig((prevState) => ({
-      ...prevState,
-      limit: event.rowsPerPage,
+    setQueryConfig({
       cursor: event.page === 1 ? null : users.cursor,
+      limit: event.rowsPerPage,
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
-      'filter[query]': event.customFilters.query || null,
-      'filter[role]': event.customFilters.role || null,
-      'filter[emailConfirmed]': JSON.stringify(event.customFilters.emailConfirmed) || null,
-      'filter[adminConfirmed]': JSON.stringify(event.customFilters.adminConfirmed) || null,
-    }));
+      ...event.customFilters,
+    });
   };
 
   const parseRoles = useCallback(
@@ -250,7 +272,7 @@ export default function UsersList() {
           campaignCount: user.campaignCount,
           siteCount: user.siteCount,
           lastActiveAt: user.lastActiveAt && new Date(user.lastActiveAt).toLocaleString(),
-          actions: <UserActionsMenu user={user} actions={{ refetch }} />,
+          actions: <UserActionsMenu user={user} actions={{ refetch: getUsersList }} />,
         }))
       : [];
   }, [users]);
@@ -289,10 +311,16 @@ export default function UsersList() {
             isDataLoading={isFetching}
             multiSort
             paginationParams={{
-              limit: queryConfig.limit,
+              page: queryConfig[PAGE] || 1,
+              lastPage: users?.lastPage || 1,
+              rowsPerPage: queryConfig[LIMIT] || 20,
               count: users?.total || 0,
               showFirstButton: true,
               showLastButton: true,
+            }}
+            defaultParams={{
+              customFilters: filterObjectByKeys(queryConfig, customFilterQueryParams),
+              orderBy: queryConfig[ORDER_BY] && Object.fromEntries(queryConfig[ORDER_BY].split(',').map((entry) => entry.split(':'))),
             }}
             customFiltersEl={[FilterByEmail, FilterByRole, FilterByEmailStatus, FilterByAccountStatus]}
           />
@@ -917,26 +945,26 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
 };
 
 const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
-  const [query, setQuery] = useState(customFilters.query || '');
+  const [query, setQuery] = useState(customFilters['filter[query]'] || '');
   const debouncedQuery = useDebounce(query, 400);
 
   useSkipFirstRenderEffect(() => {
-    customFiltersHandler({ query });
+    customFiltersHandler({ 'filter[query]': query });
   }, [debouncedQuery]);
 
   useSkipFirstRenderEffect(() => {
-    if (customFilters.query === query) {
+    if (customFilters['filter[query]'] === query) {
       return;
     }
-    setQuery(customFilters.query || '');
-  }, [customFilters.query]);
+    setQuery(customFilters['filter[query]'] || '');
+  }, [customFilters['filter[query]']]);
 
   return (
     <FormControl sx={{ mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByQueryLabel">By email or domain</InputLabel>
       <OutlinedInput
         color="secondary"
-        name="query"
+        name="'filter[query]"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         inputProps={{ autoComplete: 'off' }}
@@ -947,7 +975,7 @@ const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByRole = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ role: e.target.value || null });
+    customFiltersHandler({ 'filter[role]': e.target.value || null });
   };
 
   return (
@@ -957,7 +985,7 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
         color="secondary"
         labelId="filterByRoleLabel"
         id="filterByRoleSelect"
-        value={customFilters.role || ''}
+        value={customFilters.hasOwnProperty('filter[role]') ? customFilters['filter[role]'] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -982,7 +1010,7 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ emailConfirmed: e.target.value === '' ? null : e.target.value });
+    customFiltersHandler({ 'filter[emailConfirmed]': e.target.value === '' ? null : e.target.value });
   };
 
   return (
@@ -992,7 +1020,7 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
         color="secondary"
         labelId="filterByEmailStatusLabel"
         id="filterByEmailStatusSelect"
-        value={customFilters.hasOwnProperty('emailConfirmed') ? customFilters.emailConfirmed : ''}
+        value={customFilters.hasOwnProperty('filter[emailConfirmed]') ? customFilters['filter[emailConfirmed]'] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -1014,7 +1042,7 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ adminConfirmed: e.target.value === '' ? null : e.target.value });
+    customFiltersHandler({ 'filter[adminConfirmed]': e.target.value === '' ? null : e.target.value });
   };
 
   return (
@@ -1024,7 +1052,7 @@ const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
         color="secondary"
         labelId="filterByAccountStatusLabel"
         id="filterByEmailStatusSelect"
-        value={customFilters.hasOwnProperty('adminConfirmed') ? customFilters.adminConfirmed : ''}
+        value={customFilters.hasOwnProperty('filter[adminConfirmed]') ? customFilters['filter[adminConfirmed]'] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {

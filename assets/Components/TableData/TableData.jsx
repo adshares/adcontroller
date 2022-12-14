@@ -41,6 +41,7 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
+import { useSkipFirstRenderEffect } from '../../hooks';
 
 const sortByModel = (model, property) => (a, b) => {
   let ai = model.indexOf(a[property]);
@@ -48,6 +49,17 @@ const sortByModel = (model, property) => (a, b) => {
   if (ai === -1) ai = 999;
   if (bi === -1) bi = 999;
   return ai - bi;
+};
+
+const checkNull = (obj) => {
+  if (!obj) return null;
+  const result = { ...obj };
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === null) {
+      delete result[key];
+    }
+  });
+  return result;
 };
 
 const renderSkeletons = (columns, rowsPerPage) => {
@@ -757,8 +769,11 @@ const EnhancedTableHead = ({
 
 export default function TableData({
   multiSort = false,
-  defaultOrderBy = undefined,
-  defaultFilterBy = undefined,
+  defaultParams = {
+    orderBy: null,
+    customFilters: null,
+    tableFilters: null,
+  },
   headCells,
   rows,
   onTableChange,
@@ -771,11 +786,12 @@ export default function TableData({
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
-  const [orderBy, setOrderBy] = useState(defaultOrderBy || {});
-  const [tableFilters, setTableFilters] = useState(defaultFilterBy || {});
-  const [customFilters, setCustomFilters] = useState(defaultFilterBy || {});
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
+  const [orderBy, setOrderBy] = useState(defaultParams.orderBy || {});
+  const [tableFilters, setTableFilters] = useState(checkNull(defaultParams.tableFilters) || {});
+  const [customFilters, setCustomFilters] = useState(checkNull(defaultParams.customFilters) || {});
+  const [page, setPage] = useState(isNaN(paginationParams.page) ? 0 : Number(paginationParams.page - 1));
+  const [rowsPerPage, setRowsPerPage] = useState(isNaN(paginationParams.page) ? 20 : Number(paginationParams.rowsPerPage));
+  const rowsPerPagePaginationOptions = [20, 50, 100];
 
   const columns = useMemo(() => [...headCells], [headCells]);
 
@@ -803,7 +819,7 @@ export default function TableData({
     [headCells, rows],
   );
 
-  useEffect(() => {
+  useSkipFirstRenderEffect(() => {
     onTableChange({
       orderBy,
       tableFilters,
@@ -1042,18 +1058,20 @@ export default function TableData({
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        sx={{ overflow: 'visible', marginTop: 'auto' }}
-        component="div"
-        onPageChange={handleChangePage}
-        page={page}
-        count={paginationParams.count || rows.length}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        rowsPerPageOptions={[20, 50, 100]}
-        showFirstButton={paginationParams.showFirstButton || undefined}
-        showLastButton={paginationParams.showLastButton || undefined}
-      />
+      {!isDataLoading && (
+        <TablePagination
+          sx={{ overflow: 'visible', marginTop: 'auto' }}
+          component="div"
+          onPageChange={handleChangePage}
+          page={paginationParams.count <= 0 ? 0 : page > paginationParams.lastPage ? paginationParams.lastPage : page}
+          count={paginationParams.count || rows.length}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={rowsPerPagePaginationOptions}
+          showFirstButton={paginationParams.showFirstButton || undefined}
+          showLastButton={paginationParams.showLastButton || undefined}
+        />
+      )}
     </Box>
   );
 }

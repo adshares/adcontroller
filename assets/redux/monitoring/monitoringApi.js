@@ -134,7 +134,7 @@ export const {
   useGetConnectedHostsQuery,
   useResetHostConnectionErrorMutation,
   useGetEventsQuery,
-  useGetUsersListQuery,
+  useLazyGetUsersListQuery,
   useConfirmUserMutation,
   useSwitchToModeratorMutation,
   useSwitchToAgencyMutation,
