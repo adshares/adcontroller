@@ -9,6 +9,7 @@ import {
   useDenyAdvertisingMutation,
   useDenyPublishingMutation,
   useEditUserMutation,
+  useGetUsersListQuery,
   useGrantAdvertisingMutation,
   useGrantPublishingMutation,
   useLazyGetUsersListQuery,
@@ -59,6 +60,7 @@ import ListItemText from '@mui/material/ListItemText';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import { useSearchParams } from 'react-router-dom';
 import queryString from 'query-string';
+import NotFoundView from '../../Components/NotFound/NotFoundView';
 
 const headCells = [
   {
@@ -143,49 +145,63 @@ const headCells = [
   },
 ];
 
+const PAGE = 'page';
+const LIMIT = 'limit';
+// const CURSOR = 'cursor';
+const ORDER_BY = 'orderBy';
+const FILTER_QUERY = 'filter[query]';
+const FILTER_ROLE = 'filter[role]';
+const FILTER_EMAIL_CONFIRMED = 'filter[emailConfirmed]';
+const FILTER_ADMIN_CONFIRMED = 'filter[adminConfirmed]';
+const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
+const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
+const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
+
 const filterObjectByKeys = (obj, keys) => Object.fromEntries(Object.entries(obj).filter(([key]) => keys.includes(key)));
+const validateQueryConfig = (obj) => {
+  console.log(obj);
+  return obj;
+};
 
 export default function UsersList() {
-  const PAGE = 'page';
-  const LIMIT = 'limit';
-  // const CURSOR = 'cursor';
-  const ORDER_BY = 'orderBy';
-  const FILTER_QUERY = 'filter[query]';
-  const FILTER_ROLE = 'filter[role]';
-  const FILTER_EMAIL_CONFIRMED = 'filter[emailConfirmed]';
-  const FILTER_ADMIN_CONFIRMED = 'filter[adminConfirmed]';
-  const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
-  const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
-  const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
   const [searchParams, setSearchParams] = useSearchParams();
-  const [queryConfig, setQueryConfig] = useState(() =>
-    filterObjectByKeys(queryString.parse(searchParams.toString(), { parseNumbers: true, parseBooleans: true }), possibleQueryParams),
+  const [queryConfig, setQueryConfig] = useState(() => {
+    const filteredParams = filterObjectByKeys(
+      queryString.parse(searchParams.toString(), {
+        parseNumbers: true,
+        parseBooleans: true,
+      }),
+      possibleQueryParams,
+    );
+    const validatedParams = validateQueryConfig(filteredParams);
+    return filteredParams;
+  });
+  const { isFetching, data, error, refetch } = useGetUsersListQuery(
+    {
+      page: 1,
+      limit: 20,
+      ...queryConfig,
+    },
+    { refetchOnMountOrArgChange: true },
   );
-  const [getUsersList, { isFetching }] = useLazyGetUsersListQuery(queryConfig);
-  const users = useSelector(monitoringSelectors.getUsers);
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
-
   useEffect(() => {
-    console.log('bnmbmnbnnmbmnbmbn');
     setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
-    getUsersList(queryConfig);
   }, [queryConfig]);
 
-  console.log(queryConfig);
-
   useEffect(() => {
-    if (!users) {
+    if (!data) {
       return;
     }
-    if (queryConfig.page > users.lastPage) {
-      setQueryConfig((prevState) => ({ ...prevState, page: users.lastPage }));
+    if (queryConfig.page > data.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: data.lastPage }));
     }
-  }, [users]);
+  }, [data]);
 
   const refetchWithoutCursor = () => {
     setQueryConfig((prevState) => ({ ...prevState, cursor: null }));
     if (!queryConfig.cursor) {
-      getUsersList(queryConfig);
+      refetch();
     }
   };
 
@@ -198,7 +214,7 @@ export default function UsersList() {
       return entries.map((param) => param.join(':')).join(',');
     };
     setQueryConfig({
-      cursor: event.page === 1 ? null : users.cursor,
+      cursor: event.page === 1 ? null : data.cursor,
       limit: event.rowsPerPage,
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
@@ -229,12 +245,12 @@ export default function UsersList() {
         return 'No role';
       }
     },
-    [users],
+    [data],
   );
 
   const rows = useMemo(() => {
-    return users
-      ? users.data.map((user) => ({
+    return data
+      ? data.data.map((user) => ({
           id: user.id,
           status: (
             <Box className={`${commonStyles.flex} ${commonStyles.flexWrap}`}>
@@ -259,12 +275,16 @@ export default function UsersList() {
           campaignCount: user.campaignCount,
           siteCount: user.siteCount,
           lastActiveAt: user.lastActiveAt && new Date(user.lastActiveAt).toLocaleString(),
-          actions: <UserActionsMenu user={user} actions={{ refetch: getUsersList }} />,
+          actions: <UserActionsMenu user={user} actions={{ refetch }} />,
         }))
       : [];
-  }, [users]);
+  }, [data]);
 
-  return (
+  if (error && error.status === 422) {
+    return <NotFoundView />;
+  }
+
+  return data ? (
     <>
       <Card width="full">
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
@@ -292,10 +312,10 @@ export default function UsersList() {
             isDataLoading={isFetching}
             multiSort
             paginationParams={{
-              page: queryConfig[PAGE] || 1,
-              lastPage: users?.lastPage || 1,
-              rowsPerPage: queryConfig[LIMIT] || 20,
-              count: users?.total || 0,
+              page: data.currentPage > data.lastPage ? data.lastPage : data.currentPage,
+              lastPage: data.lastPage,
+              rowsPerPage: data.perPage,
+              count: data.total,
               showFirstButton: true,
               showLastButton: true,
             }}
@@ -309,6 +329,8 @@ export default function UsersList() {
       </Card>
       <UserDialog mode="add" open={addUserDialogOpen} setOpen={setAddUserDialogOpen} actions={{ refetch: refetchWithoutCursor }} />
     </>
+  ) : (
+    <Spinner />
   );
 }
 
@@ -1022,6 +1044,7 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
 };
 
 const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
+  const possibleOptions = [true, false];
   const handleChange = (e) => {
     customFiltersHandler({ 'filter[adminConfirmed]': e.target.value === '' ? null : e.target.value });
   };

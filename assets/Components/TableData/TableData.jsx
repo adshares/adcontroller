@@ -787,7 +787,9 @@ export default function TableData({
   const [customFilters, setCustomFilters] = useState(checkNull(defaultParams.customFilters) || {});
   const [page, setPage] = useState(isNaN(paginationParams.page) ? 0 : Number(paginationParams.page - 1));
   const [rowsPerPage, setRowsPerPage] = useState(isNaN(paginationParams.page) ? 20 : Number(paginationParams.rowsPerPage));
-  const rowsPerPagePaginationOptions = [20, 50, 100];
+  const rowsPerPagePaginationOptions = [paginationParams.rowsPerPage, 20, 50, 100]
+    .filter((el, idx, self) => self.indexOf(el) === idx)
+    .sort((a, b) => a - b);
   const rowRef = useRef(null);
 
   const rowHeight = useMemo(() => {
@@ -1078,7 +1080,7 @@ export default function TableData({
           sx={{ overflow: 'visible', marginTop: 'auto' }}
           component="div"
           onPageChange={handleChangePage}
-          page={paginationParams.count <= 0 ? 0 : page > paginationParams.lastPage ? paginationParams.lastPage : page}
+          page={paginationParams.count <= 0 ? 0 : page}
           count={paginationParams.count || rows.length}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
