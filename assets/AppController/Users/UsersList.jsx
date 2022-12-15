@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   useAddUserMutation,
   useBanUserMutation,
@@ -12,7 +11,6 @@ import {
   useGetUsersListQuery,
   useGrantAdvertisingMutation,
   useGrantPublishingMutation,
-  useLazyGetUsersListQuery,
   useSwitchToAgencyMutation,
   useSwitchToModeratorMutation,
   useSwitchToRegularMutation,
@@ -20,7 +18,8 @@ import {
 } from '../../redux/monitoring/monitoringApi';
 import { updateUserDataReducer } from '../../redux/monitoring/monitoringSlice';
 import { useDebounce, useForm, useSkipFirstRenderEffect } from '../../hooks';
-import { compareArrays, formatMoney } from '../../utils/helpers';
+import { compareArrays, filterObjectByKeys, formatMoney } from '../../utils/helpers';
+import queryString from 'query-string';
 import TableData from '../../Components/TableData/TableData';
 import Spinner from '../../Components/Spinner/Spinner';
 import {
@@ -59,8 +58,6 @@ import commonStyles from '../../styles/commonStyles.scss';
 import ListItemText from '@mui/material/ListItemText';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import { useSearchParams } from 'react-router-dom';
-import queryString from 'query-string';
-import NotFoundView from '../../Components/NotFound/NotFoundView';
 
 const headCells = [
   {
@@ -79,6 +76,7 @@ const headCells = [
     cellWidth: '18rem',
     alignContent: 'left',
     sortable: true,
+    filterableBy: ['text'],
   },
 
   {
@@ -111,7 +109,7 @@ const headCells = [
   {
     id: 'campaignCount',
     label: 'Campaigns',
-    cellWidth: '9rem',
+    cellWidth: '10.5rem',
     alignContent: 'left',
     sortable: true,
   },
@@ -147,7 +145,6 @@ const headCells = [
 
 const PAGE = 'page';
 const LIMIT = 'limit';
-// const CURSOR = 'cursor';
 const ORDER_BY = 'orderBy';
 const FILTER_QUERY = 'filter[query]';
 const FILTER_ROLE = 'filter[role]';
@@ -157,37 +154,28 @@ const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
 const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
 const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
 
-const filterObjectByKeys = (obj, keys) => Object.fromEntries(Object.entries(obj).filter(([key]) => keys.includes(key)));
-const validateQueryConfig = (obj) => {
-  console.log(obj);
-  return obj;
-};
-
 export default function UsersList() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [queryConfig, setQueryConfig] = useState(() => {
-    const filteredParams = filterObjectByKeys(
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    page: 1,
+    limit: 20,
+    cursor: null,
+    orderBy: null,
+    ...filterObjectByKeys(
       queryString.parse(searchParams.toString(), {
         parseNumbers: true,
         parseBooleans: true,
       }),
       possibleQueryParams,
-    );
-    const validatedParams = validateQueryConfig(filteredParams);
-    return filteredParams;
-  });
-  const { isFetching, data, error, refetch } = useGetUsersListQuery(
-    {
-      page: 1,
-      limit: 20,
-      ...queryConfig,
-    },
-    { refetchOnMountOrArgChange: true },
-  );
+    ),
+  }));
+  const { isFetching, data, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   useEffect(() => {
     setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
   }, [queryConfig]);
+
+  console.log({ queryConfig });
 
   useEffect(() => {
     if (!data) {
@@ -280,11 +268,7 @@ export default function UsersList() {
       : [];
   }, [data]);
 
-  if (error && error.status === 422) {
-    return <NotFoundView />;
-  }
-
-  return data ? (
+  return (
     <>
       <Card width="full">
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
@@ -312,10 +296,10 @@ export default function UsersList() {
             isDataLoading={isFetching}
             multiSort
             paginationParams={{
-              page: data.currentPage > data.lastPage ? data.lastPage : data.currentPage,
-              lastPage: data.lastPage,
-              rowsPerPage: data.perPage,
-              count: data.total,
+              page: (queryConfig[PAGE] > data?.lastPage ? data?.lastPage : data?.currentPage) || 1,
+              lastPage: data?.lastPage || 1,
+              rowsPerPage: queryConfig[LIMIT] || 20,
+              count: data?.total || 0,
               showFirstButton: true,
               showLastButton: true,
             }}
@@ -329,8 +313,6 @@ export default function UsersList() {
       </Card>
       <UserDialog mode="add" open={addUserDialogOpen} setOpen={setAddUserDialogOpen} actions={{ refetch: refetchWithoutCursor }} />
     </>
-  ) : (
-    <Spinner />
   );
 }
 
@@ -948,26 +930,26 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
 };
 
 const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
-  const [query, setQuery] = useState(customFilters['filter[query]'] || '');
+  const [query, setQuery] = useState(customFilters[FILTER_QUERY] || '');
   const debouncedQuery = useDebounce(query, 400);
 
   useSkipFirstRenderEffect(() => {
-    customFiltersHandler({ 'filter[query]': query });
+    customFiltersHandler({ [FILTER_QUERY]: query });
   }, [debouncedQuery]);
 
   useSkipFirstRenderEffect(() => {
-    if (customFilters['filter[query]'] === query) {
+    if (customFilters[FILTER_QUERY] === query) {
       return;
     }
-    setQuery(customFilters['filter[query]'] || '');
-  }, [customFilters['filter[query]']]);
+    setQuery(customFilters[FILTER_QUERY] || '');
+  }, [customFilters[FILTER_QUERY]]);
 
   return (
     <FormControl sx={{ mr: 3 }} customvariant="highLabel">
       <InputLabel id="filterByQueryLabel">By email or domain</InputLabel>
       <OutlinedInput
         color="secondary"
-        name="'filter[query]"
+        name={FILTER_QUERY}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         inputProps={{ autoComplete: 'off' }}
@@ -978,7 +960,7 @@ const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByRole = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ 'filter[role]': e.target.value || null });
+    customFiltersHandler({ [FILTER_ROLE]: e.target.value || null });
   };
 
   return (
@@ -988,7 +970,7 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
         color="secondary"
         labelId="filterByRoleLabel"
         id="filterByRoleSelect"
-        value={customFilters.hasOwnProperty('filter[role]') ? customFilters['filter[role]'] : ''}
+        value={customFilters.hasOwnProperty(FILTER_ROLE) ? customFilters[FILTER_ROLE] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -1013,7 +995,7 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ 'filter[emailConfirmed]': e.target.value === '' ? null : e.target.value });
+    customFiltersHandler({ [FILTER_EMAIL_CONFIRMED]: e.target.value === '' ? null : e.target.value });
   };
 
   return (
@@ -1023,7 +1005,7 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
         color="secondary"
         labelId="filterByEmailStatusLabel"
         id="filterByEmailStatusSelect"
-        value={customFilters.hasOwnProperty('filter[emailConfirmed]') ? customFilters['filter[emailConfirmed]'] : ''}
+        value={customFilters.hasOwnProperty(FILTER_EMAIL_CONFIRMED) ? customFilters[FILTER_EMAIL_CONFIRMED] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -1044,9 +1026,8 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
 };
 
 const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
-  const possibleOptions = [true, false];
   const handleChange = (e) => {
-    customFiltersHandler({ 'filter[adminConfirmed]': e.target.value === '' ? null : e.target.value });
+    customFiltersHandler({ [FILTER_ADMIN_CONFIRMED]: e.target.value === '' ? null : e.target.value });
   };
 
   return (
@@ -1056,7 +1037,7 @@ const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
         color="secondary"
         labelId="filterByAccountStatusLabel"
         id="filterByEmailStatusSelect"
-        value={customFilters.hasOwnProperty('filter[adminConfirmed]') ? customFilters['filter[adminConfirmed]'] : ''}
+        value={customFilters.hasOwnProperty(FILTER_ADMIN_CONFIRMED) ? customFilters[FILTER_ADMIN_CONFIRMED] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {

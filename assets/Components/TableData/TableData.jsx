@@ -34,6 +34,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
@@ -91,6 +92,7 @@ const renderSkeletons = (columns, rowsPerPage, rowHeight, rowsCount) => {
 
 const FilteringInformationBox = ({
   headCells,
+  orderBy,
   tableFilters,
   customFilters,
   onRequestFilterByText,
@@ -247,58 +249,65 @@ const FilteringInformationBox = ({
     : [];
 
   return (
-    <Box sx={{ mb: 2 }}>
-      {customFiltersEl.length > 0 && (
-        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignBaseline}`}>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 2.5 }}>
-            <FilterAltOutlinedIcon sx={{ mr: 1 }} />
-            <Typography variant="h3" component="h3">
-              Filter:
-            </Typography>
+    (!!Object.keys(tableFilters).length || !!Object.keys(customFilters).length || !!customFiltersEl.length) && (
+      <>
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+          <FilterAltOutlinedIcon sx={{ mr: 1 }} />
+          <Typography variant="h3" component="h3">
+            Filter:
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            disabled={!Object.keys(customFilters).length && !Object.keys(tableFilters).length && !Object.keys(orderBy).length}
+            onClick={onRequestResetFilters}
+            sx={{ ml: 'auto' }}
+          >
+            <FilterListOffIcon />
+            Reset filters
+          </Button>
+        </Box>
+        {customFiltersEl.length > 0 && (
+          <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignBaseline}`}>
+            {customFiltersEl.map((FilterElement, idx) => (
+              <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} customFilters={customFilters} />
+            ))}
           </Box>
-          {customFiltersEl.map((FilterElement, idx) => (
-            <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} customFilters={customFilters} />
-          ))}
-          <IconButton disabled={Object.keys(customFilters).length === 0} color="error" onClick={onRequestResetFilters}>
-            <Tooltip title="Reset filters">
-              <FilterListOffIcon />
-            </Tooltip>
-          </IconButton>
-        </Box>
-      )}
-      {!!chipsByText.length && (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
-            By text:
-          </Typography>
-          <List>{chipsByText}</List>
-        </Box>
-      )}
-      {!!chipsByRange.length && (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
-            By range:
-          </Typography>
-          <List>{chipsByRange}</List>
-        </Box>
-      )}
-      {!!chipsByDateRange.length && (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
-            By date range:
-          </Typography>
-          <List>{chipsByDateRange}</List>
-        </Box>
-      )}
-      {!!chipsBySelect.length && (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
-            By select:
-          </Typography>
-          <List>{chipsBySelect}</List>
-        </Box>
-      )}
-    </Box>
+        )}
+        {!!chipsByText.length && (
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+              By text:
+            </Typography>
+            <List>{chipsByText}</List>
+          </Box>
+        )}
+        {!!chipsByRange.length && (
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+              By range:
+            </Typography>
+            <List>{chipsByRange}</List>
+          </Box>
+        )}
+        {!!chipsByDateRange.length && (
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+              By date range:
+            </Typography>
+            <List>{chipsByDateRange}</List>
+          </Box>
+        )}
+        {!!chipsBySelect.length && (
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+              By select:
+            </Typography>
+            <List>{chipsBySelect}</List>
+          </Box>
+        )}
+      </>
+    )
   );
 };
 
@@ -786,10 +795,8 @@ export default function TableData({
   const [tableFilters, setTableFilters] = useState(checkNull(defaultParams.tableFilters) || {});
   const [customFilters, setCustomFilters] = useState(checkNull(defaultParams.customFilters) || {});
   const [page, setPage] = useState(isNaN(paginationParams.page) ? 0 : Number(paginationParams.page - 1));
-  const [rowsPerPage, setRowsPerPage] = useState(isNaN(paginationParams.page) ? 20 : Number(paginationParams.rowsPerPage));
-  const rowsPerPagePaginationOptions = [paginationParams.rowsPerPage, 20, 50, 100]
-    .filter((el, idx, self) => self.indexOf(el) === idx)
-    .sort((a, b) => a - b);
+  const [rowsPerPage, setRowsPerPage] = useState(isNaN(paginationParams.rowsPerPage) ? 20 : Number(paginationParams.rowsPerPage));
+  const rowsPerPagePaginationOptions = [rowsPerPage, 20, 50, 100].filter((el, idx, self) => self.indexOf(el) === idx).sort((a, b) => a - b);
   const rowRef = useRef(null);
 
   const rowHeight = useMemo(() => {
@@ -962,6 +969,8 @@ export default function TableData({
 
   const resetFilters = () => {
     setCustomFilters({});
+    setTableFilters({});
+    setOrderBy({});
     setPage(0);
   };
 
@@ -992,6 +1001,7 @@ export default function TableData({
         onRequestCustomFilter={handleRequestCustomFilter}
         onRequestResetFilters={resetFilters}
         headCells={columns}
+        orderBy={orderBy}
         tableFilters={tableFilters}
         customFilters={customFilters}
         setFilterBy={setTableFilters}
@@ -1082,7 +1092,7 @@ export default function TableData({
           onPageChange={handleChangePage}
           page={paginationParams.count <= 0 ? 0 : page}
           count={paginationParams.count || rows.length}
-          rowsPerPage={rowsPerPage}
+          rowsPerPage={rowsPerPage <= 0 ? 1 : rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           rowsPerPageOptions={rowsPerPagePaginationOptions}
           showFirstButton={paginationParams.showFirstButton || undefined}
