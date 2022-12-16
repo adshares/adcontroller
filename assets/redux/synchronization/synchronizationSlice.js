@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { synchronizationApi } from './synchronizationApi';
+import { authApi } from '../auth/authApi';
 
 const initialState = {
   synchronizationData: {
@@ -23,7 +24,7 @@ const synchronizationSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase('@@INIT', (state) => {
+    builder.addMatcher(authApi.endpoints.getCurrentUser.matchFulfilled, (state) => {
       const isSyncRequired = state.synchronizationData.lastSync
         ? Date.now() - JSON.parse(state.synchronizationData.lastSync) > 24 * 60 * 60 * 1000
         : true;
