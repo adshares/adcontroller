@@ -261,9 +261,9 @@ const FilteringInformationBox = ({
             color="error"
             disabled={!Object.keys(customFilters).length && !Object.keys(tableFilters).length && !Object.keys(orderBy).length}
             onClick={onRequestResetFilters}
-            sx={{ ml: 'auto' }}
+            sx={{ ml: 'auto', '&[disabled]': { color: 'error.light', borderColor: 'error.light' } }}
+            startIcon={<FilterListOffIcon />}
           >
-            <FilterListOffIcon />
             Reset filters
           </Button>
         </Box>

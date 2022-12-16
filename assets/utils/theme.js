@@ -72,6 +72,7 @@ const theme = createTheme({
     },
     error: {
       main: sunset,
+      light: failBg,
     },
     warning: {
       main: sun,
@@ -163,24 +164,10 @@ const theme = createTheme({
           minWidth: '150px',
           padding: '8px 20px',
           boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
-          '&.MuiButton-contained': {
-            '&.Mui-disabled': {
-              cursor: 'not-allowed',
-              pointerEvents: 'fill',
-              boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
-              backgroundColor: '#809EA6',
-              color: white,
-            },
-          },
-          '&.MuiButton-outlined': {
-            '&.Mui-disabled': {
-              cursor: 'not-allowed',
-              pointerEvents: 'fill',
-              boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
-              backgroundColor: 'transparent',
-              color: failBg,
-              borderColor: failBg,
-            },
+          '&.Mui-disabled': {
+            cursor: 'not-allowed',
+            pointerEvents: 'fill',
+            boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
           },
           '&:hover': {
             boxShadow: 'none',

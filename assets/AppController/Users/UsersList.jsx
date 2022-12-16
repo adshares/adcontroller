@@ -76,7 +76,6 @@ const headCells = [
     cellWidth: '18rem',
     alignContent: 'left',
     sortable: true,
-    filterableBy: ['text'],
   },
 
   {
@@ -171,11 +170,10 @@ export default function UsersList() {
   }));
   const { isFetching, data, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+
   useEffect(() => {
     setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
   }, [queryConfig]);
-
-  console.log({ queryConfig });
 
   useEffect(() => {
     if (!data) {
@@ -273,10 +271,10 @@ export default function UsersList() {
       <Card width="full">
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
           <CardHeader
-            titleTypographyProps={{
-              component: 'h2',
-              variant: 'h2',
-            }}
+            // titleTypographyProps={{
+            //   component: 'h2',
+            //   variant: 'h2',
+            //}}
             title="Users"
           />
           <Button
