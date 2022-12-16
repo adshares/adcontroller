@@ -92,7 +92,6 @@ const renderSkeletons = (columns, rowsPerPage, rowHeight, rowsCount) => {
 
 const FilteringInformationBox = ({
   headCells,
-  orderBy,
   tableFilters,
   customFilters,
   onRequestFilterByText,
@@ -259,7 +258,6 @@ const FilteringInformationBox = ({
           <Button
             variant="outlined"
             color="error"
-            disabled={!Object.keys(customFilters).length && !Object.keys(tableFilters).length && !Object.keys(orderBy).length}
             onClick={onRequestResetFilters}
             sx={{ ml: 'auto', '&[disabled]': { color: 'error.light', borderColor: 'error.light' } }}
             startIcon={<FilterListOffIcon />}
@@ -972,6 +970,7 @@ export default function TableData({
     setTableFilters({});
     setOrderBy({});
     setPage(0);
+    setRowsPerPage(20);
   };
 
   const handleChangePage = (event, newPage) => {

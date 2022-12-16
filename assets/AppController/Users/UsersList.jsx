@@ -265,18 +265,11 @@ export default function UsersList() {
         }))
       : [];
   }, [data]);
-
   return (
     <>
       <Card width="full">
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
-          <CardHeader
-            // titleTypographyProps={{
-            //   component: 'h2',
-            //   variant: 'h2',
-            //}}
-            title="Users"
-          />
+          <CardHeader title="Users" />
           <Button
             onClick={() => setAddUserDialogOpen((prevState) => !prevState)}
             variant="contained"
@@ -943,7 +936,7 @@ const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
   }, [customFilters[FILTER_QUERY]]);
 
   return (
-    <FormControl sx={{ mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByQueryLabel">By email or domain</InputLabel>
       <OutlinedInput
         color="secondary"
@@ -962,7 +955,7 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl sx={{ minWidth: '10rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '10rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByRoleLabel">By user's role</InputLabel>
       <Select
         color="secondary"
@@ -997,7 +990,7 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl sx={{ minWidth: '13rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '13rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByEmailStatusLabel">By email status</InputLabel>
       <Select
         color="secondary"
@@ -1029,7 +1022,7 @@ const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
   };
 
   return (
-    <FormControl sx={{ minWidth: '14.5rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '14.5rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByAccountStatusLabel">By account status</InputLabel>
       <Select
         color="secondary"
