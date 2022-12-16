@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
-import { Box, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardHeader, IconButton, Link, Tooltip, Typography } from '@mui/material';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
 import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
+import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 
 const headCells = [
   {
@@ -75,11 +76,13 @@ export default function ConnectedServers() {
       id: host.id,
       name: host.name,
       url: (
-        <Typography variant="tableText2" sx={{ overflowWrap: 'anywhere' }}>
-          {host.url}
-        </Typography>
+        <Link href={host.url} target="_blank">
+          <Typography variant="tableText2" sx={{ overflowWrap: 'anywhere' }} color="black.main">
+            {host.url}
+          </Typography>
+        </Link>
       ),
-      wallet: host.walletAddress,
+      wallet: <FormattedWalletAddress wallet={host.walletAddress} />,
       lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
       campaigns: host.campaignCount,
       sites: host.siteCount,
@@ -136,15 +139,9 @@ export default function ConnectedServers() {
   };
 
   return (
-    <Card
-      className={`${commonStyles.card}`}
-      sx={{
-        height: 'calc(100vh - 9rem)',
-      }}
-      width="full"
-    >
+    <Card width="full">
       <CardHeader title="Connected servers" />
-      <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
+      <CardContent>
         <TableData
           headCells={headCells} // array of objects {id, label, ...additional params}
           rows={rows} // array of objects { id: (uniq, required), key: (must be same of cell id) value }

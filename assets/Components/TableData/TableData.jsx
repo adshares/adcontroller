@@ -50,10 +50,10 @@ const sortByModel = (model, property) => (a, b) => {
   return ai - bi;
 };
 
-const renderSkeletons = (columns, rowsPerPage) => {
+const renderSkeletons = (columns, rowsPerPage, rowHeight, rowsCount) => {
   const rows = [];
 
-  for (let i = 0; i < rowsPerPage; i++) {
+  for (let i = 0; i < (rowsCount || rowsPerPage); i++) {
     rows.push(
       <TableRow key={i}>
         {columns.map((name) => (
@@ -65,6 +65,7 @@ const renderSkeletons = (columns, rowsPerPage) => {
               pt: 0.5,
               pb: 0.5,
               backgroundColor: 'background.paper',
+              height: rowHeight + 'px' || undefined,
             }}
           >
             <Skeleton animation="wave" variant="text" />
@@ -234,10 +235,10 @@ const FilteringInformationBox = ({
     : [];
 
   return (
-    <>
+    <Box sx={{ mb: 2 }}>
       {customFiltersEl.length > 0 && (
-        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignCenter}`} sx={{ mt: -3.5, mb: 3 }}>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 2.5, mt: 3.5, mb: 1 }}>
+        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignBaseline}`}>
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 2.5 }}>
             <FilterAltOutlinedIcon sx={{ mr: 1 }} />
             <Typography variant="h3" component="h3">
               Filter:
@@ -246,12 +247,7 @@ const FilteringInformationBox = ({
           {customFiltersEl.map((FilterElement, idx) => (
             <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} customFilters={customFilters} />
           ))}
-          <IconButton
-            disabled={Object.keys(customFilters).length === 0}
-            color="error"
-            onClick={onRequestResetFilters}
-            sx={{ mt: 3.5, mb: 1 }}
-          >
+          <IconButton disabled={Object.keys(customFilters).length === 0} color="error" onClick={onRequestResetFilters}>
             <Tooltip title="Reset filters">
               <FilterListOffIcon />
             </Tooltip>
@@ -290,7 +286,7 @@ const FilteringInformationBox = ({
           <List>{chipsBySelect}</List>
         </Box>
       )}
-    </>
+    </Box>
   );
 };
 
@@ -776,6 +772,11 @@ export default function TableData({
   const [customFilters, setCustomFilters] = useState(defaultFilterBy || {});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
+  const rowRef = useRef(null);
+
+  const rowHeight = useMemo(() => {
+    return rowRef.current?.clientHeight;
+  }, [rowRef.current]);
 
   const columns = useMemo(() => [...headCells], [headCells]);
 
@@ -810,6 +811,11 @@ export default function TableData({
       customFilters,
       page: page + 1,
       rowsPerPage,
+    });
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
     });
   }, [orderBy, page, tableFilters, customFilters, rowsPerPage]);
 
@@ -959,7 +965,7 @@ export default function TableData({
   };
 
   return (
-    <Box sx={{ height: '100%' }} className={`${commonStyles.flex} ${commonStyles.flexColumn}`}>
+    <>
       <FilteringInformationBox
         onRequestFilterByText={handleRequestFilterByText}
         onRequestFilterByRange={handleRequestFilterByRange}
@@ -993,7 +999,16 @@ export default function TableData({
           <TableBody>
             {!isDataLoading
               ? rows.map((row) => (
-                  <TableRow hover tabIndex={-1} key={row.id}>
+                  <TableRow
+                    ref={(row) => {
+                      if (row) {
+                        rowRef.current = row;
+                      }
+                    }}
+                    hover
+                    tabIndex={-1}
+                    key={row.id}
+                  >
                     {columns
                       .sort(sortByModel(initColumnPosition, 'id'))
                       .sort(sortByModel(columnsPinnedToLeftIds, 'id'))
@@ -1038,7 +1053,7 @@ export default function TableData({
                       })}
                   </TableRow>
                 ))
-              : renderSkeletons(columns, rowsPerPage)}
+              : renderSkeletons(columns, rowsPerPage, rowHeight, rows.length)}
           </TableBody>
         </Table>
       </TableContainer>
@@ -1054,7 +1069,7 @@ export default function TableData({
         showFirstButton={paginationParams.showFirstButton || undefined}
         showLastButton={paginationParams.showLastButton || undefined}
       />
-    </Box>
+    </>
   );
 }
 
