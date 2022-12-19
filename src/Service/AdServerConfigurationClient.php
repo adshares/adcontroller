@@ -51,6 +51,7 @@ class AdServerConfigurationClient
     public const AUTO_WITHDRAWAL_LIMIT_BTC = 'autoWithdrawalLimitBtc';
     public const AUTO_WITHDRAWAL_LIMIT_ETH = 'autoWithdrawalLimitEth';
     private const BANNER_FORCE_HTTPS = 'bannerForceHttps';
+    public const BANNER_ROTATE_INTERVAL = 'bannerRotateInterval';
     private const BTC_WITHDRAW = 'btcWithdraw';
     private const BTC_WITHDRAW_FEE = 'btcWithdrawFee';
     private const BTC_WITHDRAW_MAX_AMOUNT = 'btcWithdrawMaxAmount';
@@ -269,6 +270,7 @@ class AdServerConfigurationClient
             AdServerConfig::AutoWithdrawalLimitBsc->name => self::AUTO_WITHDRAWAL_LIMIT_BSC,
             AdServerConfig::AutoWithdrawalLimitBtc->name => self::AUTO_WITHDRAWAL_LIMIT_BTC,
             AdServerConfig::AutoWithdrawalLimitEth->name => self::AUTO_WITHDRAWAL_LIMIT_ETH,
+            AdServerConfig::BannerRotateInterval->name => self::BANNER_ROTATE_INTERVAL,
             AdServerConfig::CampaignMinBudget->name => self::CAMPAIGN_MIN_BUDGET,
             AdServerConfig::CampaignMinCpa->name => self::CAMPAIGN_MIN_CPA,
             AdServerConfig::CampaignMinCpm->name => self::CAMPAIGN_MIN_CPM,
