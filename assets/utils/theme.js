@@ -103,13 +103,13 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#DFDFDF',
+          backgroundColor: grayBg,
           '@font-face': {
             fontFamily: 'Montserrat',
             fontStyle: 'normal',
             fontDisplay: 'swap',
-            src: `local('Montserrat'), url(${Montserrat})`,
             fontWeight: 400,
+            src: `local('Montserrat'), url(${Montserrat})`,
           },
           '&::-webkit-scrollbar': {
             backgroundColor: 'transparent',
@@ -301,11 +301,13 @@ const theme = createTheme({
               display: 'none',
             },
             '& .MuiInputLabel-root': {
+              color: disableBg,
               '&.Mui-focused': {
                 color: black,
                 transform: 'translate(14px, -20px) scale(0.75)',
               },
               '&.MuiInputLabel-shrink': {
+                color: black,
                 transform: 'translate(14px, -20px) scale(0.75)',
               },
             },
@@ -464,12 +466,14 @@ const theme = createTheme({
       fontSize: '32px',
       lineHeight: 1.2,
       letterSpacing: 0,
+      fontWeight: 400,
     },
     h3: {
       fontVariationSettings: '"wght" 600',
       fontSize: '24px',
       lineHeight: 1.2,
       letterSpacing: 0,
+      fontWeight: 400,
     },
     body1: {
       fontWeight: 400,

@@ -97,15 +97,9 @@ export default function Events() {
   };
 
   return (
-    <Card
-      className={`${commonStyles.card}`}
-      sx={{
-        justifySelf: 'center',
-        height: 'calc(100vh - 9rem)',
-      }}
-    >
+    <Card>
       <CardHeader title="Events" />
-      <CardContent sx={{ height: 'calc(100% - 4rem)' }}>
+      <CardContent>
         <TableData
           headCells={headCells}
           rows={rows}

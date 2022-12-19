@@ -171,6 +171,7 @@ class ConfigurationRepository extends ServiceEntityRepository
             AdServerConfig::AutoWithdrawalLimitBsc->name => ConfigType::Integer,
             AdServerConfig::AutoWithdrawalLimitBtc->name => ConfigType::Integer,
             AdServerConfig::AutoWithdrawalLimitEth->name => ConfigType::Integer,
+            AdServerConfig::BannerRotateInterval->name => ConfigType::Integer,
             AdServerConfig::CampaignMinBudget->name => ConfigType::Integer,
             AdServerConfig::CampaignMinCpa->name => ConfigType::Integer,
             AdServerConfig::CampaignMinCpm->name => ConfigType::Integer,
