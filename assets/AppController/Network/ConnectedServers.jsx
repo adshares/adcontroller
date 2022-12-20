@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import queryString from 'query-string';
 import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import { Box, Card, CardContent, CardHeader, IconButton, Link, Tooltip, Typography } from '@mui/material';
@@ -9,6 +11,7 @@ import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
 import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
+import { filterObjectByKeys } from '../../utils/helpers';
 
 const headCells = [
   {
@@ -62,13 +65,34 @@ const headCells = [
 ];
 
 export default function ConnectedServers() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [queryConfig, setQueryConfig] = useState({
     page: 1,
     cursor: null,
     limit: 20,
+    ...filterObjectByKeys(
+      queryString.parse(searchParams.toString(), {
+        parseNumbers: true,
+        parseBooleans: true,
+      }),
+      ['page', 'limit'],
+    ),
   });
   const [resetHostConnectionError] = useResetHostConnectionErrorMutation();
   const { data: response, isFetching, refetch } = useGetConnectedHostsQuery(queryConfig, { refetchOnMountOrArgChange: true });
+
+  useEffect(() => {
+    setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
+  }, [queryConfig]);
+
+  useEffect(() => {
+    if (!response) {
+      return;
+    }
+    if (queryConfig.page > response.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: response.lastPage }));
+    }
+  }, [response]);
 
   const rows = useMemo(() => {
     const hosts = response?.data || [];
@@ -132,7 +156,7 @@ export default function ConnectedServers() {
   const handleTableChanges = (event) => {
     setQueryConfig((prevState) => ({
       ...prevState,
-      cursor: response?.cursor || null,
+      cursor: event.page === 1 ? null : response.cursor,
       page: event.page,
       limit: event.rowsPerPage,
     }));
@@ -147,9 +171,10 @@ export default function ConnectedServers() {
           rows={rows} // array of objects { id: (uniq, required), key: (must be same of cell id) value }
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
-          defaultSortBy="name" //(must be same of cell id)
           paginationParams={{
-            limit: queryConfig.limit,
+            page: (queryConfig.page > response?.lastPage ? response?.lastPage : response?.currentPage) || queryConfig.page,
+            lastPage: response?.lastPage || 1,
+            rowsPerPage: queryConfig.limit || 20,
             count: response?.total || 0,
             showFirstButton: true,
             showLastButton: true,

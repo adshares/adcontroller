@@ -259,6 +259,7 @@ const FilteringInformationBox = ({
             variant="outlined"
             color="error"
             onClick={onRequestResetFilters}
+            disabled={!Object.keys(tableFilters).length && !Object.keys(customFilters).length}
             sx={{ ml: 'auto', '&[disabled]': { color: 'error.light', borderColor: 'error.light' } }}
             startIcon={<FilterListOffIcon />}
           >
@@ -792,10 +793,50 @@ export default function TableData({
   const [orderBy, setOrderBy] = useState(defaultParams.orderBy || {});
   const [tableFilters, setTableFilters] = useState(checkNull(defaultParams.tableFilters) || {});
   const [customFilters, setCustomFilters] = useState(checkNull(defaultParams.customFilters) || {});
-  const [page, setPage] = useState(isNaN(paginationParams.page) ? 0 : Number(paginationParams.page - 1));
-  const [rowsPerPage, setRowsPerPage] = useState(isNaN(paginationParams.rowsPerPage) ? 20 : Number(paginationParams.rowsPerPage));
+  const [page, setPage] = useState(Number(paginationParams.page - 1));
+  const [rowsPerPage, setRowsPerPage] = useState(Number(paginationParams.rowsPerPage));
   const rowsPerPagePaginationOptions = [rowsPerPage, 20, 50, 100].filter((el, idx, self) => self.indexOf(el) === idx).sort((a, b) => a - b);
   const rowRef = useRef(null);
+  const sortableColumns = headCells.filter((cell) => cell.sortable).map((cell) => cell.id);
+
+  useEffect(() => {
+    if (isNaN(page)) {
+      setPage(0);
+    }
+    if (isNaN(rowsPerPage)) {
+      setRowsPerPage(20);
+    }
+    if (Object.keys(orderBy).length) {
+      setOrderBy((prevState) => {
+        const result = { ...prevState };
+        Object.entries(orderBy).forEach(([order, direction]) => {
+          if (!sortableColumns.includes(order)) {
+            delete result[order];
+          }
+
+          if (direction !== 'asc' && direction !== 'desc') {
+            delete result[order];
+          }
+        });
+        return result;
+      });
+    }
+  }, []);
+
+  useSkipFirstRenderEffect(() => {
+    onTableChange({
+      orderBy,
+      tableFilters,
+      customFilters,
+      page: page + 1,
+      rowsPerPage,
+    });
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
+  }, [orderBy, page, tableFilters, customFilters, rowsPerPage]);
 
   const rowHeight = useMemo(() => {
     return rowRef.current?.clientHeight;
@@ -826,21 +867,6 @@ export default function TableData({
         ),
     [headCells, rows],
   );
-
-  useSkipFirstRenderEffect(() => {
-    onTableChange({
-      orderBy,
-      tableFilters,
-      customFilters,
-      page: page + 1,
-      rowsPerPage,
-    });
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
-  }, [orderBy, page, tableFilters, customFilters, rowsPerPage]);
 
   const handleRequestSort = (event, property) => {
     setOrderBy((prevState) => {
@@ -968,9 +994,7 @@ export default function TableData({
   const resetFilters = () => {
     setCustomFilters({});
     setTableFilters({});
-    setOrderBy({});
     setPage(0);
-    setRowsPerPage(20);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -1084,6 +1108,11 @@ export default function TableData({
           </TableBody>
         </Table>
       </TableContainer>
+      {!isDataLoading && !rows.length && (
+        <Typography align="center" variant="h2" color="info.main" sx={{ mt: 3 }}>
+          NOTHING FOUND
+        </Typography>
+      )}
       {!isDataLoading && (
         <TablePagination
           sx={{ overflow: 'visible', marginTop: 'auto' }}
