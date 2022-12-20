@@ -31,7 +31,7 @@ export default function FormattedWalletAddress({ wallet, variant = 'tableBody2' 
             return navigator.clipboard.writeText(wallet);
           }}
         >
-          {wallet.length > 18 ? wallet.slice(0, 9) + String.fromCharCode(8230) + wallet.slice(wallet.length - 9) : wallet}
+          {wallet.length > 18 ? wallet.slice(0, 8) + '…' + wallet.slice(wallet.length - 6) : wallet}
         </Typography>
       </Tooltip>
     );
