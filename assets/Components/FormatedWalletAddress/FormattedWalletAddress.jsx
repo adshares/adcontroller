@@ -9,26 +9,29 @@ export default function FormattedWalletAddress({ wallet, variant = 'tableBody2' 
     }
     return (
       <Tooltip
-        onClose={() => setTimeout(() => setAddressCopied(false), 100)}
+        onClose={() => setTimeout(() => setAddressCopied(false), 200)}
         title={
           addressWasCopied ? (
-            'Address was copied'
+            <Typography variant="tableText2">Address was copied</Typography>
           ) : (
-            <span>
-              Click for copy <br /> {wallet}
-            </span>
+            <Typography variant="tableText2">
+              Click for copy{' '}
+              <Typography variant="tableText2" sx={{ fontFamily: 'Monospace' }}>
+                {wallet}
+              </Typography>
+            </Typography>
           )
         }
       >
         <Typography
-          sx={{ cursor: 'pointer' }}
+          sx={{ cursor: 'pointer', fontFamily: 'Monospace' }}
           variant={variant}
           onClick={() => {
             setAddressCopied(true);
             return navigator.clipboard.writeText(wallet);
           }}
         >
-          {wallet.length > 18 ? wallet.slice(0, 18) + '...' : wallet}
+          {wallet.length > 18 ? wallet.slice(0, 9) + String.fromCharCode(8230) + wallet.slice(wallet.length - 9) : wallet}
         </Typography>
       </Tooltip>
     );
