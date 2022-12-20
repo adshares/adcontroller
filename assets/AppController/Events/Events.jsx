@@ -88,8 +88,8 @@ export default function Events() {
     if (!response) {
       return;
     }
-    if (queryConfig.page > response.lastPage) {
-      setQueryConfig((prevState) => ({ ...prevState, page: response.lastPage }));
+    if (queryConfig.page > response.meta.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: response.meta.lastPage }));
     }
   }, [response]);
 
@@ -116,7 +116,7 @@ export default function Events() {
 
     setQueryConfig((prevState) => ({
       ...prevState,
-      cursor: event.page === 1 ? null : response.cursor,
+      cursor: event.page === 1 ? null : response.meta.cursor,
       page: event.page,
       limit: event.rowsPerPage,
       'filter[type]': event.tableFilters.select?.type || null,
@@ -135,10 +135,10 @@ export default function Events() {
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
           paginationParams={{
-            page: (queryConfig[PAGE] > response?.lastPage ? response?.lastPage : response?.currentPage) || queryConfig[PAGE],
-            lastPage: response?.lastPage || 1,
+            page: (queryConfig[PAGE] > response?.meta.lastPage ? response?.meta.lastPage : response?.meta.currentPage) || queryConfig[PAGE],
+            lastPage: response?.meta.lastPage || 1,
             rowsPerPage: queryConfig[LIMIT] || 20,
-            count: response?.total || 0,
+            count: response?.meta.total || 0,
             showFirstButton: true,
             showLastButton: true,
           }}

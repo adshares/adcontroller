@@ -89,8 +89,8 @@ export default function ConnectedServers() {
     if (!response) {
       return;
     }
-    if (queryConfig.page > response.lastPage) {
-      setQueryConfig((prevState) => ({ ...prevState, page: response.lastPage }));
+    if (queryConfig.page > response.meta.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: response.meta.lastPage }));
     }
   }, [response]);
 
@@ -156,7 +156,7 @@ export default function ConnectedServers() {
   const handleTableChanges = (event) => {
     setQueryConfig((prevState) => ({
       ...prevState,
-      cursor: event.page === 1 ? null : response.cursor,
+      cursor: event.page === 1 ? null : response?.meta.cursor,
       page: event.page,
       limit: event.rowsPerPage,
     }));
@@ -172,10 +172,10 @@ export default function ConnectedServers() {
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
           paginationParams={{
-            page: (queryConfig.page > response?.lastPage ? response?.lastPage : response?.currentPage) || queryConfig.page,
-            lastPage: response?.lastPage || 1,
+            page: (queryConfig.page > response?.meta.lastPage ? response?.meta.lastPage : response?.meta.currentPage) || queryConfig.page,
+            lastPage: response?.meta.lastPage || 1,
             rowsPerPage: queryConfig.limit || 20,
-            count: response?.total || 0,
+            count: response?.meta.total || 0,
             showFirstButton: true,
             showLastButton: true,
           }}

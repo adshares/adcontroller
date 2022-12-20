@@ -179,8 +179,8 @@ export default function UsersList() {
     if (!data) {
       return;
     }
-    if (queryConfig.page > data.lastPage) {
-      setQueryConfig((prevState) => ({ ...prevState, page: data.lastPage }));
+    if (queryConfig.page > data.meta.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: data.meta.lastPage }));
     }
   }, [data]);
 
@@ -200,7 +200,7 @@ export default function UsersList() {
       return entries.map((param) => param.join(':')).join(',');
     };
     setQueryConfig({
-      cursor: event.page === 1 ? null : data?.cursor,
+      cursor: event.page === 1 ? null : data?.meta.cursor,
       limit: event.rowsPerPage,
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
@@ -287,10 +287,10 @@ export default function UsersList() {
             isDataLoading={isFetching}
             multiSort
             paginationParams={{
-              page: (queryConfig[PAGE] > data?.lastPage ? data?.lastPage : data?.currentPage) || queryConfig[PAGE],
-              lastPage: data?.lastPage || 1,
+              page: (queryConfig[PAGE] > data?.meta.lastPage ? data?.meta.lastPage : data?.meta.currentPage) || queryConfig[PAGE],
+              lastPage: data?.meta.lastPage || 1,
               rowsPerPage: queryConfig[LIMIT] || 20,
-              count: data?.total || 0,
+              count: data?.meta.total || 0,
               showFirstButton: true,
               showLastButton: true,
             }}
