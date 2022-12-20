@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useGetEventsQuery } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import {
@@ -20,6 +20,9 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
+import { filterObjectByKeys } from '../../utils/helpers';
+import queryString from 'query-string';
+import { useSearchParams } from 'react-router-dom';
 
 const headCells = [
   {
@@ -53,16 +56,42 @@ const headCells = [
   },
 ];
 
+const PAGE = 'page';
+const LIMIT = 'limit';
+const FILTER_TYPE = 'filter[type]';
+const FILTER_DATE_FROM = 'filter[createdAt][from]';
+const FILTER_DATE_TO = 'filter[createdAt][to]';
+const possibleQueryParams = [PAGE, LIMIT, FILTER_TYPE, FILTER_DATE_FROM, FILTER_DATE_TO];
+
 export default function Events() {
-  const [queryConfig, setQueryConfig] = useState({
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    page: 1,
     limit: 20,
     cursor: null,
-    page: 1,
-    'filter[type]': null,
-    'filter[createdAt][from]': null,
-    'filter[createdAt][to]': null,
-  });
+    orderBy: null,
+    ...filterObjectByKeys(
+      queryString.parse(searchParams.toString(), {
+        parseNumbers: true,
+        parseBooleans: true,
+      }),
+      possibleQueryParams,
+    ),
+  }));
   const { data: response, isFetching } = useGetEventsQuery(queryConfig, { refetchOnMountOrArgChange: true });
+
+  useEffect(() => {
+    setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
+  }, [queryConfig]);
+
+  useEffect(() => {
+    if (!response) {
+      return;
+    }
+    if (queryConfig.page > response.meta.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: response.meta.lastPage }));
+    }
+  }, [response]);
 
   const rows = useMemo(() => {
     const events = response?.data || [];
@@ -87,7 +116,7 @@ export default function Events() {
 
     setQueryConfig((prevState) => ({
       ...prevState,
-      cursor: event.page === 1 ? null : response.cursor,
+      cursor: event.page === 1 ? null : response.meta.cursor,
       page: event.page,
       limit: event.rowsPerPage,
       'filter[type]': event.tableFilters.select?.type || null,
@@ -105,12 +134,34 @@ export default function Events() {
           rows={rows}
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
-          defaultSortBy="type"
           paginationParams={{
-            limit: queryConfig.limit,
-            count: response?.total || 0,
+            page: (queryConfig[PAGE] > response?.meta.lastPage ? response?.meta.lastPage : response?.meta.currentPage) || queryConfig[PAGE],
+            lastPage: response?.meta.lastPage || 1,
+            rowsPerPage: queryConfig[LIMIT] || 20,
+            count: response?.meta.total || 0,
             showFirstButton: true,
             showLastButton: true,
+          }}
+          defaultParams={{
+            tableFilters: {
+              ...(queryConfig[FILTER_TYPE]
+                ? {
+                    select: {
+                      type: Array.isArray(queryConfig[FILTER_TYPE]) ? queryConfig[FILTER_TYPE] : [queryConfig[FILTER_TYPE]],
+                    },
+                  }
+                : {}),
+              ...(queryConfig[FILTER_DATE_FROM] || queryConfig[FILTER_DATE_TO]
+                ? {
+                    dateRange: {
+                      createdAt: {
+                        from: queryConfig[FILTER_DATE_FROM] ? new Date(queryConfig[FILTER_DATE_FROM]) : null,
+                        to: queryConfig[FILTER_DATE_TO] ? new Date(queryConfig[FILTER_DATE_TO]) : null,
+                      },
+                    },
+                  }
+                : {}),
+            },
           }}
         />
       </CardContent>

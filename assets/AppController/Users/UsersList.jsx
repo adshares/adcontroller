@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   useAddUserMutation,
   useBanUserMutation,
@@ -19,7 +18,8 @@ import {
 } from '../../redux/monitoring/monitoringApi';
 import { updateUserDataReducer } from '../../redux/monitoring/monitoringSlice';
 import { useDebounce, useForm, useSkipFirstRenderEffect } from '../../hooks';
-import { compareArrays, formatMoney } from '../../utils/helpers';
+import { compareArrays, filterObjectByKeys, formatMoney } from '../../utils/helpers';
+import queryString from 'query-string';
 import TableData from '../../Components/TableData/TableData';
 import Spinner from '../../Components/Spinner/Spinner';
 import {
@@ -57,6 +57,7 @@ import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import ListItemText from '@mui/material/ListItemText';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
+import { useSearchParams } from 'react-router-dom';
 
 const headCells = [
   {
@@ -107,7 +108,7 @@ const headCells = [
   {
     id: 'campaignCount',
     label: 'Campaigns',
-    cellWidth: '9rem',
+    cellWidth: '10.5rem',
     alignContent: 'left',
     sortable: true,
   },
@@ -141,20 +142,47 @@ const headCells = [
   },
 ];
 
+const PAGE = 'page';
+const LIMIT = 'limit';
+const ORDER_BY = 'orderBy';
+const FILTER_QUERY = 'filter[query]';
+const FILTER_ROLE = 'filter[role]';
+const FILTER_EMAIL_CONFIRMED = 'filter[emailConfirmed]';
+const FILTER_ADMIN_CONFIRMED = 'filter[adminConfirmed]';
+const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
+const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
+const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
+
 export default function UsersList() {
-  const [queryConfig, setQueryConfig] = useState({
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    page: 1,
     limit: 20,
     cursor: null,
-    page: 1,
     orderBy: null,
-    'filter[query]': null,
-    'filter[role]': null,
-    'filter[emailConfirmed]': null,
-    'filter[adminConfirmed]': null,
-  });
-  const users = useSelector(monitoringSelectors.getUsers);
-  const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+    ...filterObjectByKeys(
+      queryString.parse(searchParams.toString(), {
+        parseNumbers: true,
+        parseBooleans: true,
+      }),
+      possibleQueryParams,
+    ),
+  }));
+  const { isFetching, data, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+
+  useEffect(() => {
+    setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
+  }, [queryConfig]);
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+    if (queryConfig.page > data.meta.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: data.meta.lastPage }));
+    }
+  }, [data]);
 
   const refetchWithoutCursor = () => {
     setQueryConfig((prevState) => ({ ...prevState, cursor: null }));
@@ -171,17 +199,13 @@ export default function UsersList() {
       }
       return entries.map((param) => param.join(':')).join(',');
     };
-    setQueryConfig((prevState) => ({
-      ...prevState,
+    setQueryConfig({
+      cursor: event.page === 1 ? null : data?.meta.cursor,
       limit: event.rowsPerPage,
-      cursor: event.page === 1 ? null : users.cursor,
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
-      'filter[query]': event.customFilters.query || null,
-      'filter[role]': event.customFilters.role || null,
-      'filter[emailConfirmed]': JSON.stringify(event.customFilters.emailConfirmed) || null,
-      'filter[adminConfirmed]': JSON.stringify(event.customFilters.adminConfirmed) || null,
-    }));
+      ...event.customFilters,
+    });
   };
 
   const parseRoles = useCallback(
@@ -207,12 +231,12 @@ export default function UsersList() {
         return 'No role';
       }
     },
-    [users],
+    [data],
   );
 
   const rows = useMemo(() => {
-    return users
-      ? users.data.map((user) => ({
+    return data
+      ? data.data.map((user) => ({
           id: user.id,
           status: (
             <Box className={`${commonStyles.flex} ${commonStyles.flexWrap}`}>
@@ -240,19 +264,12 @@ export default function UsersList() {
           actions: <UserActionsMenu user={user} actions={{ refetch }} />,
         }))
       : [];
-  }, [users]);
-
+  }, [data]);
   return (
     <>
       <Card width="full">
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
-          <CardHeader
-            titleTypographyProps={{
-              component: 'h2',
-              variant: 'h2',
-            }}
-            title="Users"
-          />
+          <CardHeader title="Users" />
           <Button
             onClick={() => setAddUserDialogOpen((prevState) => !prevState)}
             variant="contained"
@@ -270,10 +287,16 @@ export default function UsersList() {
             isDataLoading={isFetching}
             multiSort
             paginationParams={{
-              limit: queryConfig.limit,
-              count: users?.total || 0,
+              page: (queryConfig[PAGE] > data?.meta.lastPage ? data?.meta.lastPage : data?.meta.currentPage) || queryConfig[PAGE],
+              lastPage: data?.meta.lastPage || 1,
+              rowsPerPage: queryConfig[LIMIT] || 20,
+              count: data?.meta.total || 0,
               showFirstButton: true,
               showLastButton: true,
+            }}
+            defaultParams={{
+              customFilters: filterObjectByKeys(queryConfig, customFilterQueryParams),
+              orderBy: queryConfig[ORDER_BY] && Object.fromEntries(queryConfig[ORDER_BY].split(',').map((entry) => entry.split(':'))),
             }}
             customFiltersEl={[FilterByEmail, FilterByRole, FilterByEmailStatus, FilterByAccountStatus]}
           />
@@ -898,26 +921,26 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
 };
 
 const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
-  const [query, setQuery] = useState(customFilters.query || '');
+  const [query, setQuery] = useState(customFilters[FILTER_QUERY] || '');
   const debouncedQuery = useDebounce(query, 400);
 
   useSkipFirstRenderEffect(() => {
-    customFiltersHandler({ query });
+    customFiltersHandler({ [FILTER_QUERY]: query });
   }, [debouncedQuery]);
 
   useSkipFirstRenderEffect(() => {
-    if (customFilters.query === query) {
+    if (customFilters[FILTER_QUERY] === query) {
       return;
     }
-    setQuery(customFilters.query || '');
-  }, [customFilters.query]);
+    setQuery(customFilters[FILTER_QUERY] || '');
+  }, [customFilters[FILTER_QUERY]]);
 
   return (
-    <FormControl sx={{ mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByQueryLabel">By email or domain</InputLabel>
       <OutlinedInput
         color="secondary"
-        name="query"
+        name={FILTER_QUERY}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         inputProps={{ autoComplete: 'off' }}
@@ -928,17 +951,17 @@ const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByRole = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ role: e.target.value || null });
+    customFiltersHandler({ [FILTER_ROLE]: e.target.value || null });
   };
 
   return (
-    <FormControl sx={{ minWidth: '10rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '10rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByRoleLabel">By user's role</InputLabel>
       <Select
         color="secondary"
         labelId="filterByRoleLabel"
         id="filterByRoleSelect"
-        value={customFilters.role || ''}
+        value={customFilters.hasOwnProperty(FILTER_ROLE) ? customFilters[FILTER_ROLE] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -963,17 +986,17 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ emailConfirmed: e.target.value === '' ? null : e.target.value });
+    customFiltersHandler({ [FILTER_EMAIL_CONFIRMED]: e.target.value === '' ? null : e.target.value });
   };
 
   return (
-    <FormControl sx={{ minWidth: '13rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '13rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByEmailStatusLabel">By email status</InputLabel>
       <Select
         color="secondary"
         labelId="filterByEmailStatusLabel"
         id="filterByEmailStatusSelect"
-        value={customFilters.hasOwnProperty('emailConfirmed') ? customFilters.emailConfirmed : ''}
+        value={customFilters.hasOwnProperty(FILTER_EMAIL_CONFIRMED) ? customFilters[FILTER_EMAIL_CONFIRMED] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -995,17 +1018,17 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ adminConfirmed: e.target.value === '' ? null : e.target.value });
+    customFiltersHandler({ [FILTER_ADMIN_CONFIRMED]: e.target.value === '' ? null : e.target.value });
   };
 
   return (
-    <FormControl sx={{ minWidth: '14.5rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '14.5rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByAccountStatusLabel">By account status</InputLabel>
       <Select
         color="secondary"
         labelId="filterByAccountStatusLabel"
         id="filterByEmailStatusSelect"
-        value={customFilters.hasOwnProperty('adminConfirmed') ? customFilters.adminConfirmed : ''}
+        value={customFilters.hasOwnProperty(FILTER_ADMIN_CONFIRMED) ? customFilters[FILTER_ADMIN_CONFIRMED] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {

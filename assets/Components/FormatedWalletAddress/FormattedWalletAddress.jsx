@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tooltip, Typography } from '@mui/material';
 
-export default function FormattedWalletAddress({ wallet }) {
+export default function FormattedWalletAddress({ wallet, variant = 'tableBody2' }) {
   const [addressWasCopied, setAddressCopied] = useState(false);
   const parseConnectedWallet = (wallet) => {
     if (!wallet) {
@@ -9,26 +9,29 @@ export default function FormattedWalletAddress({ wallet }) {
     }
     return (
       <Tooltip
-        onClose={() => setTimeout(() => setAddressCopied(false), 100)}
+        onClose={() => setTimeout(() => setAddressCopied(false), 200)}
         title={
           addressWasCopied ? (
-            'Address was copied'
+            <Typography variant="tableText2">Address was copied</Typography>
           ) : (
-            <span>
-              Click for copy <br /> {wallet}
-            </span>
+            <Typography variant="tableText2">
+              Click for copy{' '}
+              <Typography variant="tableText2" sx={{ fontFamily: 'Monospace' }}>
+                {wallet}
+              </Typography>
+            </Typography>
           )
         }
       >
         <Typography
-          sx={{ cursor: 'pointer' }}
-          variant="body2"
+          sx={{ cursor: 'pointer', fontFamily: 'Monospace' }}
+          variant={variant}
           onClick={() => {
             setAddressCopied(true);
             return navigator.clipboard.writeText(wallet);
           }}
         >
-          {wallet.length > 18 ? wallet.slice(0, 15) + '...' : wallet}
+          {wallet.length > 18 ? wallet.slice(0, 8) + '…' + wallet.slice(wallet.length - 6) : wallet}
         </Typography>
       </Tooltip>
     );

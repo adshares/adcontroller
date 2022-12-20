@@ -77,4 +77,18 @@ function compareArrays(array1, array2) {
   return true;
 }
 
-export { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces, formatMoney, compareArrays, loginRedirect, logoutRedirect };
+function filterObjectByKeys(obj, keys) {
+  return Object.fromEntries(Object.entries(obj).filter(([key]) => keys.includes(key)));
+}
+
+export {
+  adsToClicks,
+  clicksToAds,
+  returnNumber,
+  setDecimalPlaces,
+  formatMoney,
+  compareArrays,
+  loginRedirect,
+  logoutRedirect,
+  filterObjectByKeys,
+};

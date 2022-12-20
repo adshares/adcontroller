@@ -72,6 +72,7 @@ const theme = createTheme({
     },
     error: {
       main: sunset,
+      light: failBg,
     },
     warning: {
       main: sun,
