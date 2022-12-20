@@ -6,11 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.3] - 2022-12-19
+### Fixed
+- Agency action menu
+- Wallet address displaying
+- Table data component
+- Connected status links
+- Textarea collapsed when changes save
+- Inputs label color
+
+## [1.2.2] - 2022-12-16
+### Fixed
+- Synchronization config
+
 ## [1.2.1] - 2022-12-08
 ### Fixed
 - Generating public URL
 - CORS support
 - Handle invalid state
+- Synchronization
 
 ## [1.2.0] - 2022-12-07
 ### Added
@@ -54,7 +68,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.1...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.3...develop
+[1.2.3]: https://github.com/adshares/adcontroller/compare/v1.2.2...v1.2.3
+[1.2.2]: https://github.com/adshares/adcontroller/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/adshares/adcontroller/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/adshares/adcontroller/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/adshares/adcontroller/compare/v1.0.2...v1.1.0
