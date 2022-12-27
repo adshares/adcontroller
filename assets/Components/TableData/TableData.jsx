@@ -803,7 +803,13 @@ export default function TableData({
     if (isNaN(page)) {
       setPage(0);
     }
+    if (page < 0) {
+      setPage(0);
+    }
     if (isNaN(rowsPerPage)) {
+      setRowsPerPage(20);
+    }
+    if (rowsPerPage < 0) {
       setRowsPerPage(20);
     }
     if (Object.keys(orderBy).length) {
@@ -1118,7 +1124,7 @@ export default function TableData({
           sx={{ overflow: 'visible', marginTop: 'auto' }}
           component="div"
           onPageChange={handleChangePage}
-          page={paginationParams.count <= 0 ? 0 : page}
+          page={paginationParams.count <= 0 ? 0 : page > paginationParams.lastPage ? paginationParams.lastPage - 1 : page}
           count={paginationParams.count || rows.length}
           rowsPerPage={rowsPerPage <= 0 ? 1 : rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
