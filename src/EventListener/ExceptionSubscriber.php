@@ -28,8 +28,9 @@ class ExceptionSubscriber implements EventSubscriberInterface
             self::HEADER_JSON_CONTENT === $request->headers->get('Content-Type')
         ) {
             if ($exception instanceof HttpExceptionInterface) {
+                $message = preg_replace('~https?://localhost(:\d+)?/~', '/', $exception->getMessage());
                 $response = new JsonResponse([
-                    'message' => $exception->getMessage(),
+                    'message' => $message,
                     'code' => $exception->getStatusCode(),
                     'data' => [],
                 ], $exception->getStatusCode(), $exception->getHeaders());
