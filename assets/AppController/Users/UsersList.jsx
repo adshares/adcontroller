@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import {
   useAddUserMutation,
   useBanUserMutation,
@@ -21,6 +23,7 @@ import { useDebounce, useForm, useSkipFirstRenderEffect } from '../../hooks';
 import { compareArrays, filterObjectByKeys, formatMoney } from '../../utils/helpers';
 import queryString from 'query-string';
 import TableData from '../../Components/TableData/TableData';
+import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import Spinner from '../../Components/Spinner/Spinner';
 import {
   Box,
@@ -38,6 +41,7 @@ import {
   FormControlLabel,
   IconButton,
   InputLabel,
+  ListItemText,
   Menu,
   MenuItem,
   OutlinedInput,
@@ -55,9 +59,6 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import InfoIcon from '@mui/icons-material/Info';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
-import ListItemText from '@mui/material/ListItemText';
-import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
-import { useSearchParams } from 'react-router-dom';
 
 const headCells = [
   {
@@ -168,7 +169,8 @@ export default function UsersList() {
       possibleQueryParams,
     ),
   }));
-  const { isFetching, data, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const users = useSelector(monitoringSelectors.getUsers);
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -176,13 +178,13 @@ export default function UsersList() {
   }, [queryConfig]);
 
   useEffect(() => {
-    if (!data) {
+    if (!users) {
       return;
     }
-    if (queryConfig.page > data.meta.lastPage) {
-      setQueryConfig((prevState) => ({ ...prevState, page: data.meta.lastPage }));
+    if (queryConfig.page > users.meta.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: users.meta.lastPage }));
     }
-  }, [data]);
+  }, [users]);
 
   const refetchWithoutCursor = () => {
     setQueryConfig((prevState) => ({ ...prevState, cursor: null }));
@@ -200,7 +202,7 @@ export default function UsersList() {
       return entries.map((param) => param.join(':')).join(',');
     };
     setQueryConfig({
-      cursor: event.page === 1 ? null : data?.meta.cursor,
+      cursor: event.page === 1 ? null : users?.meta.cursor,
       limit: event.rowsPerPage,
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
@@ -231,12 +233,12 @@ export default function UsersList() {
         return 'No role';
       }
     },
-    [data],
+    [users],
   );
 
   const rows = useMemo(() => {
-    return data
-      ? data.data.map((user) => ({
+    return users
+      ? users.data.map((user) => ({
           id: user.id,
           status: (
             <Box className={`${commonStyles.flex} ${commonStyles.flexWrap}`}>
@@ -264,7 +266,7 @@ export default function UsersList() {
           actions: <UserActionsMenu user={user} actions={{ refetch }} />,
         }))
       : [];
-  }, [data]);
+  }, [users]);
   return (
     <>
       <Card width="full">
@@ -287,10 +289,10 @@ export default function UsersList() {
             isDataLoading={isFetching}
             multiSort
             paginationParams={{
-              page: (queryConfig[PAGE] > data?.meta.lastPage ? data?.meta.lastPage : data?.meta.currentPage) || queryConfig[PAGE],
-              lastPage: data?.meta.lastPage || 1,
+              page: (queryConfig[PAGE] > users?.meta.lastPage ? users?.meta.lastPage : users?.meta.currentPage) || queryConfig[PAGE],
+              lastPage: users?.meta.lastPage || 1,
               rowsPerPage: queryConfig[LIMIT] || 20,
-              count: data?.meta.total || 0,
+              count: users?.meta.total || 0,
               showFirstButton: true,
               showLastButton: true,
             }}
