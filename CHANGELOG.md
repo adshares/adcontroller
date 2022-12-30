@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Opportunity to sort and filter tables in query parameters
+- Setting creative changing period
 ### Fixed
 - Height styles in tables
 - Pagination in tables

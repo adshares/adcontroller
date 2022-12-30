@@ -97,8 +97,12 @@ const ZoneOptions = (props) => {
   const { createSuccessNotification } = useCreateNotification();
   const [AllowZoneInIframe, setAllowZoneInIframe] = useState(appData.AdServer.AllowZoneInIframe);
   const form = useForm({
-    initialFields: { MaxPageZones: appData.AdServer.MaxPageZones.toString() },
+    initialFields: {
+      BannerRotateInterval: appData.AdServer.BannerRotateInterval.toString(),
+      MaxPageZones: appData.AdServer.MaxPageZones.toString(),
+    },
     validation: {
+      BannerRotateInterval: ['required', 'number', 'integer'],
       MaxPageZones: ['required', 'number', 'integer'],
     },
   });
@@ -107,6 +111,7 @@ const ZoneOptions = (props) => {
     const body = {
       ...(appData.AdServer.AllowZoneInIframe !== AllowZoneInIframe && { AllowZoneInIframe }),
       ...(form.changedFields.MaxPageZones ? { MaxPageZones: returnNumber(form.fields.MaxPageZones) } : {}),
+      ...(form.changedFields.BannerRotateInterval ? { BannerRotateInterval: returnNumber(form.fields.BannerRotateInterval) } : {}),
     };
 
     const response = await setZoneOptionsConfig(body);
@@ -118,7 +123,7 @@ const ZoneOptions = (props) => {
 
   return (
     <Card {...props}>
-      <CardHeader title="Banner options" subheader="Set banner limitations" />
+      <CardHeader title="Placement options" subheader="Set placement limitations" />
 
       <CardContent>
         <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
@@ -128,17 +133,30 @@ const ZoneOptions = (props) => {
             id="MaxPageZones"
             name="MaxPageZones"
             type="number"
-            label="Maximum banners per page"
+            label="Maximum placements per page"
             fullWidth
             value={form.fields.MaxPageZones}
             error={form.touchedFields.MaxPageZones && !form.errorObj.MaxPageZones.isValid}
             helperText={form.touchedFields.MaxPageZones && form.errorObj.MaxPageZones.helperText}
             inputProps={{ autoComplete: 'off', min: 0 }}
           />
+          <TextField
+            customvariant="highLabel"
+            color="secondary"
+            id="BannerRotateInterval"
+            name="BannerRotateInterval"
+            type="number"
+            label="Period between changing creatives [seconds]"
+            fullWidth
+            value={form.fields.BannerRotateInterval}
+            error={form.touchedFields.BannerRotateInterval && !form.errorObj.BannerRotateInterval.isValid}
+            helperText={form.touchedFields.BannerRotateInterval && form.errorObj.BannerRotateInterval.helperText}
+            inputProps={{ autoComplete: 'off', min: 10 }}
+          />
         </Box>
         <FormControl margin="dense">
           <FormControlLabel
-            label="Allow banners in the iframe"
+            label="Allow placement in the iframe"
             control={<Checkbox checked={AllowZoneInIframe} onChange={() => setAllowZoneInIframe((prevState) => !prevState)} />}
           />
         </FormControl>
