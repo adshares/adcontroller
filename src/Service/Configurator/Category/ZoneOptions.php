@@ -20,7 +20,10 @@ class ZoneOptions implements ConfiguratorCategory
             throw new UnprocessableEntityHttpException('Data is required');
         }
         ArrayUtils::assureBoolTypeForField($input, AdServerConfig::AllowZoneInIframe->name);
-        ArrayUtils::assurePositiveIntegerTypesForFields($input, [AdServerConfig::MaxPageZones->name]);
+        ArrayUtils::assurePositiveIntegerTypesForFields(
+            $input,
+            [AdServerConfig::BannerRotateInterval->name, AdServerConfig::MaxPageZones->name]
+        );
 
         return $this->dataCollector->push($input);
     }
@@ -29,6 +32,7 @@ class ZoneOptions implements ConfiguratorCategory
     {
         return [
             AdServerConfig::AllowZoneInIframe->name,
+            AdServerConfig::BannerRotateInterval->name,
             AdServerConfig::MaxPageZones->name,
         ];
     }
