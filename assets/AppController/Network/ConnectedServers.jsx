@@ -116,6 +116,11 @@ export default function ConnectedServers() {
             <PublishedWithChangesOutlinedIcon color="success" />
           </Tooltip>
         )) ||
+        (host.status === 'excluded' && (
+          <Tooltip title={host.error || 'Server is not on a whitelist'}>
+            <CloseOutlinedIcon color="info" />
+          </Tooltip>
+        )) ||
         (host.status === 'failure' && (
           <Tooltip title={host.error || 'Failure'}>
             <CloseOutlinedIcon color="error" />
