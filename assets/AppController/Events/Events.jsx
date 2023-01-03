@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useGetEventsQuery } from '../../redux/monitoring/monitoringApi';
+import { useGetEventsQuery, useGetEventTypesQuery } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import {
   Box,
@@ -24,22 +24,13 @@ import { filterObjectByKeys } from '../../utils/helpers';
 import queryString from 'query-string';
 import { useSearchParams } from 'react-router-dom';
 
-const headCells = [
+const initialHeadCells = [
   {
     id: 'type',
     label: 'Type',
     cellWidth: '15rem',
     alignContent: 'left',
     filterableBy: ['select'],
-    possibleSelectionOptions: [
-      'BroadcastSent',
-      'ExchangeRatesFetched',
-      'FilteringUpdated',
-      'HostBroadcastProcessed',
-      'InventorySynchronized',
-      'SiteRankUpdated',
-      'TargetingUpdated',
-    ],
   },
   {
     id: 'createdAt',
@@ -65,6 +56,7 @@ const possibleQueryParams = [PAGE, LIMIT, FILTER_TYPE, FILTER_DATE_FROM, FILTER_
 
 export default function Events() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [headCells, setHeadCells] = useState(() => initialHeadCells);
   const [queryConfig, setQueryConfig] = useState(() => ({
     page: 1,
     limit: 20,
@@ -78,7 +70,23 @@ export default function Events() {
       possibleQueryParams,
     ),
   }));
+  const { data: eventTypes } = useGetEventTypesQuery();
   const { data: response, isFetching } = useGetEventsQuery(queryConfig, { refetchOnMountOrArgChange: true });
+
+  useEffect(() => {
+    if (!eventTypes || eventTypes.data.length === 0) {
+      return;
+    }
+    setHeadCells((prevState) => {
+      const newState = [...prevState];
+      const index = newState.findIndex((item) => item.id === 'type');
+      newState[index] = {
+        ...newState[index],
+        possibleSelectionOptions: eventTypes.data,
+      };
+      return newState;
+    });
+  }, [eventTypes]);
 
   useEffect(() => {
     setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
