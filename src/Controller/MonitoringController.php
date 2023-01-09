@@ -23,10 +23,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class MonitoringController extends AbstractController
 {
     private const ALLOWED_KEYS = [
-        'event-types',
         'events',
-        'hosts',
         'events/latest',
+        'events/types',
+        'hosts',
         'users',
         'wallet',
     ];
