@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Opportunity to sort and filter tables in query parameters
 - Setting creative changing period
+- Load server event types
 - Highlighting servers which are not whitelisted
 ### Fixed
 - Height styles in tables

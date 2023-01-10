@@ -36,6 +36,14 @@ export const monitoringApi = createApi({
         };
       },
     }),
+    getEventTypes: builder.query({
+      query: () => {
+        return {
+          url: `/api/event-types`,
+          method: 'GET',
+        };
+      },
+    }),
     getUsersList: builder.query({
       query: (queryConfig) => {
         const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
@@ -134,6 +142,7 @@ export const {
   useGetConnectedHostsQuery,
   useResetHostConnectionErrorMutation,
   useGetEventsQuery,
+  useGetEventTypesQuery,
   useGetUsersListQuery,
   useConfirmUserMutation,
   useSwitchToModeratorMutation,
