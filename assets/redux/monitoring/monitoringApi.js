@@ -39,7 +39,7 @@ export const monitoringApi = createApi({
     getEventTypes: builder.query({
       query: () => {
         return {
-          url: `/api/event-types`,
+          url: `/api/events/types`,
           method: 'GET',
         };
       },
