@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Setting creative changing period
 - Load server event types
 - Highlighting servers which are not whitelisted
+- Connected server's date of last synchronization attempt
 ### Fixed
 - Height styles in tables
 - Pagination in tables

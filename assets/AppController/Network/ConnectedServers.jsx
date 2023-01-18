@@ -138,7 +138,15 @@ export default function ConnectedServers() {
         )),
       countOfError: (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyFlexStart}`}>
-          <Typography variant="body2">{host.connectionErrorCount}</Typography>
+          <Tooltip
+            title={
+              host.lastSynchronizationAttempt
+                ? 'Last synchronization attempt: ' + new Date(host.lastSynchronizationAttempt).toLocaleString()
+                : ''
+            }
+          >
+            <Typography variant="body2">{host.connectionErrorCount}</Typography>
+          </Tooltip>
           {Number(host.connectionErrorCount) > 0 && (
             <Tooltip title="Reset counter">
               <IconButton sx={{ ml: 2 }} size="small" color="secondary" onClick={() => onResetCounterClick(host.id)}>
