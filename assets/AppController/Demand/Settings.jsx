@@ -318,7 +318,8 @@ const RejectedDomainsCard = (props) => {
     <Card {...props}>
       <CardHeader
         title="Rejected domains"
-        subheader="Set domains on which campaigns will not be displayed. All subdomains will be rejected."
+        subheader="Set the domains that will be banned. Users will not be able to add a site with such domains. All
+         subdomains will also be banned."
       />
       <CardContent>
         <ListOfInputs
