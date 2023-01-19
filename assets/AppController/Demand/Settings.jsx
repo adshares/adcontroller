@@ -1,19 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../hooks';
 import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../utils/helpers';
-import {
-  useSetBannerSettingsConfigMutation,
-  useSetCampaignSettingsConfigMutation,
-  useSetRejectedDomainsSettingsConfigMutation,
-} from '../../redux/config/configApi';
-import {
-  changeBannerSettingsInformation,
-  changeCampaignSettingsInformation,
-  changeRejectedDomainsInformation,
-} from '../../redux/config/configSlice';
-import ListOfInputs from '../../Components/ListOfInputs/ListOfInputs';
+import { useSetBannerSettingsConfigMutation, useSetCampaignSettingsConfigMutation } from '../../redux/config/configApi';
+import { changeBannerSettingsInformation, changeCampaignSettingsInformation } from '../../redux/config/configSlice';
 import {
   Box,
   Button,
@@ -33,7 +24,6 @@ export default function Settings() {
     <>
       <CampaignSettingsCard />
       <BannerSettingsCard sx={{ mt: 3 }} />
-      <RejectedDomainsCard sx={{ mt: 3 }} />
     </>
   );
 }
@@ -277,60 +267,6 @@ const BannerSettingsCard = (props) => {
 
       <CardActions>
         <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
-          Save
-        </Button>
-      </CardActions>
-    </Card>
-  );
-};
-
-const RejectedDomainsCard = (props) => {
-  const appData = useSelector(configSelectors.getAppData);
-  const dispatch = useDispatch();
-  const [setRejectedDomainsSettings, { isLoading }] = useSetRejectedDomainsSettingsConfigMutation();
-  const { createSuccessNotification } = useCreateNotification();
-
-  const [RejectedDomains, setRejectedDomains] = useState([]);
-  const [isListValid, setListValid] = useState(true);
-  const [isListWasChanged, setListWasChanged] = useState(false);
-
-  const onSaveClick = async () => {
-    const body = {
-      ...(isListWasChanged ? { RejectedDomains: RejectedDomains } : {}),
-    };
-
-    const response = await setRejectedDomainsSettings(body);
-
-    if (response.data && response.data.message === 'OK') {
-      dispatch(changeRejectedDomainsInformation(response.data.data));
-      createSuccessNotification();
-    }
-  };
-
-  const fieldsHandler = (event) => {
-    const { isValuesValid, isListWasChanged, list } = event;
-    setRejectedDomains(list);
-    setListValid(list.length > 0 ? isValuesValid : true);
-    setListWasChanged(isListWasChanged);
-  };
-
-  return (
-    <Card {...props}>
-      <CardHeader
-        title="Rejected domains"
-        subheader="Set the domains that will be banned. Users will not be able to add a site with such domains. All
-         subdomains will also be banned."
-      />
-      <CardContent>
-        <ListOfInputs
-          initialList={appData.AdServer.RejectedDomains}
-          fieldsHandler={fieldsHandler}
-          listName="RejectedDomains"
-          type="domain"
-        />
-      </CardContent>
-      <CardActions>
-        <Button disabled={isLoading || !isListWasChanged || !isListValid} type="button" variant="contained" onClick={onSaveClick}>
           Save
         </Button>
       </CardActions>
