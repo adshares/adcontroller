@@ -13,6 +13,7 @@ import {
   useGetUsersListQuery,
   useGrantAdvertisingMutation,
   useGrantPublishingMutation,
+  useSwitchToAdminMutation,
   useSwitchToAgencyMutation,
   useSwitchToModeratorMutation,
   useSwitchToRegularMutation,
@@ -320,6 +321,7 @@ const UserActionsMenu = ({ user, actions }) => {
   const [deletionConfirmed, setDeletionConfirmed] = useState(false);
   const [banReason, setBanReason] = useState('');
   const [confirmUser, { isLoading: confirmUserPending }] = useConfirmUserMutation();
+  const [switchToAdmin, { isLoading: switchToAdminPending }] = useSwitchToAdminMutation();
   const [switchToModerator, { isLoading: switchToModeratorPending }] = useSwitchToModeratorMutation();
   const [switchToAgency, { isLoading: switchToAgencyPending }] = useSwitchToAgencyMutation();
   const [switchToRegular, { isLoading: switchToRegularPending }] = useSwitchToRegularMutation();
@@ -339,6 +341,7 @@ const UserActionsMenu = ({ user, actions }) => {
   const isActionPending = useMemo(() => {
     return (
       confirmUserPending ||
+      switchToAdminPending ||
       switchToModeratorPending ||
       switchToAgencyPending ||
       switchToRegularPending ||
@@ -352,6 +355,7 @@ const UserActionsMenu = ({ user, actions }) => {
     );
   }, [
     confirmUserPending,
+    switchToAdminPending,
     switchToModeratorPending,
     switchToAgencyPending,
     switchToRegularPending,
@@ -366,6 +370,13 @@ const UserActionsMenu = ({ user, actions }) => {
 
   const handleConfirmUser = async (id) => {
     const response = await confirmUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(updateUserDataReducer(response.data));
+    }
+  };
+
+  const handleSwitchToAdmin = async (id) => {
+    const response = await switchToAdmin(id);
     if (response.data && response.data.message === 'OK') {
       dispatch(updateUserDataReducer(response.data));
     }
@@ -451,7 +462,7 @@ const UserActionsMenu = ({ user, actions }) => {
 
   return (
     <>
-      <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen} color="black">
+      <IconButton disabled={isActionPending} onClick={handleMenuOpen} color="black">
         {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
       </IconButton>
       <Menu
@@ -479,6 +490,17 @@ const UserActionsMenu = ({ user, actions }) => {
             Confirm
           </MenuItem>
         )}
+        {!isAdmin && !user.isBanned && (
+          <MenuItem
+            sx={{ color: 'warning.main' }}
+            onClick={() => {
+              handleSwitchToAdmin(user.id);
+              handleMenuClose();
+            }}
+          >
+            Switch to admin
+          </MenuItem>
+        )}
         {!isAdmin && !isModerator && !isAgency && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
@@ -500,7 +522,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to agency
           </MenuItem>
         )}
-        {!isAdmin && (isModerator || isAgency) && !user.isBanned && (
+        {(isAdmin || isModerator || isAgency) && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
@@ -551,7 +573,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Deny publishing
           </MenuItem>
         )}
-        {!isAdmin && !user.isBanned && (
+        {!user.isBanned && (
           <MenuItem
             onClick={() => {
               setEditUserDialog((prevState) => !prevState);
@@ -561,7 +583,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Edit user
           </MenuItem>
         )}
-        {!isAdmin && !user.isBanned && (
+        {!user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -572,7 +594,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Ban user
           </MenuItem>
         )}
-        {!isAdmin && user.isBanned && (
+        {user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -583,17 +605,15 @@ const UserActionsMenu = ({ user, actions }) => {
             Unban user
           </MenuItem>
         )}
-        {!isAdmin && (
-          <MenuItem
-            sx={{ color: 'error.main' }}
-            onClick={() => {
-              setDeleteUserDialog((prevState) => !prevState);
-              handleMenuClose();
-            }}
-          >
-            Delete user
-          </MenuItem>
-        )}
+        <MenuItem
+          sx={{ color: 'error.main' }}
+          onClick={() => {
+            setDeleteUserDialog((prevState) => !prevState);
+            handleMenuClose();
+          }}
+        >
+          Delete user
+        </MenuItem>
       </Menu>
 
       {banUserDialog && (

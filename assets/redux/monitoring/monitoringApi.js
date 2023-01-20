@@ -59,6 +59,12 @@ export const monitoringApi = createApi({
         method: 'PATCH',
       }),
     }),
+    switchToAdmin: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/switchToAdmin`,
+        method: 'PATCH',
+      }),
+    }),
     switchToModerator: builder.mutation({
       query: (id) => ({
         url: `/api/users/${id}/switchToModerator`,
@@ -145,6 +151,7 @@ export const {
   useGetEventTypesQuery,
   useGetUsersListQuery,
   useConfirmUserMutation,
+  useSwitchToAdminMutation,
   useSwitchToModeratorMutation,
   useSwitchToAgencyMutation,
   useSwitchToRegularMutation,
