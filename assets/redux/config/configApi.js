@@ -13,7 +13,7 @@ export const configApi = createApi({
     }),
     getLicenseData: builder.query({
       query: () => ({
-        url: '/api/monitoring/license-data',
+        url: '/api/license-data',
         method: 'GET',
       }),
     }),
@@ -26,8 +26,8 @@ export const configApi = createApi({
     }),
     setExistingLicense: builder.mutation({
       query: (body) => ({
-        url: '/api/license_key',
-        method: 'POST',
+        url: '/api/config/license',
+        method: 'PATCH',
         body,
       }),
     }),
