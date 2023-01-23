@@ -151,6 +151,11 @@ const FILTER_QUERY = 'filter[query]';
 const FILTER_ROLE = 'filter[role]';
 const FILTER_EMAIL_CONFIRMED = 'filter[emailConfirmed]';
 const FILTER_ADMIN_CONFIRMED = 'filter[adminConfirmed]';
+const ROLE_ADMIN = 'admin';
+const ROLE_MODERATOR = 'moderator';
+const ROLE_AGENCY = 'agency';
+const ROLE_ADVERTISER = 'advertiser';
+const ROLE_PUBLISHER = 'publisher';
 const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
 const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
 const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
@@ -213,11 +218,11 @@ export default function UsersList() {
 
   const parseRoles = useCallback(
     (roles) => {
-      const isAdmin = roles.includes('admin');
-      const isModerator = roles.includes('moderator');
-      const isAgency = roles.includes('agency');
-      const isAdvertiser = roles.includes('advertiser');
-      const isPublisher = roles.includes('publisher');
+      const isAdmin = roles.includes(ROLE_ADMIN);
+      const isModerator = roles.includes(ROLE_MODERATOR);
+      const isAgency = roles.includes(ROLE_AGENCY);
+      const isAdvertiser = roles.includes(ROLE_ADVERTISER);
+      const isPublisher = roles.includes(ROLE_PUBLISHER);
       if (isAdmin) {
         return 'Admin';
       } else if (isModerator) {
@@ -332,11 +337,11 @@ const UserActionsMenu = ({ user, actions }) => {
   const [banUser, { isLoading: banUserPending }] = useBanUserMutation();
   const [unbanUser, { isLoading: unbanUserPending }] = useUnbanUserMutation();
   const [deleteUser, { isLoading: deleteUserPending }] = useDeleteUserMutation();
-  const isAdmin = user.roles.includes('admin');
-  const isModerator = user.roles.includes('moderator');
-  const isAgency = user.roles.includes('agency');
-  const isAdvertiser = user.roles.includes('advertiser');
-  const isPublisher = user.roles.includes('publisher');
+  const isAdmin = user.roles.includes(ROLE_ADMIN);
+  const isModerator = user.roles.includes(ROLE_MODERATOR);
+  const isAgency = user.roles.includes(ROLE_AGENCY);
+  const isAdvertiser = user.roles.includes(ROLE_ADVERTISER);
+  const isPublisher = user.roles.includes(ROLE_PUBLISHER);
 
   const isActionPending = useMemo(() => {
     return (
@@ -753,7 +758,7 @@ const UserActionsMenu = ({ user, actions }) => {
 };
 
 const UserDialog = ({ open, setOpen, mode, user, actions }) => {
-  const possibleRoles = ['moderator', 'agency', 'advertiser', 'publisher'];
+  const possibleRoles = [ROLE_ADMIN, ROLE_MODERATOR, ROLE_AGENCY, ROLE_ADVERTISER, ROLE_PUBLISHER];
   const dispatch = useDispatch();
   const form = useForm({
     initialFields: {
@@ -776,11 +781,22 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
     form.changeValidationRules({ wallet: [`${form.fields.network}Wallet`] });
   }, [form.fields.network]);
 
+  const isModeAdd = useMemo(() => 'add' === mode, [mode]);
   const isRoleWasChanged = useMemo(() => !compareArrays(role.initialState, role.currentState), [role]);
 
   const handleRolePick = (e) => {
     const { value } = e.target;
-    setRole((prevState) => ({ ...prevState, currentState: typeof value === 'string' ? value.split(',') : value }));
+    let roles = typeof value === 'string' ? value.split(',') : value;
+    if (isModeAdd) {
+      const distinctRoles = [ROLE_ADMIN, ROLE_MODERATOR];
+      for (let distinctRole of distinctRoles) {
+        if (roles.includes(distinctRole) && !role.currentState.includes(distinctRole)) {
+          roles = [distinctRole];
+          break;
+        }
+      }
+    }
+    setRole((prevState) => ({ ...prevState, currentState: roles }));
   };
 
   const resetForm = () => {
@@ -830,7 +846,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
   return (
     <>
       <Dialog fullWidth maxWidth="xs" open={open} onClose={() => onCloseClick()}>
-        <DialogTitle>{mode === 'add' ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
+        <DialogTitle>{isModeAdd ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -862,7 +878,16 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
               renderValue={(selected) => selected.map((el) => el.charAt(0).toUpperCase() + el.slice(1)).join(', ')}
             >
               {possibleRoles.map((el) => (
-                <MenuItem key={el} value={el}>
+                <MenuItem
+                  key={el}
+                  value={el}
+                  disabled={
+                    isModeAdd &&
+                    ROLE_ADMIN !== el &&
+                    ROLE_MODERATOR !== el &&
+                    (role.currentState.includes(ROLE_ADMIN) || role.currentState.includes(ROLE_MODERATOR))
+                  }
+                >
                   <Checkbox checked={role.currentState.indexOf(el) > -1} />
                   <ListItemText primary={el.charAt(0).toUpperCase() + el.slice(1)} />
                 </MenuItem>
@@ -917,7 +942,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
       </Dialog>
 
       <Dialog fullWidth maxWidth="xs" open={infoDialogOpen}>
-        <DialogTitle>User was {mode === 'add' ? 'added' : 'edited'}</DialogTitle>
+        <DialogTitle>User was {isModeAdd ? 'added' : 'edited'}</DialogTitle>
         <DialogContent>
           {addUserData && addUserData.data.email && <Typography variant="body1">Email: {addUserData.data.email}</Typography>}
           {addUserData && addUserData.data.connectedWallet.address && (
@@ -996,11 +1021,11 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
         <MenuItem value="">
           <em>All</em>
         </MenuItem>
-        <MenuItem value={'admin'}>Admin</MenuItem>
-        <MenuItem value={'agency'}>Agency</MenuItem>
-        <MenuItem value={'moderator'}>Moderator</MenuItem>
-        <MenuItem value={'advertiser'}>Advertiser</MenuItem>
-        <MenuItem value={'publisher'}>Publisher</MenuItem>
+        <MenuItem value={ROLE_ADMIN}>Admin</MenuItem>
+        <MenuItem value={ROLE_AGENCY}>Agency</MenuItem>
+        <MenuItem value={ROLE_MODERATOR}>Moderator</MenuItem>
+        <MenuItem value={ROLE_ADVERTISER}>Advertiser</MenuItem>
+        <MenuItem value={ROLE_PUBLISHER}>Publisher</MenuItem>
       </Select>
     </FormControl>
   );
