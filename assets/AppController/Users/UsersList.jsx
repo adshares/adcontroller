@@ -42,7 +42,6 @@ import {
   FormControlLabel,
   IconButton,
   InputLabel,
-  ListItemText,
   Menu,
   MenuItem,
   OutlinedInput,
@@ -758,7 +757,6 @@ const UserActionsMenu = ({ user, actions }) => {
 };
 
 const UserDialog = ({ open, setOpen, mode, user, actions }) => {
-  const possibleRoles = [ROLE_ADMIN, ROLE_MODERATOR, ROLE_AGENCY, ROLE_ADVERTISER, ROLE_PUBLISHER];
   const dispatch = useDispatch();
   const form = useForm({
     initialFields: {
@@ -783,21 +781,6 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
 
   const isModeAdd = useMemo(() => 'add' === mode, [mode]);
   const isRoleWasChanged = useMemo(() => !compareArrays(role.initialState, role.currentState), [role]);
-
-  const handleRolePick = (e) => {
-    const { value } = e.target;
-    let roles = typeof value === 'string' ? value.split(',') : value;
-    if (isModeAdd) {
-      const distinctRoles = [ROLE_ADMIN, ROLE_MODERATOR];
-      for (let distinctRole of distinctRoles) {
-        if (roles.includes(distinctRole) && !role.currentState.includes(distinctRole)) {
-          roles = [distinctRole];
-          break;
-        }
-      }
-    }
-    setRole((prevState) => ({ ...prevState, currentState: roles }));
-  };
 
   const resetForm = () => {
     form.resetForm();
@@ -866,34 +849,6 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
               control={<Checkbox checked={forcePasswordChange} onChange={() => setForcePasswordChange((prevState) => !prevState)} />}
             />
           </Collapse>
-          <FormControl fullWidth customvariant="highLabel" color="secondary">
-            <InputLabel id="rolesPickerLabel">Roles</InputLabel>
-            <Select
-              labelId="rolesPickerLabel"
-              id="rolesPickerSelect"
-              multiple
-              value={role.currentState}
-              onChange={handleRolePick}
-              input={<OutlinedInput label="Roles" />}
-              renderValue={(selected) => selected.map((el) => el.charAt(0).toUpperCase() + el.slice(1)).join(', ')}
-            >
-              {possibleRoles.map((el) => (
-                <MenuItem
-                  key={el}
-                  value={el}
-                  disabled={
-                    isModeAdd &&
-                    ROLE_ADMIN !== el &&
-                    ROLE_MODERATOR !== el &&
-                    (role.currentState.includes(ROLE_ADMIN) || role.currentState.includes(ROLE_MODERATOR))
-                  }
-                >
-                  <Checkbox checked={role.currentState.indexOf(el) > -1} />
-                  <ListItemText primary={el.charAt(0).toUpperCase() + el.slice(1)} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
           <FormControl fullWidth customvariant="highLabel" color="secondary">
             <InputLabel id="networkLabel">Network</InputLabel>
             <Select
