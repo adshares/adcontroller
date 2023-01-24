@@ -23,7 +23,13 @@ const headCells = [
   {
     id: 'status',
     label: 'Status',
-    cellWidth: '6rem',
+    cellWidth: '4rem',
+    alignContent: 'left',
+  },
+  {
+    id: 'version',
+    label: 'Version',
+    cellWidth: '4rem',
     alignContent: 'left',
   },
   {
@@ -136,6 +142,7 @@ export default function ConnectedServers() {
             <SyncOutlinedIcon color="info" />
           </Tooltip>
         )),
+      version: host.infoJson?.version || 'no data',
       countOfError: (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyFlexStart}`}>
           <Tooltip
