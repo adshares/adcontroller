@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pagination in tables
 - Displaying wallet address in tables
 - API error messages with host (no localhost)
+- Rejected domains are part of supply side
 - License read
 
 ## [1.2.3] - 2022-12-19
