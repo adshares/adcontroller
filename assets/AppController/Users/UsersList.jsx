@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import authSelectors from '../../redux/auth/authSelectors';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import {
   useAddUserMutation,
@@ -175,6 +176,7 @@ export default function UsersList() {
     ),
   }));
   const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const currentUser = useSelector(authSelectors.getUser);
   const users = useSelector(monitoringSelectors.getUsers);
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
 
@@ -268,7 +270,7 @@ export default function UsersList() {
           campaignCount: user.campaignCount,
           siteCount: user.siteCount,
           lastActiveAt: user.lastActiveAt && new Date(user.lastActiveAt).toLocaleString(),
-          actions: <UserActionsMenu user={user} actions={{ refetch }} />,
+          actions: <UserActionsMenu currentUser={currentUser} user={user} actions={{ refetch }} />,
         }))
       : [];
   }, [users]);
@@ -314,7 +316,7 @@ export default function UsersList() {
   );
 }
 
-const UserActionsMenu = ({ user, actions }) => {
+const UserActionsMenu = ({ currentUser, user, actions }) => {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -342,6 +344,7 @@ const UserActionsMenu = ({ user, actions }) => {
   const isAdvertiser = user.roles.includes(ROLE_ADVERTISER);
   const isPublisher = user.roles.includes(ROLE_PUBLISHER);
   const isRegularUser = !isAdmin && !isModerator && !isAgency;
+  const isSelfRow = currentUser.name === user.email;
 
   const isActionPending = useMemo(() => {
     return (
@@ -528,7 +531,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to agency
           </MenuItem>
         )}
-        {!isRegularUser && !user.isBanned && (
+        {!isSelfRow && !isRegularUser && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
@@ -589,7 +592,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Edit user
           </MenuItem>
         )}
-        {!user.isBanned && (
+        {!isSelfRow && !user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -600,7 +603,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Ban user
           </MenuItem>
         )}
-        {user.isBanned && (
+        {!isSelfRow && user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -611,15 +614,17 @@ const UserActionsMenu = ({ user, actions }) => {
             Unban user
           </MenuItem>
         )}
-        <MenuItem
-          sx={{ color: 'error.main' }}
-          onClick={() => {
-            setDeleteUserDialog((prevState) => !prevState);
-            handleMenuClose();
-          }}
-        >
-          Delete user
-        </MenuItem>
+        {!isSelfRow && user.isBanned && (
+          <MenuItem
+            sx={{ color: 'error.main' }}
+            onClick={() => {
+              setDeleteUserDialog((prevState) => !prevState);
+              handleMenuClose();
+            }}
+          >
+            Delete user
+          </MenuItem>
+        )}
       </Menu>
 
       {banUserDialog && (
