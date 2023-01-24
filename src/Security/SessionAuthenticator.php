@@ -48,11 +48,19 @@ class SessionAuthenticator extends AbstractAuthenticator
         }
 
         $roles = $payload['roles'] ?? [];
-        if (!in_array(Role::Admin->value, $roles, true)) {
-            throw new AccessDeniedHttpException('User does not have administrator rights');
+        if (!in_array(Role::Moderator->value, $roles, true) && !in_array(Role::Admin->value, $roles, true)) {
+            throw new AccessDeniedHttpException('User does not have right to access');
         }
+        $email = $payload['username'];
 
-        return new SelfValidatingPassport(new UserBadge($payload['username']));
+        return new SelfValidatingPassport(
+            new UserBadge($email, function () use ($email, $roles) {
+                $user = new User();
+                $user->setEmail($email);
+                $user->setRoles($roles);
+                return $user;
+            })
+        );
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
