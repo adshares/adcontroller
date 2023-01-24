@@ -10,13 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Setting creative changing period
 - Load server event types
 - Highlighting servers which are not whitelisted
-- Connected server's date of last synchronization attempt
+- Connected server's version and date of last synchronization attempt
 - Possibility to grant user administrator privileges
 ### Fixed
 - Height styles in tables
 - Pagination in tables
 - Displaying wallet address in tables
 - API error messages with host (no localhost)
+- Rejected domains are part of supply side
+- License read
 
 ## [1.2.3] - 2022-12-19
 ### Fixed

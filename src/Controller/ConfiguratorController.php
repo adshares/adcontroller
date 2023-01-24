@@ -20,6 +20,7 @@ use App\Service\Configurator\Category\CampaignSettings;
 use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\CrmNotifications;
+use App\Service\Configurator\Category\License;
 use App\Service\Configurator\Category\PanelAssets;
 use App\Service\Configurator\Category\PanelPlaceholders;
 use App\Service\Configurator\Category\Registration;
@@ -53,6 +54,7 @@ class ConfiguratorController extends AbstractController
         'cold-wallet-config' => ColdWallet::class,
         'commission-config' => Commission::class,
         'crm-notifications-config' => CrmNotifications::class,
+        'license-config' => License::class,
         'panel-placeholders-config' => PanelPlaceholders::class,
         'registration-config' => Registration::class,
         'regulations-config' => Regulations::class,

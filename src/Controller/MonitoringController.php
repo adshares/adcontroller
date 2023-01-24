@@ -44,8 +44,8 @@ class MonitoringController extends AbstractController
 
         try {
             $license = $licenseReader->read($licenseKey);
-        } catch (OutdatedLicense) {
-            throw new UnprocessableEntityHttpException('License is outdated');
+        } catch (OutdatedLicense $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
         } catch (ServiceNotPresent $exception) {
             throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
         } catch (UnexpectedResponseException $exception) {
