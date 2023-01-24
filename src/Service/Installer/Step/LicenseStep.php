@@ -12,6 +12,7 @@ use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
 use App\Service\AdServerConfigurationClient;
+use App\Service\Configurator\Category\License as LicenseConfigurator;
 use App\Service\LicenseReader;
 use App\Service\LicenseServerClient;
 use App\ValueObject\License;
@@ -21,11 +22,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class LicenseStep implements InstallerStep
 {
-    private const LICENSE_KEY_PATTERN = '/^(COM|SRV)-[\da-z]{6}-[\da-z]{5}-[\da-z]{5}-[\da-z]{4}-[\da-z]{4}$/i';
-
     public function __construct(
         private readonly AdServerConfigurationClient $adServerConfigurationClient,
         private readonly ConfigurationRepository $repository,
+        private readonly LicenseConfigurator $licenseConfigurator,
         private readonly LicenseReader $licenseReader,
         private readonly LicenseServerClient $licenseServerClient,
         private readonly LoggerInterface $logger
@@ -43,30 +43,8 @@ class LicenseStep implements InstallerStep
 
     public function setLicenseKey(array $content): void
     {
-        $this->validate($content);
-
-        $licenseKey = $content[AdServerConfig::LicenseKey->name];
-        $this->adServerConfigurationClient->store([
-            AdServerConfig::LicenseKey->name => $licenseKey,
-        ]);
-
-        $this->repository->insertOrUpdateOne(AdServerConfig::LicenseKey, $licenseKey);
+        $this->licenseConfigurator->process($content);
         $this->repository->insertOrUpdateOne(AppConfig::InstallerStep, $this->getName());
-    }
-
-    private function validate(array $content): void
-    {
-        if (!isset($content[AdServerConfig::LicenseKey->name])) {
-            throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` is required', AdServerConfig::LicenseKey->name)
-            );
-        }
-
-        if (null === $this->getLicenseByKey($content[AdServerConfig::LicenseKey->name])) {
-            throw new UnprocessableEntityHttpException(
-                sprintf('Field `%s` must be a valid license key', AdServerConfig::LicenseKey->name)
-            );
-        }
     }
 
     public function getName(): string
@@ -82,7 +60,7 @@ class LicenseStep implements InstallerStep
 
         $licenseKey = $this->repository->fetchValueByEnum(AdServerConfig::LicenseKey);
 
-        if (null !== ($license = $this->getLicenseByKey($licenseKey))) {
+        if (null !== $licenseKey && null !== ($license = $this->getLicenseByKey($licenseKey))) {
             $data[Configuration::COMMON_DATA_REQUIRED] = false;
             $data[Configuration::LICENSE_DATA] = $license->toArray();
         }
@@ -94,16 +72,11 @@ class LicenseStep implements InstallerStep
     {
         $licenseKey = $this->repository->fetchValueByEnum(AdServerConfig::LicenseKey);
 
-        return null === $this->getLicenseByKey($licenseKey);
+        return null === $licenseKey || null === $this->getLicenseByKey($licenseKey);
     }
 
-    private function getLicenseByKey($licenseKey): ?License
+    private function getLicenseByKey(string $licenseKey): ?License
     {
-        if (!is_string($licenseKey) || 1 !== preg_match(self::LICENSE_KEY_PATTERN, $licenseKey)) {
-            $this->logger->debug('Invalid license key format');
-            return null;
-        }
-
         try {
             $license = $this->licenseReader->read($licenseKey);
         } catch (OutdatedLicense | ServiceNotPresent | UnexpectedResponseException) {
