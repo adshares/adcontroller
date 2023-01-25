@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Load server event types
 - Highlighting servers which are not whitelisted
 - Connected server's version and date of last synchronization attempt
+- Possibility to grant user administrator privileges
 ### Fixed
 - Height styles in tables
 - Pagination in tables

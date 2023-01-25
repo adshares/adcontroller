@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import authSelectors from '../../redux/auth/authSelectors';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import {
   useAddUserMutation,
@@ -13,6 +14,7 @@ import {
   useGetUsersListQuery,
   useGrantAdvertisingMutation,
   useGrantPublishingMutation,
+  useSwitchToAdminMutation,
   useSwitchToAgencyMutation,
   useSwitchToModeratorMutation,
   useSwitchToRegularMutation,
@@ -41,7 +43,6 @@ import {
   FormControlLabel,
   IconButton,
   InputLabel,
-  ListItemText,
   Menu,
   MenuItem,
   OutlinedInput,
@@ -150,6 +151,11 @@ const FILTER_QUERY = 'filter[query]';
 const FILTER_ROLE = 'filter[role]';
 const FILTER_EMAIL_CONFIRMED = 'filter[emailConfirmed]';
 const FILTER_ADMIN_CONFIRMED = 'filter[adminConfirmed]';
+const ROLE_ADMIN = 'admin';
+const ROLE_MODERATOR = 'moderator';
+const ROLE_AGENCY = 'agency';
+const ROLE_ADVERTISER = 'advertiser';
+const ROLE_PUBLISHER = 'publisher';
 const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
 const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
 const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
@@ -170,6 +176,7 @@ export default function UsersList() {
     ),
   }));
   const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const currentUser = useSelector(authSelectors.getUser);
   const users = useSelector(monitoringSelectors.getUsers);
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
 
@@ -212,11 +219,11 @@ export default function UsersList() {
 
   const parseRoles = useCallback(
     (roles) => {
-      const isAdmin = roles.includes('admin');
-      const isModerator = roles.includes('moderator');
-      const isAgency = roles.includes('agency');
-      const isAdvertiser = roles.includes('advertiser');
-      const isPublisher = roles.includes('publisher');
+      const isAdmin = roles.includes(ROLE_ADMIN);
+      const isModerator = roles.includes(ROLE_MODERATOR);
+      const isAgency = roles.includes(ROLE_AGENCY);
+      const isAdvertiser = roles.includes(ROLE_ADVERTISER);
+      const isPublisher = roles.includes(ROLE_PUBLISHER);
       if (isAdmin) {
         return 'Admin';
       } else if (isModerator) {
@@ -263,7 +270,7 @@ export default function UsersList() {
           campaignCount: user.campaignCount,
           siteCount: user.siteCount,
           lastActiveAt: user.lastActiveAt && new Date(user.lastActiveAt).toLocaleString(),
-          actions: <UserActionsMenu user={user} actions={{ refetch }} />,
+          actions: <UserActionsMenu currentUser={currentUser} user={user} actions={{ refetch }} />,
         }))
       : [];
   }, [users]);
@@ -309,7 +316,7 @@ export default function UsersList() {
   );
 }
 
-const UserActionsMenu = ({ user, actions }) => {
+const UserActionsMenu = ({ currentUser, user, actions }) => {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -320,6 +327,7 @@ const UserActionsMenu = ({ user, actions }) => {
   const [deletionConfirmed, setDeletionConfirmed] = useState(false);
   const [banReason, setBanReason] = useState('');
   const [confirmUser, { isLoading: confirmUserPending }] = useConfirmUserMutation();
+  const [switchToAdmin, { isLoading: switchToAdminPending }] = useSwitchToAdminMutation();
   const [switchToModerator, { isLoading: switchToModeratorPending }] = useSwitchToModeratorMutation();
   const [switchToAgency, { isLoading: switchToAgencyPending }] = useSwitchToAgencyMutation();
   const [switchToRegular, { isLoading: switchToRegularPending }] = useSwitchToRegularMutation();
@@ -330,15 +338,18 @@ const UserActionsMenu = ({ user, actions }) => {
   const [banUser, { isLoading: banUserPending }] = useBanUserMutation();
   const [unbanUser, { isLoading: unbanUserPending }] = useUnbanUserMutation();
   const [deleteUser, { isLoading: deleteUserPending }] = useDeleteUserMutation();
-  const isAdmin = user.roles.includes('admin');
-  const isModerator = user.roles.includes('moderator');
-  const isAgency = user.roles.includes('agency');
-  const isAdvertiser = user.roles.includes('advertiser');
-  const isPublisher = user.roles.includes('publisher');
+  const isAdmin = user.roles.includes(ROLE_ADMIN);
+  const isModerator = user.roles.includes(ROLE_MODERATOR);
+  const isAgency = user.roles.includes(ROLE_AGENCY);
+  const isAdvertiser = user.roles.includes(ROLE_ADVERTISER);
+  const isPublisher = user.roles.includes(ROLE_PUBLISHER);
+  const isRegularUser = !isAdmin && !isModerator && !isAgency;
+  const isSelfRow = currentUser.name === user.email;
 
   const isActionPending = useMemo(() => {
     return (
       confirmUserPending ||
+      switchToAdminPending ||
       switchToModeratorPending ||
       switchToAgencyPending ||
       switchToRegularPending ||
@@ -352,6 +363,7 @@ const UserActionsMenu = ({ user, actions }) => {
     );
   }, [
     confirmUserPending,
+    switchToAdminPending,
     switchToModeratorPending,
     switchToAgencyPending,
     switchToRegularPending,
@@ -366,6 +378,13 @@ const UserActionsMenu = ({ user, actions }) => {
 
   const handleConfirmUser = async (id) => {
     const response = await confirmUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(updateUserDataReducer(response.data));
+    }
+  };
+
+  const handleSwitchToAdmin = async (id) => {
+    const response = await switchToAdmin(id);
     if (response.data && response.data.message === 'OK') {
       dispatch(updateUserDataReducer(response.data));
     }
@@ -451,7 +470,7 @@ const UserActionsMenu = ({ user, actions }) => {
 
   return (
     <>
-      <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen} color="black">
+      <IconButton disabled={isActionPending} onClick={handleMenuOpen} color="black">
         {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
       </IconButton>
       <Menu
@@ -479,7 +498,18 @@ const UserActionsMenu = ({ user, actions }) => {
             Confirm
           </MenuItem>
         )}
-        {!isAdmin && !isModerator && !isAgency && !user.isBanned && (
+        {isRegularUser && !user.isBanned && (
+          <MenuItem
+            sx={{ color: 'warning.main' }}
+            onClick={() => {
+              handleSwitchToAdmin(user.id);
+              handleMenuClose();
+            }}
+          >
+            Switch to admin
+          </MenuItem>
+        )}
+        {isRegularUser && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
@@ -490,8 +520,9 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to moderator
           </MenuItem>
         )}
-        {!isAdmin && !isModerator && !isAgency && !user.isBanned && (
+        {isRegularUser && !user.isBanned && (
           <MenuItem
+            sx={{ color: 'warning.main' }}
             onClick={() => {
               handleSwitchToAgency(user.id);
               handleMenuClose();
@@ -500,7 +531,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to agency
           </MenuItem>
         )}
-        {!isAdmin && (isModerator || isAgency) && !user.isBanned && (
+        {!isSelfRow && !isRegularUser && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
@@ -511,7 +542,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to regular
           </MenuItem>
         )}
-        {!isAdmin && !isAdvertiser && !isAgency && !user.isBanned && (
+        {isRegularUser && !isAdvertiser && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantAdvertising(user.id);
@@ -521,7 +552,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow advertising
           </MenuItem>
         )}
-        {!isAdmin && isAdvertiser && !isAgency && !user.isBanned && (
+        {isRegularUser && isAdvertiser && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyAdvertising(user.id);
@@ -531,7 +562,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Deny advertising
           </MenuItem>
         )}
-        {!isAdmin && !isPublisher && !isAgency && !user.isBanned && (
+        {isRegularUser && !isPublisher && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantPublishing(user.id);
@@ -541,7 +572,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow publishing
           </MenuItem>
         )}
-        {!isAdmin && isPublisher && !isAgency && !user.isBanned && (
+        {isRegularUser && isPublisher && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyPublishing(user.id);
@@ -551,7 +582,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Deny publishing
           </MenuItem>
         )}
-        {!isAdmin && !user.isBanned && (
+        {!user.isBanned && (
           <MenuItem
             onClick={() => {
               setEditUserDialog((prevState) => !prevState);
@@ -561,7 +592,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Edit user
           </MenuItem>
         )}
-        {!isAdmin && !user.isBanned && (
+        {!isSelfRow && !user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -572,7 +603,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Ban user
           </MenuItem>
         )}
-        {!isAdmin && user.isBanned && (
+        {!isSelfRow && user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -583,7 +614,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Unban user
           </MenuItem>
         )}
-        {!isAdmin && (
+        {!isSelfRow && user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -733,7 +764,6 @@ const UserActionsMenu = ({ user, actions }) => {
 };
 
 const UserDialog = ({ open, setOpen, mode, user, actions }) => {
-  const possibleRoles = ['moderator', 'agency', 'advertiser', 'publisher'];
   const dispatch = useDispatch();
   const form = useForm({
     initialFields: {
@@ -756,12 +786,8 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
     form.changeValidationRules({ wallet: [`${form.fields.network}Wallet`] });
   }, [form.fields.network]);
 
+  const isModeAdd = useMemo(() => 'add' === mode, [mode]);
   const isRoleWasChanged = useMemo(() => !compareArrays(role.initialState, role.currentState), [role]);
-
-  const handleRolePick = (e) => {
-    const { value } = e.target;
-    setRole((prevState) => ({ ...prevState, currentState: typeof value === 'string' ? value.split(',') : value }));
-  };
 
   const resetForm = () => {
     form.resetForm();
@@ -810,7 +836,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
   return (
     <>
       <Dialog fullWidth maxWidth="xs" open={open} onClose={() => onCloseClick()}>
-        <DialogTitle>{mode === 'add' ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
+        <DialogTitle>{isModeAdd ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -830,25 +856,6 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
               control={<Checkbox checked={forcePasswordChange} onChange={() => setForcePasswordChange((prevState) => !prevState)} />}
             />
           </Collapse>
-          <FormControl fullWidth customvariant="highLabel" color="secondary">
-            <InputLabel id="rolesPickerLabel">Roles</InputLabel>
-            <Select
-              labelId="rolesPickerLabel"
-              id="rolesPickerSelect"
-              multiple
-              value={role.currentState}
-              onChange={handleRolePick}
-              input={<OutlinedInput label="Roles" />}
-              renderValue={(selected) => selected.map((el) => el.charAt(0).toUpperCase() + el.slice(1)).join(', ')}
-            >
-              {possibleRoles.map((el) => (
-                <MenuItem key={el} value={el}>
-                  <Checkbox checked={role.currentState.indexOf(el) > -1} />
-                  <ListItemText primary={el.charAt(0).toUpperCase() + el.slice(1)} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
           <FormControl fullWidth customvariant="highLabel" color="secondary">
             <InputLabel id="networkLabel">Network</InputLabel>
             <Select
@@ -897,7 +904,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
       </Dialog>
 
       <Dialog fullWidth maxWidth="xs" open={infoDialogOpen}>
-        <DialogTitle>User was {mode === 'add' ? 'added' : 'edited'}</DialogTitle>
+        <DialogTitle>User was {isModeAdd ? 'added' : 'edited'}</DialogTitle>
         <DialogContent>
           {addUserData && addUserData.data.email && <Typography variant="body1">Email: {addUserData.data.email}</Typography>}
           {addUserData && addUserData.data.connectedWallet.address && (
@@ -976,11 +983,11 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
         <MenuItem value="">
           <em>All</em>
         </MenuItem>
-        <MenuItem value={'admin'}>Admin</MenuItem>
-        <MenuItem value={'agency'}>Agency</MenuItem>
-        <MenuItem value={'moderator'}>Moderator</MenuItem>
-        <MenuItem value={'advertiser'}>Advertiser</MenuItem>
-        <MenuItem value={'publisher'}>Publisher</MenuItem>
+        <MenuItem value={ROLE_ADMIN}>Admin</MenuItem>
+        <MenuItem value={ROLE_AGENCY}>Agency</MenuItem>
+        <MenuItem value={ROLE_MODERATOR}>Moderator</MenuItem>
+        <MenuItem value={ROLE_ADVERTISER}>Advertiser</MenuItem>
+        <MenuItem value={ROLE_PUBLISHER}>Publisher</MenuItem>
       </Select>
     </FormControl>
   );
