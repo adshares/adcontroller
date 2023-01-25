@@ -345,6 +345,7 @@ const UserActionsMenu = ({ currentUser, user, actions }) => {
   const isPublisher = user.roles.includes(ROLE_PUBLISHER);
   const isRegularUser = !isAdmin && !isModerator && !isAgency;
   const isSelfRow = currentUser.name === user.email;
+  const isSelfAdmin = currentUser.roles.includes(ROLE_ADMIN);
 
   const isActionPending = useMemo(() => {
     return (
@@ -470,7 +471,11 @@ const UserActionsMenu = ({ currentUser, user, actions }) => {
 
   return (
     <>
-      <IconButton disabled={isActionPending} onClick={handleMenuOpen} color="black">
+      <IconButton
+        color="black"
+        disabled={isActionPending || (!isSelfAdmin && !isSelfRow && (isAdmin || isModerator))}
+        onClick={handleMenuOpen}
+      >
         {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
       </IconButton>
       <Menu
