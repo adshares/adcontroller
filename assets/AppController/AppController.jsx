@@ -51,7 +51,7 @@ import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import commonStyles from '../styles/commonStyles.scss';
 
 const insertIf = (condition, element) => {
-  return condition ? element : [];
+  return condition ? [element] : [];
 };
 
 const getAppModules = (currentUser) => {
