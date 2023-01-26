@@ -29,7 +29,7 @@ import Panel from './General/Panel';
 import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
 import ConnectedServers from './Network/ConnectedServers';
-import Events from './Events/Events';
+import { EventsAll, EventsLatest } from './Events/Events';
 import UsersList from './Users/UsersList';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -60,6 +60,12 @@ const getAppModules = (currentUser) => {
   }
   const isAdmin = currentUser.roles.includes('admin');
   return [
+    {
+      name: 'Dashboard',
+      path: '/dashboard',
+      component: EventsLatest,
+      icon: DashboardIcon,
+    },
     {
       name: 'Users',
       icon: PeopleAltOutlinedIcon,
@@ -190,7 +196,7 @@ const getAppModules = (currentUser) => {
     {
       name: 'Events',
       path: '/events',
-      component: Events,
+      component: EventsAll,
       icon: DashboardIcon,
     },
   ];

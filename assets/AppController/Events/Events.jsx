@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useGetEventsQuery, useGetEventTypesQuery } from '../../redux/monitoring/monitoringApi';
+import { useGetEventsQuery, useGetEventsLatestQuery, useGetEventTypesQuery } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import {
   Box,
@@ -54,7 +54,12 @@ const FILTER_DATE_FROM = 'filter[createdAt][from]';
 const FILTER_DATE_TO = 'filter[createdAt][to]';
 const possibleQueryParams = [PAGE, LIMIT, FILTER_TYPE, FILTER_DATE_FROM, FILTER_DATE_TO];
 
-export default function Events() {
+const EventsDataType = {
+  ALL: 'all',
+  LATEST: 'latest',
+};
+
+function Events(dataType) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [headCells, setHeadCells] = useState(() => initialHeadCells);
   const [queryConfig, setQueryConfig] = useState(() => ({
@@ -71,7 +76,10 @@ export default function Events() {
     ),
   }));
   const { data: eventTypes } = useGetEventTypesQuery();
-  const { data: response, isFetching } = useGetEventsQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const { data: response, isFetching } =
+    EventsDataType.LATEST === dataType
+      ? useGetEventsLatestQuery(queryConfig, { refetchOnMountOrArgChange: true })
+      : useGetEventsQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
     if (!eventTypes || eventTypes.data.length === 0) {
@@ -135,7 +143,7 @@ export default function Events() {
 
   return (
     <Card>
-      <CardHeader title="Events" />
+      <CardHeader title={EventsDataType.LATEST === dataType ? 'Latest events' : 'Events'} />
       <CardContent>
         <TableData
           headCells={headCells}
@@ -229,3 +237,11 @@ const PropertiesDialog = ({ data }) => {
     </>
   );
 };
+
+export function EventsAll() {
+  return Events(EventsDataType.ALL);
+}
+
+export function EventsLatest() {
+  return Events(EventsDataType.LATEST);
+}
