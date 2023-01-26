@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import queryString from 'query-string';
 import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import { Box, Card, CardContent, CardHeader, IconButton, Link, Tooltip, Typography } from '@mui/material';
@@ -9,6 +11,7 @@ import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
 import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
+import { filterObjectByKeys } from '../../utils/helpers';
 
 const headCells = [
   {
@@ -20,7 +23,13 @@ const headCells = [
   {
     id: 'status',
     label: 'Status',
-    cellWidth: '6rem',
+    cellWidth: '4rem',
+    alignContent: 'left',
+  },
+  {
+    id: 'version',
+    label: 'Version',
+    cellWidth: '4rem',
     alignContent: 'left',
   },
   {
@@ -62,13 +71,34 @@ const headCells = [
 ];
 
 export default function ConnectedServers() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [queryConfig, setQueryConfig] = useState({
     page: 1,
     cursor: null,
     limit: 20,
+    ...filterObjectByKeys(
+      queryString.parse(searchParams.toString(), {
+        parseNumbers: true,
+        parseBooleans: true,
+      }),
+      ['page', 'limit'],
+    ),
   });
   const [resetHostConnectionError] = useResetHostConnectionErrorMutation();
   const { data: response, isFetching, refetch } = useGetConnectedHostsQuery(queryConfig, { refetchOnMountOrArgChange: true });
+
+  useEffect(() => {
+    setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
+  }, [queryConfig]);
+
+  useEffect(() => {
+    if (!response) {
+      return;
+    }
+    if (queryConfig.page > response.meta.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: response.meta.lastPage }));
+    }
+  }, [response]);
 
   const rows = useMemo(() => {
     const hosts = response?.data || [];
@@ -92,6 +122,11 @@ export default function ConnectedServers() {
             <PublishedWithChangesOutlinedIcon color="success" />
           </Tooltip>
         )) ||
+        (host.status === 'excluded' && (
+          <Tooltip title={host.error || 'Server is not on a whitelist'}>
+            <CloseOutlinedIcon color="info" />
+          </Tooltip>
+        )) ||
         (host.status === 'failure' && (
           <Tooltip title={host.error || 'Failure'}>
             <CloseOutlinedIcon color="error" />
@@ -107,9 +142,18 @@ export default function ConnectedServers() {
             <SyncOutlinedIcon color="info" />
           </Tooltip>
         )),
+      version: host.infoJson?.version || 'no data',
       countOfError: (
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifyFlexStart}`}>
-          <Typography variant="body2">{host.connectionErrorCount}</Typography>
+          <Tooltip
+            title={
+              host.lastSynchronizationAttempt
+                ? 'Last synchronization attempt: ' + new Date(host.lastSynchronizationAttempt).toLocaleString()
+                : ''
+            }
+          >
+            <Typography variant="body2">{host.connectionErrorCount}</Typography>
+          </Tooltip>
           {Number(host.connectionErrorCount) > 0 && (
             <Tooltip title="Reset counter">
               <IconButton sx={{ ml: 2 }} size="small" color="secondary" onClick={() => onResetCounterClick(host.id)}>
@@ -132,7 +176,7 @@ export default function ConnectedServers() {
   const handleTableChanges = (event) => {
     setQueryConfig((prevState) => ({
       ...prevState,
-      cursor: response?.cursor || null,
+      cursor: event.page === 1 ? null : response?.meta.cursor,
       page: event.page,
       limit: event.rowsPerPage,
     }));
@@ -147,10 +191,11 @@ export default function ConnectedServers() {
           rows={rows} // array of objects { id: (uniq, required), key: (must be same of cell id) value }
           onTableChange={handleTableChanges}
           isDataLoading={isFetching}
-          defaultSortBy="name" //(must be same of cell id)
           paginationParams={{
-            limit: queryConfig.limit,
-            count: response?.total || 0,
+            page: (queryConfig.page > response?.meta.lastPage ? response?.meta.lastPage : response?.meta.currentPage) || queryConfig.page,
+            lastPage: response?.meta.lastPage || 1,
+            rowsPerPage: queryConfig.limit || 20,
+            count: response?.meta.total || 0,
             showFirstButton: true,
             showLastButton: true,
           }}

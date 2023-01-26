@@ -34,6 +34,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
@@ -41,6 +42,7 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import commonStyles from '../../styles/commonStyles.scss';
+import { useSkipFirstRenderEffect } from '../../hooks';
 
 const sortByModel = (model, property) => (a, b) => {
   let ai = model.indexOf(a[property]);
@@ -48,6 +50,17 @@ const sortByModel = (model, property) => (a, b) => {
   if (ai === -1) ai = 999;
   if (bi === -1) bi = 999;
   return ai - bi;
+};
+
+const checkNull = (obj) => {
+  if (!obj) return null;
+  const result = { ...obj };
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === null) {
+      delete result[key];
+    }
+  });
+  return result;
 };
 
 const renderSkeletons = (columns, rowsPerPage, rowHeight, rowsCount) => {
@@ -235,58 +248,65 @@ const FilteringInformationBox = ({
     : [];
 
   return (
-    <Box sx={{ mb: 2 }}>
-      {customFiltersEl.length > 0 && (
-        <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignBaseline}`}>
-          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`} sx={{ mr: 2.5 }}>
-            <FilterAltOutlinedIcon sx={{ mr: 1 }} />
-            <Typography variant="h3" component="h3">
-              Filter:
-            </Typography>
+    (!!Object.keys(tableFilters).length || !!Object.keys(customFilters).length || !!customFiltersEl.length) && (
+      <>
+        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+          <FilterAltOutlinedIcon sx={{ mr: 1 }} />
+          <Typography variant="h3" component="h3">
+            Filter:
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={onRequestResetFilters}
+            disabled={!Object.keys(tableFilters).length && !Object.keys(customFilters).length}
+            sx={{ ml: 'auto', '&[disabled]': { color: 'error.light', borderColor: 'error.light' } }}
+            startIcon={<FilterListOffIcon />}
+          >
+            Reset filters
+          </Button>
+        </Box>
+        {customFiltersEl.length > 0 && (
+          <Box className={`${commonStyles.flex} ${commonStyles.flexWrap} ${commonStyles.alignBaseline}`}>
+            {customFiltersEl.map((FilterElement, idx) => (
+              <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} customFilters={customFilters} />
+            ))}
           </Box>
-          {customFiltersEl.map((FilterElement, idx) => (
-            <FilterElement key={idx} customFiltersHandler={onRequestCustomFilter} customFilters={customFilters} />
-          ))}
-          <IconButton disabled={Object.keys(customFilters).length === 0} color="error" onClick={onRequestResetFilters}>
-            <Tooltip title="Reset filters">
-              <FilterListOffIcon />
-            </Tooltip>
-          </IconButton>
-        </Box>
-      )}
-      {!!chipsByText.length && (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
-            By text:
-          </Typography>
-          <List>{chipsByText}</List>
-        </Box>
-      )}
-      {!!chipsByRange.length && (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
-            By range:
-          </Typography>
-          <List>{chipsByRange}</List>
-        </Box>
-      )}
-      {!!chipsByDateRange.length && (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
-            By date range:
-          </Typography>
-          <List>{chipsByDateRange}</List>
-        </Box>
-      )}
-      {!!chipsBySelect.length && (
-        <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-          <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
-            By select:
-          </Typography>
-          <List>{chipsBySelect}</List>
-        </Box>
-      )}
-    </Box>
+        )}
+        {!!chipsByText.length && (
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+              By text:
+            </Typography>
+            <List>{chipsByText}</List>
+          </Box>
+        )}
+        {!!chipsByRange.length && (
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+              By range:
+            </Typography>
+            <List>{chipsByRange}</List>
+          </Box>
+        )}
+        {!!chipsByDateRange.length && (
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+              By date range:
+            </Typography>
+            <List>{chipsByDateRange}</List>
+          </Box>
+        )}
+        {!!chipsBySelect.length && (
+          <Box className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            <Typography sx={{ whiteSpace: 'nowrap' }} variant="body1">
+              By select:
+            </Typography>
+            <List>{chipsBySelect}</List>
+          </Box>
+        )}
+      </>
+    )
   );
 };
 
@@ -753,8 +773,11 @@ const EnhancedTableHead = ({
 
 export default function TableData({
   multiSort = false,
-  defaultOrderBy = undefined,
-  defaultFilterBy = undefined,
+  defaultParams = {
+    orderBy: null,
+    customFilters: null,
+    tableFilters: null,
+  },
   headCells,
   rows,
   onTableChange,
@@ -767,12 +790,59 @@ export default function TableData({
   const [columnsPinnedToLeftIds, setColumnsPinnedToLeftIds] = useState(
     headCells.filter((cell) => cell.pinnedToLeft).map((cell) => cell.id),
   );
-  const [orderBy, setOrderBy] = useState(defaultOrderBy || {});
-  const [tableFilters, setTableFilters] = useState(defaultFilterBy || {});
-  const [customFilters, setCustomFilters] = useState(defaultFilterBy || {});
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(paginationParams.limit);
+  const [orderBy, setOrderBy] = useState(defaultParams.orderBy || {});
+  const [tableFilters, setTableFilters] = useState(checkNull(defaultParams.tableFilters) || {});
+  const [customFilters, setCustomFilters] = useState(checkNull(defaultParams.customFilters) || {});
+  const [page, setPage] = useState(Number(paginationParams.page - 1));
+  const [rowsPerPage, setRowsPerPage] = useState(Number(paginationParams.rowsPerPage));
+  const rowsPerPagePaginationOptions = [rowsPerPage, 20, 50, 100].filter((el, idx, self) => self.indexOf(el) === idx).sort((a, b) => a - b);
   const rowRef = useRef(null);
+  const sortableColumns = headCells.filter((cell) => cell.sortable).map((cell) => cell.id);
+
+  useEffect(() => {
+    if (isNaN(page)) {
+      setPage(0);
+    }
+    if (page < 0) {
+      setPage(0);
+    }
+    if (isNaN(rowsPerPage)) {
+      setRowsPerPage(20);
+    }
+    if (rowsPerPage < 0) {
+      setRowsPerPage(20);
+    }
+    if (Object.keys(orderBy).length) {
+      setOrderBy((prevState) => {
+        const result = { ...prevState };
+        Object.entries(orderBy).forEach(([order, direction]) => {
+          if (!sortableColumns.includes(order)) {
+            delete result[order];
+          }
+
+          if (direction !== 'asc' && direction !== 'desc') {
+            delete result[order];
+          }
+        });
+        return result;
+      });
+    }
+  }, []);
+
+  useSkipFirstRenderEffect(() => {
+    onTableChange({
+      orderBy,
+      tableFilters,
+      customFilters,
+      page: page + 1,
+      rowsPerPage,
+    });
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
+  }, [orderBy, page, tableFilters, customFilters, rowsPerPage]);
 
   const rowHeight = useMemo(() => {
     return rowRef.current?.clientHeight;
@@ -803,21 +873,6 @@ export default function TableData({
         ),
     [headCells, rows],
   );
-
-  useEffect(() => {
-    onTableChange({
-      orderBy,
-      tableFilters,
-      customFilters,
-      page: page + 1,
-      rowsPerPage,
-    });
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
-  }, [orderBy, page, tableFilters, customFilters, rowsPerPage]);
 
   const handleRequestSort = (event, property) => {
     setOrderBy((prevState) => {
@@ -944,6 +999,7 @@ export default function TableData({
 
   const resetFilters = () => {
     setCustomFilters({});
+    setTableFilters({});
     setPage(0);
   };
 
@@ -974,6 +1030,7 @@ export default function TableData({
         onRequestCustomFilter={handleRequestCustomFilter}
         onRequestResetFilters={resetFilters}
         headCells={columns}
+        orderBy={orderBy}
         tableFilters={tableFilters}
         customFilters={customFilters}
         setFilterBy={setTableFilters}
@@ -1057,18 +1114,25 @@ export default function TableData({
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        sx={{ overflow: 'visible', marginTop: 'auto' }}
-        component="div"
-        onPageChange={handleChangePage}
-        page={page}
-        count={paginationParams.count || rows.length}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        rowsPerPageOptions={[20, 50, 100]}
-        showFirstButton={paginationParams.showFirstButton || undefined}
-        showLastButton={paginationParams.showLastButton || undefined}
-      />
+      {!isDataLoading && !rows.length && (
+        <Typography align="center" variant="h2" color="info.main" sx={{ mt: 4, mb: 4 }}>
+          NO RESULTS
+        </Typography>
+      )}
+      {!isDataLoading && (
+        <TablePagination
+          sx={{ overflow: 'visible', marginTop: 'auto' }}
+          component="div"
+          onPageChange={handleChangePage}
+          page={paginationParams.count <= 0 ? 0 : page > paginationParams.lastPage ? paginationParams.lastPage - 1 : page}
+          count={paginationParams.count || rows.length}
+          rowsPerPage={rowsPerPage <= 0 ? 1 : rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={rowsPerPagePaginationOptions}
+          showFirstButton={paginationParams.showFirstButton || undefined}
+          showLastButton={paginationParams.showLastButton || undefined}
+        />
+      )}
     </>
   );
 }

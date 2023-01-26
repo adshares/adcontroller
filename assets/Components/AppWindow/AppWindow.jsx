@@ -64,7 +64,7 @@ function GlobalNotificationsWrapper() {
   return <></>;
 }
 
-export default function AppWindow({ children }) {
+export default function AppWindow({ children, sx }) {
   const { showNotification } = useSelector(globalNotificationsSelectors.getGlobalNotificationState);
   const snackBarRef = useRef(null);
   const dispatch = useDispatch();
@@ -85,7 +85,7 @@ export default function AppWindow({ children }) {
         </IconButton>
       )}
     >
-      <Box className={styles.container}>
+      <Box className={styles.container} sx={sx}>
         {children}
         <GlobalNotificationsWrapper />
       </Box>

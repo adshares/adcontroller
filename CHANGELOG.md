@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.4] - 2023-01-26
+### Added
+- Opportunity to sort and filter tables in query parameters
+- Setting creative changing period
+- Load server event types
+- Highlighting servers which are not whitelisted
+- Connected server's version and date of last synchronization attempt
+- Possibility to grant user administrator privileges
+### Fixed
+- Height styles in tables
+- Pagination in tables
+- Displaying wallet address in tables
+- API error messages with host (no localhost)
+- Rejected domains are part of supply side
+- License read
+
 ## [1.2.3] - 2022-12-19
 ### Fixed
 - Agency action menu
@@ -68,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.3...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.4...develop
+[1.2.4]: https://github.com/adshares/adcontroller/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/adshares/adcontroller/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/adshares/adcontroller/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/adshares/adcontroller/compare/v1.2.0...v1.2.1

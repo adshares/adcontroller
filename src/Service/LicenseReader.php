@@ -20,6 +20,9 @@ class LicenseReader
     ) {
     }
 
+    /**
+     * @throws OutdatedLicense
+     */
     public function read(string $licenseKey): License
     {
         try {
@@ -43,7 +46,7 @@ class LicenseReader
 
         if (!$license->isValid()) {
             $this->logger->debug('License is not valid');
-            throw new OutdatedLicense();
+            throw new OutdatedLicense('License expired');
         }
 
         return $license;

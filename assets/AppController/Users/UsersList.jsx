@@ -1,5 +1,7 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import authSelectors from '../../redux/auth/authSelectors';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import {
   useAddUserMutation,
@@ -12,6 +14,7 @@ import {
   useGetUsersListQuery,
   useGrantAdvertisingMutation,
   useGrantPublishingMutation,
+  useSwitchToAdminMutation,
   useSwitchToAgencyMutation,
   useSwitchToModeratorMutation,
   useSwitchToRegularMutation,
@@ -19,8 +22,10 @@ import {
 } from '../../redux/monitoring/monitoringApi';
 import { updateUserDataReducer } from '../../redux/monitoring/monitoringSlice';
 import { useDebounce, useForm, useSkipFirstRenderEffect } from '../../hooks';
-import { compareArrays, formatMoney } from '../../utils/helpers';
+import { compareArrays, filterObjectByKeys, formatMoney } from '../../utils/helpers';
+import queryString from 'query-string';
 import TableData from '../../Components/TableData/TableData';
+import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import Spinner from '../../Components/Spinner/Spinner';
 import {
   Box,
@@ -55,8 +60,6 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import InfoIcon from '@mui/icons-material/Info';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
-import ListItemText from '@mui/material/ListItemText';
-import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 
 const headCells = [
   {
@@ -107,7 +110,7 @@ const headCells = [
   {
     id: 'campaignCount',
     label: 'Campaigns',
-    cellWidth: '9rem',
+    cellWidth: '10.5rem',
     alignContent: 'left',
     sortable: true,
   },
@@ -141,20 +144,54 @@ const headCells = [
   },
 ];
 
+const PAGE = 'page';
+const LIMIT = 'limit';
+const ORDER_BY = 'orderBy';
+const FILTER_QUERY = 'filter[query]';
+const FILTER_ROLE = 'filter[role]';
+const FILTER_EMAIL_CONFIRMED = 'filter[emailConfirmed]';
+const FILTER_ADMIN_CONFIRMED = 'filter[adminConfirmed]';
+const ROLE_ADMIN = 'admin';
+const ROLE_MODERATOR = 'moderator';
+const ROLE_AGENCY = 'agency';
+const ROLE_ADVERTISER = 'advertiser';
+const ROLE_PUBLISHER = 'publisher';
+const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
+const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
+const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
+
 export default function UsersList() {
-  const [queryConfig, setQueryConfig] = useState({
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    page: 1,
     limit: 20,
     cursor: null,
-    page: 1,
     orderBy: null,
-    'filter[query]': null,
-    'filter[role]': null,
-    'filter[emailConfirmed]': null,
-    'filter[adminConfirmed]': null,
-  });
-  const users = useSelector(monitoringSelectors.getUsers);
+    ...filterObjectByKeys(
+      queryString.parse(searchParams.toString(), {
+        parseNumbers: true,
+        parseBooleans: true,
+      }),
+      possibleQueryParams,
+    ),
+  }));
   const { isFetching, refetch } = useGetUsersListQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const currentUser = useSelector(authSelectors.getUser);
+  const users = useSelector(monitoringSelectors.getUsers);
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+
+  useEffect(() => {
+    setSearchParams(queryString.stringify(queryConfig, { skipNull: true }));
+  }, [queryConfig]);
+
+  useEffect(() => {
+    if (!users) {
+      return;
+    }
+    if (queryConfig.page > users.meta.lastPage) {
+      setQueryConfig((prevState) => ({ ...prevState, page: users.meta.lastPage }));
+    }
+  }, [users]);
 
   const refetchWithoutCursor = () => {
     setQueryConfig((prevState) => ({ ...prevState, cursor: null }));
@@ -171,26 +208,22 @@ export default function UsersList() {
       }
       return entries.map((param) => param.join(':')).join(',');
     };
-    setQueryConfig((prevState) => ({
-      ...prevState,
+    setQueryConfig({
+      cursor: event.page === 1 ? null : users?.meta.cursor,
       limit: event.rowsPerPage,
-      cursor: event.page === 1 ? null : users.cursor,
       page: event.page,
       orderBy: createOrderByParams(event.orderBy),
-      'filter[query]': event.customFilters.query || null,
-      'filter[role]': event.customFilters.role || null,
-      'filter[emailConfirmed]': JSON.stringify(event.customFilters.emailConfirmed) || null,
-      'filter[adminConfirmed]': JSON.stringify(event.customFilters.adminConfirmed) || null,
-    }));
+      ...event.customFilters,
+    });
   };
 
   const parseRoles = useCallback(
     (roles) => {
-      const isAdmin = roles.includes('admin');
-      const isModerator = roles.includes('moderator');
-      const isAgency = roles.includes('agency');
-      const isAdvertiser = roles.includes('advertiser');
-      const isPublisher = roles.includes('publisher');
+      const isAdmin = roles.includes(ROLE_ADMIN);
+      const isModerator = roles.includes(ROLE_MODERATOR);
+      const isAgency = roles.includes(ROLE_AGENCY);
+      const isAdvertiser = roles.includes(ROLE_ADVERTISER);
+      const isPublisher = roles.includes(ROLE_PUBLISHER);
       if (isAdmin) {
         return 'Admin';
       } else if (isModerator) {
@@ -237,22 +270,15 @@ export default function UsersList() {
           campaignCount: user.campaignCount,
           siteCount: user.siteCount,
           lastActiveAt: user.lastActiveAt && new Date(user.lastActiveAt).toLocaleString(),
-          actions: <UserActionsMenu user={user} actions={{ refetch }} />,
+          actions: <UserActionsMenu currentUser={currentUser} user={user} actions={{ refetch }} />,
         }))
       : [];
   }, [users]);
-
   return (
     <>
       <Card width="full">
         <Box className={`${commonStyles.flex} ${commonStyles.alignCenter} ${commonStyles.justifySpaceBetween}`}>
-          <CardHeader
-            titleTypographyProps={{
-              component: 'h2',
-              variant: 'h2',
-            }}
-            title="Users"
-          />
+          <CardHeader title="Users" />
           <Button
             onClick={() => setAddUserDialogOpen((prevState) => !prevState)}
             variant="contained"
@@ -270,10 +296,16 @@ export default function UsersList() {
             isDataLoading={isFetching}
             multiSort
             paginationParams={{
-              limit: queryConfig.limit,
-              count: users?.total || 0,
+              page: (queryConfig[PAGE] > users?.meta.lastPage ? users?.meta.lastPage : users?.meta.currentPage) || queryConfig[PAGE],
+              lastPage: users?.meta.lastPage || 1,
+              rowsPerPage: queryConfig[LIMIT] || 20,
+              count: users?.meta.total || 0,
               showFirstButton: true,
               showLastButton: true,
+            }}
+            defaultParams={{
+              customFilters: filterObjectByKeys(queryConfig, customFilterQueryParams),
+              orderBy: queryConfig[ORDER_BY] && Object.fromEntries(queryConfig[ORDER_BY].split(',').map((entry) => entry.split(':'))),
             }}
             customFiltersEl={[FilterByEmail, FilterByRole, FilterByEmailStatus, FilterByAccountStatus]}
           />
@@ -284,7 +316,7 @@ export default function UsersList() {
   );
 }
 
-const UserActionsMenu = ({ user, actions }) => {
+const UserActionsMenu = ({ currentUser, user, actions }) => {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -295,6 +327,7 @@ const UserActionsMenu = ({ user, actions }) => {
   const [deletionConfirmed, setDeletionConfirmed] = useState(false);
   const [banReason, setBanReason] = useState('');
   const [confirmUser, { isLoading: confirmUserPending }] = useConfirmUserMutation();
+  const [switchToAdmin, { isLoading: switchToAdminPending }] = useSwitchToAdminMutation();
   const [switchToModerator, { isLoading: switchToModeratorPending }] = useSwitchToModeratorMutation();
   const [switchToAgency, { isLoading: switchToAgencyPending }] = useSwitchToAgencyMutation();
   const [switchToRegular, { isLoading: switchToRegularPending }] = useSwitchToRegularMutation();
@@ -305,15 +338,18 @@ const UserActionsMenu = ({ user, actions }) => {
   const [banUser, { isLoading: banUserPending }] = useBanUserMutation();
   const [unbanUser, { isLoading: unbanUserPending }] = useUnbanUserMutation();
   const [deleteUser, { isLoading: deleteUserPending }] = useDeleteUserMutation();
-  const isAdmin = user.roles.includes('admin');
-  const isModerator = user.roles.includes('moderator');
-  const isAgency = user.roles.includes('agency');
-  const isAdvertiser = user.roles.includes('advertiser');
-  const isPublisher = user.roles.includes('publisher');
+  const isAdmin = user.roles.includes(ROLE_ADMIN);
+  const isModerator = user.roles.includes(ROLE_MODERATOR);
+  const isAgency = user.roles.includes(ROLE_AGENCY);
+  const isAdvertiser = user.roles.includes(ROLE_ADVERTISER);
+  const isPublisher = user.roles.includes(ROLE_PUBLISHER);
+  const isRegularUser = !isAdmin && !isModerator && !isAgency;
+  const isSelfRow = currentUser.name === user.email;
 
   const isActionPending = useMemo(() => {
     return (
       confirmUserPending ||
+      switchToAdminPending ||
       switchToModeratorPending ||
       switchToAgencyPending ||
       switchToRegularPending ||
@@ -327,6 +363,7 @@ const UserActionsMenu = ({ user, actions }) => {
     );
   }, [
     confirmUserPending,
+    switchToAdminPending,
     switchToModeratorPending,
     switchToAgencyPending,
     switchToRegularPending,
@@ -341,6 +378,13 @@ const UserActionsMenu = ({ user, actions }) => {
 
   const handleConfirmUser = async (id) => {
     const response = await confirmUser(id);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(updateUserDataReducer(response.data));
+    }
+  };
+
+  const handleSwitchToAdmin = async (id) => {
+    const response = await switchToAdmin(id);
     if (response.data && response.data.message === 'OK') {
       dispatch(updateUserDataReducer(response.data));
     }
@@ -426,7 +470,7 @@ const UserActionsMenu = ({ user, actions }) => {
 
   return (
     <>
-      <IconButton disabled={isActionPending || isAdmin} onClick={handleMenuOpen} color="black">
+      <IconButton disabled={isActionPending} onClick={handleMenuOpen} color="black">
         {isActionPending ? <Spinner size={24} /> : <MoreVertIcon size="small" />}
       </IconButton>
       <Menu
@@ -454,7 +498,18 @@ const UserActionsMenu = ({ user, actions }) => {
             Confirm
           </MenuItem>
         )}
-        {!isAdmin && !isModerator && !isAgency && !user.isBanned && (
+        {isRegularUser && !user.isBanned && (
+          <MenuItem
+            sx={{ color: 'warning.main' }}
+            onClick={() => {
+              handleSwitchToAdmin(user.id);
+              handleMenuClose();
+            }}
+          >
+            Switch to admin
+          </MenuItem>
+        )}
+        {isRegularUser && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
@@ -465,8 +520,9 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to moderator
           </MenuItem>
         )}
-        {!isAdmin && !isModerator && !isAgency && !user.isBanned && (
+        {isRegularUser && !user.isBanned && (
           <MenuItem
+            sx={{ color: 'warning.main' }}
             onClick={() => {
               handleSwitchToAgency(user.id);
               handleMenuClose();
@@ -475,7 +531,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to agency
           </MenuItem>
         )}
-        {!isAdmin && (isModerator || isAgency) && !user.isBanned && (
+        {!isSelfRow && !isRegularUser && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
@@ -486,7 +542,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Switch to regular
           </MenuItem>
         )}
-        {!isAdmin && !isAdvertiser && !isAgency && !user.isBanned && (
+        {isRegularUser && !isAdvertiser && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantAdvertising(user.id);
@@ -496,7 +552,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow advertising
           </MenuItem>
         )}
-        {!isAdmin && isAdvertiser && !isAgency && !user.isBanned && (
+        {isRegularUser && isAdvertiser && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyAdvertising(user.id);
@@ -506,7 +562,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Deny advertising
           </MenuItem>
         )}
-        {!isAdmin && !isPublisher && !isAgency && !user.isBanned && (
+        {isRegularUser && !isPublisher && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleGrantPublishing(user.id);
@@ -516,7 +572,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Allow publishing
           </MenuItem>
         )}
-        {!isAdmin && isPublisher && !isAgency && !user.isBanned && (
+        {isRegularUser && isPublisher && !user.isBanned && (
           <MenuItem
             onClick={() => {
               handleDenyPublishing(user.id);
@@ -526,7 +582,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Deny publishing
           </MenuItem>
         )}
-        {!isAdmin && !user.isBanned && (
+        {!user.isBanned && (
           <MenuItem
             onClick={() => {
               setEditUserDialog((prevState) => !prevState);
@@ -536,7 +592,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Edit user
           </MenuItem>
         )}
-        {!isAdmin && !user.isBanned && (
+        {!isSelfRow && !user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -547,7 +603,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Ban user
           </MenuItem>
         )}
-        {!isAdmin && user.isBanned && (
+        {!isSelfRow && user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -558,7 +614,7 @@ const UserActionsMenu = ({ user, actions }) => {
             Unban user
           </MenuItem>
         )}
-        {!isAdmin && (
+        {!isSelfRow && user.isBanned && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
@@ -708,7 +764,6 @@ const UserActionsMenu = ({ user, actions }) => {
 };
 
 const UserDialog = ({ open, setOpen, mode, user, actions }) => {
-  const possibleRoles = ['moderator', 'agency', 'advertiser', 'publisher'];
   const dispatch = useDispatch();
   const form = useForm({
     initialFields: {
@@ -731,12 +786,8 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
     form.changeValidationRules({ wallet: [`${form.fields.network}Wallet`] });
   }, [form.fields.network]);
 
+  const isModeAdd = useMemo(() => 'add' === mode, [mode]);
   const isRoleWasChanged = useMemo(() => !compareArrays(role.initialState, role.currentState), [role]);
-
-  const handleRolePick = (e) => {
-    const { value } = e.target;
-    setRole((prevState) => ({ ...prevState, currentState: typeof value === 'string' ? value.split(',') : value }));
-  };
 
   const resetForm = () => {
     form.resetForm();
@@ -785,7 +836,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
   return (
     <>
       <Dialog fullWidth maxWidth="xs" open={open} onClose={() => onCloseClick()}>
-        <DialogTitle>{mode === 'add' ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
+        <DialogTitle>{isModeAdd ? 'Add new user' : `Edit user ${user.email}`}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -805,25 +856,6 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
               control={<Checkbox checked={forcePasswordChange} onChange={() => setForcePasswordChange((prevState) => !prevState)} />}
             />
           </Collapse>
-          <FormControl fullWidth customvariant="highLabel" color="secondary">
-            <InputLabel id="rolesPickerLabel">Roles</InputLabel>
-            <Select
-              labelId="rolesPickerLabel"
-              id="rolesPickerSelect"
-              multiple
-              value={role.currentState}
-              onChange={handleRolePick}
-              input={<OutlinedInput label="Roles" />}
-              renderValue={(selected) => selected.map((el) => el.charAt(0).toUpperCase() + el.slice(1)).join(', ')}
-            >
-              {possibleRoles.map((el) => (
-                <MenuItem key={el} value={el}>
-                  <Checkbox checked={role.currentState.indexOf(el) > -1} />
-                  <ListItemText primary={el.charAt(0).toUpperCase() + el.slice(1)} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
           <FormControl fullWidth customvariant="highLabel" color="secondary">
             <InputLabel id="networkLabel">Network</InputLabel>
             <Select
@@ -872,7 +904,7 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
       </Dialog>
 
       <Dialog fullWidth maxWidth="xs" open={infoDialogOpen}>
-        <DialogTitle>User was {mode === 'add' ? 'added' : 'edited'}</DialogTitle>
+        <DialogTitle>User was {isModeAdd ? 'added' : 'edited'}</DialogTitle>
         <DialogContent>
           {addUserData && addUserData.data.email && <Typography variant="body1">Email: {addUserData.data.email}</Typography>}
           {addUserData && addUserData.data.connectedWallet.address && (
@@ -898,26 +930,26 @@ const UserDialog = ({ open, setOpen, mode, user, actions }) => {
 };
 
 const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
-  const [query, setQuery] = useState(customFilters.query || '');
+  const [query, setQuery] = useState(customFilters[FILTER_QUERY] || '');
   const debouncedQuery = useDebounce(query, 400);
 
   useSkipFirstRenderEffect(() => {
-    customFiltersHandler({ query });
+    customFiltersHandler({ [FILTER_QUERY]: query });
   }, [debouncedQuery]);
 
   useSkipFirstRenderEffect(() => {
-    if (customFilters.query === query) {
+    if (customFilters[FILTER_QUERY] === query) {
       return;
     }
-    setQuery(customFilters.query || '');
-  }, [customFilters.query]);
+    setQuery(customFilters[FILTER_QUERY] || '');
+  }, [customFilters[FILTER_QUERY]]);
 
   return (
-    <FormControl sx={{ mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByQueryLabel">By email or domain</InputLabel>
       <OutlinedInput
         color="secondary"
-        name="query"
+        name={FILTER_QUERY}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         inputProps={{ autoComplete: 'off' }}
@@ -928,17 +960,17 @@ const FilterByEmail = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByRole = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ role: e.target.value || null });
+    customFiltersHandler({ [FILTER_ROLE]: e.target.value || null });
   };
 
   return (
-    <FormControl sx={{ minWidth: '10rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '10rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByRoleLabel">By user's role</InputLabel>
       <Select
         color="secondary"
         labelId="filterByRoleLabel"
         id="filterByRoleSelect"
-        value={customFilters.role || ''}
+        value={customFilters.hasOwnProperty(FILTER_ROLE) ? customFilters[FILTER_ROLE] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -951,11 +983,11 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
         <MenuItem value="">
           <em>All</em>
         </MenuItem>
-        <MenuItem value={'admin'}>Admin</MenuItem>
-        <MenuItem value={'agency'}>Agency</MenuItem>
-        <MenuItem value={'moderator'}>Moderator</MenuItem>
-        <MenuItem value={'advertiser'}>Advertiser</MenuItem>
-        <MenuItem value={'publisher'}>Publisher</MenuItem>
+        <MenuItem value={ROLE_ADMIN}>Admin</MenuItem>
+        <MenuItem value={ROLE_AGENCY}>Agency</MenuItem>
+        <MenuItem value={ROLE_MODERATOR}>Moderator</MenuItem>
+        <MenuItem value={ROLE_ADVERTISER}>Advertiser</MenuItem>
+        <MenuItem value={ROLE_PUBLISHER}>Publisher</MenuItem>
       </Select>
     </FormControl>
   );
@@ -963,17 +995,17 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ emailConfirmed: e.target.value === '' ? null : e.target.value });
+    customFiltersHandler({ [FILTER_EMAIL_CONFIRMED]: e.target.value === '' ? null : e.target.value });
   };
 
   return (
-    <FormControl sx={{ minWidth: '13rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '13rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByEmailStatusLabel">By email status</InputLabel>
       <Select
         color="secondary"
         labelId="filterByEmailStatusLabel"
         id="filterByEmailStatusSelect"
-        value={customFilters.hasOwnProperty('emailConfirmed') ? customFilters.emailConfirmed : ''}
+        value={customFilters.hasOwnProperty(FILTER_EMAIL_CONFIRMED) ? customFilters[FILTER_EMAIL_CONFIRMED] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {
@@ -995,17 +1027,17 @@ const FilterByEmailStatus = ({ customFiltersHandler, customFilters }) => {
 
 const FilterByAccountStatus = ({ customFiltersHandler, customFilters }) => {
   const handleChange = (e) => {
-    customFiltersHandler({ adminConfirmed: e.target.value === '' ? null : e.target.value });
+    customFiltersHandler({ [FILTER_ADMIN_CONFIRMED]: e.target.value === '' ? null : e.target.value });
   };
 
   return (
-    <FormControl sx={{ minWidth: '14.5rem', mr: 3 }} customvariant="highLabel">
+    <FormControl sx={{ minWidth: '14.5rem', mr: 3, mt: 2 }} customvariant="highLabel">
       <InputLabel id="filterByAccountStatusLabel">By account status</InputLabel>
       <Select
         color="secondary"
         labelId="filterByAccountStatusLabel"
         id="filterByEmailStatusSelect"
-        value={customFilters.hasOwnProperty('adminConfirmed') ? customFilters.adminConfirmed : ''}
+        value={customFilters.hasOwnProperty(FILTER_ADMIN_CONFIRMED) ? customFilters[FILTER_ADMIN_CONFIRMED] : ''}
         onChange={handleChange}
         onClose={(e) => {
           if (!e.target.value) {

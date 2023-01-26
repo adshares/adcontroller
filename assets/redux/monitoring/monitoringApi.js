@@ -36,6 +36,14 @@ export const monitoringApi = createApi({
         };
       },
     }),
+    getEventTypes: builder.query({
+      query: () => {
+        return {
+          url: `/api/events/types`,
+          method: 'GET',
+        };
+      },
+    }),
     getUsersList: builder.query({
       query: (queryConfig) => {
         const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
@@ -48,6 +56,12 @@ export const monitoringApi = createApi({
     confirmUser: builder.mutation({
       query: (id) => ({
         url: `/api/users/${id}/confirm`,
+        method: 'PATCH',
+      }),
+    }),
+    switchToAdmin: builder.mutation({
+      query: (id) => ({
+        url: `/api/users/${id}/switchToAdmin`,
         method: 'PATCH',
       }),
     }),
@@ -134,8 +148,10 @@ export const {
   useGetConnectedHostsQuery,
   useResetHostConnectionErrorMutation,
   useGetEventsQuery,
+  useGetEventTypesQuery,
   useGetUsersListQuery,
   useConfirmUserMutation,
+  useSwitchToAdminMutation,
   useSwitchToModeratorMutation,
   useSwitchToAgencyMutation,
   useSwitchToRegularMutation,
