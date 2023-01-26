@@ -29,7 +29,8 @@ import Panel from './General/Panel';
 import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
 import ConnectedServers from './Network/ConnectedServers';
-import { EventsAll, EventsLatest } from './Events/Events';
+import { EventsAll } from './Events/Events';
+import Dashboard from './Dashboard/Dashboard';
 import UsersList from './Users/UsersList';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -63,7 +64,7 @@ const getAppModules = (currentUser) => {
     {
       name: 'Dashboard',
       path: '/dashboard',
-      component: EventsLatest,
+      component: Dashboard,
       icon: DashboardIcon,
     },
     {

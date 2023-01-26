@@ -7,27 +7,27 @@ import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/Insta
 import Spinner from '../../../Components/Spinner/Spinner';
 import { useCreateNotification } from '../../../hooks';
 
-const StatusTable = ({ stepData }) => {
+export const ServiceStatusTable = ({ data }) => {
   const fields = ['adserver', 'adpanel', 'aduser', 'adselect', 'adclassify', 'adpay', 'main.js'];
   return (
     <Table>
       <TableBody>
         {fields
-          .filter((field) => stepData.hasOwnProperty(field))
+          .filter((field) => data.hasOwnProperty(field))
           .map((field) => (
-            <TableRow key={stepData[field].module}>
+            <TableRow key={data[field].module}>
               <TableCell align="left">
-                <Typography variant="tableText1">{stepData[field].module}</Typography>
+                <Typography variant="tableText1">{data[field].module}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableText1">{stepData[field].version}</Typography>
+                <Typography variant="tableText1">{data[field].version}</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="tableText1">{stepData[field].url}</Typography>
+                <Typography variant="tableText1">{data[field].url}</Typography>
               </TableCell>
               <TableCell>
-                <Tooltip title={stepData[field].code}>
-                  <Icon>{stepData[field].code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
+                <Tooltip title={data[field].code}>
+                  <Icon>{data[field].code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
                 </Tooltip>
               </TableCell>
             </TableRow>
@@ -52,15 +52,7 @@ function Status({ handlePrevStep, step }) {
     try {
       setIsLoading(true);
       const response = await apiService.getCurrentStepData(step.path);
-      setStepData({
-        adclassify: response.adclassify,
-        adpanel: response.adpanel,
-        adpay: response.adpay,
-        adselect: response.adselect,
-        adserver: response.adserver,
-        aduser: response.aduser,
-        'main.js': response['main.js'],
-      });
+      setStepData(response);
     } catch (err) {
       createErrorNotification(err);
     } finally {
@@ -87,7 +79,7 @@ function Status({ handlePrevStep, step }) {
       onNextClick={handleSubmit}
       isLastCard
     >
-      {isLoading ? <Spinner /> : <StatusTable stepData={stepData} />}
+      {isLoading ? <Spinner /> : <ServiceStatusTable data={stepData} />}
     </InstallerStepWrapper>
   );
 }
