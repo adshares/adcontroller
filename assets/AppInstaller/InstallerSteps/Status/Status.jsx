@@ -7,51 +7,39 @@ import InstallerStepWrapper from '../../../Components/InstallerStepWrapper/Insta
 import Spinner from '../../../Components/Spinner/Spinner';
 import { useCreateNotification } from '../../../hooks';
 
+const StatusTable = ({ stepData }) => {
+  const fields = ['adserver', 'adpanel', 'aduser', 'adselect', 'adclassify', 'adpay', 'main.js'];
+  return (
+    <Table>
+      <TableBody>
+        {fields
+          .filter((field) => stepData.hasOwnProperty(field))
+          .map((field) => (
+            <TableRow key={stepData[field].module}>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData[field].module}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData[field].version}</Typography>
+              </TableCell>
+              <TableCell align="left">
+                <Typography variant="tableText1">{stepData[field].url}</Typography>
+              </TableCell>
+              <TableCell>
+                <Tooltip title={stepData[field].code}>
+                  <Icon>{stepData[field].code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+          ))}
+      </TableBody>
+    </Table>
+  );
+};
+
 function Status({ handlePrevStep, step }) {
   const [isLoading, setIsLoading] = useState(true);
   const [stepData, setStepData] = useState({
-    adclassify: {
-      module: null,
-      version: null,
-      url: null,
-      code: null,
-    },
-    adpanel: {
-      module: null,
-      version: null,
-      url: null,
-      code: null,
-    },
-    adpay: {
-      module: null,
-      version: null,
-      url: null,
-      code: null,
-    },
-    adselect: {
-      module: null,
-      version: null,
-      url: null,
-      code: null,
-    },
-    adserver: {
-      module: null,
-      version: null,
-      url: null,
-      code: null,
-    },
-    aduser: {
-      module: null,
-      version: null,
-      url: null,
-      code: null,
-    },
-    'main.js': {
-      module: null,
-      version: null,
-      url: null,
-      code: null,
-    },
     DataRequired: false,
   });
   const { createErrorNotification } = useCreateNotification();
@@ -99,126 +87,7 @@ function Status({ handlePrevStep, step }) {
       onNextClick={handleSubmit}
       isLastCard
     >
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <Table>
-          <TableBody>
-            <TableRow>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adserver.module}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adserver.version}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adserver.url}</Typography>
-              </TableCell>
-              <TableCell>
-                <Tooltip title={stepData.adserver.code}>
-                  <Icon>{stepData.adserver.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adpanel.module}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adpanel.version}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adpanel.url}</Typography>
-              </TableCell>
-              <TableCell>
-                <Tooltip title={stepData.adpanel.code}>
-                  <Icon>{stepData.adpanel.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.aduser.module}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.aduser.version}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.aduser.url}</Typography>
-              </TableCell>
-              <TableCell>
-                <Tooltip title={stepData.aduser.code}>
-                  <Icon>{stepData.aduser.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adselect.module}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adselect.version}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adselect.url}</Typography>
-              </TableCell>
-              <TableCell>
-                <Tooltip title={stepData.adselect.code}>
-                  <Icon>{stepData.adselect.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adclassify.module}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adclassify.version}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adclassify.url}</Typography>
-              </TableCell>
-              <TableCell>
-                <Tooltip title={stepData.adclassify.code}>
-                  <Icon>{stepData.adclassify.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adpay.module}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adpay.version}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData.adpay.url}</Typography>
-              </TableCell>
-              <TableCell>
-                <Tooltip title={stepData.adpay.code}>
-                  <Icon>{stepData.adpay.code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData['main.js'].module}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData['main.js'].version}</Typography>
-              </TableCell>
-              <TableCell align="left">
-                <Typography variant="tableText1">{stepData['main.js'].url}</Typography>
-              </TableCell>
-              <TableCell>
-                <Tooltip title={stepData['main.js'].code}>
-                  <Icon>{stepData['main.js'].code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      )}
+      {isLoading ? <Spinner /> : <StatusTable stepData={stepData} />}
     </InstallerStepWrapper>
   );
 }
