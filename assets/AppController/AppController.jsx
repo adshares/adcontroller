@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { loginRedirect } from '../utils/helpers';
@@ -50,141 +50,151 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import commonStyles from '../styles/commonStyles.scss';
 
-const appModules = [
-  {
-    name: 'Users',
-    icon: PeopleAltOutlinedIcon,
-    children: [
-      {
-        name: 'List of users',
-        path: '/users/list',
-        component: UsersList,
-        icon: FormatListBulletedOutlinedIcon,
-      },
-      {
-        name: 'Settings',
-        path: '/users/settings',
-        component: UsersSettings,
-        icon: SettingsOutlinedIcon,
-      },
-    ],
-  },
-  {
-    name: 'Demand',
-    icon: TrendingFlatIcon,
-    children: [
-      {
-        name: 'Settings',
-        path: '/demand/settings',
-        component: DemandSettings,
-        icon: SettingsOutlinedIcon,
-      },
-    ],
-  },
-  {
-    name: 'Supply',
-    icon: TrendingFlatIcon,
-    rotateIcon: '180deg',
-    children: [
-      {
-        name: 'Settings',
-        path: '/supply/settings',
-        component: SupplySettings,
-        icon: SettingsOutlinedIcon,
-      },
-      {
-        name: 'Rejected domains',
-        path: '/supply/rejected-domains',
-        component: RejectedDomains,
-        icon: CancelPresentationIcon,
-      },
-    ],
-  },
-  {
-    name: 'Network',
-    icon: SyncAltIcon,
-    children: [
-      {
-        name: 'Connected servers',
-        path: '/network/connected-servers',
-        component: ConnectedServers,
-        icon: LanOutlinedIcon,
-      },
-      {
-        name: 'Settings',
-        path: '/network/settings',
-        component: NetworkSettings,
-        icon: SettingsOutlinedIcon,
-      },
-    ],
-  },
-  {
-    name: 'Finance',
-    icon: AttachMoneyOutlinedIcon,
-    children: [
-      {
-        name: 'Wallet',
-        path: '/finance/wallet',
-        component: Wallet,
-        icon: AccountBalanceWalletOutlinedIcon,
-      },
-      {
-        name: 'Commissions',
-        path: '/finance/commissions',
-        component: Commissions,
-        icon: PercentIcon,
-      },
-    ],
-  },
-  {
-    name: 'General',
-    icon: SettingsOutlinedIcon,
-    children: [
-      {
-        name: 'Base',
-        path: '/base',
-        component: Base,
-        icon: InfoOutlinedIcon,
-      },
-      {
-        name: 'SMTP',
-        path: '/smtp',
-        component: SMTP,
-        icon: EmailOutlinedIcon,
-      },
-      {
-        name: 'License',
-        path: '/license',
-        component: License,
-        icon: VpnKeyOutlinedIcon,
-      },
-      {
-        name: 'Panel',
-        path: '/panel',
-        component: Panel,
-        icon: DisplaySettingsIcon,
-      },
-      {
-        name: 'Privacy & Terms',
-        path: '/terms',
-        component: Terms,
-        icon: PrivacyTipOutlinedIcon,
-      },
-    ],
-  },
-  {
-    name: 'AdClassifier',
-    path: '/adclassifier',
-    component: AdClassifier,
-    icon: DashboardIcon,
-  },
-  {
-    name: 'Events',
-    path: '/events',
-    component: Events,
-    icon: DashboardIcon,
-  },
-];
+const insertIf = (condition, element) => {
+  return condition ? element : [];
+};
+
+const getAppModules = (currentUser) => {
+  if (null === currentUser.roles) {
+    return [];
+  }
+  const isAdmin = currentUser.roles.includes('admin');
+  return [
+    {
+      name: 'Users',
+      icon: PeopleAltOutlinedIcon,
+      children: [
+        {
+          name: 'List of users',
+          path: '/users/list',
+          component: UsersList,
+          icon: FormatListBulletedOutlinedIcon,
+        },
+        ...insertIf(isAdmin, {
+          name: 'Settings',
+          path: '/users/settings',
+          component: UsersSettings,
+          icon: SettingsOutlinedIcon,
+        }),
+      ],
+    },
+    ...insertIf(isAdmin, {
+      name: 'Demand',
+      icon: TrendingFlatIcon,
+      children: [
+        {
+          name: 'Settings',
+          path: '/demand/settings',
+          component: DemandSettings,
+          icon: SettingsOutlinedIcon,
+        },
+      ],
+    }),
+    {
+      name: 'Supply',
+      icon: TrendingFlatIcon,
+      rotateIcon: '180deg',
+      children: [
+        ...insertIf(isAdmin, {
+          name: 'Settings',
+          path: '/supply/settings',
+          component: SupplySettings,
+          icon: SettingsOutlinedIcon,
+        }),
+        {
+          name: 'Rejected domains',
+          path: '/supply/rejected-domains',
+          component: RejectedDomains,
+          icon: CancelPresentationIcon,
+        },
+      ],
+    },
+    {
+      name: 'Network',
+      icon: SyncAltIcon,
+      children: [
+        {
+          name: 'Connected servers',
+          path: '/network/connected-servers',
+          component: ConnectedServers,
+          icon: LanOutlinedIcon,
+        },
+        ...insertIf(isAdmin, {
+          name: 'Settings',
+          path: '/network/settings',
+          component: NetworkSettings,
+          icon: SettingsOutlinedIcon,
+        }),
+      ],
+    },
+    ...insertIf(isAdmin, {
+      name: 'Finance',
+      icon: AttachMoneyOutlinedIcon,
+      children: [
+        {
+          name: 'Wallet',
+          path: '/finance/wallet',
+          component: Wallet,
+          icon: AccountBalanceWalletOutlinedIcon,
+        },
+        {
+          name: 'Commissions',
+          path: '/finance/commissions',
+          component: Commissions,
+          icon: PercentIcon,
+        },
+      ],
+    }),
+    ...insertIf(isAdmin, {
+      name: 'General',
+      icon: SettingsOutlinedIcon,
+      children: [
+        {
+          name: 'Base',
+          path: '/base',
+          component: Base,
+          icon: InfoOutlinedIcon,
+        },
+        {
+          name: 'SMTP',
+          path: '/smtp',
+          component: SMTP,
+          icon: EmailOutlinedIcon,
+        },
+        {
+          name: 'License',
+          path: '/license',
+          component: License,
+          icon: VpnKeyOutlinedIcon,
+        },
+        {
+          name: 'Panel',
+          path: '/panel',
+          component: Panel,
+          icon: DisplaySettingsIcon,
+        },
+        {
+          name: 'Privacy & Terms',
+          path: '/terms',
+          component: Terms,
+          icon: PrivacyTipOutlinedIcon,
+        },
+      ],
+    }),
+    ...insertIf(isAdmin, {
+      name: 'AdClassifier',
+      path: '/adclassifier',
+      component: AdClassifier,
+      icon: DashboardIcon,
+    }),
+    {
+      name: 'Events',
+      path: '/events',
+      component: Events,
+      icon: DashboardIcon,
+    },
+  ];
+};
 
 const getAppPages = (appModules) => {
   const pages = [];
@@ -205,7 +215,8 @@ function AppController() {
   const currentUser = useSelector(authSelectors.getUser);
   const { isSynchronizationRequired, isDataSynchronized, changedModules } = useSelector(synchronizationSelectors.getSynchronizationData);
   const [showSideMenu, toggleSideMenu] = useState(true);
-  const pages = getAppPages(appModules);
+  const appModules = useMemo(() => getAppModules(currentUser), [currentUser]);
+  const pages = useMemo(() => getAppPages(appModules), [appModules]);
   const [synchronizeConfig, { isFetching: isSyncInProgress }] = useLazySynchronizeConfigQuery();
   const [getAppConfig, { isFetching: isAppDataLoading, isSuccess: isAppDataLoadingSuccess }] = useLazyGetAppConfigQuery();
 
