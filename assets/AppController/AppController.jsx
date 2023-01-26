@@ -187,19 +187,16 @@ const appModules = [
 ];
 
 const getAppPages = (appModules) => {
-  const parseAppModules = (modules) => {
-    const pages = [];
-    for (let page of modules) {
-      if (page.component) {
-        pages.push(<Route key={page.name} path={page.path} element={<page.component />} />);
-      }
-      if (page.children) {
-        pages.push(...parseAppModules(page.children));
-      }
+  const pages = [];
+  for (let page of appModules) {
+    if (page.component) {
+      pages.push(<Route key={page.name} path={page.path} element={<page.component />} />);
     }
-    return pages;
-  };
-  return parseAppModules(appModules);
+    if (page.children) {
+      pages.push(...getAppPages(page.children));
+    }
+  }
+  return pages;
 };
 
 function AppController() {
