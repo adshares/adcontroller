@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useCreateNotification } from '../../hooks';
 import { EventsLatest } from '../Events/Events';
 import apiService from '../../utils/apiService';
+import ServiceStatusTable from '../../Components/ServiceStatusTable/ServiceStatusTable';
 import Spinner from '../../Components/Spinner/Spinner';
-import { ServiceStatusTable } from '../../AppInstaller/InstallerSteps/Status/Status';
 import { Card, CardContent, CardHeader } from '@mui/material';
 
 export default function Dashboard() {
