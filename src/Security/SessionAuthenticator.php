@@ -52,6 +52,7 @@ class SessionAuthenticator extends AbstractAuthenticator
             throw new AccessDeniedHttpException('User does not have right to access');
         }
         $email = $payload['username'];
+        $roles = array_map(fn ($role) => 'ROLE_' . strtoupper($role), $roles);
 
         return new SelfValidatingPassport(
             new UserBadge($email, function () use ($email, $roles) {
