@@ -281,9 +281,9 @@ function AppController() {
               <Routes>
                 <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name} />}>
                   {pages}
-                  <Route path="/" element={<Navigate to="/base" />} />
+                  <Route path="/" element={<Navigate to="/dashboard" />} />
                   <Route path="*" element={<NotFoundView />} />
-                  <Route path="/steps/*" element={<Navigate to="/base" />} />
+                  <Route path="/steps/*" element={<Navigate to="/dashboard" />} />
                 </Route>
               </Routes>
             )}
