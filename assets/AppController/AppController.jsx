@@ -29,7 +29,7 @@ import Panel from './General/Panel';
 import Terms from './General/Terms';
 import AdClassifier from './AdClassifier/AdClassifier';
 import ConnectedServers from './Network/ConnectedServers';
-import { EventsAll } from './Events/Events';
+import Events from './Events/Events';
 import Dashboard from './Dashboard/Dashboard';
 import UsersList from './Users/UsersList';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
@@ -197,7 +197,7 @@ const getAppModules = (currentUser) => {
     {
       name: 'Events',
       path: '/events',
-      component: EventsAll,
+      component: Events,
       icon: DashboardIcon,
     },
   ];

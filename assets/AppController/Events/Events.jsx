@@ -59,7 +59,7 @@ const EventsDataType = {
   LATEST: 'latest',
 };
 
-function Events(dataType) {
+export default function Events({ dataType = EventsDataType.ALL }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [headCells, setHeadCells] = useState(() => initialHeadCells);
   const [queryConfig, setQueryConfig] = useState(() => ({
@@ -237,11 +237,3 @@ const PropertiesDialog = ({ data }) => {
     </>
   );
 };
-
-export function EventsAll() {
-  return Events(EventsDataType.ALL);
-}
-
-export function EventsLatest() {
-  return Events(EventsDataType.LATEST);
-}
