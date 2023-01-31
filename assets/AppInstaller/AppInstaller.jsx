@@ -103,9 +103,9 @@ export default function AppInstaller() {
 
         {!isUserChecking && (
           <AppWindow>
-            {!isUserChecking && !currentUser.name && isLoggedIn && <ForbiddenView />}
+            {((!currentUser.name && isLoggedIn) || !currentUser.roles.includes('admin')) && <ForbiddenView />}
 
-            {currentUser.name && (
+            {currentUser.name && currentUser.roles.includes('admin') && (
               <Routes>
                 <Route element={<PrivateRoute isLoggedIn={isLoggedIn} available={!!currentUser.name} />}>
                   <Route
