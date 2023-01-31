@@ -169,7 +169,6 @@ export default function UsersList() {
     orderBy: null,
     ...filterObjectByKeys(
       queryString.parse(searchParams.toString(), {
-        parseNumbers: true,
         parseBooleans: true,
       }),
       possibleQueryParams,
