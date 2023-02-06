@@ -17,6 +17,12 @@ export const configApi = createApi({
         method: 'GET',
       }),
     }),
+    getRejectedDomains: builder.query({
+      query: () => ({
+        url: '/api/config/rejected-domains',
+        method: 'GET',
+      }),
+    }),
     getWalletNode: builder.mutation({
       query: (body) => ({
         url: '/api/node_host',
@@ -169,6 +175,7 @@ export const configApi = createApi({
 export const {
   useLazyGetAppConfigQuery,
   useGetLicenseDataQuery,
+  useGetRejectedDomainsQuery,
   useSetExistingLicenseMutation,
   useGetWalletNodeMutation,
   useSetBaseInformationMutation,

@@ -48,7 +48,6 @@ const initialState = {
       OperatorTxFee: null,
       ReferralRefundEnabled: null,
       ReferralRefundCommission: null,
-      RejectedDomains: null,
       RegistrationMode: null,
       SiteClassifierLocalBanners: null,
       SiteAcceptBannersManually: null,
@@ -114,9 +113,6 @@ const configSlice = createSlice({
     changeBannerSettingsInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
-    changeRejectedDomainsInformation: (state, { payload }) => {
-      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
-    },
     changeRegistrationModeInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
@@ -165,7 +161,6 @@ export const {
   changeZoneOptionsInformation,
   changeCampaignSettingsInformation,
   changeBannerSettingsInformation,
-  changeRejectedDomainsInformation,
   changeRegistrationModeInformation,
   changeAutoWithdrawalConfigInformation,
   changeRegulationsInformation,

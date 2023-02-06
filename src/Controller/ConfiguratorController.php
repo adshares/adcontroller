@@ -13,6 +13,7 @@ use App\Exception\InvalidArgumentException;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
+use App\Service\AdServerConfigurationClient;
 use App\Service\Configurator\Category\AutomaticWithdrawal;
 use App\Service\Configurator\Category\BannerSettings;
 use App\Service\Configurator\Category\BaseInformation;
@@ -170,6 +171,20 @@ class ConfiguratorController extends AbstractController
         $removedFileIds = $panelAssets->remove($fileIds);
 
         return $this->jsonOk(['fileIds' => $removedFileIds]);
+    }
+
+    #[Route('/config/rejected-domains', name: 'fetch_rejected_domains', methods: ['GET'])]
+    public function fetchRejectedDomains(AdServerConfigurationClient $adServerConfigurationClient): JsonResponse
+    {
+        try {
+            $result = $adServerConfigurationClient->fetchRejectedDomains();
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+
+        return $this->jsonOk($result);
     }
 
     #[Route('/config/{category}', name: 'store_config', methods: ['PATCH'])]

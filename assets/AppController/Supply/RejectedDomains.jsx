@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import configSelectors from '../../redux/config/configSelectors';
 import { useCreateNotification } from '../../hooks';
-import { useSetRejectedDomainsSettingsConfigMutation } from '../../redux/config/configApi';
-import { changeRejectedDomainsInformation } from '../../redux/config/configSlice';
+import { useGetRejectedDomainsQuery, useSetRejectedDomainsSettingsConfigMutation } from '../../redux/config/configApi';
 import ListOfInputs from '../../Components/ListOfInputs/ListOfInputs';
 import { Button, Card, CardActions, CardContent, CardHeader } from '@mui/material';
 
@@ -16,8 +13,7 @@ export default function RejectedDomains() {
 }
 
 const RejectedDomainsCard = (props) => {
-  const appData = useSelector(configSelectors.getAppData);
-  const dispatch = useDispatch();
+  const { data, isFetching } = useGetRejectedDomainsQuery({}, { refetchOnMountOrArgChange: true });
   const [setRejectedDomainsSettings, { isLoading }] = useSetRejectedDomainsSettingsConfigMutation();
   const { createSuccessNotification } = useCreateNotification();
 
@@ -33,7 +29,6 @@ const RejectedDomainsCard = (props) => {
     const response = await setRejectedDomainsSettings(body);
 
     if (response.data && response.data.message === 'OK') {
-      dispatch(changeRejectedDomainsInformation(response.data.data));
       createSuccessNotification();
     }
   };
@@ -53,15 +48,17 @@ const RejectedDomainsCard = (props) => {
          subdomains will also be banned."
       />
       <CardContent>
-        <ListOfInputs
-          initialList={appData.AdServer.RejectedDomains}
-          fieldsHandler={fieldsHandler}
-          listName="RejectedDomains"
-          type="domain"
-        />
+        {!isFetching && data?.data.rejectedDomains && (
+          <ListOfInputs initialList={data.data.rejectedDomains} fieldsHandler={fieldsHandler} listName="RejectedDomains" type="domain" />
+        )}
       </CardContent>
       <CardActions>
-        <Button disabled={isLoading || !isListWasChanged || !isListValid} type="button" variant="contained" onClick={onSaveClick}>
+        <Button
+          disabled={isFetching || isLoading || !isListWasChanged || !isListValid}
+          type="button"
+          variant="contained"
+          onClick={onSaveClick}
+        >
           Save
         </Button>
       </CardActions>

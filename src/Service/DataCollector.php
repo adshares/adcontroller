@@ -256,6 +256,12 @@ class DataCollector
         return $placeholders;
     }
 
+    public function pushRejectedDomains(array $data): array
+    {
+        $content = $this->adServerConfigurationClient->storeRejectedDomains($data);
+        return self::map(self::KEY_MAP, $content);
+    }
+
     private function synchronizeApp(): array
     {
         $logId = $this->getLatestLogId();

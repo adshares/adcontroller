@@ -161,6 +161,7 @@ class AdServerConfigurationClient
 
     private const RESOURCE_CONFIG = 'config';
     private const RESOURCE_CONFIG_PLACEHOLDERS = 'config/placeholders';
+    private const RESOURCE_CONFIG_REJECTED_DOMAINS = 'config/rejectedDomains';
     private const RESOURCE_HOSTS = 'hosts';
     private const RESOURCE_USERS = 'users';
 
@@ -188,6 +189,11 @@ class AdServerConfigurationClient
         return $this->getData($this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS));
     }
 
+    public function fetchRejectedDomains(): array
+    {
+        return $this->getData($this->buildUri(self::RESOURCE_CONFIG_REJECTED_DOMAINS));
+    }
+
     public function store(array $data): array
     {
         return $this->patchData($this->buildUri(self::RESOURCE_CONFIG), self::mapDataToAdServerFormat($data));
@@ -198,6 +204,14 @@ class AdServerConfigurationClient
         return $this->patchData(
             $this->buildUri(self::RESOURCE_CONFIG_PLACEHOLDERS),
             self::mapPlaceholderDataToAdServerFormat($data),
+        );
+    }
+
+    public function storeRejectedDomains(array $data): array
+    {
+        return $this->patchData(
+            $this->buildUri(self::RESOURCE_CONFIG_REJECTED_DOMAINS),
+            self::mapDataToAdServerFormat($data),
         );
     }
 
