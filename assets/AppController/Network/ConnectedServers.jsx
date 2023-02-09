@@ -11,6 +11,7 @@ import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
 import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
+import TypographyOverflowTooltip from '../../Components/TypographyOverflowTooltip/TypographyOverflowTooltip';
 import { filterObjectByKeys } from '../../utils/helpers';
 
 const headCells = [
@@ -23,13 +24,13 @@ const headCells = [
   {
     id: 'status',
     label: 'Status',
-    cellWidth: '4rem',
+    cellWidth: '6.5rem',
     alignContent: 'left',
   },
   {
     id: 'version',
     label: 'Version',
-    cellWidth: '4rem',
+    cellWidth: '6.5rem',
     alignContent: 'left',
   },
   {
@@ -107,9 +108,9 @@ export default function ConnectedServers() {
       name: host.name,
       url: (
         <Link href={host.url} target="_blank">
-          <Typography variant="tableText2" sx={{ overflowWrap: 'anywhere' }} color="black.main">
+          <TypographyOverflowTooltip variant="tableText2" color="black.main">
             {host.url}
-          </Typography>
+          </TypographyOverflowTooltip>
         </Link>
       ),
       wallet: <FormattedWalletAddress wallet={host.walletAddress} />,
@@ -152,12 +153,12 @@ export default function ConnectedServers() {
                 : ''
             }
           >
-            <Typography variant="body2">{host.connectionErrorCount}</Typography>
+            <Typography variant="tableText2">{host.connectionErrorCount}</Typography>
           </Tooltip>
           {Number(host.connectionErrorCount) > 0 && (
             <Tooltip title="Reset counter">
               <IconButton sx={{ ml: 2 }} size="small" color="secondary" onClick={() => onResetCounterClick(host.id)}>
-                <RestartAltOutlinedIcon />
+                <RestartAltOutlinedIcon fontSize="inherit" />
               </IconButton>
             </Tooltip>
           )}

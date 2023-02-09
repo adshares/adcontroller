@@ -29,7 +29,14 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api/accounts, roles: PUBLIC_ACCESS }
-        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/config/rejected-domains, roles: ROLE_MODERATOR, methods: PATCH }
+        - { path: ^/api/users, roles: ROLE_MODERATOR, methods: PATCH }
+        - { path: ^/api, roles: ROLE_MODERATOR, methods: GET }
+        - { path: ^/api, roles: ROLE_ADMIN }
+
+    role_hierarchy:
+        ROLE_MODERATOR: ROLE_USER
+        ROLE_ADMIN: ROLE_MODERATOR
 
 when@test:
     security:

@@ -39,7 +39,7 @@ class RejectedDomains implements ConfiguratorCategory
             $input[AdServerConfig::RejectedDomains->name] = join(',', $input[AdServerConfig::RejectedDomains->name]);
         }
 
-        return $this->dataCollector->push($input);
+        return $this->dataCollector->pushRejectedDomains($input);
     }
 
     private static function fields(): array

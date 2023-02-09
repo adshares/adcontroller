@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ExceptionSubscriber implements EventSubscriberInterface
 {
@@ -27,7 +28,13 @@ class ExceptionSubscriber implements EventSubscriberInterface
             str_starts_with($request->getPathInfo(), '/api/') ||
             self::HEADER_JSON_CONTENT === $request->headers->get('Content-Type')
         ) {
-            if ($exception instanceof HttpExceptionInterface) {
+            if ($exception instanceof AccessDeniedException) {
+                $response = new JsonResponse([
+                    'message' => 'Access Denied',
+                    'code' => Response::HTTP_FORBIDDEN,
+                    'data' => [],
+                ], Response::HTTP_FORBIDDEN);
+            } elseif ($exception instanceof HttpExceptionInterface) {
                 $message = preg_replace('~https?://localhost(:\d+)?/~', '/', $exception->getMessage());
                 $response = new JsonResponse([
                     'message' => $message,
