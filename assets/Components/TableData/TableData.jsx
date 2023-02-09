@@ -1090,7 +1090,7 @@ export default function TableData({
                               ...(index === columns.length - 1 && cell.pinToRight
                                 ? { position: 'sticky', right: 0, borderLeft: '1px solid rgba(224, 224, 224, 1)' }
                                 : {}),
-
+                              maxWidth: cell.cellWidth,
                               pl: 1,
                               pr: 1,
                               pt: 0.5,
