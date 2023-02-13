@@ -45,6 +45,11 @@ class BaseInformation implements ConfiguratorCategory
                 sprintf('Field `%s` must be an url or null', GeneralConfig::SupportChat->name)
             );
         }
+        if (false === filter_var($input[AdServerConfig::LandingUrl->name], FILTER_VALIDATE_URL)) {
+            throw new InvalidArgumentException(
+                sprintf('Field `%s` must be an url', AdServerConfig::LandingUrl->name)
+            );
+        }
         if (
             isset($input[GeneralConfig::SupportTelegram->name]) &&
             (
@@ -63,6 +68,7 @@ class BaseInformation implements ConfiguratorCategory
     private static function fields(): array
     {
         return [
+            AdServerConfig::LandingUrl->name,
             AdServerConfig::Name->name,
             GeneralConfig::SupportChat->name,
             GeneralConfig::SupportEmail->name,

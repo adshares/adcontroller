@@ -67,6 +67,7 @@ class DataCollector
         AdServerConfigurationClient::INVENTORY_EXPORT_WHITELIST => AdServerConfig::InventoryExportWhitelist,
         AdServerConfigurationClient::INVENTORY_IMPORT_WHITELIST => AdServerConfig::InventoryImportWhitelist,
         AdServerConfigurationClient::INVENTORY_WHITELIST => AdServerConfig::InventoryWhitelist,
+        AdServerConfigurationClient::LANDING_URL => AdServerConfig::LandingUrl,
         AdServerConfigurationClient::MAX_PAGE_ZONES => AdServerConfig::MaxPageZones,
         AdServerConfigurationClient::OPERATOR_RX_FEE => AdServerConfig::OperatorRxFee,
         AdServerConfigurationClient::OPERATOR_TX_FEE => AdServerConfig::OperatorTxFee,

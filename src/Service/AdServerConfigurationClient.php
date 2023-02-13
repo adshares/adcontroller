@@ -100,6 +100,7 @@ class AdServerConfigurationClient
     private const INVOICE_COMPANY_VAT_ID = 'invoiceCompanyVatId';
     private const INVOICE_ENABLED = 'invoiceEnabled';
     private const INVOICE_NUMBER_FORMAT = 'invoiceNumberFormat';
+    public const LANDING_URL = 'landingUrl';
     private const LAST_UPDATED_IMPRESSION_ID = 'lastUpdatedImpressionId';
     private const MAIL_FROM_ADDRESS = 'mailFromAddress';
     public const MAIL_FROM_NAME = 'mailFromName';
@@ -300,6 +301,7 @@ class AdServerConfigurationClient
             AdServerConfig::InventoryExportWhitelist->name => self::INVENTORY_EXPORT_WHITELIST,
             AdServerConfig::InventoryImportWhitelist->name => self::INVENTORY_IMPORT_WHITELIST,
             AdServerConfig::InventoryWhitelist->name => self::INVENTORY_WHITELIST,
+            AdServerConfig::LandingUrl->name => self::LANDING_URL,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
             AdServerConfig::Name->name => self::ADSERVER_NAME,
             AdServerConfig::MaxPageZones->name => self::MAX_PAGE_ZONES,
