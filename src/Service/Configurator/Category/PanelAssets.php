@@ -240,8 +240,12 @@ class PanelAssets implements ConfiguratorCategory
 
     private function deploy(): void
     {
+        if (false === ($directory = realpath($this->getAssetDirectory()))) {
+            $this->logger->error('Cannot deploy panel assets changes');
+            throw new RuntimeException('Cannot deploy changes');
+        }
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
-        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $this->getAssetDirectory());
+        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $directory);
     }
 
     public function buildUrl(string $filePath): string
