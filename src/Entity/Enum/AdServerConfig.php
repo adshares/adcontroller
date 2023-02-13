@@ -31,6 +31,7 @@ enum AdServerConfig implements ConfigEnum
     case InventoryImportWhitelist;
     case InventoryPrivate;
     case InventoryWhitelist;
+    case LandingUrl;
     case LicenseData;
     case LicenseKey;
     case MaxPageZones;
