@@ -192,7 +192,6 @@ class PanelAssets implements ConfiguratorCategory
             $storedFileIds[] = $fileId;
         }
         $this->assetRepository->upsert($assets);
-        $this->bus->dispatch(new AdPanelReload());
 
         return $this->mapAssetsToArray($this->assetRepository->findByFileIds($storedFileIds));
     }
@@ -246,6 +245,8 @@ class PanelAssets implements ConfiguratorCategory
         }
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
         $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $directory);
+
+        $this->bus->dispatch(new AdPanelReload());
     }
 
     public function buildUrl(string $filePath): string
