@@ -735,7 +735,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
           Logo
         </Typography>
         <Typography sx={{ mt: 1 }} variant="body2">
-          You can add png files with minimal height 30 px
+          You can add png file with minimal height 30 px
         </Typography>
         <Table sx={{ mt: 3, backgroundColor: 'primary.main' }}>
           <TableBody>
