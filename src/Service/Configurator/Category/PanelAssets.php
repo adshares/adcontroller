@@ -278,8 +278,6 @@ class PanelAssets implements ConfiguratorCategory
     {
         return [
             PanelAssetConfig::LogoH30->name,
-            PanelAssetConfig::LogoH60->name,
-            PanelAssetConfig::LogoH90->name,
         ];
     }
 

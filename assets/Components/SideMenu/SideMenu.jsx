@@ -12,9 +12,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { AccordionDetails, AccordionSummary, Typography } from '@mui/material';
-import Icon from '../Icon/Icon';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import commonStyles from '../../styles/commonStyles.scss';
+import Icon from '../Icon/Icon';
 
 const drawerWidth = 292;
 
