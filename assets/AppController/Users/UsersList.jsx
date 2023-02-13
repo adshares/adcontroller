@@ -618,7 +618,7 @@ const UserActionsMenu = ({ currentUser, user, actions }) => {
             Unban user
           </MenuItem>
         )}
-        {!isSelfRow && user.isBanned && (
+        {!isSelfRow && (
           <MenuItem
             sx={{ color: 'error.main' }}
             onClick={() => {
