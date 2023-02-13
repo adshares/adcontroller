@@ -30,7 +30,7 @@ security:
     access_control:
         - { path: ^/api/accounts, roles: PUBLIC_ACCESS }
         - { path: ^/api/config/rejected-domains, roles: ROLE_MODERATOR, methods: PATCH }
-        - { path: ^/api/users, roles: ROLE_MODERATOR, methods: PATCH }
+        - { path: ^/api/users, roles: ROLE_MODERATOR, methods: [ DELETE, PATCH ] }
         - { path: ^/api, roles: ROLE_MODERATOR, methods: GET }
         - { path: ^/api, roles: ROLE_ADMIN }
 
