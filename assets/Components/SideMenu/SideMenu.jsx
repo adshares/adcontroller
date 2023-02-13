@@ -12,8 +12,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { AccordionDetails, AccordionSummary, Typography } from '@mui/material';
-import Icon from '../Icon/Icon';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import configuration from '../../controllerConfig/configuration';
 import commonStyles from '../../styles/commonStyles.scss';
 
 const drawerWidth = 292;
@@ -217,29 +217,8 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
         onClose={() => toggleSideMenu(false)}
         variant="permanent"
       >
-        <Toolbar sx={{ pl: 2 }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-          <Box>
-            <Icon
-              name="logo"
-              sx={{
-                width: 32,
-                height: 32,
-                color: 'white.main',
-              }}
-            />
-            {showSideMenu && (
-              <Icon
-                name="adSharesText"
-                sx={{
-                  ml: 1,
-                  mb: 1,
-                  width: 79,
-                  height: 9,
-                  color: 'white.main',
-                }}
-              />
-            )}
-          </Box>
+        <Toolbar sx={{ pl: 2 }} className={`${commonStyles.flex} ${showSideMenu ? commonStyles.justifyCenter : ''}`}>
+          <Box height="32px" component="img" src={`${configuration.basePath}/assets/panel/LogoH30?${Date.now()}`} alt="Adshares logo" />
         </Toolbar>
         <Divider sx={{ borderColor: 'deep.main' }} />
         <List disablePadding>{items}</List>
