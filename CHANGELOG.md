@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Check if asset stored successfully
 - Moderator can delete user
 
 ## [1.2.5] - 2023-02-09
