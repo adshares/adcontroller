@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.6] - 2023-02-13
+### Fixed
+- Check if asset stored successfully
+- Moderator can delete user
+
 ## [1.2.5] - 2023-02-09
 ### Added
 - Moderator can edit rejected domains
@@ -93,7 +98,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.5...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.6...develop
+[1.2.6]: https://github.com/adshares/adcontroller/compare/v1.2.5...v1.2.6
 [1.2.5]: https://github.com/adshares/adcontroller/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/adshares/adcontroller/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/adshares/adcontroller/compare/v1.2.2...v1.2.3

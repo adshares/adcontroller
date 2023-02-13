@@ -14,6 +14,8 @@ use App\Service\Env\EnvEditorFactory;
 use App\Utility\DirUtils;
 use App\ValueObject\Module;
 use DateTimeInterface;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -31,6 +33,7 @@ class PanelAssets implements ConfiguratorCategory
         private readonly PanelAssetRepository $assetRepository,
         private readonly ConfigurationRepository $configurationRepository,
         private readonly EnvEditorFactory $envEditorFactory,
+        private readonly LoggerInterface $logger,
         private readonly MessageBusInterface $bus,
         private readonly string $appDirectory,
     ) {
@@ -156,18 +159,29 @@ class PanelAssets implements ConfiguratorCategory
             }
             if (false !== ($index = strrpos($filePath, '/'))) {
                 $path = substr($filePath, 0, $index + 1);
-                $directory = $assetDirectory . $path;
-                if (!file_exists($directory)) {
-                    mkdir($directory, 0777, true);
-                }
-                $directory = $assetTmpDirectory . $path;
-                if (!file_exists($directory)) {
-                    mkdir($directory, 0777, true);
+                $directories = [
+                    $assetDirectory . $path,
+                    $assetTmpDirectory . $path,
+                ];
+                foreach ($directories as $directory) {
+                    if (!file_exists($directory)) {
+                        mkdir($directory, 0777, true);
+                    }
                 }
             }
 
-            file_put_contents($assetDirectory . $filePath, $fileContent);
-            file_put_contents($assetTmpDirectory . $this->appendHashToFileName($filePath, $hash), $fileContent);
+            $fileNames = [
+                $assetDirectory . $filePath,
+                $assetTmpDirectory . $this->appendHashToFileName($filePath, $hash),
+            ];
+            foreach ($fileNames as $fileName) {
+                if (false === @file_put_contents($fileName, $fileContent)) {
+                    $this->logger->error(
+                        sprintf('Asset (%s) cannot be saved: (%s)', $fileName, error_get_last()['message'])
+                    );
+                    throw new RuntimeException(sprintf('Cannot save file `%s`', $fileName));
+                }
+            }
 
             $asset = new PanelAsset();
             $asset->setFileId($fileId);
@@ -178,7 +192,6 @@ class PanelAssets implements ConfiguratorCategory
             $storedFileIds[] = $fileId;
         }
         $this->assetRepository->upsert($assets);
-        $this->bus->dispatch(new AdPanelReload());
 
         return $this->mapAssetsToArray($this->assetRepository->findByFileIds($storedFileIds));
     }
@@ -226,8 +239,14 @@ class PanelAssets implements ConfiguratorCategory
 
     private function deploy(): void
     {
+        if (false === ($directory = realpath($this->getAssetDirectory()))) {
+            $this->logger->error('Cannot deploy panel assets changes');
+            throw new RuntimeException('Cannot deploy changes');
+        }
         $envEditor = $this->envEditorFactory->createEnvEditor(Module::AdPanel);
-        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $this->getAssetDirectory());
+        $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $directory);
+
+        $this->bus->dispatch(new AdPanelReload());
     }
 
     public function buildUrl(string $filePath): string
@@ -278,8 +297,6 @@ class PanelAssets implements ConfiguratorCategory
     {
         return [
             PanelAssetConfig::LogoH30->name,
-            PanelAssetConfig::LogoH60->name,
-            PanelAssetConfig::LogoH90->name,
         ];
     }
 

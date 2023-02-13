@@ -188,7 +188,7 @@ const RebrandingCard = (props) => {
   const [activeTab, setActiveTab] = React.useState('requiredAssets');
   const [saveButton, setSaveButton] = React.useState({});
   const requiredFavicons = ['Favicon16x16', 'Favicon32x32', 'Favicon48x48', 'Favicon96x96'];
-  const requiredLogos = ['LogoH30', 'LogoH60', 'LogoH90'];
+  const requiredLogos = ['LogoH30'];
 
   const handleTabChange = (e, newActiveTab) => {
     setActiveTab(newActiveTab);
@@ -373,7 +373,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
   };
 
   return (
-    <Box sx={{ height: '862px', overflow: 'auto' }}>
+    <Box sx={{ height: '638px', overflow: 'auto' }}>
       <Button variant="contained" component="label">
         <FileUploadIcon />
         Upload
@@ -644,20 +644,6 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
             enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
           }
           break;
-        case 'LogoH60':
-          if (height >= 30) {
-            updateComponentState(name, file);
-          } else {
-            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
-          }
-          break;
-        case 'LogoH90':
-          if (height >= 30) {
-            updateComponentState(name, file);
-          } else {
-            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
-          }
-          break;
 
         default:
           break;
@@ -678,7 +664,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
   };
 
   return (
-    <Box sx={{ height: '862px', overflow: 'auto' }}>
+    <Box sx={{ height: '638px', overflow: 'auto' }}>
       <Box>
         <Typography variant="h3" component="h3">
           Favicons
@@ -746,10 +732,10 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
 
       <Box sx={{ mt: 4 }}>
         <Typography variant="h3" component="h3">
-          Logos
+          Logo
         </Typography>
         <Typography sx={{ mt: 1 }} variant="body2">
-          You can add png files with minimal height 30 px and optional @2x and @3x
+          You can add png file with minimal height 30 px
         </Typography>
         <Table sx={{ mt: 3, backgroundColor: 'primary.main' }}>
           <TableBody>
