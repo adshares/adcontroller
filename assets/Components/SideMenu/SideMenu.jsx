@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import configSelectors from '../../redux/config/configSelectors';
 import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAccordion from '@mui/material/Accordion';
 import Toolbar from '@mui/material/Toolbar';
@@ -11,7 +12,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { AccordionDetails, AccordionSummary, Typography } from '@mui/material';
+import { AccordionDetails, AccordionSummary, Link, Typography } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import commonStyles from '../../styles/commonStyles.scss';
 import Icon from '../Icon/Icon';
@@ -204,6 +205,7 @@ const getMappedMenuItems = (items) => {
 
 const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) => {
   const items = getMappedMenuItems(menuItems);
+  const { AdServer } = useSelector(configSelectors.getAppData);
 
   return (
     enableSideMenu && (
@@ -218,7 +220,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
         variant="permanent"
       >
         <Toolbar sx={{ pl: 2 }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-          <Box>
+          <Link href={AdServer.LandingUrl} target="_self">
             <Icon
               name="logo"
               sx={{
@@ -239,7 +241,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
                 }}
               />
             )}
-          </Box>
+          </Link>
         </Toolbar>
         <Divider sx={{ borderColor: 'deep.main' }} />
         <List disablePadding>{items}</List>
