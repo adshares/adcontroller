@@ -43,6 +43,7 @@ const initialState = {
       InventoryWhitelist: [],
       InventoryImportWhitelist: [],
       InventoryExportWhitelist: [],
+      LandingUrl: null,
       MaxPageZones: null,
       OperatorRxFee: null,
       OperatorTxFee: null,
