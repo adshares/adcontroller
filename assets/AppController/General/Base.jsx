@@ -22,6 +22,7 @@ const BaseInformationCard = (props) => {
   const form = useForm({
     initialFields: {
       Name: appData.AdServer.Name || '',
+      LandingUrl: appData.AdServer.LandingUrl || '',
       TechnicalEmail: appData.General.TechnicalEmail || '',
       SupportEmail: appData.General.SupportEmail || '',
       SupportChat: appData.General.SupportChat || '',
@@ -29,6 +30,7 @@ const BaseInformationCard = (props) => {
     },
     validation: {
       Name: ['required'],
+      LandingUrl: ['required', 'url'],
       TechnicalEmail: ['required', 'email'],
       SupportEmail: ['required', 'email'],
       SupportChat: ['url'],
@@ -68,6 +70,20 @@ const BaseInformationCard = (props) => {
             error={form.changedFields.Name && !form.errorObj.Name.isValid}
             helperText={form.changedFields.Name && form.errorObj.Name.helperText}
             value={form.fields.Name}
+            type="text"
+            inputProps={{ autoComplete: 'off' }}
+          />
+          <TextField
+            sx={{ mb: 3 }}
+            fullWidth
+            customvariant="highLabel"
+            name="LandingUrl"
+            variant="outlined"
+            color="secondary"
+            label="Landing page URL"
+            error={form.changedFields.LandingUrl && !form.errorObj.LandingUrl.isValid}
+            helperText={form.changedFields.LandingUrl && form.errorObj.LandingUrl.helperText}
+            value={form.fields.LandingUrl}
             type="text"
             inputProps={{ autoComplete: 'off' }}
           />
