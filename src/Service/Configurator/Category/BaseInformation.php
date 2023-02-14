@@ -45,7 +45,9 @@ class BaseInformation implements ConfiguratorCategory
                 sprintf('Field `%s` must be an url or null', GeneralConfig::SupportChat->name)
             );
         }
-        if (false === filter_var($input[AdServerConfig::LandingUrl->name], FILTER_VALIDATE_URL)) {
+        if (
+            isset($input[AdServerConfig::LandingUrl->name]) &&
+            false === filter_var($input[AdServerConfig::LandingUrl->name], FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(
                 sprintf('Field `%s` must be an url', AdServerConfig::LandingUrl->name)
             );
