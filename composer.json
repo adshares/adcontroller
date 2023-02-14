@@ -96,6 +96,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
+            "php bin/console cache:clear",
             "php -S ${APP_HOST:-localhost}:${APP_PORT:-8030} -t public dev-router.php"
         ]
     },
