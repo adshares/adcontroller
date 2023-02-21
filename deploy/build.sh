@@ -5,6 +5,7 @@ cd ${1:-"."} || exit 1
 
 mkdir -p var/{panel-assets,panel-assets-history}
 
+composer dump-env prod
 composer install --no-dev --no-interaction
 if [ $? -ne 0 ]; then exit 1; fi
 
