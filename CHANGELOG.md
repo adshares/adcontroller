@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.8] - 2023-02-14
+### Fixed
+- OAuth2 token revoke
+
 ## [1.2.7] - 2023-02-14
 ### Changed
 - Link do landing page
@@ -104,7 +108,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.7...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.2.8...develop
+[1.2.8]: https://github.com/adshares/adcontroller/compare/v1.2.7...v1.2.8
 [1.2.7]: https://github.com/adshares/adcontroller/compare/v1.2.6...v1.2.7
 [1.2.6]: https://github.com/adshares/adcontroller/compare/v1.2.5...v1.2.6
 [1.2.5]: https://github.com/adshares/adcontroller/compare/v1.2.4...v1.2.5
