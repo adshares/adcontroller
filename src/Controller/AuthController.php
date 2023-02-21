@@ -22,7 +22,7 @@ class AuthController extends AbstractController
 {
     private const OAUTH_AUTHORIZE = '/auth/authorize';
     private const OAUTH_FETCH_TOKEN = '/oauth/token';
-    private const OAUTH_REVOKE_TOKEN = '/oauth/tokens/';
+    private const OAUTH_REVOKE_TOKEN = '/auth/tokens/';
 
     public function __construct(
         private readonly string $adServerBaseUri,
