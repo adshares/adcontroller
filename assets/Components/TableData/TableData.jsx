@@ -608,7 +608,7 @@ const EnhancedTableHead = ({
                             position: 'relative',
                             bottom: '-5px',
                             left: '-5px',
-                            color: 'blue.main',
+                            color: 'infoBg.main',
                           },
                         }}
                       >

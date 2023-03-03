@@ -59,7 +59,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     borderRadius: '10px',
   },
   '& .MuiDrawer-paper::-webkit-scrollbar-thumb': {
-    backgroundColor: theme.palette.blue.main,
+    backgroundColor: theme.palette.infoBg.main,
     borderRadius: '10px',
   },
 }));
@@ -156,14 +156,14 @@ const getMappedMenuItems = (items) => {
                     <ListItemIcon>
                       {React.createElement(children.icon, {
                         sx: { transform: children.rotateIcon && `rotate(${children.rotateIcon})` },
-                        color: children.path === location.pathname ? 'blue' : 'light',
+                        color: children.path === location.pathname ? 'infoBg' : 'light',
                       })}
                     </ListItemIcon>
                     <ListItemText
                       primary={children.name}
                       primaryTypographyProps={{
                         sx: {
-                          color: children.path === location.pathname ? 'blue.main' : 'light.main',
+                          color: children.path === location.pathname ? 'infoBg.main' : 'light.main',
                           margin: 0,
                           fontVariationSettings: '"wght" 500',
                         },
@@ -183,14 +183,14 @@ const getMappedMenuItems = (items) => {
             <ListItemIcon>
               {React.createElement(item.icon, {
                 sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                color: item.path === location.pathname ? 'blue' : 'light',
+                color: item.path === location.pathname ? 'infoBg' : 'light',
               })}
             </ListItemIcon>
             <ListItemText
               primary={item.name}
               primaryTypographyProps={{
                 sx: {
-                  color: item.path === location.pathname ? 'blue.main' : 'light.main',
+                  color: item.path === location.pathname ? 'infoBg.main' : 'light.main',
                   margin: 0,
                   fontVariationSettings: '"wght" 600',
                 },
@@ -212,7 +212,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
       <Drawer
         PaperProps={{
           sx: {
-            backgroundColor: 'navy.main',
+            backgroundColor: 'info.main',
           },
         }}
         open={showSideMenu}

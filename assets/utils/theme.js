@@ -2,8 +2,8 @@ import { createTheme } from '@mui/material/styles';
 import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
 const bodyBg = '#DFDFDF';
-const navy = '#003D4D';
-const blue = '#96DFEF';
+const info = '#003D4D';
+const infoBg = '#96DFEF';
 const dark = '#000000';
 const primaryAlt = '#002F36';
 const secondaryAlt = '#BFF7FF';
@@ -13,7 +13,7 @@ const errorBg = '#FFA0A6';
 const warning = '#FFB400';
 const warningBg = '#F8E7BF';
 const gray = '#BFBFBF';
-const disable = '#606060';
+// const disable = '#606060';
 const success = '#19AD42';
 const successBg = '#8DEBC8';
 
@@ -22,13 +22,13 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: navy,
+      main: info,
       dark: primaryAlt,
       light: '#336370FF',
       contrastText: light,
     },
     secondary: {
-      main: blue,
+      main: infoBg,
       light: secondaryAlt,
       dark: '#699CA7FF',
       contrastText: light,
@@ -36,11 +36,11 @@ const theme = createTheme({
     bodyBg: {
       main: bodyBg,
     },
-    navy: {
-      main: navy,
+    info: {
+      main: info,
     },
-    blue: {
-      main: blue,
+    infoBg: {
+      main: infoBg,
     },
     dark: {
       main: dark,
@@ -77,9 +77,9 @@ const theme = createTheme({
     warning: {
       main: warning,
     },
-    info: {
-      main: blue,
-    },
+    // info: {
+    //   main: infoBg,
+    // },
     success: {
       main: success,
     },
@@ -118,7 +118,7 @@ const theme = createTheme({
             borderRadius: '10px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: `${navy}50`,
+            backgroundColor: `${info}50`,
             borderRadius: '10px',
           },
         },
@@ -134,7 +134,7 @@ const theme = createTheme({
             borderRadius: '10px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: `${navy}50`,
+            backgroundColor: `${info}50`,
             width: '8px',
             borderRadius: '10px',
           },
@@ -151,7 +151,7 @@ const theme = createTheme({
             borderRadius: '10px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: `${navy}50`,
+            backgroundColor: `${info}50`,
             width: '8px',
             borderRadius: '10px',
           },
@@ -322,7 +322,7 @@ const theme = createTheme({
     MuiPopover: {
       styleOverrides: {
         paper: {
-          border: `1px solid ${blue}`,
+          border: `1px solid ${infoBg}`,
         },
       },
     },
@@ -371,7 +371,7 @@ const theme = createTheme({
             opacity: 1,
           },
           '&.Mui-active > .MuiTableSortLabel-icon': {
-            color: blue,
+            color: infoBg,
           },
         },
       },
@@ -419,7 +419,7 @@ const theme = createTheme({
             overflow: 'none',
 
             '&.Mui-selected': {
-              color: blue,
+              color: infoBg,
             },
           },
         },
@@ -440,7 +440,7 @@ const theme = createTheme({
               borderRadius: '10px',
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: `${navy}50`,
+              backgroundColor: `${info}50`,
               width: '8px',
               borderRadius: '10px',
             },
