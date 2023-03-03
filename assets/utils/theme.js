@@ -8,8 +8,8 @@ const dark = '#000000';
 const deep = '#002F36';
 const sky = '#BFF7FF';
 const light = '#FFFFFF';
-const sunset = '#FF414D';
-const failBg = '#FFA0A6';
+const error = '#FF414D';
+const errorBg = '#FFA0A6';
 const warning = '#FFB400';
 const warningBg = '#F8E7BF';
 const disableBg = '#BFBFBF';
@@ -55,8 +55,8 @@ const theme = createTheme({
       main: light,
     },
     sunset: {
-      light: failBg,
-      main: sunset,
+      light: errorBg,
+      main: error,
     },
     sun: {
       light: warningBg,
@@ -71,8 +71,8 @@ const theme = createTheme({
       light: light,
     },
     error: {
-      main: sunset,
-      light: failBg,
+      main: error,
+      light: errorBg,
     },
     warning: {
       main: warning,
@@ -387,8 +387,8 @@ const theme = createTheme({
             color: warning,
           },
           '&.MuiAlert-standardError': {
-            backgroundColor: failBg,
-            color: sunset,
+            backgroundColor: errorBg,
+            color: error,
           },
           '&.MuiAlert-standardSuccess': {
             backgroundColor: successBg,
