@@ -10,7 +10,7 @@ const sky = '#BFF7FF';
 const light = '#FFFFFF';
 const sunset = '#FF414D';
 const failBg = '#FFA0A6';
-const sun = '#FFB400';
+const warning = '#FFB400';
 const warningBg = '#F8E7BF';
 const disableBg = '#BFBFBF';
 const disable = '#606060';
@@ -60,7 +60,7 @@ const theme = createTheme({
     },
     sun: {
       light: warningBg,
-      main: sun,
+      main: warning,
     },
     freshGrass: {
       light: successBg,
@@ -75,7 +75,7 @@ const theme = createTheme({
       light: failBg,
     },
     warning: {
-      main: sun,
+      main: warning,
     },
     info: {
       main: blue,
@@ -384,7 +384,7 @@ const theme = createTheme({
           fontVariationSettings: '"wght" 700',
           '&.MuiAlert-standardWarning': {
             backgroundColor: warningBg,
-            color: sun,
+            color: warning,
           },
           '&.MuiAlert-standardError': {
             backgroundColor: failBg,
