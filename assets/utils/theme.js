@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
-const grayBg = '#DFDFDF';
+const bodyBg = '#DFDFDF';
 const navy = '#003D4D';
 const blue = '#96DFEF';
 const dark = '#000000';
@@ -33,8 +33,8 @@ const theme = createTheme({
       dark: '#699CA7FF',
       contrastText: light,
     },
-    grayBg: {
-      main: grayBg,
+    bodyBg: {
+      main: bodyBg,
     },
     navy: {
       main: navy,
@@ -86,13 +86,13 @@ const theme = createTheme({
     text: {
       primary: dark,
       secondary: dark,
-      disabled: grayBg,
+      disabled: bodyBg,
     },
     divider: gray,
     background: {
       paper: light,
       default: light,
-      grayBg,
+      bodyBg,
       gray,
     },
     action: {
@@ -104,7 +104,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: grayBg,
+          backgroundColor: bodyBg,
           '@font-face': {
             fontFamily: 'Montserrat',
             fontStyle: 'normal',
