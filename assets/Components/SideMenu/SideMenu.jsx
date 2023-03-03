@@ -125,15 +125,15 @@ const getMappedMenuItems = (items) => {
                   backgroundColor: 'rgba(0, 47, 54, 0.5)',
                 },
               }}
-              expandIcon={<ArrowDropDownIcon color="white" />}
+              expandIcon={<ArrowDropDownIcon color="light" />}
             >
               <ListItemIcon>
                 {React.createElement(item.icon, {
                   sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                  color: 'white',
+                  color: 'light',
                 })}
               </ListItemIcon>
-              <Typography sx={{ color: 'white.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
+              <Typography sx={{ color: 'light.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
             </AccordionSummary>
             <AccordionDetails
               sx={{
@@ -156,14 +156,14 @@ const getMappedMenuItems = (items) => {
                     <ListItemIcon>
                       {React.createElement(children.icon, {
                         sx: { transform: children.rotateIcon && `rotate(${children.rotateIcon})` },
-                        color: children.path === location.pathname ? 'blue' : 'white',
+                        color: children.path === location.pathname ? 'blue' : 'light',
                       })}
                     </ListItemIcon>
                     <ListItemText
                       primary={children.name}
                       primaryTypographyProps={{
                         sx: {
-                          color: children.path === location.pathname ? 'blue.main' : 'white.main',
+                          color: children.path === location.pathname ? 'blue.main' : 'light.main',
                           margin: 0,
                           fontVariationSettings: '"wght" 500',
                         },
@@ -183,14 +183,14 @@ const getMappedMenuItems = (items) => {
             <ListItemIcon>
               {React.createElement(item.icon, {
                 sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                color: item.path === location.pathname ? 'blue' : 'white',
+                color: item.path === location.pathname ? 'blue' : 'light',
               })}
             </ListItemIcon>
             <ListItemText
               primary={item.name}
               primaryTypographyProps={{
                 sx: {
-                  color: item.path === location.pathname ? 'blue.main' : 'white.main',
+                  color: item.path === location.pathname ? 'blue.main' : 'light.main',
                   margin: 0,
                   fontVariationSettings: '"wght" 600',
                 },
@@ -226,7 +226,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
               sx={{
                 width: 32,
                 height: 32,
-                color: 'white.main',
+                color: 'light.main',
               }}
             />
             {showSideMenu && (
@@ -237,7 +237,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
                   mb: 1,
                   width: 79,
                   height: 9,
-                  color: 'white.main',
+                  color: 'light.main',
                 }}
               />
             )}

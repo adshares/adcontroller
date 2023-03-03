@@ -17,7 +17,7 @@ const Step = styled(MuiStep)(({ theme, disabled, active, current }) => {
         stroke: active && !current ? theme.palette.black.main : 'transparent',
       },
       '& text': {
-        fill: active && !current ? theme.palette.black.main : theme.palette.white.main,
+        fill: active && !current ? theme.palette.black.main : theme.palette.light.main,
         stroke: 'none',
         fontVariationSettings: !current && !disabled ? '"wght" 900' : '"wght" 400',
       },

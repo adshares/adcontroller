@@ -7,14 +7,14 @@ const blue = '#96DFEF';
 const black = '#000000';
 const deep = '#002F36';
 const sky = '#BFF7FF';
-const white = '#FFFFFF';
+const light = '#FFFFFF';
 const sunset = '#FF414D';
 const failBg = '#FFA0A6';
 const sun = '#FFB400';
 const warningBg = '#F8E7BF';
 const disableBg = '#BFBFBF';
 const disable = '#606060';
-const freshGrass = '#19AD42';
+const success = '#19AD42';
 const successBg = '#8DEBC8';
 
 const theme = createTheme({
@@ -25,13 +25,13 @@ const theme = createTheme({
       main: navy,
       dark: deep,
       light: '#336370FF',
-      contrastText: white,
+      contrastText: light,
     },
     secondary: {
       main: blue,
       light: sky,
       dark: '#699CA7FF',
-      contrastText: white,
+      contrastText: light,
     },
     grayBg: {
       main: grayBg,
@@ -51,8 +51,8 @@ const theme = createTheme({
     sky: {
       main: sky,
     },
-    white: {
-      main: white,
+    light: {
+      main: light,
     },
     sunset: {
       light: failBg,
@@ -64,11 +64,11 @@ const theme = createTheme({
     },
     freshGrass: {
       light: successBg,
-      main: freshGrass,
+      main: success,
     },
     common: {
       black: black,
-      white: white,
+      light: light,
     },
     error: {
       main: sunset,
@@ -81,7 +81,7 @@ const theme = createTheme({
       main: blue,
     },
     success: {
-      main: freshGrass,
+      main: success,
     },
     text: {
       primary: black,
@@ -90,13 +90,13 @@ const theme = createTheme({
     },
     divider: disableBg,
     background: {
-      paper: white,
-      default: white,
+      paper: light,
+      default: light,
       grayBg,
       disableBg,
     },
     action: {
-      disabled: white,
+      disabled: light,
       disabledBackground: '#809EA6',
     },
   },
@@ -392,7 +392,7 @@ const theme = createTheme({
           },
           '&.MuiAlert-standardSuccess': {
             backgroundColor: successBg,
-            color: freshGrass,
+            color: success,
           },
         },
       },
@@ -405,7 +405,7 @@ const theme = createTheme({
             overflow: 'initial !important',
           },
           '& .MuiTabs-indicator': {
-            backgroundColor: white,
+            backgroundColor: light,
             transition: 'none',
             height: '3px',
             bottom: '-2px',
