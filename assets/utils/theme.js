@@ -12,7 +12,7 @@ const error = '#FF414D';
 const errorBg = '#FFA0A6';
 const warning = '#FFB400';
 const warningBg = '#F8E7BF';
-const disableBg = '#BFBFBF';
+const gray = '#BFBFBF';
 const disable = '#606060';
 const success = '#19AD42';
 const successBg = '#8DEBC8';
@@ -88,12 +88,12 @@ const theme = createTheme({
       secondary: dark,
       disabled: grayBg,
     },
-    divider: disableBg,
+    divider: gray,
     background: {
       paper: light,
       default: light,
       grayBg,
-      disableBg,
+      gray,
     },
     action: {
       disabled: light,
@@ -220,7 +220,7 @@ const theme = createTheme({
           },
           style: {
             boxShadow: 'none',
-            border: `1px solid ${disableBg}`,
+            border: `1px solid ${gray}`,
           },
         },
         {
@@ -302,7 +302,7 @@ const theme = createTheme({
               display: 'none',
             },
             '& .MuiInputLabel-root': {
-              color: disableBg,
+              color: gray,
               '&.Mui-focused': {
                 color: dark,
                 transform: 'translate(14px, -20px) scale(0.75)',
@@ -330,7 +330,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiSlider-rail': {
-            color: disableBg,
+            color: gray,
             height: '15px',
             borderRadius: '5px',
           },
@@ -351,7 +351,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '&.MuiTableCell-root': {
-            borderColor: disableBg,
+            borderColor: gray,
           },
           '&.MuiTableCell-head': {
             fontSize: '16px',
@@ -412,7 +412,7 @@ const theme = createTheme({
           },
           '& .MuiTab-root': {
             padding: '7px 34px',
-            border: `1px solid ${disableBg}`,
+            border: `1px solid ${gray}`,
             borderBottom: 0,
             borderTopRightRadius: '15px',
             borderTopLeftRadius: '15px',
@@ -428,7 +428,7 @@ const theme = createTheme({
     MuiTabPanel: {
       styleOverrides: {
         root: {
-          border: `1px solid ${disableBg}`,
+          border: `1px solid ${gray}`,
           borderRadius: '15px',
           borderTopLeftRadius: 0,
           padding: '38px',
