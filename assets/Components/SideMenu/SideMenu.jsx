@@ -54,7 +54,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     '& .MuiDrawer-paper': closedMixin(theme),
   }),
   '& .MuiDrawer-paper::-webkit-scrollbar': {
-    backgroundColor: theme.palette.deep.dark,
+    backgroundColor: theme.palette.primaryAlt.dark,
     width: '8px',
     borderRadius: '10px',
   },
@@ -137,7 +137,7 @@ const getMappedMenuItems = (items) => {
             </AccordionSummary>
             <AccordionDetails
               sx={{
-                backgroundColor: 'deep.main',
+                backgroundColor: 'primaryAlt.main',
                 boxShadow: 'inset 0px 4px 4px rgba(0, 0, 0, 0.25)',
                 pl: 0,
                 pr: 0,
@@ -243,7 +243,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
             )}
           </Link>
         </Toolbar>
-        <Divider sx={{ borderColor: 'deep.main' }} />
+        <Divider sx={{ borderColor: 'primaryAlt.main' }} />
         <List disablePadding>{items}</List>
       </Drawer>
     )

@@ -5,7 +5,7 @@ const bodyBg = '#DFDFDF';
 const navy = '#003D4D';
 const blue = '#96DFEF';
 const dark = '#000000';
-const deep = '#002F36';
+const primaryAlt = '#002F36';
 const secondaryAlt = '#BFF7FF';
 const light = '#FFFFFF';
 const error = '#FF414D';
@@ -23,7 +23,7 @@ const theme = createTheme({
     mode: 'light',
     primary: {
       main: navy,
-      dark: deep,
+      dark: primaryAlt,
       light: '#336370FF',
       contrastText: light,
     },
@@ -45,8 +45,8 @@ const theme = createTheme({
     dark: {
       main: dark,
     },
-    deep: {
-      main: deep,
+    primaryAlt: {
+      main: primaryAlt,
     },
     secondaryAlt: {
       main: secondaryAlt,
