@@ -460,7 +460,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
                         </IconButton>
                       </Tooltip>
 
-                      <IconButton disabled={!isImgWasEdited} size="small" color="black" onClick={onUndoClick(img.fileId)}>
+                      <IconButton disabled={!isImgWasEdited} size="small" color="dark" onClick={onUndoClick(img.fileId)}>
                         <Tooltip title="Undo changes">
                           <UndoIcon />
                         </Tooltip>

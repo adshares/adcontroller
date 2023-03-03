@@ -14,10 +14,10 @@ const Step = styled(MuiStep)(({ theme, disabled, active, current }) => {
       '& circle': {
         r: 11,
         fill: disabled ? '#7b7b7b' : current ? theme.palette.primary.main : 'transparent',
-        stroke: active && !current ? theme.palette.black.main : 'transparent',
+        stroke: active && !current ? theme.palette.dark.main : 'transparent',
       },
       '& text': {
-        fill: active && !current ? theme.palette.black.main : theme.palette.light.main,
+        fill: active && !current ? theme.palette.dark.main : theme.palette.light.main,
         stroke: 'none',
         fontVariationSettings: !current && !disabled ? '"wght" 900' : '"wght" 400',
       },

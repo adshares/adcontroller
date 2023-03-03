@@ -4,7 +4,7 @@ import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 const grayBg = '#DFDFDF';
 const navy = '#003D4D';
 const blue = '#96DFEF';
-const black = '#000000';
+const dark = '#000000';
 const deep = '#002F36';
 const sky = '#BFF7FF';
 const light = '#FFFFFF';
@@ -42,8 +42,8 @@ const theme = createTheme({
     blue: {
       main: blue,
     },
-    black: {
-      main: black,
+    dark: {
+      main: dark,
     },
     deep: {
       main: deep,
@@ -67,7 +67,7 @@ const theme = createTheme({
       main: success,
     },
     common: {
-      black: black,
+      dark: dark,
       light: light,
     },
     error: {
@@ -84,8 +84,8 @@ const theme = createTheme({
       main: success,
     },
     text: {
-      primary: black,
-      secondary: black,
+      primary: dark,
+      secondary: dark,
       disabled: grayBg,
     },
     divider: disableBg,
@@ -283,7 +283,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderColor: black,
+            borderColor: dark,
           },
         },
       },
@@ -304,11 +304,11 @@ const theme = createTheme({
             '& .MuiInputLabel-root': {
               color: disableBg,
               '&.Mui-focused': {
-                color: black,
+                color: dark,
                 transform: 'translate(14px, -20px) scale(0.75)',
               },
               '&.MuiInputLabel-shrink': {
-                color: black,
+                color: dark,
                 transform: 'translate(14px, -20px) scale(0.75)',
               },
             },

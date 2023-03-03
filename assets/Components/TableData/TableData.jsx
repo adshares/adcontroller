@@ -324,7 +324,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
     <>
       <Tooltip title="Column options">
         <IconButton sx={sxButton} size="small" onClick={handleOpenMenu}>
-          <MoreVertIcon fontSize="small" color="black" />
+          <MoreVertIcon fontSize="small" color="dark" />
         </IconButton>
       </Tooltip>
       <Menu
@@ -342,7 +342,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
       >
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('text') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByText', handleClose)}>
-            <FilterListIcon color="black" />
+            <FilterListIcon color="dark" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by text
             </Typography>
@@ -351,7 +351,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('range') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByRange', handleClose)}>
-            <NumbersIcon color="black" />
+            <NumbersIcon color="dark" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by range
             </Typography>
@@ -360,7 +360,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('select') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterBySelect', handleClose)}>
-            <LibraryAddCheckIcon color="black" />
+            <LibraryAddCheckIcon color="dark" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by select
             </Typography>
@@ -369,7 +369,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {cellOptions.filterableBy?.length && cellOptions.filterableBy.includes('date') && (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'columnFilterByDate', handleClose)}>
-            <CalendarMonthIcon color="black" />
+            <CalendarMonthIcon color="dark" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Filter by date range
             </Typography>
@@ -380,14 +380,14 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
 
         {columnsPinnedToLeft.includes(cellOptions.id) ? (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'unpin', handleClose)}>
-            <PushPinOutlinedIcon color="black" />
+            <PushPinOutlinedIcon color="dark" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Unpin
             </Typography>
           </MenuItem>
         ) : (
           <MenuItem onClick={() => onMenuItemClick(cellOptions.id, 'pinToLeft', handleClose)}>
-            <PushPinIcon color="black" />
+            <PushPinIcon color="dark" />
             <Typography sx={{ pl: 1 }} variant="body1">
               Pin to left
             </Typography>
