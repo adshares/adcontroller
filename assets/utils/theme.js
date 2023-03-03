@@ -1,7 +1,10 @@
 import { createTheme } from '@mui/material/styles';
 import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
+const primary = '#003D4D';
+const secondary = '#96DFEF';
 const bodyBg = '#DFDFDF';
+const bodyColor = '#000000';
 const info = '#003D4D';
 const infoBg = '#96DFEF';
 const dark = '#000000';
@@ -13,7 +16,7 @@ const errorBg = '#FFA0A6';
 const warning = '#FFB400';
 const warningBg = '#F8E7BF';
 const gray = '#BFBFBF';
-// const disable = '#606060';
+const disable = '#606060';
 const success = '#19AD42';
 const successBg = '#8DEBC8';
 
@@ -22,13 +25,13 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: info,
+      main: primary,
       dark: primaryAlt,
       light: '#336370FF',
       contrastText: light,
     },
     secondary: {
-      main: infoBg,
+      main: secondary,
       light: secondaryAlt,
       dark: '#699CA7FF',
       contrastText: light,
@@ -84,8 +87,8 @@ const theme = createTheme({
       main: success,
     },
     text: {
-      primary: dark,
-      secondary: dark,
+      primary: bodyColor,
+      secondary: bodyColor,
       disabled: bodyBg,
     },
     divider: gray,
