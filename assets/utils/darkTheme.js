@@ -18,13 +18,14 @@ const freshGrass = '#19AD42';
 const successBg = '#8DEBC8';
 
 
-const theme = createTheme({
+const darkTheme = createTheme({
   direction: 'ltr',
   palette: {
-    mode: 'light',
+    mode: 'dark',
     primary: {
       main: navy,
-      dark: deep,
+      // main: navy,
+      dark: '#eb34b4',
       light: '#336370FF',
       contrastText: white,
     },
@@ -96,11 +97,13 @@ const theme = createTheme({
       primary: black,
       secondary: black,
       disabled: grayBg,
+      dark: '#eb34b4',
     },
     divider: disableBg,
     background: {
       paper: white,
       default: white,
+      dark: '#eb34b4',
       grayBg,
       disableBg,
     },
@@ -328,6 +331,13 @@ const theme = createTheme({
         },
       ],
     },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: sun,
+        },
+      },
+    },
     MuiPopover: {
       styleOverrides: {
         paper: {
@@ -360,7 +370,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '&.MuiTableCell-root': {
-            borderColor: disableBg,
+            borderColor: '#eb34b4',
           },
           '&.MuiTableCell-head': {
             fontSize: '16px',
@@ -613,4 +623,4 @@ const theme = createTheme({
   },
 });
 
-export default theme;
+export default darkTheme;
