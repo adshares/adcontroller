@@ -1,88 +1,105 @@
 import { createTheme } from '@mui/material/styles';
 import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
-
+const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
+const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
+const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
+const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
+const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
+const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
+const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
+// const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
+// const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
+const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
+const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
+const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
+const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
+const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
+const disable = getComputedStyle(document.documentElement).getPropertyValue('--disable').trim();
+const success = getComputedStyle(document.documentElement).getPropertyValue('--success').trim();
+const successBg = getComputedStyle(document.documentElement).getPropertyValue('--success-bg').trim();
 
 const theme = createTheme({
   direction: 'ltr',
   palette: {
     mode: 'light',
     primary: {
-      main: navy,
-      dark: deep,
+      main: primary,
+      dark: primaryAlt,
       light: '#336370FF',
-      contrastText: white,
+      contrastText: 'var(--light)',
     },
     secondary: {
-      main: blue,
-      light: sky,
+      main: secondary,
+      light: secondaryAlt,
       dark: '#699CA7FF',
-      contrastText: white,
+      contrastText: 'var(--light)',
     },
-    grayBg: {
-      main: grayBg,
+    bodyBg: {
+      main: bodyBg,
     },
-    navy: {
-      main: navy,
+    info: {
+      main: info,
     },
-    blue: {
-      main: blue,
+    infoBg: {
+      main: infoBg,
     },
-    black: {
-      main: black,
+    dark: {
+      main: 'var(--dark)',
     },
-    deep: {
-      main: deep,
+    primaryAlt: {
+      main: primaryAlt,
     },
-    sky: {
-      main: sky,
+    secondaryAlt: {
+      main: secondaryAlt,
     },
-    white: {
-      main: white,
+    light: {
+      main: 'var(--light)',
     },
     sunset: {
-      light: failBg,
-      main: sunset,
+      light: errorBg,
+      main: error,
     },
     sun: {
       light: warningBg,
-      main: sun,
+      main: warning,
     },
     freshGrass: {
       light: successBg,
-      main: freshGrass,
+      main: success,
     },
     common: {
-      black: black,
-      white: white,
+      dark: 'var(--dark)',
+      light: 'var(--light)',
     },
     error: {
-      main: sunset,
-      light: failBg,
+      main: error,
+      light: errorBg,
     },
     warning: {
-      main: sun,
+      main: warning,
     },
-    info: {
-      main: blue,
-    },
+    // info: {
+    //   main: infoBg,
+    // },
     success: {
-      main: freshGrass,
+      main: success,
     },
     text: {
-      primary: black,
-      secondary: black,
-      disabled: grayBg,
+      primary: bodyColor,
+      secondary: bodyColor,
+      disabled: bodyBg,
     },
-    divider: disableBg,
+    divider: gray,
     background: {
-      paper: white,
-      default: white,
-      grayBg,
-      disableBg,
+      paper: 'var(--light)',
+      default: 'var(--light)',
+      bodyBg,
+      gray,
     },
     action: {
-      disabled: white,
+      disabled: 'var(--light)',
       disabledBackground: '#809EA6',
     },
   },
@@ -90,7 +107,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: grayBg,
+          backgroundColor: bodyBg,
           '@font-face': {
             fontFamily: 'Montserrat',
             fontStyle: 'normal',
@@ -104,7 +121,7 @@ const theme = createTheme({
             borderRadius: '10px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: `${navy}50`,
+            backgroundColor: `${info}50`,
             borderRadius: '10px',
           },
         },
@@ -120,7 +137,7 @@ const theme = createTheme({
             borderRadius: '10px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: `${navy}50`,
+            backgroundColor: `${info}50`,
             width: '8px',
             borderRadius: '10px',
           },
@@ -137,7 +154,7 @@ const theme = createTheme({
             borderRadius: '10px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: `${navy}50`,
+            backgroundColor: `${info}50`,
             width: '8px',
             borderRadius: '10px',
           },
@@ -206,7 +223,7 @@ const theme = createTheme({
           },
           style: {
             boxShadow: 'none',
-            border: `1px solid ${disableBg}`,
+            border: `1px solid ${gray}`,
           },
         },
         {
@@ -269,7 +286,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderColor: black,
+            borderColor: 'var(--dark)',
           },
         },
       },
@@ -288,13 +305,13 @@ const theme = createTheme({
               display: 'none',
             },
             '& .MuiInputLabel-root': {
-              color: disableBg,
+              color: gray,
               '&.Mui-focused': {
-                color: black,
+                color: 'var(--dark)',
                 transform: 'translate(14px, -20px) scale(0.75)',
               },
               '&.MuiInputLabel-shrink': {
-                color: black,
+                color: 'var(--dark)',
                 transform: 'translate(14px, -20px) scale(0.75)',
               },
             },
@@ -308,7 +325,7 @@ const theme = createTheme({
     MuiPopover: {
       styleOverrides: {
         paper: {
-          border: `1px solid ${blue}`,
+          border: `1px solid ${infoBg}`,
         },
       },
     },
@@ -316,7 +333,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiSlider-rail': {
-            color: disableBg,
+            color: gray,
             height: '15px',
             borderRadius: '5px',
           },
@@ -337,7 +354,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '&.MuiTableCell-root': {
-            borderColor: disableBg,
+            borderColor: gray,
           },
           '&.MuiTableCell-head': {
             fontSize: '16px',
@@ -357,7 +374,7 @@ const theme = createTheme({
             opacity: 1,
           },
           '&.Mui-active > .MuiTableSortLabel-icon': {
-            color: blue,
+            color: infoBg,
           },
         },
       },
@@ -370,15 +387,15 @@ const theme = createTheme({
           fontVariationSettings: '"wght" 700',
           '&.MuiAlert-standardWarning': {
             backgroundColor: warningBg,
-            color: sun,
+            color: warning,
           },
           '&.MuiAlert-standardError': {
-            backgroundColor: failBg,
-            color: sunset,
+            backgroundColor: errorBg,
+            color: error,
           },
           '&.MuiAlert-standardSuccess': {
             backgroundColor: successBg,
-            color: freshGrass,
+            color: success,
           },
         },
       },
@@ -391,21 +408,21 @@ const theme = createTheme({
             overflow: 'initial !important',
           },
           '& .MuiTabs-indicator': {
-            backgroundColor: white,
+            backgroundColor: 'var(--light)',
             transition: 'none',
             height: '3px',
             bottom: '-2px',
           },
           '& .MuiTab-root': {
             padding: '7px 34px',
-            border: `1px solid ${disableBg}`,
+            border: `1px solid ${gray}`,
             borderBottom: 0,
             borderTopRightRadius: '15px',
             borderTopLeftRadius: '15px',
             overflow: 'none',
 
             '&.Mui-selected': {
-              color: blue,
+              color: infoBg,
             },
           },
         },
@@ -414,7 +431,7 @@ const theme = createTheme({
     MuiTabPanel: {
       styleOverrides: {
         root: {
-          border: `1px solid ${disableBg}`,
+          border: `1px solid ${gray}`,
           borderRadius: '15px',
           borderTopLeftRadius: 0,
           padding: '38px',
@@ -426,7 +443,7 @@ const theme = createTheme({
               borderRadius: '10px',
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: `${navy}50`,
+              backgroundColor: `${info}50`,
               width: '8px',
               borderRadius: '10px',
             },
