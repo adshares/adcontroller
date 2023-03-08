@@ -17,4 +17,11 @@
     --info: #003d4d;
     --info-bg: #96dfef;
     --disable: #606060;
+    --pink: #fc03b6;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --dark: #fc03b6;
+    }
 }
