@@ -2,15 +2,15 @@ import { createTheme } from '@mui/material/styles';
 import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
 const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-// const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
-// const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
+const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
+const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
 const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
 const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
 const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
 const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
 const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
 const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
-// const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
+const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
 const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
@@ -26,15 +26,15 @@ const theme = createTheme({
     mode: 'light',
     primary: {
       main: primary,
-      dark: 'var(--primary-alt)',
+      dark: primaryAlt,
       light: '#336370FF',
-      contrastText: 'var(--light)',
+      contrastText: light,
     },
     secondary: {
-      main: 'var(--secondary)',
-      light: 'var(--secondary-alt)',
+      main: secondary,
+      light: secondaryAlt,
       dark: '#699CA7FF',
-      contrastText: 'var(--light)',
+      contrastText: light,
     },
     bodyBg: {
       main: bodyBg,
@@ -49,13 +49,13 @@ const theme = createTheme({
       main: dark,
     },
     primaryAlt: {
-      main: 'var(--primary-alt)',
+      main: primaryAlt,
     },
     secondaryAlt: {
-      main: 'var(--secondary-alt)',
+      main: secondaryAlt,
     },
     light: {
-      main: 'var(--light)',
+      main: light,
     },
     sunset: {
       light: errorBg,
@@ -71,7 +71,7 @@ const theme = createTheme({
     },
     common: {
       dark: dark,
-      light: 'var(--light)',
+      light: light,
     },
     error: {
       main: error,
@@ -93,13 +93,13 @@ const theme = createTheme({
     },
     divider: gray,
     background: {
-      paper: 'var(--light)',
-      default: 'var(--light)',
+      paper: light,
+      default: light,
       bodyBg,
       gray,
     },
     action: {
-      disabled: 'var(--light)',
+      disabled: light,
       disabledBackground: '#809EA6',
     },
   },
@@ -408,7 +408,7 @@ const theme = createTheme({
             overflow: 'initial !important',
           },
           '& .MuiTabs-indicator': {
-            backgroundColor: 'var(--light)',
+            backgroundColor: light,
             transition: 'none',
             height: '3px',
             bottom: '-2px',
