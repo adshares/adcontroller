@@ -1,24 +1,24 @@
 import { createTheme } from '@mui/material/styles';
 import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
-const primary = '#003D4D';
-const secondary = '#96DFEF';
-const bodyBg = '#DFDFDF';
-const bodyColor = '#000000';
-const info = '#003D4D';
-const infoBg = '#96DFEF';
-const dark = '#000000';
-const primaryAlt = '#002F36';
-const secondaryAlt = '#BFF7FF';
-const light = '#FFFFFF';
-const error = '#FF414D';
-const errorBg = '#FFA0A6';
-const warning = '#FFB400';
-const warningBg = '#F8E7BF';
-const gray = '#BFBFBF';
-const disable = '#606060';
-const success = '#19AD42';
-const successBg = '#8DEBC8';
+const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
+const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
+const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
+const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
+const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
+const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
+const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
+const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
+const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
+const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
+const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
+const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
+const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
+const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
+const disable = getComputedStyle(document.documentElement).getPropertyValue('--disable').trim();
+const success = getComputedStyle(document.documentElement).getPropertyValue('--success').trim();
+const successBg = getComputedStyle(document.documentElement).getPropertyValue('--success-bg').trim();
 
 const theme = createTheme({
   direction: 'ltr',
