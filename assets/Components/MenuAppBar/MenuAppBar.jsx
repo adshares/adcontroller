@@ -35,7 +35,7 @@ export default function MenuAppBar({ mode = 'app', showProtectedOptions = false,
                 sx={{
                   width: 32,
                   height: 32,
-                  color: 'light.dark',
+                  color: 'light.main',
                 }}
               />
               <Icon
@@ -45,7 +45,7 @@ export default function MenuAppBar({ mode = 'app', showProtectedOptions = false,
                   mb: 1,
                   width: 79,
                   height: 9,
-                  color: 'light.dark',
+                  color: 'light.main',
                 }}
               />
             </Box>

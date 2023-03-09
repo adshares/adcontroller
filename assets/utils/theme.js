@@ -9,7 +9,7 @@ const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--bo
 const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
 const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
 const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
-// const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
+const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
 // const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
 const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
@@ -46,7 +46,7 @@ const theme = createTheme({
       main: infoBg,
     },
     dark: {
-      main: 'var(--dark)',
+      main: dark,
     },
     primaryAlt: {
       main: primaryAlt,
@@ -70,7 +70,7 @@ const theme = createTheme({
       main: success,
     },
     common: {
-      dark: 'var(--dark)',
+      dark: dark,
       light: 'var(--light)',
     },
     error: {
@@ -286,7 +286,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderColor: 'var(--dark)',
+            borderColor: dark,
           },
         },
       },
@@ -307,11 +307,11 @@ const theme = createTheme({
             '& .MuiInputLabel-root': {
               color: gray,
               '&.Mui-focused': {
-                color: 'var(--dark)',
+                color: dark,
                 transform: 'translate(14px, -20px) scale(0.75)',
               },
               '&.MuiInputLabel-shrink': {
-                color: 'var(--dark)',
+                color: dark,
                 transform: 'translate(14px, -20px) scale(0.75)',
               },
             },
