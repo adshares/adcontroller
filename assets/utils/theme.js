@@ -8,10 +8,10 @@ const secondary = getComputedStyle(document.documentElement).getPropertyValue('-
 const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
 const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
 const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
-const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
-const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
-const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
-// const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
+// const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
+// const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
+// const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
+const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
 const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
@@ -29,25 +29,25 @@ const theme = createTheme({
       main: primary,
       dark: primaryAlt,
       light: '#336370FF',
-      contrastText: 'var(--light)',
+      contrastText: light,
     },
     secondary: {
       main: secondary,
       light: secondaryAlt,
       dark: '#699CA7FF',
-      contrastText: 'var(--light)',
+      contrastText: light,
     },
     bodyBg: {
       main: bodyBg,
     },
     info: {
-      main: info,
+      main: 'var(--info)',
     },
     infoBg: {
-      main: infoBg,
+      main: 'var(--info-bg)',
     },
     dark: {
-      main: dark,
+      main: 'var(--dark)',
     },
     primaryAlt: {
       main: primaryAlt,
@@ -56,7 +56,10 @@ const theme = createTheme({
       main: secondaryAlt,
     },
     light: {
-      main: 'var(--light)',
+      main: light,
+    },
+    white: {
+      main: light,
     },
     sunset: {
       light: errorBg,
@@ -72,7 +75,7 @@ const theme = createTheme({
     },
     common: {
       dark: dark,
-      light: 'var(--light)',
+      light: light,
     },
     error: {
       main: error,
@@ -91,13 +94,13 @@ const theme = createTheme({
     },
     divider: gray,
     background: {
-      paper: 'var(--light)',
-      default: 'var(--light)',
+      paper: light,
+      default: light,
       bodyBg,
       gray,
     },
     action: {
-      disabled: 'var(--light)',
+      disabled: light,
       disabledBackground: '#809EA6',
     },
   },
@@ -406,7 +409,7 @@ const theme = createTheme({
             overflow: 'initial !important',
           },
           '& .MuiTabs-indicator': {
-            backgroundColor: 'var(--light)',
+            backgroundColor: light,
             transition: 'none',
             height: '3px',
             bottom: '-2px',
