@@ -14,12 +14,12 @@ const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark
 const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
 // const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
-const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
+// const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
 // const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
 const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
 const disable = getComputedStyle(document.documentElement).getPropertyValue('--disable').trim();
 const success = getComputedStyle(document.documentElement).getPropertyValue('--success').trim();
-const successBg = getComputedStyle(document.documentElement).getPropertyValue('--success-bg').trim();
+// const successBg = getComputedStyle(document.documentElement).getPropertyValue('--success-bg').trim();
 
 const theme = createTheme({
   direction: 'ltr',
@@ -70,7 +70,7 @@ const theme = createTheme({
     },
     sun: {
       light: 'var(--warning-bg)',
-      main: warning,
+      main: 'var(--warning)',
     },
     freshGrass: {
       light: 'var(--success-bg)',
@@ -85,7 +85,7 @@ const theme = createTheme({
       light: 'var(--error-bg)',
     },
     warning: {
-      main: warning,
+      main: 'var(--warning)',
     },
     success: {
       main: success,
@@ -391,7 +391,7 @@ const theme = createTheme({
           fontVariationSettings: '"wght" 700',
           '&.MuiAlert-standardWarning': {
             backgroundColor: 'var(--warning-bg)',
-            color: warning,
+            color: 'var(--warning)',
           },
           '&.MuiAlert-standardError': {
             backgroundColor: 'var(--error-bg)',
