@@ -1,0 +1,27 @@
+:root {
+    --primary: #003d4d;
+    --secondary: #96dfef;
+    --primary-alt: #fc03b6;
+    --secondary-alt: #4d41ff;
+    --body-bg: #4d41ff;
+    --body-color: #4d41ff;
+    --dark: #4d41ff;
+    --light: #ffffff;
+    --gray: #bfbfbf;
+    --error: #fc03b6;
+    --error-bg: #fc03b6;
+    --warning: #ffb400;
+    --warning-bg: #fc03b6;
+    --success: #19ad42;
+    --success-bg: #fc03b6;
+    --info: #003d4d;
+    --info-bg: #fc03b6;
+    --disable: #606060;
+    --pink: #fc03b6;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --dark: #fc03b6;
+    }
+}

@@ -3,23 +3,23 @@ import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
 
 const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-// const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
+const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
 const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
-// const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
-// const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
+const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
+const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
 const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
 const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
-// const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
+const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
 const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
 const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
-// const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
+const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
-// const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
+const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
 const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
 const disable = getComputedStyle(document.documentElement).getPropertyValue('--disable').trim();
 const success = getComputedStyle(document.documentElement).getPropertyValue('--success').trim();
-// const successBg = getComputedStyle(document.documentElement).getPropertyValue('--success-bg').trim();
+const successBg = getComputedStyle(document.documentElement).getPropertyValue('--success-bg').trim();
 
 const theme = createTheme({
   direction: 'ltr',
@@ -27,24 +27,24 @@ const theme = createTheme({
     mode: 'light',
     primary: {
       main: primary,
-      dark: 'var(--primary-alt)',
+      dark: primaryAlt,
       light: '#336370FF',
       contrastText: light,
     },
     secondary: {
       main: secondary,
-      light: 'var(--secondary-alt)',
+      light: secondaryAlt,
       dark: '#699CA7FF',
       contrastText: light,
     },
     bodyBg: {
-      main: 'var(--body-bg)',
+      main: bodyBg,
     },
     info: {
       main: info,
     },
     infoBg: {
-      main: 'var(--info-bg)',
+      main: infoBg,
     },
     dark: {
       main: dark,
@@ -53,10 +53,10 @@ const theme = createTheme({
       main: dark,
     },
     primaryAlt: {
-      main: 'var(--primary-alt)',
+      main: primaryAlt,
     },
     secondaryAlt: {
-      main: 'var(--secondary-alt)',
+      main: secondaryAlt,
     },
     light: {
       main: light,
@@ -65,15 +65,15 @@ const theme = createTheme({
       main: light,
     },
     sunset: {
-      light: 'var(--error-bg)',
+      light: errorBg,
       main: error,
     },
     sun: {
-      light: 'var(--warning-bg)',
+      light: warningBg,
       main: warning,
     },
     freshGrass: {
-      light: 'var(--success-bg)',
+      light: successBg,
       main: success,
     },
     common: {
@@ -82,7 +82,7 @@ const theme = createTheme({
     },
     error: {
       main: error,
-      light: 'var(--error-bg)',
+      light: errorBg,
     },
     warning: {
       main: warning,
@@ -93,13 +93,13 @@ const theme = createTheme({
     text: {
       primary: bodyColor,
       secondary: bodyColor,
-      disabled: 'var(--body-bg)',
+      disabled: bodyBg,
     },
     divider: gray,
     background: {
       paper: light,
       default: light,
-      light,
+      bodyBg,
       gray,
     },
     action: {
@@ -111,7 +111,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: 'var(--body-bg)',
+          backgroundColor: bodyBg,
           '@font-face': {
             fontFamily: 'Montserrat',
             fontStyle: 'normal',
@@ -329,7 +329,7 @@ const theme = createTheme({
     MuiPopover: {
       styleOverrides: {
         paper: {
-          border: `1px solid ${'var(--info-bg)'}`,
+          border: `1px solid ${infoBg}`,
         },
       },
     },
@@ -378,7 +378,7 @@ const theme = createTheme({
             opacity: 1,
           },
           '&.Mui-active > .MuiTableSortLabel-icon': {
-            color: 'var(--info-bg)',
+            color: infoBg,
           },
         },
       },
@@ -390,11 +390,11 @@ const theme = createTheme({
           fontSize: '16px',
           fontVariationSettings: '"wght" 700',
           '&.MuiAlert-standardWarning': {
-            backgroundColor: 'var(--warning-bg)',
+            backgroundColor: warningBg,
             color: warning,
           },
           '&.MuiAlert-standardError': {
-            backgroundColor: 'var(--error-bg)',
+            backgroundColor: errorBg,
             color: error,
           },
           '&.MuiAlert-standardSuccess': {
@@ -426,7 +426,7 @@ const theme = createTheme({
             overflow: 'none',
 
             '&.Mui-selected': {
-              color: 'var(--info-bg)',
+              color: infoBg,
             },
           },
         },
