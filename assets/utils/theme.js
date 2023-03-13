@@ -3,15 +3,15 @@ import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
 
 const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-// const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
+const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
 const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
-// const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
-const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
+const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
+// const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
 const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
-// const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
-// const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
-// const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
-// const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
+const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
+const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
+const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
+const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
 const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
@@ -38,25 +38,28 @@ const theme = createTheme({
       contrastText: light,
     },
     bodyBg: {
-      main: bodyBg,
+      main: 'var(--body-bg)',
     },
     info: {
-      main: 'var(--info)',
+      main: info,
     },
     infoBg: {
-      main: 'var(--info-bg)',
+      main: infoBg,
     },
     dark: {
-      main: 'var(--dark)',
+      main: dark,
+    },
+    black: {
+      main: dark,
     },
     primaryAlt: {
-      main: 'var(--primary-alt)',
+      main: primaryAlt,
     },
     secondaryAlt: {
-      main: 'var(--secondary-alt)',
+      main: secondaryAlt,
     },
     light: {
-      main: 'var(--light)',
+      main: light,
     },
     white: {
       main: light,
@@ -90,13 +93,13 @@ const theme = createTheme({
     text: {
       primary: bodyColor,
       secondary: bodyColor,
-      disabled: bodyBg,
+      disabled: 'var(--body-bg)',
     },
     divider: gray,
     background: {
       paper: light,
       default: light,
-      bodyBg,
+      light,
       gray,
     },
     action: {
@@ -108,7 +111,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: bodyBg,
+          backgroundColor: 'var(--body-bg)',
           '@font-face': {
             fontFamily: 'Montserrat',
             fontStyle: 'normal',
