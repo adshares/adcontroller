@@ -11,7 +11,7 @@ const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('-
 // const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
 // const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
 // const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
-const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
+// const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
 const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
@@ -56,7 +56,7 @@ const theme = createTheme({
       main: 'var(--secondary-alt)',
     },
     light: {
-      main: light,
+      main: 'var(--light)',
     },
     white: {
       main: light,
