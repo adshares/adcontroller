@@ -9,11 +9,11 @@ const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue
 // const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
 const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
 const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
-const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
+// const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
 const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
 const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
-const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
+// const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
 const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
 const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
@@ -44,7 +44,7 @@ const theme = createTheme({
       main: info,
     },
     infoBg: {
-      main: infoBg,
+      main: 'var(--info-bg)',
     },
     dark: {
       main: dark,
@@ -65,7 +65,7 @@ const theme = createTheme({
       main: light,
     },
     sunset: {
-      light: errorBg,
+      light: 'var(--error-bg)',
       main: error,
     },
     sun: {
@@ -82,7 +82,7 @@ const theme = createTheme({
     },
     error: {
       main: error,
-      light: errorBg,
+      light: 'var(--error-bg)',
     },
     warning: {
       main: warning,
@@ -329,7 +329,7 @@ const theme = createTheme({
     MuiPopover: {
       styleOverrides: {
         paper: {
-          border: `1px solid ${infoBg}`,
+          border: `1px solid ${'var(--info-bg)'}`,
         },
       },
     },
@@ -378,7 +378,7 @@ const theme = createTheme({
             opacity: 1,
           },
           '&.Mui-active > .MuiTableSortLabel-icon': {
-            color: infoBg,
+            color: 'var(--info-bg)',
           },
         },
       },
@@ -394,7 +394,7 @@ const theme = createTheme({
             color: warning,
           },
           '&.MuiAlert-standardError': {
-            backgroundColor: errorBg,
+            backgroundColor: 'var(--error-bg)',
             color: error,
           },
           '&.MuiAlert-standardSuccess': {
@@ -426,7 +426,7 @@ const theme = createTheme({
             overflow: 'none',
 
             '&.Mui-selected': {
-              color: infoBg,
+              color: 'var(--info-bg)',
             },
           },
         },
