@@ -3,7 +3,7 @@ import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
 
 const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
+// const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
 const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
 const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
 // const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
@@ -14,7 +14,7 @@ const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark
 const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
 // const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
-// const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
+const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
 // const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
 const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
 const disable = getComputedStyle(document.documentElement).getPropertyValue('--disable').trim();
@@ -27,7 +27,7 @@ const theme = createTheme({
     mode: 'light',
     primary: {
       main: primary,
-      dark: primaryAlt,
+      dark: 'var(--primary-alt)',
       light: '#336370FF',
       contrastText: light,
     },
@@ -53,7 +53,7 @@ const theme = createTheme({
       main: dark,
     },
     primaryAlt: {
-      main: primaryAlt,
+      main: 'var(--primary-alt)',
     },
     secondaryAlt: {
       main: secondaryAlt,
@@ -70,7 +70,7 @@ const theme = createTheme({
     },
     sun: {
       light: 'var(--warning-bg)',
-      main: 'var(--warning)',
+      main: warning,
     },
     freshGrass: {
       light: 'var(--success-bg)',
@@ -85,7 +85,7 @@ const theme = createTheme({
       light: 'var(--error-bg)',
     },
     warning: {
-      main: 'var(--warning)',
+      main: warning,
     },
     success: {
       main: success,
@@ -391,7 +391,7 @@ const theme = createTheme({
           fontVariationSettings: '"wght" 700',
           '&.MuiAlert-standardWarning': {
             backgroundColor: 'var(--warning-bg)',
-            color: 'var(--warning)',
+            color: warning,
           },
           '&.MuiAlert-standardError': {
             backgroundColor: 'var(--error-bg)',
