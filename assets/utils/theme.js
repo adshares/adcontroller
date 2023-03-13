@@ -5,7 +5,7 @@ import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
 // const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
 const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
-const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
+// const secondaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--secondary-alt').trim();
 // const bodyBg = getComputedStyle(document.documentElement).getPropertyValue('--body-bg').trim();
 const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color').trim();
 const info = getComputedStyle(document.documentElement).getPropertyValue('--info').trim();
@@ -33,7 +33,7 @@ const theme = createTheme({
     },
     secondary: {
       main: secondary,
-      light: secondaryAlt,
+      light: 'var(--secondary-alt)',
       dark: '#699CA7FF',
       contrastText: light,
     },
@@ -56,7 +56,7 @@ const theme = createTheme({
       main: 'var(--primary-alt)',
     },
     secondaryAlt: {
-      main: secondaryAlt,
+      main: 'var(--secondary-alt)',
     },
     light: {
       main: light,
