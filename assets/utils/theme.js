@@ -49,9 +49,6 @@ const theme = createTheme({
     dark: {
       main: dark,
     },
-    black: {
-      main: dark,
-    },
     primaryAlt: {
       main: primaryAlt,
     },

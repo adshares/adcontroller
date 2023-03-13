@@ -1,6 +1,5 @@
 import './styles/app.scss';
 import './styles/colors.css';
-// import './styles/users-colors.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { store } from './redux/store';
