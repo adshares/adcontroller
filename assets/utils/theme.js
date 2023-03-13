@@ -15,7 +15,7 @@ const light = getComputedStyle(document.documentElement).getPropertyValue('--lig
 const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
 // const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
-const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
+// const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
 const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
 const disable = getComputedStyle(document.documentElement).getPropertyValue('--disable').trim();
 const success = getComputedStyle(document.documentElement).getPropertyValue('--success').trim();
@@ -69,11 +69,11 @@ const theme = createTheme({
       main: error,
     },
     sun: {
-      light: warningBg,
+      light: 'var(--warning-bg)',
       main: warning,
     },
     freshGrass: {
-      light: successBg,
+      light: 'var(--success-bg)',
       main: success,
     },
     common: {
@@ -390,7 +390,7 @@ const theme = createTheme({
           fontSize: '16px',
           fontVariationSettings: '"wght" 700',
           '&.MuiAlert-standardWarning': {
-            backgroundColor: warningBg,
+            backgroundColor: 'var(--warning-bg)',
             color: warning,
           },
           '&.MuiAlert-standardError': {
@@ -398,7 +398,7 @@ const theme = createTheme({
             color: error,
           },
           '&.MuiAlert-standardSuccess': {
-            backgroundColor: successBg,
+            backgroundColor: 'var(--success-bg)',
             color: success,
           },
         },
