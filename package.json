@@ -5,7 +5,6 @@
         "@babel/preset-react": "^7.0.0",
         "@symfony/webpack-encore": "^4.0.0",
         "core-js": "^3.23.0",
-        "cypress": "^12.7.0",
         "dotenv": "^16.0.1",
         "eslint": "^7.32.0 || ^8.2.0",
         "eslint-config-airbnb": "^19.0.4",
