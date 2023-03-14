@@ -17,8 +17,8 @@ const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--e
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
 const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
 const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
-const disable = getComputedStyle(document.documentElement).getPropertyValue('--disable').trim();
-const disabledBg = getComputedStyle(document.documentElement).getPropertyValue('--disabled-bg').trim();
+const muted = getComputedStyle(document.documentElement).getPropertyValue('--muted').trim();
+const mutedBg = getComputedStyle(document.documentElement).getPropertyValue('--muted-bg').trim();
 const success = getComputedStyle(document.documentElement).getPropertyValue('--success').trim();
 const successBg = getComputedStyle(document.documentElement).getPropertyValue('--success-bg').trim();
 
@@ -29,13 +29,13 @@ const theme = createTheme({
     primary: {
       main: primary,
       dark: primaryAlt,
-      light: disabledBg,
+      light: mutedBg,
       contrastText: light,
     },
     secondary: {
       main: secondary,
       light: secondaryAlt,
-      dark: disabledBg,
+      dark: mutedBg,
       contrastText: light,
     },
     bodyBg: {
@@ -102,7 +102,7 @@ const theme = createTheme({
     },
     action: {
       disabled: light,
-      disabledBackground: disabledBg,
+      disabledBackground: mutedBg,
     },
   },
   components: {
@@ -201,7 +201,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '&.Mui-disabled': {
-            color: disabledBg,
+            color: mutedBg,
             cursor: 'not-allowed',
             pointerEvents: 'fill',
           },
