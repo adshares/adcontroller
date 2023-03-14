@@ -25,7 +25,7 @@ export default function MenuAppBar({ mode = 'app', showProtectedOptions = false,
   };
 
   return (
-    <AppBar position="sticky" color="bodyBg" sx={{ boxShadow: 'none' }}>
+    <AppBar position="sticky" color="grayBg" sx={{ boxShadow: 'none' }}>
       <Toolbar>
         {!showProtectedOptions && (
           <>
@@ -35,7 +35,7 @@ export default function MenuAppBar({ mode = 'app', showProtectedOptions = false,
                 sx={{
                   width: 32,
                   height: 32,
-                  color: 'light.main',
+                  color: 'white.black',
                 }}
               />
               <Icon
@@ -45,7 +45,7 @@ export default function MenuAppBar({ mode = 'app', showProtectedOptions = false,
                   mb: 1,
                   width: 79,
                   height: 9,
-                  color: 'light.main',
+                  color: 'white.black',
                 }}
               />
             </Box>

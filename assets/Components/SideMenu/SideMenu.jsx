@@ -54,12 +54,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     '& .MuiDrawer-paper': closedMixin(theme),
   }),
   '& .MuiDrawer-paper::-webkit-scrollbar': {
-    backgroundColor: theme.palette.primaryAlt.dark,
+    backgroundColor: theme.palette.deep.dark,
     width: '8px',
     borderRadius: '10px',
   },
   '& .MuiDrawer-paper::-webkit-scrollbar-thumb': {
-    backgroundColor: theme.palette.infoBg.main,
+    backgroundColor: theme.palette.blue.main,
     borderRadius: '10px',
   },
 }));
@@ -125,19 +125,19 @@ const getMappedMenuItems = (items) => {
                   backgroundColor: 'rgba(0, 47, 54, 0.5)',
                 },
               }}
-              expandIcon={<ArrowDropDownIcon color="light" />}
+              expandIcon={<ArrowDropDownIcon color="white" />}
             >
               <ListItemIcon>
                 {React.createElement(item.icon, {
                   sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                  color: 'light',
+                  color: 'white',
                 })}
               </ListItemIcon>
-              <Typography sx={{ color: 'light.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
+              <Typography sx={{ color: 'white.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
             </AccordionSummary>
             <AccordionDetails
               sx={{
-                backgroundColor: 'primaryAlt.main',
+                backgroundColor: 'deep.main',
                 boxShadow: 'inset 0px 4px 4px rgba(0, 0, 0, 0.25)',
                 pl: 0,
                 pr: 0,
@@ -156,14 +156,14 @@ const getMappedMenuItems = (items) => {
                     <ListItemIcon>
                       {React.createElement(children.icon, {
                         sx: { transform: children.rotateIcon && `rotate(${children.rotateIcon})` },
-                        color: children.path === location.pathname ? 'infoBg' : 'light',
+                        color: children.path === location.pathname ? 'blue' : 'white',
                       })}
                     </ListItemIcon>
                     <ListItemText
                       primary={children.name}
                       primaryTypographyProps={{
                         sx: {
-                          color: children.path === location.pathname ? 'infoBg.main' : 'light.main',
+                          color: children.path === location.pathname ? 'blue.main' : 'white.main',
                           margin: 0,
                           fontVariationSettings: '"wght" 500',
                         },
@@ -183,14 +183,14 @@ const getMappedMenuItems = (items) => {
             <ListItemIcon>
               {React.createElement(item.icon, {
                 sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                color: item.path === location.pathname ? 'infoBg' : 'light',
+                color: item.path === location.pathname ? 'blue' : 'white',
               })}
             </ListItemIcon>
             <ListItemText
               primary={item.name}
               primaryTypographyProps={{
                 sx: {
-                  color: item.path === location.pathname ? 'infoBg.main' : 'light.main',
+                  color: item.path === location.pathname ? 'blue.main' : 'white.main',
                   margin: 0,
                   fontVariationSettings: '"wght" 600',
                 },
@@ -212,7 +212,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
       <Drawer
         PaperProps={{
           sx: {
-            backgroundColor: 'info.main',
+            backgroundColor: 'navy.main',
           },
         }}
         open={showSideMenu}
@@ -226,7 +226,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
               sx={{
                 width: 32,
                 height: 32,
-                color: 'light.main',
+                color: 'white.main',
               }}
             />
             {showSideMenu && (
@@ -237,13 +237,13 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
                   mb: 1,
                   width: 79,
                   height: 9,
-                  color: 'light.main',
+                  color: 'white.main',
                 }}
               />
             )}
           </Link>
         </Toolbar>
-        <Divider sx={{ borderColor: 'primaryAlt.main' }} />
+        <Divider sx={{ borderColor: 'deep.main' }} />
         <List disablePadding>{items}</List>
       </Drawer>
     )
