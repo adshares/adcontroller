@@ -460,7 +460,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
                         </IconButton>
                       </Tooltip>
 
-                      <IconButton disabled={!isImgWasEdited} size="small" color="black" onClick={onUndoClick(img.fileId)}>
+                      <IconButton disabled={!isImgWasEdited} size="small" color="dark" onClick={onUndoClick(img.fileId)}>
                         <Tooltip title="Undo changes">
                           <UndoIcon />
                         </Tooltip>
@@ -717,7 +717,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                       </IconButton>
                     </Tooltip>
 
-                    <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="black" onClick={onUndoClick(id)}>
+                    <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="dark" onClick={onUndoClick(id)}>
                       <Tooltip title="Undo changes">
                         <UndoIcon />
                       </Tooltip>
@@ -758,7 +758,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableText1" color="white.main">
+                    <Typography variant="tableText1" color="light.main">
                       Min height {height}{' '}
                       {changedFiles.hasOwnProperty(id) && (
                         <Typography component="span" variant="body2" color="error.main">
@@ -781,7 +781,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                       </IconButton>
                     </Tooltip>
 
-                    <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="white" onClick={onUndoClick(id)}>
+                    <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="light" onClick={onUndoClick(id)}>
                       <Tooltip title="Undo changes">
                         <UndoIcon />
                       </Tooltip>
