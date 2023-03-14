@@ -12,8 +12,8 @@ const info = getComputedStyle(document.documentElement).getPropertyValue('--info
 const infoBg = getComputedStyle(document.documentElement).getPropertyValue('--info-bg').trim();
 const dark = getComputedStyle(document.documentElement).getPropertyValue('--dark').trim();
 const light = getComputedStyle(document.documentElement).getPropertyValue('--light').trim();
-const error = getComputedStyle(document.documentElement).getPropertyValue('--error').trim();
-const errorBg = getComputedStyle(document.documentElement).getPropertyValue('--error-bg').trim();
+const danger = getComputedStyle(document.documentElement).getPropertyValue('--danger').trim();
+const dangerBg = getComputedStyle(document.documentElement).getPropertyValue('--danger-bg').trim();
 const warning = getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
 const warningBg = getComputedStyle(document.documentElement).getPropertyValue('--warning-bg').trim();
 const gray = getComputedStyle(document.documentElement).getPropertyValue('--gray').trim();
@@ -63,8 +63,8 @@ const theme = createTheme({
       main: light,
     },
     sunset: {
-      light: errorBg,
-      main: error,
+      light: dangerBg,
+      main: danger,
     },
     sun: {
       light: warningBg,
@@ -79,8 +79,8 @@ const theme = createTheme({
       light: light,
     },
     error: {
-      main: error,
-      light: errorBg,
+      main: danger,
+      light: dangerBg,
     },
     warning: {
       main: warning,
@@ -392,8 +392,8 @@ const theme = createTheme({
             color: warning,
           },
           '&.MuiAlert-standardError': {
-            backgroundColor: errorBg,
-            color: error,
+            backgroundColor: dangerBg,
+            color: danger,
           },
           '&.MuiAlert-standardSuccess': {
             backgroundColor: successBg,
