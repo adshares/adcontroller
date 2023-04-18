@@ -1162,12 +1162,12 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler, initialState = { fr
     validateDate();
   }, [dateState]);
 
-  const onPickerChange = (name) => (newValue, string) => {
+  const onPickerChange = (name) => (newValue) => {
     setDateState((prevState) => ({
       ...prevState,
       [name]: {
         value: newValue,
-        string: string || (dayjs(newValue).isValid() ? dayjs(newValue).format('DD-MM-YYYY HH:mm') : null),
+        string: dayjs(newValue).isValid() ? dayjs(newValue).format('DD-MM-YYYY HH:mm') : null,
       },
     }));
   };
@@ -1253,20 +1253,17 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler, initialState = { fr
         <DateTimePicker
           ampm={false}
           label="From"
-          inputFormat={'DD-MM-YYYY HH:mm'}
+          format={'DD-MM-YYYY HH:mm'}
           value={dateState.fromDate.value}
           onChange={onPickerChange('fromDate')}
-          renderInput={(params) => {
-            params.error = !errorObj.fromDate.isValid;
-            return (
-              <TextField
-                helperText={!errorObj.fromDate.isValid ? errorObj.fromDate.reason : undefined}
-                onBlur={onInputBlur('fromDate')}
-                size="small"
-                margin="dense"
-                {...params}
-              />
-            );
+          slotProps={{
+            textField: {
+              error: !errorObj.fromDate.isValid,
+              helperText: !errorObj.fromDate.isValid ? errorObj.fromDate.reason : undefined,
+              onBlur: onInputBlur('fromDate'),
+              size: 'small',
+              margin: 'dense',
+            },
           }}
         />
         <DateTimePicker
@@ -1274,19 +1271,16 @@ const FilterByDateRange = ({ createFilterByDateRangeHandler, initialState = { fr
           ampm={false}
           label="To"
           value={dateState.toDate.value}
-          inputFormat={'DD-MM-YYYY HH:mm'}
+          format={'DD-MM-YYYY HH:mm'}
           onChange={onPickerChange('toDate')}
-          renderInput={(params) => {
-            params.error = !errorObj.toDate.isValid;
-            return (
-              <TextField
-                helperText={!errorObj.toDate.isValid ? errorObj.toDate.reason : undefined}
-                onBlur={onInputBlur('toDate')}
-                size="small"
-                margin="dense"
-                {...params}
-              />
-            );
+          slotProps={{
+            textField: {
+              error: !errorObj.toDate.isValid,
+              helperText: !errorObj.toDate.isValid ? errorObj.toDate.reason : undefined,
+              onBlur: onInputBlur('toDate'),
+              size: 'small',
+              margin: 'dense',
+            },
           }}
         />
       </LocalizationProvider>
