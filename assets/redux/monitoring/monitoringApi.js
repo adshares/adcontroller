@@ -53,6 +53,15 @@ export const monitoringApi = createApi({
         };
       },
     }),
+    getTurnover: builder.query({
+      query: (queryConfig) => {
+        const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
+        return {
+          url: `/api/turnover?${queryParams}`,
+          method: 'GET',
+        };
+      },
+    }),
     getUsersList: builder.query({
       query: (queryConfig) => {
         const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
@@ -159,6 +168,7 @@ export const {
   useGetEventsQuery,
   useGetEventsLatestQuery,
   useGetEventTypesQuery,
+  useGetTurnoverQuery,
   useGetUsersListQuery,
   useConfirmUserMutation,
   useSwitchToAdminMutation,

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import { useSetWalletConfigMutation, useSetColdWalletConfigMutation, useGetWalletNodeMutation } from '../../redux/config/configApi';
-import { useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
+import { useGetTurnoverQuery, useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
 import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../redux/config/configSlice';
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
@@ -20,6 +20,7 @@ import {
   Collapse,
   FormControlLabel,
   IconButton,
+  Link,
   TextField,
   Tooltip,
   Typography,
@@ -28,6 +29,16 @@ import InfoIcon from '@mui/icons-material/Info';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 export default function Wallet() {
   return (
@@ -130,7 +141,18 @@ const WalletSettingsCard = (props) => {
         <>
           <Collapse in={!editMode} timeout="auto">
             <Typography variant="h3">
-              Wallet address: <Typography variant="b800">{appData.AdServer.WalletAddress} ADS</Typography>
+              Wallet address:{' '}
+              <Typography variant="b800">
+                <Link
+                  href={'https://operator.adshares.net/blockexplorer/accounts/' + appData.AdServer.WalletAddress}
+                  target="_blank"
+                  rel="nofollow noopener noreferrer"
+                  underline={'none'}
+                >
+                  {appData.AdServer.WalletAddress}
+                </Link>{' '}
+                ADS
+              </Typography>
             </Typography>
           </Collapse>
           <Collapse in={editMode} timeout="auto" unmountOnExit>
@@ -212,6 +234,40 @@ const WalletSettingsCard = (props) => {
 };
 
 const WalletStatusCard = (props) => {
+  const [dateFrom, setDateFrom] = useState(dayjs().subtract(1, 'day').startOf('day'));
+  const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    'filter[date][from]': dateFrom?.format(),
+    'filter[date][to]': dateTo?.format(),
+  }));
+  const [rows, setRows] = useState(() => []);
+  const { data: turnoverResponse, isFetching } = useGetTurnoverQuery(queryConfig, { refetchOnMountOrArgChange: true });
+
+  useEffect(() => {
+    setQueryConfig((prevState) => ({
+      ...prevState,
+      'filter[date][from]': dateFrom?.format(),
+      'filter[date][to]': dateTo?.format(),
+    }));
+  }, [dateFrom, dateTo]);
+
+  useEffect(() => {
+    if (!turnoverResponse?.data) {
+      return;
+    }
+    setRows(() => [
+      { name: 'dspAdvertisersExpense', description: 'DSP Advertisers expense', amount: turnoverResponse.data.dspAdvertisersExpense },
+      { name: 'dspLicenseFee', description: 'DSP license fee', amount: turnoverResponse.data.dspLicenseFee },
+      { name: 'dspOperatorFee', description: 'DSP operator fee', amount: turnoverResponse.data.dspOperatorFee },
+      { name: 'dspCommunityFee', description: 'DSP community fee', amount: turnoverResponse.data.dspCommunityFee },
+      { name: 'dspExpense', description: 'DSP expense', amount: turnoverResponse.data.dspExpense },
+      { name: 'sspIncome', description: 'SSP income', amount: turnoverResponse.data.sspIncome },
+      { name: 'sspLicenseFee', description: 'SSP license fee', amount: turnoverResponse.data.sspLicenseFee },
+      { name: 'sspOperatorFee', description: 'SSP operator fee', amount: turnoverResponse.data.sspOperatorFee },
+      { name: 'sspPublishersIncome', description: 'SSP publishers income', amount: turnoverResponse.data.sspPublishersIncome },
+    ]);
+  }, [turnoverResponse]);
+
   const monitoringWalletInfo = useSelector(monitoringSelectors.getMonitoringWalletInfo);
   useGetWalletMonitoringQuery([], {
     pollingInterval: 3000,
@@ -236,6 +292,50 @@ const WalletStatusCard = (props) => {
         <Typography variant="body1" sx={{ mt: 1 }}>
           The total amount of all bonuses that have been added to user accounts but have not yet been used up.
         </Typography>
+      </CardContent>
+      <CardContent>
+        <Typography variant="h3">Turnover</Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          Cash flows by category.
+        </Typography>
+        <Box sx={{ mt: 2 }}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="From"
+              value={dateFrom}
+              onChange={(newValue) => setDateFrom(newValue)}
+              disabled={isFetching}
+              maxDate={dateTo}
+              disableFuture={true}
+              sx={{ mr: 2 }}
+            />
+            <DatePicker label="To" value={dateTo} onChange={(newValue) => setDateTo(newValue)} disabled={isFetching} />
+          </LocalizationProvider>
+        </Box>
+        {!isFetching && rows && (
+          <Box sx={{ mt: 2 }}>
+            <TableContainer sx={{ maxWidth: 600 }}>
+              <Table sx={{ minWidth: 450 }} aria-label="Turnover data table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Category</TableCell>
+                    <TableCell align="right">Amount</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.name}>
+                      <TableCell component="th" scope="row">
+                        {row.description}
+                      </TableCell>
+                      <TableCell align="right">{formatMoney(row.amount, 5)} ADS</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
       </CardContent>
     </Card>
   );
