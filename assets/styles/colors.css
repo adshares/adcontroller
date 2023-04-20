@@ -19,3 +19,12 @@
     --muted: #606060;
     --muted-bg: #809EA6;
 }
+
+/*@media (prefers-color-scheme: dark) {*/
+/*    :root {*/
+/*        --info: #f8e7bf;*/
+/*        --primary: #96dfef;*/
+/*        --secondary-alt: #002f36;*/
+/*        --primary-alt: #bff7ff;*/
+/*    }*/
+/*}*/
