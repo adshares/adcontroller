@@ -281,6 +281,7 @@ const WalletStatusCard = (props) => {
           Total balance: <Typography variant="b800">{formatMoney(monitoringWalletInfo.balance, 5)} ADS</Typography>
         </Typography>
         <Typography variant="body1" sx={{ mt: 1 }}>
+          {/* eslint-disable-next-line max-len */}
           Total balance of all user accounts. This amount should be at least equal to the sum of funds accumulated in hot and cold wallets.{' '}
           <Typography variant="b600">The amount exceeding this value is the operator's profit</Typography>.
         </Typography>
@@ -296,7 +297,11 @@ const WalletStatusCard = (props) => {
       <CardContent>
         <Typography variant="h3">Turnover</Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Cash flows by category.
+          Cash flows by category. Money flow is explained in{' '}
+          <Link href={'https://docs.adshares.net/protocol/payments/index.html'} rel="nofollow noopener noreferrer" target="_blank">
+            the docs
+          </Link>
+          .
         </Typography>
         <Box sx={{ mt: 2 }}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -409,6 +414,7 @@ const ColdWalletSettingsCard = (props) => {
                 <Tooltip
                   sx={{ ml: 2 }}
                   title={
+                    // eslint-disable-next-line max-len
                     'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail.'
                   }
                 >
@@ -437,6 +443,7 @@ const ColdWalletSettingsCard = (props) => {
                 <Tooltip
                   sx={{ ml: 2 }}
                   title={
+                    // eslint-disable-next-line max-len
                     'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
                   }
                 >
