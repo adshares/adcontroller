@@ -19,6 +19,7 @@ import {
   Checkbox,
   Collapse,
   FormControlLabel,
+  Grid,
   IconButton,
   Link,
   TextField,
@@ -240,7 +241,8 @@ const WalletStatusCard = (props) => {
     'filter[date][from]': dateFrom?.format(),
     'filter[date][to]': dateTo?.format(),
   }));
-  const [rows, setRows] = useState(() => []);
+  const [dspRows, setDspRows] = useState(() => []);
+  const [sspRows, setSspRows] = useState(() => []);
   const { data: turnoverResponse, isFetching } = useGetTurnoverQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
@@ -255,12 +257,14 @@ const WalletStatusCard = (props) => {
     if (!turnoverResponse?.data) {
       return;
     }
-    setRows(() => [
+    setDspRows(() => [
       { name: 'dspAdvertisersExpense', description: 'DSP Advertisers expense', amount: turnoverResponse.data.dspAdvertisersExpense },
       { name: 'dspLicenseFee', description: 'DSP license fee', amount: turnoverResponse.data.dspLicenseFee },
       { name: 'dspOperatorFee', description: 'DSP operator fee', amount: turnoverResponse.data.dspOperatorFee },
       { name: 'dspCommunityFee', description: 'DSP community fee', amount: turnoverResponse.data.dspCommunityFee },
       { name: 'dspExpense', description: 'DSP expense', amount: turnoverResponse.data.dspExpense },
+    ]);
+    setSspRows(() => [
       { name: 'sspIncome', description: 'SSP income', amount: turnoverResponse.data.sspIncome },
       { name: 'sspLicenseFee', description: 'SSP license fee', amount: turnoverResponse.data.sspLicenseFee },
       { name: 'sspOperatorFee', description: 'SSP operator fee', amount: turnoverResponse.data.sspOperatorFee },
@@ -317,29 +321,53 @@ const WalletStatusCard = (props) => {
             <DatePicker label="To" value={dateTo} onChange={(newValue) => setDateTo(newValue)} disabled={isFetching} />
           </LocalizationProvider>
         </Box>
-        {!isFetching && rows && (
-          <Box sx={{ mt: 2 }}>
-            <TableContainer sx={{ maxWidth: 600 }}>
-              <Table sx={{ minWidth: 450 }} aria-label="Turnover data table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Category</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.name}>
-                      <TableCell component="th" scope="row">
-                        {row.description}
-                      </TableCell>
-                      <TableCell align="right">{formatMoney(row.amount, 5)} ADS</TableCell>
+        {!isFetching && (
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid item xs={6}>
+              <TableContainer sx={{ maxWidth: 600 }}>
+                <Table aria-label="Turnover data table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>DSP Category</TableCell>
+                      <TableCell align="right">Amount</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
+                  </TableHead>
+                  <TableBody>
+                    {dspRows.map((row) => (
+                      <TableRow key={row.name}>
+                        <TableCell component="th" scope="row">
+                          {row.description}
+                        </TableCell>
+                        <TableCell align="right">{formatMoney(row.amount, 5)} ADS</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+            <Grid item xs={6}>
+              <TableContainer sx={{ maxWidth: 600 }}>
+                <Table aria-label="Turnover data table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>SSP Category</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sspRows.map((row) => (
+                      <TableRow key={row.name}>
+                        <TableCell component="th" scope="row">
+                          {row.description}
+                        </TableCell>
+                        <TableCell align="right">{formatMoney(row.amount, 5)} ADS</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
         )}
       </CardContent>
     </Card>
