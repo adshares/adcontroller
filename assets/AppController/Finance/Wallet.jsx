@@ -258,17 +258,17 @@ const WalletStatusCard = (props) => {
       return;
     }
     setDspRows(() => [
-      { name: 'dspAdvertisersExpense', description: 'DSP Advertisers expense', amount: turnoverResponse.data.dspAdvertisersExpense },
-      { name: 'dspLicenseFee', description: 'DSP license fee', amount: turnoverResponse.data.dspLicenseFee },
-      { name: 'dspOperatorFee', description: 'DSP operator fee', amount: turnoverResponse.data.dspOperatorFee },
-      { name: 'dspCommunityFee', description: 'DSP community fee', amount: turnoverResponse.data.dspCommunityFee },
-      { name: 'dspExpense', description: 'DSP expense', amount: turnoverResponse.data.dspExpense },
+      { name: 'dspAdvertisersExpense', description: 'Advertisers expense', amount: turnoverResponse.data.dspAdvertisersExpense },
+      { name: 'dspLicenseFee', description: 'License fee', amount: turnoverResponse.data.dspLicenseFee },
+      { name: 'dspOperatorFee', description: 'Operator fee', amount: turnoverResponse.data.dspOperatorFee },
+      { name: 'dspCommunityFee', description: 'Community fee', amount: turnoverResponse.data.dspCommunityFee },
+      { name: 'dspExpense', description: 'Expense', amount: turnoverResponse.data.dspExpense },
     ]);
     setSspRows(() => [
-      { name: 'sspIncome', description: 'SSP income', amount: turnoverResponse.data.sspIncome },
-      { name: 'sspLicenseFee', description: 'SSP license fee', amount: turnoverResponse.data.sspLicenseFee },
-      { name: 'sspOperatorFee', description: 'SSP operator fee', amount: turnoverResponse.data.sspOperatorFee },
-      { name: 'sspPublishersIncome', description: 'SSP publishers income', amount: turnoverResponse.data.sspPublishersIncome },
+      { name: 'sspIncome', description: 'Income', amount: turnoverResponse.data.sspIncome },
+      { name: 'sspLicenseFee', description: 'License fee', amount: turnoverResponse.data.sspLicenseFee },
+      { name: 'sspOperatorFee', description: 'Operator fee', amount: turnoverResponse.data.sspOperatorFee },
+      { name: 'sspPublishersIncome', description: 'Publishers income', amount: turnoverResponse.data.sspPublishersIncome },
     ]);
   }, [turnoverResponse]);
 
@@ -328,7 +328,7 @@ const WalletStatusCard = (props) => {
                 <Table aria-label="Turnover data table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>DSP Category</TableCell>
+                      <TableCell>DSP</TableCell>
                       <TableCell align="right">Amount</TableCell>
                     </TableRow>
                   </TableHead>
@@ -350,7 +350,7 @@ const WalletStatusCard = (props) => {
                 <Table aria-label="Turnover data table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>SSP Category</TableCell>
+                      <TableCell>SSP</TableCell>
                       <TableCell align="right">Amount</TableCell>
                     </TableRow>
                   </TableHead>
