@@ -27,6 +27,7 @@ class MonitoringController extends AbstractController
         'events/latest',
         'events/types',
         'hosts',
+        'turnover',
         'users',
         'wallet',
     ];

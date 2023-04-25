@@ -112,6 +112,7 @@ class AdServerConfigurationClient
     public const MAIL_SMTP_USERNAME = 'mailSmtpUsername';
     private const MAIN_JS_BASE_URL = 'mainJsBaseUrl';
     private const MAIN_JS_TLD = 'mainJsTld';
+    private const MAX_INVALID_LOGIN_ATTEMPTS = 'maxInvalidLoginAttempts';
     public const MAX_PAGE_ZONES = 'maxPageZones';
     private const NETWORK_DATA_CACHE_TTL = 'networkDataCacheTtl';
     private const NOW_PAYMENTS_API_KEY = 'nowPaymentsApiKey';

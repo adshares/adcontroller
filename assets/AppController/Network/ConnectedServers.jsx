@@ -107,7 +107,7 @@ export default function ConnectedServers() {
       id: host.id,
       name: host.name,
       url: (
-        <Link href={host.url} target="_blank">
+        <Link href={host.url} rel="nofollow noopener noreferrer" target="_blank">
           <TypographyOverflowTooltip variant="tableText2" color="dark.main">
             {host.url}
           </TypographyOverflowTooltip>
