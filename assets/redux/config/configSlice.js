@@ -69,6 +69,9 @@ const initialState = {
       AdvertiserApplyFormUrl: null,
       PublisherApplyFormUrl: null,
       DefaultUserRoles: null,
+      AdsTxtCheckDemandEnabled: null,
+      AdsTxtCheckSupplyEnabled: null,
+      AdsTxtDomain: null,
     },
     AdUser: {
       InternalUrl: null,
