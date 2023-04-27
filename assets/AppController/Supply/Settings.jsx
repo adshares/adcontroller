@@ -13,6 +13,7 @@ import {
   CardContent,
   CardHeader,
   Checkbox,
+  Collapse,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -89,7 +90,7 @@ const SiteOptions = (props) => {
           label="Require ads.txt on sites"
           control={<Checkbox checked={AdsTxtCheckSupplyEnabled} onChange={() => setAdsTxtCheckSupplyEnabled((prevState) => !prevState)} />}
         />
-        {AdsTxtCheckSupplyEnabled && (
+        <Collapse in={AdsTxtCheckSupplyEnabled} timeout="auto">
           <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
             <TextField
               customvariant="highLabel"
@@ -105,7 +106,7 @@ const SiteOptions = (props) => {
               inputProps={{ autoComplete: 'off' }}
             />
           </Box>
-        )}
+        </Collapse>
       </CardContent>
 
       <CardActions>
