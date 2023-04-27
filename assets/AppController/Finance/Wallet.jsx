@@ -18,10 +18,14 @@ import {
   CardHeader,
   Checkbox,
   Collapse,
+  FormControl,
   FormControlLabel,
   Grid,
   IconButton,
+  InputLabel,
   Link,
+  MenuItem,
+  Select,
   TextField,
   Tooltip,
   Typography,
@@ -270,8 +274,9 @@ const WalletStatusCard = (props) => {
   const dspChartOptions = getChartOptions('DSP Turnover');
   const sspChartOptions = getChartOptions('SSP Turnover');
 
-  const [dateFrom, setDateFrom] = useState(dayjs().subtract(13, 'day').startOf('day'));
-  const [dateTo, setDateTo] = useState(dayjs().subtract(7, 'day').endOf('day'));
+  const [dateFrom, setDateFrom] = useState(dayjs().startOf('month'));
+  const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
+  const [dataRangeOption, setDataRangeOption] = useState('0');
   const [chartResolution, setChartResolution] = useState('day');
   const [queryConfig, setQueryConfig] = useState(() => ({
     chartResolution,
@@ -479,6 +484,40 @@ const WalletStatusCard = (props) => {
     pollingInterval: 3000,
   });
 
+  const dateRangeOptions = [
+    { value: '0', label: 'This month' },
+    { value: '1', label: 'This year' },
+    { value: '2', label: 'Previous month' },
+    { value: '3', label: 'Previous year' },
+    { value: '4', label: 'Last month' },
+    { value: '5', label: 'Last year' },
+    { value: '6', label: 'Custom' },
+  ];
+
+  const handleDateRangeChange = (event) => {
+    if ('0' === event.target.value) {
+      setDateFrom(dayjs().startOf('month'));
+      setDateTo(dayjs().endOf('day'));
+    } else if ('1' === event.target.value) {
+      setDateFrom(dayjs().startOf('year'));
+      setDateTo(dayjs().endOf('day'));
+    } else if ('2' === event.target.value) {
+      const startOfMonth = dayjs().startOf('month');
+      setDateFrom(startOfMonth.subtract(1, 'month'));
+      setDateTo(startOfMonth.subtract(1, 'second'));
+    } else if ('3' === event.target.value) {
+      const startOfYear = dayjs().startOf('year');
+      setDateFrom(startOfYear.subtract(1, 'year'));
+      setDateTo(startOfYear.subtract(1, 'second'));
+    } else if ('4' === event.target.value) {
+      setDateFrom(dayjs().subtract(1, 'month').startOf('day'));
+      setDateTo(dayjs().endOf('day'));
+    } else if ('5' === event.target.value) {
+      setDateFrom(dayjs().subtract(1, 'year').startOf('day'));
+      setDateTo(dayjs().endOf('day'));
+    }
+    setDataRangeOption(event.target.value);
+  };
   return (
     <Card {...props}>
       <CardHeader title="Ad server balance" />
@@ -514,7 +553,10 @@ const WalletStatusCard = (props) => {
             <DatePicker
               label="From"
               value={dateFrom}
-              onChange={(newValue) => setDateFrom(newValue)}
+              onChange={(newValue) => {
+                setDateFrom(newValue);
+                setDataRangeOption('6');
+              }}
               disabled={isFetching}
               minDate={dayjs().subtract(2, 'year')}
               maxDate={dateTo}
@@ -524,10 +566,28 @@ const WalletStatusCard = (props) => {
             <DatePicker
               label="To"
               value={dateTo}
-              onChange={(newValue) => setDateTo(newValue)}
+              onChange={(newValue) => {
+                setDateTo(newValue);
+                setDataRangeOption('6');
+              }}
               disabled={isFetching}
               maxDate={dayjs().endOf('day')}
+              sx={{ mr: 2 }}
             />
+            <FormControl sx={{ minWidth: '165px' }}>
+              <InputLabel id="date-range-select-label">Date range</InputLabel>
+              <Select
+                labelId="date-range-select-label"
+                id="date-range-select"
+                value={dataRangeOption}
+                label="Date range"
+                onChange={handleDateRangeChange}
+              >
+                {dateRangeOptions.map((option) => (
+                  <MenuItem value={option.value}>{option.label}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </LocalizationProvider>
         </Box>
         {!isFetching && (
