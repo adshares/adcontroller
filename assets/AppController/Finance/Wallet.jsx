@@ -8,6 +8,7 @@ import { changeColdWalletConfigInformation, changeWalletConfigInformation } from
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
+import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import Spinner from '../../Components/Spinner/Spinner';
 import {
   Box,
@@ -142,18 +143,7 @@ const WalletSettingsCard = (props) => {
         <>
           <Collapse in={!editMode} timeout="auto">
             <Typography variant="h3">
-              Wallet address:{' '}
-              <Typography variant="b800">
-                <Link
-                  href={'https://operator.adshares.net/blockexplorer/accounts/' + appData.AdServer.WalletAddress}
-                  target="_blank"
-                  rel="nofollow noopener noreferrer"
-                  underline={'none'}
-                >
-                  {appData.AdServer.WalletAddress}
-                </Link>{' '}
-                ADS
-              </Typography>
+              Wallet address: <FormattedWalletAddress wallet={appData.AdServer.WalletAddress} variant="b800" />
             </Typography>
           </Collapse>
           <Collapse in={editMode} timeout="auto" unmountOnExit>
