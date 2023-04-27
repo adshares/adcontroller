@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import { useSetWalletConfigMutation, useSetColdWalletConfigMutation, useGetWalletNodeMutation } from '../../redux/config/configApi';
-import { useGetTurnoverQuery, useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
+import { useGetTurnoverQuery, useGetTurnoverChartQuery, useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
 import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../redux/config/configSlice';
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
@@ -40,6 +40,19 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartJsTooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, ChartJsTooltip, Legend);
 
 export default function Wallet() {
   return (
@@ -235,19 +248,129 @@ const WalletSettingsCard = (props) => {
 };
 
 const WalletStatusCard = (props) => {
-  const [dateFrom, setDateFrom] = useState(dayjs().subtract(1, 'day').startOf('day'));
-  const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
+  function getChartOptions(title) {
+    return {
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: !!title,
+          text: title,
+        },
+      },
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    };
+  }
+  const dspChartOptions = getChartOptions('DSP Turnover');
+  const sspChartOptions = getChartOptions('SSP Turnover');
+
+  const [dateFrom, setDateFrom] = useState(dayjs().subtract(13, 'day').startOf('day'));
+  const [dateTo, setDateTo] = useState(dayjs().subtract(7, 'day').endOf('day'));
+  const [chartResolution, setChartResolution] = useState('day');
   const [queryConfig, setQueryConfig] = useState(() => ({
+    chartResolution,
     'filter[date][from]': dateFrom?.format(),
     'filter[date][to]': dateTo?.format(),
   }));
   const [dspRows, setDspRows] = useState(() => []);
   const [sspRows, setSspRows] = useState(() => []);
+  const [dspChart, setDspChart] = useState(() => ({
+    labels: [],
+    datasets: [
+      {
+        label: 'Advertisers Expense',
+        data: [],
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        hidden: true,
+      },
+      {
+        label: 'License Fee',
+        data: [],
+        borderColor: 'rgb(53, 162, 235)',
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+        hidden: true,
+      },
+      {
+        label: 'Operator Fee',
+        data: [],
+        borderColor: 'rgb(240, 60, 240)',
+        backgroundColor: 'rgba(240, 60, 240, 0.5)',
+      },
+      {
+        label: 'Community Fee',
+        data: [],
+        borderColor: 'rgb(230, 230, 50)',
+        backgroundColor: 'rgba(230, 230, 50, 0.5)',
+        hidden: true,
+      },
+      {
+        label: 'Expense',
+        data: [],
+        borderColor: 'rgb(53, 162, 50)',
+        backgroundColor: 'rgba(53, 162, 50, 0.5)',
+        hidden: true,
+      },
+    ],
+  }));
+  const [sspChart, setSspChart] = useState(() => ({
+    labels: [],
+    datasets: [
+      {
+        label: 'Income',
+        data: [],
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        hidden: true,
+      },
+      {
+        label: 'License Fee',
+        data: [],
+        borderColor: 'rgb(53, 162, 235)',
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+        hidden: true,
+      },
+      {
+        label: 'Operator Fee',
+        data: [],
+        borderColor: 'rgb(240, 60, 240)',
+        backgroundColor: 'rgba(240, 60, 240, 0.5)',
+      },
+      {
+        label: 'Publishers Income',
+        data: [],
+        borderColor: 'rgb(53, 162, 50)',
+        backgroundColor: 'rgba(53, 162, 50, 0.5)',
+        hidden: true,
+      },
+    ],
+  }));
+
   const { data: turnoverResponse, isFetching } = useGetTurnoverQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const { data: turnoverChartResponse, isFetchingChart } = useGetTurnoverChartQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
+    const daysSpan = dateTo.diff(dateFrom, 'day');
+    let resolution = 'day';
+    if (daysSpan <= 2) {
+      resolution = 'hour';
+    } else if (daysSpan <= 31) {
+      resolution = 'day';
+    } else if (daysSpan <= 182) {
+      resolution = 'week';
+    } else {
+      resolution = 'month';
+    }
+    setChartResolution(resolution);
     setQueryConfig((prevState) => ({
       ...prevState,
+      chartResolution: resolution,
       'filter[date][from]': dateFrom?.format(),
       'filter[date][to]': dateTo?.format(),
     }));
@@ -271,6 +394,85 @@ const WalletStatusCard = (props) => {
       { name: 'sspPublishersIncome', description: 'Publishers income', amount: turnoverResponse.data.sspPublishersIncome },
     ]);
   }, [turnoverResponse]);
+
+  function getDateLabelFormatter() {
+    if ('hour' === chartResolution) {
+      return function (date) {
+        return `${date.substring(0, 10)} ${date.substring(11, 16)}`;
+      };
+    }
+
+    if ('day' === chartResolution || 'week' === chartResolution) {
+      return function (date) {
+        return date.substring(0, 10);
+      };
+    }
+
+    return function (date) {
+      return date.substring(0, 7);
+    };
+  }
+
+  function extractDataFromResponse(fields) {
+    const fieldsCount = fields.length;
+    const labels = [];
+    const datasets = [];
+    const formatDate = getDateLabelFormatter();
+    for (let i = 0; i < fieldsCount; i++) {
+      datasets.push([]);
+    }
+
+    for (const entry of turnoverChartResponse.data) {
+      labels.push(formatDate(entry.date));
+      for (let i = 0; i < fieldsCount; i++) {
+        datasets[i].push(entry[fields[i]] / 1e11);
+      }
+    }
+
+    return { labels, datasets };
+  }
+
+  useEffect(() => {
+    if (!turnoverChartResponse?.data) {
+      return;
+    }
+
+    const { labels: dspLabels, datasets: dspDatasets } = extractDataFromResponse([
+      'dspAdvertisersExpense',
+      'dspLicenseFee',
+      'dspOperatorFee',
+      'dspCommunityFee',
+      'dspExpense',
+    ]);
+    const { labels: sspLabels, datasets: sspDatasets } = extractDataFromResponse([
+      'sspIncome',
+      'sspLicenseFee',
+      'sspOperatorFee',
+      'sspPublishersIncome',
+    ]);
+
+    setDspChart(() => ({
+      ...dspChart,
+      labels: dspLabels,
+      datasets: [
+        { ...dspChart.datasets[0], data: dspDatasets[0] },
+        { ...dspChart.datasets[1], data: dspDatasets[1] },
+        { ...dspChart.datasets[2], data: dspDatasets[2] },
+        { ...dspChart.datasets[3], data: dspDatasets[3] },
+        { ...dspChart.datasets[4], data: dspDatasets[4] },
+      ],
+    }));
+    setSspChart(() => ({
+      ...sspChart,
+      labels: sspLabels,
+      datasets: [
+        { ...sspChart.datasets[0], data: sspDatasets[0] },
+        { ...sspChart.datasets[1], data: sspDatasets[1] },
+        { ...sspChart.datasets[2], data: sspDatasets[2] },
+        { ...sspChart.datasets[3], data: sspDatasets[3] },
+      ],
+    }));
+  }, [turnoverChartResponse]);
 
   const monitoringWalletInfo = useSelector(monitoringSelectors.getMonitoringWalletInfo);
   useGetWalletMonitoringQuery([], {
@@ -314,11 +516,18 @@ const WalletStatusCard = (props) => {
               value={dateFrom}
               onChange={(newValue) => setDateFrom(newValue)}
               disabled={isFetching}
+              minDate={dayjs().subtract(2, 'year')}
               maxDate={dateTo}
               disableFuture={true}
               sx={{ mr: 2 }}
             />
-            <DatePicker label="To" value={dateTo} onChange={(newValue) => setDateTo(newValue)} disabled={isFetching} />
+            <DatePicker
+              label="To"
+              value={dateTo}
+              onChange={(newValue) => setDateTo(newValue)}
+              disabled={isFetching}
+              maxDate={dayjs().endOf('day')}
+            />
           </LocalizationProvider>
         </Box>
         {!isFetching && (
@@ -369,6 +578,8 @@ const WalletStatusCard = (props) => {
             </Grid>
           </Grid>
         )}
+        {!isFetchingChart && dspChart.labels.length > 0 && <Line options={dspChartOptions} data={dspChart} />}
+        {!isFetchingChart && sspChart.labels.length > 0 && <Line options={sspChartOptions} data={sspChart} />}
       </CardContent>
     </Card>
   );
