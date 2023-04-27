@@ -95,6 +95,9 @@ const configSlice = createSlice({
   name: 'configSlice',
   initialState,
   reducers: {
+    changeAdServerConfiguration: (state, { payload }) => {
+      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
+    },
     changeBaseInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
       state.appData.General = { ...state.appData.General, ...payload.General };
@@ -104,18 +107,6 @@ const configSlice = createSlice({
     },
     changePlaceholdersInformation: (state, { payload }) => {
       state.appData.AdPanel = { ...state.appData.AdPanel, ...payload.AdPanel };
-    },
-    changeSiteOptionsInformation: (state, { payload }) => {
-      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
-    },
-    changeZoneOptionsInformation: (state, { payload }) => {
-      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
-    },
-    changeCampaignSettingsInformation: (state, { payload }) => {
-      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
-    },
-    changeBannerSettingsInformation: (state, { payload }) => {
-      state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
     },
     changeRegistrationModeInformation: (state, { payload }) => {
       state.appData.AdServer = { ...state.appData.AdServer, ...payload.AdServer };
@@ -158,13 +149,10 @@ const configSlice = createSlice({
 });
 
 export const {
+  changeAdServerConfiguration,
   changeBaseInformation,
   changeCrmNotificationsInformation,
   changePlaceholdersInformation,
-  changeSiteOptionsInformation,
-  changeZoneOptionsInformation,
-  changeCampaignSettingsInformation,
-  changeBannerSettingsInformation,
   changeRegistrationModeInformation,
   changeAutoWithdrawalConfigInformation,
   changeRegulationsInformation,

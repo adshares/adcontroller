@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import configSelectors from '../../redux/config/configSelectors';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSetSiteOptionsConfigMutation, useSetZoneOptionsConfigMutation } from '../../redux/config/configApi';
-import { changeSiteOptionsInformation, changeZoneOptionsInformation } from '../../redux/config/configSlice';
+import { changeAdServerConfiguration } from '../../redux/config/configSlice';
 import { useCreateNotification, useForm } from '../../hooks';
 import { returnNumber } from '../../utils/helpers';
 import {
@@ -60,7 +60,7 @@ const SiteOptions = (props) => {
 
     const response = await setSiteOptionsConfig(body);
     if (response.data && response.data.message === 'OK') {
-      dispatch(changeSiteOptionsInformation(response.data.data));
+      dispatch(changeAdServerConfiguration(response.data.data));
       createSuccessNotification();
     }
   };
@@ -156,7 +156,7 @@ const ZoneOptions = (props) => {
 
     const response = await setZoneOptionsConfig(body);
     if (response.data && response.data.message === 'OK') {
-      dispatch(changeZoneOptionsInformation(response.data.data));
+      dispatch(changeAdServerConfiguration(response.data.data));
       createSuccessNotification();
     }
   };
