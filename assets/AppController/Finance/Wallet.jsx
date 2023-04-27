@@ -8,6 +8,7 @@ import { changeColdWalletConfigInformation, changeWalletConfigInformation } from
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
+import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import Spinner from '../../Components/Spinner/Spinner';
 import {
@@ -19,14 +20,10 @@ import {
   CardHeader,
   Checkbox,
   Collapse,
-  FormControl,
   FormControlLabel,
   Grid,
   IconButton,
-  InputLabel,
   Link,
-  MenuItem,
-  Select,
   TextField,
   Tooltip,
   Typography,
@@ -36,9 +33,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
 import dayjs from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -266,7 +260,6 @@ const WalletStatusCard = (props) => {
 
   const [dateFrom, setDateFrom] = useState(dayjs().startOf('month'));
   const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
-  const [dataRangeOption, setDataRangeOption] = useState('0');
   const [chartResolution, setChartResolution] = useState('day');
   const [queryConfig, setQueryConfig] = useState(() => ({
     chartResolution,
@@ -348,7 +341,8 @@ const WalletStatusCard = (props) => {
   }));
 
   const { data: turnoverResponse, isFetching } = useGetTurnoverQuery(queryConfig, { refetchOnMountOrArgChange: true });
-  const { data: turnoverChartResponse, isFetchingChart } = useGetTurnoverChartQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  // eslint-disable-next-line max-len
+  const { data: turnoverChartResponse, isFetching: isFetchingChart } = useGetTurnoverChartQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
     const daysSpan = dateTo.diff(dateFrom, 'day');
@@ -474,40 +468,6 @@ const WalletStatusCard = (props) => {
     pollingInterval: 3000,
   });
 
-  const dateRangeOptions = [
-    { value: '0', label: 'This month' },
-    { value: '1', label: 'This year' },
-    { value: '2', label: 'Previous month' },
-    { value: '3', label: 'Previous year' },
-    { value: '4', label: 'Last month' },
-    { value: '5', label: 'Last year' },
-    { value: '6', label: 'Custom' },
-  ];
-
-  const handleDateRangeChange = (event) => {
-    if ('0' === event.target.value) {
-      setDateFrom(dayjs().startOf('month'));
-      setDateTo(dayjs().endOf('day'));
-    } else if ('1' === event.target.value) {
-      setDateFrom(dayjs().startOf('year'));
-      setDateTo(dayjs().endOf('day'));
-    } else if ('2' === event.target.value) {
-      const startOfMonth = dayjs().startOf('month');
-      setDateFrom(startOfMonth.subtract(1, 'month'));
-      setDateTo(startOfMonth.subtract(1, 'second'));
-    } else if ('3' === event.target.value) {
-      const startOfYear = dayjs().startOf('year');
-      setDateFrom(startOfYear.subtract(1, 'year'));
-      setDateTo(startOfYear.subtract(1, 'second'));
-    } else if ('4' === event.target.value) {
-      setDateFrom(dayjs().subtract(1, 'month').startOf('day'));
-      setDateTo(dayjs().endOf('day'));
-    } else if ('5' === event.target.value) {
-      setDateFrom(dayjs().subtract(1, 'year').startOf('day'));
-      setDateTo(dayjs().endOf('day'));
-    }
-    setDataRangeOption(event.target.value);
-  };
   return (
     <Card {...props}>
       <CardHeader title="Ad server balance" />
@@ -538,48 +498,14 @@ const WalletStatusCard = (props) => {
           </Link>
           .
         </Typography>
-        <Box sx={{ mt: 2 }}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="From"
-              value={dateFrom}
-              onChange={(newValue) => {
-                setDateFrom(newValue);
-                setDataRangeOption('6');
-              }}
-              disabled={isFetching}
-              minDate={dayjs().subtract(2, 'year')}
-              maxDate={dateTo}
-              disableFuture={true}
-              sx={{ mr: 2 }}
-            />
-            <DatePicker
-              label="To"
-              value={dateTo}
-              onChange={(newValue) => {
-                setDateTo(newValue);
-                setDataRangeOption('6');
-              }}
-              disabled={isFetching}
-              maxDate={dayjs().endOf('day')}
-              sx={{ mr: 2 }}
-            />
-            <FormControl sx={{ minWidth: '165px' }}>
-              <InputLabel id="date-range-select-label">Date range</InputLabel>
-              <Select
-                labelId="date-range-select-label"
-                id="date-range-select"
-                value={dataRangeOption}
-                label="Date range"
-                onChange={handleDateRangeChange}
-              >
-                {dateRangeOptions.map((option) => (
-                  <MenuItem value={option.value}>{option.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </LocalizationProvider>
-        </Box>
+        <DateRangePicker
+          sx={{ mt: 2 }}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          disabled={isFetching}
+          onDateFromChange={setDateFrom}
+          onDateToChange={setDateTo}
+        />
         {!isFetching && (
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid item xs={6}>
