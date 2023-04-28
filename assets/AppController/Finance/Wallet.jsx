@@ -282,8 +282,8 @@ const WalletStatusCard = (props) => {
       {
         label: 'Community Fee',
         data: [],
-        borderColor: 'rgb(230, 230, 50)',
-        backgroundColor: 'rgba(230, 230, 50, 0.5)',
+        borderColor: 'rgb(255, 205, 86)',
+        backgroundColor: 'rgb(255, 205, 86, 0.5)',
         hidden: true,
       },
       {

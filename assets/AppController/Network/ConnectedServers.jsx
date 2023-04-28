@@ -20,6 +20,7 @@ import commonStyles from '../../styles/commonStyles.scss';
 import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import TypographyOverflowTooltip from '../../Components/TypographyOverflowTooltip/TypographyOverflowTooltip';
+import { colorGenerator } from '../../utils/colorGenerator';
 import { filterObjectByKeys } from '../../utils/helpers';
 import dayjs from 'dayjs';
 
@@ -254,19 +255,41 @@ const ConnectedServersFlow = (props) => {
 
   useEffect(() => {
     const dspExpenseData = dspExpenseTurnoverResponse?.data || [];
-    const sspExpenseData = sspIncomeTurnoverResponse?.data || [];
+    const sspIncomeData = sspIncomeTurnoverResponse?.data || [];
 
+    const colorGeneratorInstance = colorGenerator();
+    const colorByAddress = {};
     const data = [];
+    for (const entry of sspIncomeData) {
+      if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
+        colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
+      }
+      data.push({
+        from: `DSP ${entry.adsAddress}`,
+        to: adServerAddress,
+        flow: entry.amount / 1e11,
+        color: colorByAddress[entry.adsAddress].from,
+      });
+    }
     for (const entry of dspExpenseData) {
-      data.push({ from: adServerAddress, to: `SSP ${entry.adsAddress}`, flow: entry.amount / 1e11 });
+      if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
+        colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
+      }
+      data.push({
+        from: adServerAddress,
+        to: `SSP ${entry.adsAddress}`,
+        flow: entry.amount / 1e11,
+        color: colorByAddress[entry.adsAddress].to,
+      });
     }
-    for (const entry of sspExpenseData) {
-      data.push({ from: `DSP ${entry.adsAddress}`, to: adServerAddress, flow: entry.amount / 1e11 });
-    }
+
     setChartData(() => ({
       datasets: [
         {
           data,
+          colorFrom: (c) => c.dataset.data[c.dataIndex].color,
+          colorTo: (c) => c.dataset.data[c.dataIndex].color,
+          colorMode: 'to',
         },
       ],
     }));
