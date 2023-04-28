@@ -4,13 +4,19 @@ import Events from '../Events/Events';
 import apiService from '../../utils/apiService';
 import ServiceStatusTable from '../../Components/ServiceStatusTable/ServiceStatusTable';
 import Spinner from '../../Components/Spinner/Spinner';
-import { Card, CardContent, CardHeader } from '@mui/material';
+import { Card, CardContent, CardHeader, Grid } from '@mui/material';
 
 export default function Dashboard() {
   return (
     <>
-      <Events dataType="latest" />
-      <ServiceStatus sx={{ mt: 3 }} />
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <Events dataType="latest" />
+        </Grid>
+        <Grid item xs={6}>
+          <ServiceStatus />
+        </Grid>
+      </Grid>
     </>
   );
 }

@@ -23,3 +23,23 @@ export function* colorGenerator() {
     };
   }
 }
+
+export function getChartOptions(title) {
+  return {
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
+      title: {
+        display: !!title,
+        text: title,
+      },
+    },
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  };
+}

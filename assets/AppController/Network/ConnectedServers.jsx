@@ -20,7 +20,7 @@ import commonStyles from '../../styles/commonStyles.scss';
 import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import TypographyOverflowTooltip from '../../Components/TypographyOverflowTooltip/TypographyOverflowTooltip';
-import { colorGenerator } from '../../utils/colorGenerator';
+import { colorGenerator } from '../../utils/chartUtils';
 import { filterObjectByKeys } from '../../utils/helpers';
 import dayjs from 'dayjs';
 

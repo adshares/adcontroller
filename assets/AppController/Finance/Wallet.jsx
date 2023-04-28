@@ -6,6 +6,7 @@ import { useSetWalletConfigMutation, useSetColdWalletConfigMutation, useGetWalle
 import { useGetTurnoverQuery, useGetTurnoverChartQuery, useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
 import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../redux/config/configSlice';
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
+import { getChartOptions } from '../../utils/chartUtils';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
 import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
@@ -224,25 +225,6 @@ const WalletSettingsCard = (props) => {
 };
 
 const WalletStatusCard = (props) => {
-  function getChartOptions(title) {
-    return {
-      plugins: {
-        legend: {
-          position: 'bottom',
-        },
-        title: {
-          display: !!title,
-          text: title,
-        },
-      },
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-        },
-      },
-    };
-  }
   const dspChartOptions = getChartOptions('DSP Turnover');
   const sspChartOptions = getChartOptions('SSP Turnover');
 
@@ -276,14 +258,14 @@ const WalletStatusCard = (props) => {
       {
         label: 'Operator Fee',
         data: [],
-        borderColor: 'rgb(240, 60, 240)',
-        backgroundColor: 'rgba(240, 60, 240, 0.5)',
+        borderColor: 'rgb(255, 205, 86)',
+        backgroundColor: 'rgb(255, 205, 86, 0.5)',
       },
       {
         label: 'Community Fee',
         data: [],
-        borderColor: 'rgb(255, 205, 86)',
-        backgroundColor: 'rgb(255, 205, 86, 0.5)',
+        borderColor: 'rgb(240, 60, 240)',
+        backgroundColor: 'rgba(240, 60, 240, 0.5)',
         hidden: true,
       },
       {
@@ -315,8 +297,8 @@ const WalletStatusCard = (props) => {
       {
         label: 'Operator Fee',
         data: [],
-        borderColor: 'rgb(240, 60, 240)',
-        backgroundColor: 'rgba(240, 60, 240, 0.5)',
+        borderColor: 'rgb(255, 205, 86)',
+        backgroundColor: 'rgb(255, 205, 86, 0.5)',
       },
       {
         label: 'Publishers Income',
