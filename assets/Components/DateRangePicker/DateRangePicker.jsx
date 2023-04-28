@@ -78,7 +78,7 @@ export default function DateRangePicker({ dateFrom, dateTo, disabled, onDateFrom
           maxDate={dayjs().endOf('day')}
           sx={{ mr: 2 }}
         />
-        <FormControl sx={{ minWidth: '165px' }}>
+        <FormControl sx={{ minWidth: '176px' }}>
           <InputLabel id="date-range-select-label">Date range</InputLabel>
           <Select
             labelId="date-range-select-label"
