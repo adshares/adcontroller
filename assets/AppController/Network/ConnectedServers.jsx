@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Chart } from 'react-chartjs-2';
 import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
@@ -225,9 +225,48 @@ const ConnectedServersList = () => {
   );
 };
 
+function getAdsFlowChartData(sspIncomeData, dspExpenseData, adServerAddress) {
+  const colorGeneratorInstance = colorGenerator();
+  const colorByAddress = {};
+  const data = [];
+  for (const entry of sspIncomeData) {
+    if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
+      colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
+    }
+    data.push({
+      from: `DSP ${entry.adsAddress}`,
+      to: adServerAddress,
+      flow: entry.amount / 1e11,
+      color: colorByAddress[entry.adsAddress].from,
+    });
+  }
+  for (const entry of dspExpenseData) {
+    if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
+      colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
+    }
+    data.push({
+      from: adServerAddress,
+      to: `SSP ${entry.adsAddress}`,
+      flow: entry.amount / 1e11,
+      color: colorByAddress[entry.adsAddress].to,
+    });
+  }
+
+  const colorCallback = (c) => c.dataset.data[c.dataIndex]?.color || 0;
+  const datasets = [];
+  if (data.length > 0) {
+    datasets.push({
+      data,
+      colorFrom: colorCallback,
+      colorTo: colorCallback,
+      colorMode: 'to',
+    });
+  }
+  return { datasets };
+}
+
 const ConnectedServersFlow = (props) => {
-  const appData = useSelector(configSelectors.getAppData);
-  const adServerAddress = appData.AdServer.WalletAddress;
+  const adServerAddress = useSelector(configSelectors.getAppData).AdServer.WalletAddress;
   const [dateFrom, setDateFrom] = useState(dayjs().startOf('month'));
   const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
   const [queryConfig, setQueryConfig] = useState(() => ({
@@ -254,45 +293,9 @@ const ConnectedServersFlow = (props) => {
   }, [dateFrom, dateTo]);
 
   useEffect(() => {
-    const dspExpenseData = dspExpenseTurnoverResponse?.data || [];
     const sspIncomeData = sspIncomeTurnoverResponse?.data || [];
-
-    const colorGeneratorInstance = colorGenerator();
-    const colorByAddress = {};
-    const data = [];
-    for (const entry of sspIncomeData) {
-      if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
-        colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
-      }
-      data.push({
-        from: `DSP ${entry.adsAddress}`,
-        to: adServerAddress,
-        flow: entry.amount / 1e11,
-        color: colorByAddress[entry.adsAddress].from,
-      });
-    }
-    for (const entry of dspExpenseData) {
-      if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
-        colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
-      }
-      data.push({
-        from: adServerAddress,
-        to: `SSP ${entry.adsAddress}`,
-        flow: entry.amount / 1e11,
-        color: colorByAddress[entry.adsAddress].to,
-      });
-    }
-
-    setChartData(() => ({
-      datasets: [
-        {
-          data,
-          colorFrom: (c) => c.dataset.data[c.dataIndex].color,
-          colorTo: (c) => c.dataset.data[c.dataIndex].color,
-          colorMode: 'to',
-        },
-      ],
-    }));
+    const dspExpenseData = dspExpenseTurnoverResponse?.data || [];
+    setChartData(getAdsFlowChartData(sspIncomeData, dspExpenseData, adServerAddress));
   }, [dspExpenseTurnoverResponse, sspIncomeTurnoverResponse]);
 
   return (
@@ -309,8 +312,8 @@ const ConnectedServersFlow = (props) => {
           onDateToChange={setDateTo}
         />
         {!isFetchingDspExpense && !isFetchingSspIncome && (
-          <Box sx={{ mt: 2, maxWidth: '60%' }}>
-            <Chart type={'sankey'} data={chartData} />
+          <Box sx={{ mt: 2, maxWidth: '60%', textAlign: 'center' }}>
+            {chartData.datasets.length > 0 ? <Chart type={'sankey'} data={chartData} /> : <Typography variant="b800">No data</Typography>}
           </Box>
         )}
       </CardContent>
