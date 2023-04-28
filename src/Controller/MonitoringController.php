@@ -32,6 +32,8 @@ class MonitoringController extends AbstractController
         'turnover/chart/day',
         'turnover/chart/week',
         'turnover/chart/month',
+        'turnover/DspExpense',
+        'turnover/SspIncome',
         'users',
         'wallet',
     ];

@@ -39,19 +39,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip as ChartJsTooltip,
-  Legend,
-} from 'chart.js';
 import { Line } from 'react-chartjs-2';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, ChartJsTooltip, Legend);
 
 export default function Wallet() {
   return (
@@ -341,8 +329,9 @@ const WalletStatusCard = (props) => {
   }));
 
   const { data: turnoverResponse, isFetching } = useGetTurnoverQuery(queryConfig, { refetchOnMountOrArgChange: true });
-  // eslint-disable-next-line max-len
-  const { data: turnoverChartResponse, isFetching: isFetchingChart } = useGetTurnoverChartQuery(queryConfig, { refetchOnMountOrArgChange: true });
+  const { data: turnoverChartResponse, isFetching: isFetchingChart } = useGetTurnoverChartQuery(queryConfig, {
+    refetchOnMountOrArgChange: true,
+  });
 
   useEffect(() => {
     const daysSpan = dateTo.diff(dateFrom, 'day');

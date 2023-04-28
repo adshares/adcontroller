@@ -1,7 +1,14 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { Chart } from 'react-chartjs-2';
+import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import queryString from 'query-string';
-import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
+import configSelectors from '../../redux/config/configSelectors';
+import {
+  useGetConnectedHostsQuery,
+  useGetTurnoverByTypeQuery,
+  useResetHostConnectionErrorMutation,
+} from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import { Box, Card, CardContent, CardHeader, IconButton, Link, Tooltip, Typography } from '@mui/material';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
@@ -10,9 +17,11 @@ import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
 import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
+import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import TypographyOverflowTooltip from '../../Components/TypographyOverflowTooltip/TypographyOverflowTooltip';
 import { filterObjectByKeys } from '../../utils/helpers';
+import dayjs from 'dayjs';
 
 const headCells = [
   {
@@ -72,6 +81,15 @@ const headCells = [
 ];
 
 export default function ConnectedServers() {
+  return (
+    <>
+      <ConnectedServersList />
+      <ConnectedServersFlow sx={{ mt: 3 }} />
+    </>
+  );
+}
+
+const ConnectedServersList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [queryConfig, setQueryConfig] = useState({
     page: 1,
@@ -204,4 +222,75 @@ export default function ConnectedServers() {
       </CardContent>
     </Card>
   );
-}
+};
+
+const ConnectedServersFlow = (props) => {
+  const appData = useSelector(configSelectors.getAppData);
+  const adServerAddress = appData.AdServer.WalletAddress;
+  const [dateFrom, setDateFrom] = useState(dayjs().startOf('month'));
+  const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    'filter[date][from]': dateFrom?.format(),
+    'filter[date][to]': dateTo?.format(),
+  }));
+  const [chartData, setChartData] = useState({ datasets: [] });
+
+  const { data: dspExpenseTurnoverResponse, isFetching: isFetchingDspExpense } = useGetTurnoverByTypeQuery(
+    { ...queryConfig, type: 'DspExpense' },
+    { refetchOnMountOrArgChange: true },
+  );
+  const { data: sspIncomeTurnoverResponse, isFetching: isFetchingSspIncome } = useGetTurnoverByTypeQuery(
+    { ...queryConfig, type: 'SspIncome' },
+    { refetchOnMountOrArgChange: true },
+  );
+
+  useEffect(() => {
+    setQueryConfig((prevState) => ({
+      ...prevState,
+      'filter[date][from]': dateFrom?.format(),
+      'filter[date][to]': dateTo?.format(),
+    }));
+  }, [dateFrom, dateTo]);
+
+  useEffect(() => {
+    const dspExpenseData = dspExpenseTurnoverResponse?.data || [];
+    const sspExpenseData = sspIncomeTurnoverResponse?.data || [];
+
+    const data = [];
+    for (const entry of dspExpenseData) {
+      data.push({ from: adServerAddress, to: `SSP ${entry.adsAddress}`, flow: entry.amount / 1e11 });
+    }
+    for (const entry of sspExpenseData) {
+      data.push({ from: `DSP ${entry.adsAddress}`, to: adServerAddress, flow: entry.amount / 1e11 });
+    }
+    setChartData(() => ({
+      datasets: [
+        {
+          data,
+        },
+      ],
+    }));
+  }, [dspExpenseTurnoverResponse, sspIncomeTurnoverResponse]);
+
+  return (
+    <Card width="full" {...props}>
+      <CardHeader title="Flow" />
+      <CardContent>
+        <Typography variant="body1">Sankey diagram below presents ADS transfers between connected servers.</Typography>
+        <DateRangePicker
+          sx={{ mt: 2 }}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          disabled={isFetchingDspExpense || isFetchingSspIncome}
+          onDateFromChange={setDateFrom}
+          onDateToChange={setDateTo}
+        />
+        {!isFetchingDspExpense && !isFetchingSspIncome && (
+          <Box sx={{ mt: 2, maxWidth: '60%' }}>
+            <Chart type={'sankey'} data={chartData} />
+          </Box>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
