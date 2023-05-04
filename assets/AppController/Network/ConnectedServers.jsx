@@ -20,7 +20,7 @@ import commonStyles from '../../styles/commonStyles.scss';
 import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import TypographyOverflowTooltip from '../../Components/TypographyOverflowTooltip/TypographyOverflowTooltip';
-import { colorGenerator } from '../../utils/chartUtils';
+import { getFlowChartData } from '../../utils/chartUtils';
 import { filterObjectByKeys } from '../../utils/helpers';
 import dayjs from 'dayjs';
 
@@ -225,46 +225,6 @@ const ConnectedServersList = () => {
   );
 };
 
-function getAdsFlowChartData(sspIncomeData, dspExpenseData, adServerAddress) {
-  const colorGeneratorInstance = colorGenerator();
-  const colorByAddress = {};
-  const data = [];
-  for (const entry of sspIncomeData) {
-    if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
-      colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
-    }
-    data.push({
-      from: `DSP ${entry.adsAddress}`,
-      to: adServerAddress,
-      flow: entry.amount / 1e11,
-      color: colorByAddress[entry.adsAddress].from,
-    });
-  }
-  for (const entry of dspExpenseData) {
-    if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
-      colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
-    }
-    data.push({
-      from: adServerAddress,
-      to: `SSP ${entry.adsAddress}`,
-      flow: entry.amount / 1e11,
-      color: colorByAddress[entry.adsAddress].to,
-    });
-  }
-
-  const colorCallback = (c) => c.dataset.data[c.dataIndex]?.color || 0;
-  const datasets = [];
-  if (data.length > 0) {
-    datasets.push({
-      data,
-      colorFrom: colorCallback,
-      colorTo: colorCallback,
-      colorMode: 'to',
-    });
-  }
-  return { datasets };
-}
-
 const ConnectedServersFlow = (props) => {
   const adServerAddress = useSelector(configSelectors.getAppData).AdServer.WalletAddress;
   const [dateFrom, setDateFrom] = useState(dayjs().startOf('month'));
@@ -295,14 +255,14 @@ const ConnectedServersFlow = (props) => {
   useEffect(() => {
     const sspIncomeData = sspIncomeTurnoverResponse?.data || [];
     const dspExpenseData = dspExpenseTurnoverResponse?.data || [];
-    setChartData(getAdsFlowChartData(sspIncomeData, dspExpenseData, adServerAddress));
+    setChartData(getFlowChartData(sspIncomeData, dspExpenseData, adServerAddress));
   }, [dspExpenseTurnoverResponse, sspIncomeTurnoverResponse]);
 
   return (
     <Card width="full" {...props}>
       <CardHeader title="Flow" />
       <CardContent>
-        <Typography variant="body1">Sankey diagram below presents ADS transfers between connected servers.</Typography>
+        <Typography variant="body1">Sankey diagram below presents transfers between connected servers.</Typography>
         <DateRangePicker
           sx={{ mt: 2 }}
           dateFrom={dateFrom}

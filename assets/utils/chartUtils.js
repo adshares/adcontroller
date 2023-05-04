@@ -43,3 +43,43 @@ export function getChartOptions(title) {
     },
   };
 }
+
+export function getFlowChartData(sspIncomeData, dspExpenseData, adServerAddress) {
+  const colorGeneratorInstance = colorGenerator();
+  const colorByAddress = {};
+  const data = [];
+  for (const entry of sspIncomeData) {
+    if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
+      colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
+    }
+    data.push({
+      from: `DSP ${entry.adsAddress}`,
+      to: adServerAddress,
+      flow: entry.amount / 1e11,
+      color: colorByAddress[entry.adsAddress].from,
+    });
+  }
+  for (const entry of dspExpenseData) {
+    if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
+      colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
+    }
+    data.push({
+      from: adServerAddress,
+      to: `SSP ${entry.adsAddress}`,
+      flow: entry.amount / 1e11,
+      color: colorByAddress[entry.adsAddress].to,
+    });
+  }
+
+  const colorCallback = (c) => c.dataset.data[c.dataIndex]?.color || 0;
+  const datasets = [];
+  if (data.length > 0) {
+    datasets.push({
+      data,
+      colorFrom: colorCallback,
+      colorTo: colorCallback,
+      colorMode: 'to',
+    });
+  }
+  return { datasets };
+}
