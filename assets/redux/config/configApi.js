@@ -79,6 +79,13 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setSettlementOptionsConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/demand/settlement-options',
+        method: 'PATCH',
+        body,
+      }),
+    }),
     setSiteOptionsConfig: builder.mutation({
       query: (body) => ({
         url: '/api/config/site-options',
@@ -184,6 +191,7 @@ export const {
   useSetColdWalletConfigMutation,
   useSetCommissionsConfigMutation,
   useSetInventoryWhitelistConfigMutation,
+  useSetSettlementOptionsConfigMutation,
   useSetSiteOptionsConfigMutation,
   useSetZoneOptionsConfigMutation,
   useSetPlaceholdersConfigMutation,

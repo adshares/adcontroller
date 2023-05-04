@@ -164,6 +164,8 @@ class ConfigurationRepository extends ServiceEntityRepository
     private static function typeConversion(): array
     {
         return [
+            AdServerConfig::AdsTxtCheckDemandEnabled->name => ConfigType::Bool,
+            AdServerConfig::AdsTxtCheckSupplyEnabled->name => ConfigType::Bool,
             AdServerConfig::AllowZoneInIframe->name => ConfigType::Bool,
             AdServerConfig::AutoConfirmationEnabled->name => ConfigType::Bool,
             AdServerConfig::AutoRegistrationEnabled->name => ConfigType::Bool,

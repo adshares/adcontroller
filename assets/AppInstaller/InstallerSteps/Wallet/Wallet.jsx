@@ -132,7 +132,7 @@ function Wallet({ handleNextStep, handlePrevStep, step }) {
       <Typography variant="body1" paragraph align="center">
         The wallet is used to store users' deposits and earnings. The total profit of the adserver will be deposited in this account. To
         create a new wallet{' '}
-        <a href="https://adshares.net/wallet" target="_blank">
+        <a href="https://adshares.net/wallet" rel="nofollow noopener noreferrer" target="_blank">
           follow the instructions
         </a>
         .
