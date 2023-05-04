@@ -21,15 +21,11 @@ export default function Dashboard() {
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Events dataType="latest" />
+          <Flow sx={{ mt: 2 }} />
         </Grid>
         <Grid item xs={6}>
           <ServiceStatus />
-        </Grid>
-        <Grid item xs={6}>
-          <Flow />
-        </Grid>
-        <Grid item xs={6}>
-          <Turnover />
+          <Turnover sx={{ mt: 2 }} />
         </Grid>
       </Grid>
     </>
