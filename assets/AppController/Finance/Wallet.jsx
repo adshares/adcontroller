@@ -6,7 +6,12 @@ import { useSetWalletConfigMutation, useSetColdWalletConfigMutation, useGetWalle
 import { useGetTurnoverQuery, useGetTurnoverChartQuery, useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
 import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../redux/config/configSlice';
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
-import { getChartOptions } from '../../utils/chartUtils';
+import {
+  extractDatasetsFromResponseData,
+  extractLabelsFromResponseData,
+  getChartOptions,
+  getChartResolutionByDaysSpan,
+} from '../../utils/chartUtils';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
 import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
@@ -317,16 +322,7 @@ const WalletStatusCard = (props) => {
 
   useEffect(() => {
     const daysSpan = dateTo.diff(dateFrom, 'day');
-    let resolution = 'day';
-    if (daysSpan <= 2) {
-      resolution = 'hour';
-    } else if (daysSpan <= 31) {
-      resolution = 'day';
-    } else if (daysSpan <= 182) {
-      resolution = 'week';
-    } else {
-      resolution = 'month';
-    }
+    const resolution = getChartResolutionByDaysSpan(daysSpan);
     setChartResolution(resolution);
     setQueryConfig((prevState) => ({
       ...prevState,
@@ -355,56 +351,20 @@ const WalletStatusCard = (props) => {
     ]);
   }, [turnoverResponse]);
 
-  function getDateLabelFormatter() {
-    if ('hour' === chartResolution) {
-      return function (date) {
-        return `${date.substring(0, 10)} ${date.substring(11, 16)}`;
-      };
-    }
-
-    if ('day' === chartResolution || 'week' === chartResolution) {
-      return function (date) {
-        return date.substring(0, 10);
-      };
-    }
-
-    return function (date) {
-      return date.substring(0, 7);
-    };
-  }
-
-  function extractDataFromResponse(fields) {
-    const fieldsCount = fields.length;
-    const labels = [];
-    const datasets = [];
-    const formatDate = getDateLabelFormatter();
-    for (let i = 0; i < fieldsCount; i++) {
-      datasets.push([]);
-    }
-
-    for (const entry of turnoverChartResponse.data) {
-      labels.push(formatDate(entry.date));
-      for (let i = 0; i < fieldsCount; i++) {
-        datasets[i].push(entry[fields[i]] / 1e11);
-      }
-    }
-
-    return { labels, datasets };
-  }
-
   useEffect(() => {
     if (!turnoverChartResponse?.data) {
       return;
     }
 
-    const { labels: dspLabels, datasets: dspDatasets } = extractDataFromResponse([
+    const labels = extractLabelsFromResponseData(turnoverChartResponse.data, chartResolution);
+    const dspDatasets = extractDatasetsFromResponseData(turnoverChartResponse.data, [
       'dspAdvertisersExpense',
       'dspLicenseFee',
       'dspOperatorFee',
       'dspCommunityFee',
       'dspExpense',
     ]);
-    const { labels: sspLabels, datasets: sspDatasets } = extractDataFromResponse([
+    const sspDatasets = extractDatasetsFromResponseData(turnoverChartResponse.data, [
       'sspIncome',
       'sspLicenseFee',
       'sspOperatorFee',
@@ -413,7 +373,7 @@ const WalletStatusCard = (props) => {
 
     setDspChart(() => ({
       ...dspChart,
-      labels: dspLabels,
+      labels,
       datasets: [
         { ...dspChart.datasets[0], data: dspDatasets[0] },
         { ...dspChart.datasets[1], data: dspDatasets[1] },
@@ -424,7 +384,7 @@ const WalletStatusCard = (props) => {
     }));
     setSspChart(() => ({
       ...sspChart,
-      labels: sspLabels,
+      labels,
       datasets: [
         { ...sspChart.datasets[0], data: sspDatasets[0] },
         { ...sspChart.datasets[1], data: sspDatasets[1] },
