@@ -1,15 +1,17 @@
-import { Box, Card, CardContent, CardHeader, Grid, Typography } from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Box, Card, CardContent, CardHeader, Grid, IconButton, Link, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'react-chartjs-2';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { useCreateNotification } from '../../hooks';
 import Events from '../Events/Events';
 import apiService from '../../utils/apiService';
 import { getFlowChartData } from '../../utils/chartUtils';
 import ServiceStatusTable from '../../Components/ServiceStatusTable/ServiceStatusTable';
 import Spinner from '../../Components/Spinner/Spinner';
+import TurnoverCharts from '../../Components/TurnoverCharts/TurnoverCharts';
 import configSelectors from '../../redux/config/configSelectors';
 import { useGetTurnoverByTypeQuery } from '../../redux/monitoring/monitoringApi';
 
@@ -25,6 +27,9 @@ export default function Dashboard() {
         </Grid>
         <Grid item xs={6}>
           <Flow />
+        </Grid>
+        <Grid item xs={6}>
+          <Turnover />
         </Grid>
       </Grid>
     </>
@@ -85,16 +90,45 @@ const Flow = (props) => {
 
   return (
     <Card {...props}>
-      <CardHeader title="Flow" />
+      <CardHeader
+        action={
+          <IconButton aria-label="details">
+            <Link component={RouterLink} to="/network/connected-servers">
+              <ArrowForwardIcon />
+            </Link>
+          </IconButton>
+        }
+        title="Flow"
+      />
       <CardContent>
-        <Typography variant="body1">
-          Sankey diagram below presents transfers between connected servers. <Link to="/network/connected-servers">More info</Link>
-        </Typography>
         {!isFetchingDspExpense && !isFetchingSspIncome && (
           <Box sx={{ mt: 2, textAlign: 'center' }}>
             {chartData.datasets.length > 0 ? <Chart type={'sankey'} data={chartData} /> : <Typography variant="b800">No data</Typography>}
           </Box>
         )}
+      </CardContent>
+    </Card>
+  );
+};
+
+const Turnover = (props) => {
+  const dateFrom = dayjs().startOf('month');
+  const dateTo = dayjs().endOf('day');
+
+  return (
+    <Card {...props}>
+      <CardHeader
+        action={
+          <IconButton aria-label="details">
+            <Link component={RouterLink} to="/finance/wallet">
+              <ArrowForwardIcon />
+            </Link>
+          </IconButton>
+        }
+        title="Turnover"
+      />
+      <CardContent>
+        <TurnoverCharts dateFrom={dateFrom} dateTo={dateTo} />
       </CardContent>
     </Card>
   );
