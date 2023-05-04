@@ -19,6 +19,7 @@ import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithC
 import commonStyles from '../../styles/commonStyles.scss';
 import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
+import Spinner from '../../Components/Spinner/Spinner';
 import TypographyOverflowTooltip from '../../Components/TypographyOverflowTooltip/TypographyOverflowTooltip';
 import { getFlowChartData } from '../../utils/chartUtils';
 import { filterObjectByKeys } from '../../utils/helpers';
@@ -271,7 +272,9 @@ const ConnectedServersFlow = (props) => {
           onDateFromChange={setDateFrom}
           onDateToChange={setDateTo}
         />
-        {!isFetchingDspExpense && !isFetchingSspIncome && (
+        {isFetchingDspExpense || isFetchingSspIncome ? (
+          <Spinner />
+        ) : (
           <Box sx={{ mt: 2, maxWidth: '60%', textAlign: 'center' }}>
             {chartData.datasets.length > 0 ? <Chart type={'sankey'} data={chartData} /> : <Typography variant="b800">No data</Typography>}
           </Box>

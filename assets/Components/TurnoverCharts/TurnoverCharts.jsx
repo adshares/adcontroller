@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import { useGetTurnoverChartQuery } from '../../redux/monitoring/monitoringApi';
+import Spinner from '../Spinner/Spinner';
 
 function getChartOptions(title) {
   return {
@@ -222,8 +223,14 @@ export default function TurnoverCharts({ dateFrom, dateTo, props }) {
 
   return (
     <Box {...props}>
-      {!isFetchingChart && dspChart.labels.length > 0 && <Line options={dspChartOptions} data={dspChart} />}
-      {!isFetchingChart && sspChart.labels.length > 0 && <Line options={sspChartOptions} data={sspChart} />}
+      {isFetchingChart ? (
+        <Spinner />
+      ) : (
+        <>
+          {dspChart.labels.length > 0 && <Line options={dspChartOptions} data={dspChart} />}
+          {sspChart.labels.length > 0 && <Line options={sspChartOptions} data={sspChart} />}
+        </>
+      )}
     </Box>
   );
 }

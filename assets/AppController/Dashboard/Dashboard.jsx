@@ -97,7 +97,9 @@ const Flow = (props) => {
         title="Flow"
       />
       <CardContent>
-        {!isFetchingDspExpense && !isFetchingSspIncome && (
+        {isFetchingDspExpense || isFetchingSspIncome ? (
+          <Spinner />
+        ) : (
           <Box sx={{ mt: 2, textAlign: 'center' }}>
             {chartData.datasets.length > 0 ? <Chart type={'sankey'} data={chartData} /> : <Typography variant="b800">No data</Typography>}
           </Box>
