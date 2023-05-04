@@ -35,6 +35,9 @@ class DataCollector
         // AdSelect
         AdServerConfigurationClient::ADSELECT_URL => AdSelectConfig::Url,
         // AdServer
+        AdServerConfigurationClient::ADS_TXT_CHECK_DEMAND_ENABLED => AdServerConfig::AdsTxtCheckDemandEnabled,
+        AdServerConfigurationClient::ADS_TXT_CHECK_SUPPLY_ENABLED => AdServerConfig::AdsTxtCheckSupplyEnabled,
+        AdServerConfigurationClient::ADS_TXT_DOMAIN => AdServerConfig::AdsTxtDomain,
         AdServerConfigurationClient::ADSERVER_NAME => AdServerConfig::Name,
         AdServerConfigurationClient::ADSHARES_LICENSE_KEY => AdServerConfig::LicenseKey,
         AdServerConfigurationClient::ADSHARES_ADDRESS => AdServerConfig::WalletAddress,

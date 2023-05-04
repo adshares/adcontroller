@@ -21,6 +21,7 @@ use App\Service\Configurator\Category\CampaignSettings;
 use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\CrmNotifications;
+use App\Service\Configurator\Category\DemandSettlementOptions;
 use App\Service\Configurator\Category\License;
 use App\Service\Configurator\Category\PanelAssets;
 use App\Service\Configurator\Category\PanelPlaceholders;
@@ -51,6 +52,7 @@ class ConfiguratorController extends AbstractController
         'auto-withdrawal-config' => AutomaticWithdrawal::class,
         'banner-settings-config' => BannerSettings::class,
         'campaign-settings-config' => CampaignSettings::class,
+        'demand/settlement-options-config' => DemandSettlementOptions::class,
         'base-information-config' => BaseInformation::class,
         'cold-wallet-config' => ColdWallet::class,
         'commission-config' => Commission::class,
@@ -187,7 +189,7 @@ class ConfiguratorController extends AbstractController
         return $this->jsonOk($result);
     }
 
-    #[Route('/config/{category}', name: 'store_config', methods: ['PATCH'])]
+    #[Route('/config/{category}', name: 'store_config', requirements: ['category' => '^[a-z\-\/]+$'], methods: ['PATCH'])]
     public function storeConfig(string $category, ConfigurationRepository $repository, Request $request): JsonResponse
     {
         try {

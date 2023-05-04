@@ -26,15 +26,17 @@ class SiteOptions implements ConfiguratorCategory
         if (empty($input)) {
             throw new InvalidArgumentException('Data is required');
         }
-        if (
-            array_key_exists(AdServerConfig::SiteAcceptBannersManually->name, $input) &&
-            null === $input[AdServerConfig::SiteAcceptBannersManually->name]
+        foreach (
+            [
+                AdServerConfig::AdsTxtCheckSupplyEnabled->name,
+                AdServerConfig::SiteAcceptBannersManually->name,
+            ] as $field
         ) {
-            throw new InvalidArgumentException(
-                sprintf('Field `%s` must be a boolean', AdServerConfig::SiteAcceptBannersManually->name)
-            );
+            if (array_key_exists($field, $input) && null === $input[$field]) {
+                throw new InvalidArgumentException(sprintf('Field `%s` must be a boolean', $field));
+            }
+            ArrayUtils::assureBoolTypeForField($input, $field);
         }
-        ArrayUtils::assureBoolTypeForField($input, AdServerConfig::SiteAcceptBannersManually->name);
 
         if (
             array_key_exists(AdServerConfig::SiteClassifierLocalBanners->name, $input) &&
@@ -52,6 +54,24 @@ class SiteOptions implements ConfiguratorCategory
                 )
             );
         }
+        if (
+            array_key_exists(AdServerConfig::AdsTxtCheckSupplyEnabled->name, $input) &&
+            false === $input[AdServerConfig::AdsTxtCheckSupplyEnabled->name]
+        ) {
+            $input[AdServerConfig::AdsTxtDomain->name] = null;
+        }
+        if (
+            isset($input[AdServerConfig::AdsTxtDomain->name]) &&
+            false === filter_var(
+                $input[AdServerConfig::AdsTxtDomain->name],
+                FILTER_VALIDATE_DOMAIN,
+                FILTER_FLAG_HOSTNAME,
+            )
+        ) {
+            throw new InvalidArgumentException(
+                sprintf('Field `%s` must be a domain', AdServerConfig::AdsTxtDomain->name)
+            );
+        }
 
         return $this->dataCollector->push($input);
     }
@@ -59,6 +79,8 @@ class SiteOptions implements ConfiguratorCategory
     private static function fields(): array
     {
         return [
+            AdServerConfig::AdsTxtCheckSupplyEnabled->name,
+            AdServerConfig::AdsTxtDomain->name,
             AdServerConfig::SiteAcceptBannersManually->name,
             AdServerConfig::SiteClassifierLocalBanners->name,
         ];

@@ -29,6 +29,9 @@ class AdServerConfigurationClient
     private const ADS_LOG_START = 'adsLogStart';
     private const ADS_OPERATOR_SERVER_URL = 'adsOperatorServerUrl';
     private const ADS_RPC_URL = 'adsRpcUrl';
+    public const ADS_TXT_CHECK_DEMAND_ENABLED = 'adsTxtCheckDemandEnabled';
+    public const ADS_TXT_CHECK_SUPPLY_ENABLED = 'adsTxtCheckSupplyEnabled';
+    public const ADS_TXT_DOMAIN = 'adsTxtDomain';
     private const ADSELECT_INVENTORY_EXPORT_TIME = 'adselectInventoryExport';
     public const ADSELECT_URL = 'adselectUrl';
     public const ADSERVER_NAME = 'adserverName';
@@ -278,6 +281,9 @@ class AdServerConfigurationClient
     private static function mapDataToAdServerFormat(array $data): array
     {
         $keyMap = [
+            AdServerConfig::AdsTxtCheckDemandEnabled->name => self::ADS_TXT_CHECK_DEMAND_ENABLED,
+            AdServerConfig::AdsTxtCheckSupplyEnabled->name => self::ADS_TXT_CHECK_SUPPLY_ENABLED,
+            AdServerConfig::AdsTxtDomain->name => self::ADS_TXT_DOMAIN,
             AdServerConfig::AdvertiserApplyFormUrl->name => self::ADVERTISER_APPLY_FORM_URL,
             AdServerConfig::AllowZoneInIframe->name => self::ALLOW_ZONE_IN_IFRAME,
             AdServerConfig::AutoConfirmationEnabled->name => self::AUTO_CONFIRMATION_ENABLED,
