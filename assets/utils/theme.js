@@ -1,7 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 import Montserrat from '../fonts/Montserrat/Montserrat-VariableFont_wght.ttf';
 
-
 const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
 const primaryAlt = getComputedStyle(document.documentElement).getPropertyValue('--primary-alt').trim();
 const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
@@ -298,6 +297,9 @@ const theme = createTheme({
       },
     },
     MuiFormControl: {
+      defaultProps: {
+        size: 'small',
+      },
       variants: [
         {
           props: {
@@ -465,6 +467,11 @@ const theme = createTheme({
             backgroundColor: primaryAlt,
           },
         },
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        size: 'small',
       },
     },
   },
