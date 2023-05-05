@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import configSelectors from '../../redux/config/configSelectors';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSetSiteOptionsConfigMutation, useSetZoneOptionsConfigMutation } from '../../redux/config/configApi';
-import { changeSiteOptionsInformation, changeZoneOptionsInformation } from '../../redux/config/configSlice';
+import { changeAdServerConfiguration } from '../../redux/config/configSlice';
 import { useCreateNotification, useForm } from '../../hooks';
 import { returnNumber } from '../../utils/helpers';
 import {
@@ -13,6 +13,7 @@ import {
   CardContent,
   CardHeader,
   Checkbox,
+  Collapse,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -35,18 +36,31 @@ const SiteOptions = (props) => {
   const [setSiteOptionsConfig, { isLoading }] = useSetSiteOptionsConfigMutation();
   const dispatch = useDispatch();
   const { createSuccessNotification } = useCreateNotification();
+  const [AdsTxtCheckSupplyEnabled, setAdsTxtCheckSupplyEnabled] = useState(appData.AdServer.AdsTxtCheckSupplyEnabled);
   const [SiteAcceptBannersManually, setSiteAcceptBannersManually] = useState(appData.AdServer.SiteAcceptBannersManually);
   const [SiteClassifierLocalBanners, setSiteClassifierLocalBanners] = useState(appData.AdServer.SiteClassifierLocalBanners);
+  const form = useForm({
+    initialFields: {
+      AdsTxtDomain: appData.AdServer.AdsTxtDomain,
+    },
+    validation: {
+      AdsTxtDomain: ['domain'],
+    },
+  });
 
   const onSaveClick = async () => {
     const body = {
       ...(appData.AdServer.SiteAcceptBannersManually === SiteAcceptBannersManually ? {} : { SiteAcceptBannersManually }),
       ...(appData.AdServer.SiteClassifierLocalBanners === SiteClassifierLocalBanners ? {} : { SiteClassifierLocalBanners }),
+      ...(appData.AdServer.AdsTxtCheckSupplyEnabled === AdsTxtCheckSupplyEnabled ? {} : { AdsTxtCheckSupplyEnabled }),
+      ...(AdsTxtCheckSupplyEnabled && form.changedFields.AdsTxtDomain
+        ? { AdsTxtDomain: 0 === form.fields.AdsTxtDomain.length ? null : form.fields.AdsTxtDomain }
+        : {}),
     };
 
     const response = await setSiteOptionsConfig(body);
     if (response.data && response.data.message === 'OK') {
-      dispatch(changeSiteOptionsInformation(response.data.data));
+      dispatch(changeAdServerConfiguration(response.data.data));
       createSuccessNotification();
     }
   };
@@ -70,14 +84,40 @@ const SiteOptions = (props) => {
             <FormControlLabel value="local-only" control={<Radio />} label="Only from local server" />
           </RadioGroup>
         </FormControl>
+
+        <FormControlLabel
+          sx={{ display: 'block', mt: 3, mb: 3, ml: -1.5 }}
+          label="Require ads.txt on sites"
+          control={<Checkbox checked={AdsTxtCheckSupplyEnabled} onChange={() => setAdsTxtCheckSupplyEnabled((prevState) => !prevState)} />}
+        />
+        <Collapse in={AdsTxtCheckSupplyEnabled} timeout="auto">
+          <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+            <TextField
+              customvariant="highLabel"
+              color="secondary"
+              id="AdsTxtDomain"
+              name="AdsTxtDomain"
+              type="text"
+              label="Required ads.txt domain"
+              fullWidth
+              value={form.fields.AdsTxtDomain}
+              error={form.touchedFields.AdsTxtDomain && !form.errorObj.AdsTxtDomain.isValid}
+              helperText={form.touchedFields.AdsTxtDomain && form.errorObj.AdsTxtDomain.helperText}
+              inputProps={{ autoComplete: 'off' }}
+            />
+          </Box>
+        </Collapse>
       </CardContent>
 
       <CardActions>
         <Button
           disabled={
+            isLoading ||
+            (AdsTxtCheckSupplyEnabled && form.isFormWasChanged && !form.isFormValid) ||
             (appData.AdServer.SiteAcceptBannersManually === SiteAcceptBannersManually &&
-              appData.AdServer.SiteClassifierLocalBanners === SiteClassifierLocalBanners) ||
-            isLoading
+              appData.AdServer.SiteClassifierLocalBanners === SiteClassifierLocalBanners &&
+              appData.AdServer.AdsTxtCheckSupplyEnabled === AdsTxtCheckSupplyEnabled &&
+              !(AdsTxtCheckSupplyEnabled && form.isFormWasChanged))
           }
           type="button"
           variant="contained"
@@ -116,7 +156,7 @@ const ZoneOptions = (props) => {
 
     const response = await setZoneOptionsConfig(body);
     if (response.data && response.data.message === 'OK') {
-      dispatch(changeZoneOptionsInformation(response.data.data));
+      dispatch(changeAdServerConfiguration(response.data.data));
       createSuccessNotification();
     }
   };

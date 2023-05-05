@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Turnover and token flow monitoring
 - Link to wallet on list
+- Ads.txt configuration
 
 ## [1.2.8] - 2023-02-14
 ### Fixed
