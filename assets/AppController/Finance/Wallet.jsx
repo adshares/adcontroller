@@ -8,8 +8,10 @@ import { changeColdWalletConfigInformation, changeWalletConfigInformation } from
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
+import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import Spinner from '../../Components/Spinner/Spinner';
+import TurnoverChart from '../../Components/TurnoverCharts/TurnoverChart';
 import {
   Box,
   Button,
@@ -32,9 +34,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
 import dayjs from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -225,7 +224,7 @@ const WalletSettingsCard = (props) => {
 };
 
 const WalletStatusCard = (props) => {
-  const [dateFrom, setDateFrom] = useState(dayjs().subtract(1, 'day').startOf('day'));
+  const [dateFrom, setDateFrom] = useState(dayjs().startOf('month'));
   const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
   const [queryConfig, setQueryConfig] = useState(() => ({
     'filter[date][from]': dateFrom?.format(),
@@ -233,7 +232,6 @@ const WalletStatusCard = (props) => {
   }));
   const [dspRows, setDspRows] = useState(() => []);
   const [sspRows, setSspRows] = useState(() => []);
-  const { data: turnoverResponse, isFetching } = useGetTurnoverQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
     setQueryConfig((prevState) => ({
@@ -242,6 +240,8 @@ const WalletStatusCard = (props) => {
       'filter[date][to]': dateTo?.format(),
     }));
   }, [dateFrom, dateTo]);
+
+  const { data: turnoverResponse, isFetching } = useGetTurnoverQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
     if (!turnoverResponse?.data) {
@@ -297,20 +297,14 @@ const WalletStatusCard = (props) => {
           </Link>
           .
         </Typography>
-        <Box sx={{ mt: 2 }}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="From"
-              value={dateFrom}
-              onChange={(newValue) => setDateFrom(newValue)}
-              disabled={isFetching}
-              maxDate={dateTo}
-              disableFuture={true}
-              sx={{ mr: 2 }}
-            />
-            <DatePicker label="To" value={dateTo} onChange={(newValue) => setDateTo(newValue)} disabled={isFetching} />
-          </LocalizationProvider>
-        </Box>
+        <DateRangePicker
+          sx={{ mt: 2 }}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          disabled={isFetching}
+          onDateFromChange={setDateFrom}
+          onDateToChange={setDateTo}
+        />
         {!isFetching && (
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid item xs={6}>
@@ -359,6 +353,7 @@ const WalletStatusCard = (props) => {
             </Grid>
           </Grid>
         )}
+        <TurnoverChart dateFrom={dateFrom} dateTo={dateTo} />
       </CardContent>
     </Card>
   );

@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Turnover and token flow monitoring
 - Dark mode support
 - Turnover monitoring
 - Link to wallet on list

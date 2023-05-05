@@ -59,7 +59,7 @@ const EventsDataType = {
   LATEST: 'latest',
 };
 
-export default function Events({ dataType = EventsDataType.ALL }) {
+export default function Events({ dataType = EventsDataType.ALL, ...props }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [headCells, setHeadCells] = useState(() => initialHeadCells);
   const [queryConfig, setQueryConfig] = useState(() => ({
@@ -142,7 +142,7 @@ export default function Events({ dataType = EventsDataType.ALL }) {
   };
 
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader title={EventsDataType.LATEST === dataType ? 'Latest events' : 'Events'} />
       <CardContent>
         <TableData

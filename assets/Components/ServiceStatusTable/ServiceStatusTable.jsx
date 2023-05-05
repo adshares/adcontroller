@@ -12,16 +12,16 @@ const ServiceStatusTable = ({ data }) => {
           .filter((field) => data.hasOwnProperty(field))
           .map((field) => (
             <TableRow key={data[field].module}>
-              <TableCell sx={{ padding: '8px' }} align="left">
+              <TableCell sx={{ padding: '0 8px' }} align="left">
                 <Typography variant="tableText2">{data[field].module}</Typography>
               </TableCell>
-              <TableCell sx={{ padding: '8px' }} align="left">
+              <TableCell sx={{ padding: '0 8px' }} align="left">
                 <Typography variant="tableText2">{data[field].version}</Typography>
               </TableCell>
-              <TableCell sx={{ padding: '8px' }} align="left">
+              <TableCell sx={{ padding: '0 8px' }} align="left">
                 <Typography variant="tableText2">{data[field].url}</Typography>
               </TableCell>
-              <TableCell sx={{ padding: '8px' }}>
+              <TableCell sx={{ padding: '0 8px' }}>
                 <Tooltip title={data[field].code}>
                   <Icon>{data[field].code === 200 ? <CheckIcon color="success" /> : <CloseIcon color="error" />}</Icon>
                 </Tooltip>
