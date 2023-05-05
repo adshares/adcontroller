@@ -58,6 +58,9 @@ const theme = createTheme({
     light: {
       main: light,
     },
+    muted: {
+      main: muted,
+    },
     white: {
       main: light,
     },
@@ -168,6 +171,7 @@ const theme = createTheme({
           minWidth: '150px',
           padding: '8px 20px',
           boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
+          color: bodyColor,
           '&.Mui-disabled': {
             cursor: 'not-allowed',
             pointerEvents: 'fill',
@@ -460,6 +464,7 @@ const theme = createTheme({
         root: {
           '& .MuiDialog-paper': {
             padding: '9px 22px 30px 22px',
+            backgroundColor: primaryAlt,
           },
         },
       },
