@@ -11,7 +11,7 @@ import apiService from '../../utils/apiService';
 import { getFlowChartData } from '../../utils/chartUtils';
 import ServiceStatusTable from '../../Components/ServiceStatusTable/ServiceStatusTable';
 import Spinner from '../../Components/Spinner/Spinner';
-import TurnoverCharts from '../../Components/TurnoverCharts/TurnoverCharts';
+import TurnoverChart from '../../Components/TurnoverCharts/TurnoverChart';
 import configSelectors from '../../redux/config/configSelectors';
 import { useGetTurnoverByTypeQuery } from '../../redux/monitoring/monitoringApi';
 
@@ -20,12 +20,12 @@ export default function Dashboard() {
     <>
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          <Events dataType="latest" />
-          <Flow sx={{ mt: 2 }} />
+          <Turnover />
+          <Events dataType="latest" sx={{ mt: 2 }} />
         </Grid>
         <Grid item xs={6}>
           <ServiceStatus />
-          <Turnover sx={{ mt: 2 }} />
+          <Flow sx={{ mt: 2 }} />
         </Grid>
       </Grid>
     </>
@@ -126,7 +126,7 @@ const Turnover = (props) => {
         title="Turnover"
       />
       <CardContent>
-        <TurnoverCharts dateFrom={dateFrom} dateTo={dateTo} />
+        <TurnoverChart dateFrom={dateFrom} dateTo={dateTo} />
       </CardContent>
     </Card>
   );

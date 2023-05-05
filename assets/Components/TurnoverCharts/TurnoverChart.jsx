@@ -82,16 +82,8 @@ function extractLabelsFromResponseData(responseData, chartResolution) {
   return labels;
 }
 
-export default function TurnoverCharts({ dateFrom, dateTo, props }) {
-  const dspChartOptions = getChartOptions('DSP Turnover');
-  const sspChartOptions = getChartOptions('SSP Turnover');
-  const [chartResolution, setChartResolution] = useState('day');
-  const [queryConfig, setQueryConfig] = useState(() => ({
-    chartResolution,
-    'filter[date][from]': dateFrom?.format(),
-    'filter[date][to]': dateTo?.format(),
-  }));
-  const [dspChart, setDspChart] = useState(() => ({
+function getChartDataInitialState() {
+  return {
     labels: [],
     datasets: [
       {
@@ -122,46 +114,39 @@ export default function TurnoverCharts({ dateFrom, dateTo, props }) {
         hidden: true,
       },
       {
-        label: 'Expense',
+        label: 'DSP Expense',
         data: [],
         borderColor: 'rgb(53, 162, 50)',
         backgroundColor: 'rgba(53, 162, 50, 0.5)',
         hidden: true,
       },
-    ],
-  }));
-  const [sspChart, setSspChart] = useState(() => ({
-    labels: [],
-    datasets: [
       {
-        label: 'Income',
+        label: 'SSP Income',
         data: [],
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: 'rgb(98, 66, 145)',
+        backgroundColor: 'rgba(98, 66, 145, 0.5)',
         hidden: true,
-      },
-      {
-        label: 'License Fee',
-        data: [],
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-        hidden: true,
-      },
-      {
-        label: 'Operator Fee',
-        data: [],
-        borderColor: 'rgb(255, 205, 86)',
-        backgroundColor: 'rgb(255, 205, 86, 0.5)',
       },
       {
         label: 'Publishers Income',
         data: [],
-        borderColor: 'rgb(53, 162, 50)',
-        backgroundColor: 'rgba(53, 162, 50, 0.5)',
+        borderColor: 'rgb(136, 227, 170)',
+        backgroundColor: 'rgba(136, 227, 170, 0.5)',
         hidden: true,
       },
     ],
+  };
+}
+
+export default function TurnoverChart({ dateFrom, dateTo, props }) {
+  const chartOptions = getChartOptions();
+  const [chartResolution, setChartResolution] = useState('day');
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    chartResolution,
+    'filter[date][from]': dateFrom?.format(),
+    'filter[date][to]': dateTo?.format(),
   }));
+  const [chart, setChartData] = useState(() => getChartDataInitialState());
   const { data: turnoverChartResponse, isFetching: isFetchingChart } = useGetTurnoverChartQuery(queryConfig, {
     refetchOnMountOrArgChange: true,
   });
@@ -184,53 +169,41 @@ export default function TurnoverCharts({ dateFrom, dateTo, props }) {
     }
 
     const labels = extractLabelsFromResponseData(turnoverChartResponse.data, chartResolution);
-    const dspDatasets = extractDatasetsFromResponseData(turnoverChartResponse.data, [
+    const datasets = extractDatasetsFromResponseData(turnoverChartResponse.data, [
       'dspAdvertisersExpense',
       'dspLicenseFee',
       'dspOperatorFee',
       'dspCommunityFee',
       'dspExpense',
-    ]);
-    const sspDatasets = extractDatasetsFromResponseData(turnoverChartResponse.data, [
       'sspIncome',
       'sspLicenseFee',
       'sspOperatorFee',
       'sspPublishersIncome',
     ]);
 
-    setDspChart(() => ({
-      ...dspChart,
+    setChartData(() => ({
+      ...chart,
       labels,
       datasets: [
-        { ...dspChart.datasets[0], data: dspDatasets[0] },
-        { ...dspChart.datasets[1], data: dspDatasets[1] },
-        { ...dspChart.datasets[2], data: dspDatasets[2] },
-        { ...dspChart.datasets[3], data: dspDatasets[3] },
-        { ...dspChart.datasets[4], data: dspDatasets[4] },
-      ],
-    }));
-    setSspChart(() => ({
-      ...sspChart,
-      labels,
-      datasets: [
-        { ...sspChart.datasets[0], data: sspDatasets[0] },
-        { ...sspChart.datasets[1], data: sspDatasets[1] },
-        { ...sspChart.datasets[2], data: sspDatasets[2] },
-        { ...sspChart.datasets[3], data: sspDatasets[3] },
+        // dspAdvertisersExpense
+        { ...chart.datasets[0], data: datasets[0] },
+        // dspLicenseFee + sspLicenseFee
+        { ...chart.datasets[1], data: datasets[1].map((num, idx) => num + datasets[6][idx]) },
+        // dspOperatorFee + sspOperatorFee
+        { ...chart.datasets[2], data: datasets[2].map((num, idx) => num + datasets[7][idx]) },
+        // dspCommunityFee
+        { ...chart.datasets[3], data: datasets[3] },
+        // dspExpense
+        { ...chart.datasets[4], data: datasets[4] },
+        // sspIncome
+        { ...chart.datasets[5], data: datasets[5] },
+        // sspPublishersIncome
+        { ...chart.datasets[6], data: datasets[8] },
       ],
     }));
   }, [turnoverChartResponse]);
 
   return (
-    <Box {...props}>
-      {isFetchingChart ? (
-        <Spinner />
-      ) : (
-        <>
-          {dspChart.labels.length > 0 && <Line options={dspChartOptions} data={dspChart} />}
-          {sspChart.labels.length > 0 && <Line options={sspChartOptions} data={sspChart} />}
-        </>
-      )}
-    </Box>
+    <Box {...props}>{isFetchingChart ? <Spinner /> : <>{chart.labels.length > 0 && <Line options={chartOptions} data={chart} />}</>}</Box>
   );
 }

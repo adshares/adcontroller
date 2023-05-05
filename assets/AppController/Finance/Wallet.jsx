@@ -11,7 +11,7 @@ import { validateAddress } from '@adshares/ads';
 import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import Spinner from '../../Components/Spinner/Spinner';
-import TurnoverCharts from '../../Components/TurnoverCharts/TurnoverCharts';
+import TurnoverChart from '../../Components/TurnoverCharts/TurnoverChart';
 import {
   Box,
   Button,
@@ -353,7 +353,7 @@ const WalletStatusCard = (props) => {
             </Grid>
           </Grid>
         )}
-        <TurnoverCharts dateFrom={dateFrom} dateTo={dateTo} />
+        <TurnoverChart dateFrom={dateFrom} dateTo={dateTo} />
       </CardContent>
     </Card>
   );
