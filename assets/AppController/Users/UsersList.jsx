@@ -66,7 +66,7 @@ const headCells = [
     id: 'status',
     label: (
       <Tooltip title="Status">
-        <AssignmentTurnedInOutlinedIcon size="small" color="dark" />
+        <AssignmentTurnedInOutlinedIcon size="small" color="black" />
       </Tooltip>
     ),
     cellWidth: '5rem',
@@ -133,7 +133,7 @@ const headCells = [
     label: (
       <Box sx={{ width: '100%' }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
         <Tooltip title="Actions">
-          <MenuIcon size="small" color="dark" />
+          <MenuIcon size="small" color="black" />
         </Tooltip>
       </Box>
     ),
@@ -471,7 +471,7 @@ const UserActionsMenu = ({ currentUser, user, actions }) => {
   return (
     <>
       <IconButton
-        color="dark"
+        color="black"
         disabled={isActionPending || (!isSelfAdmin && !isSelfRow && (isAdmin || isModerator))}
         onClick={handleMenuOpen}
       >
