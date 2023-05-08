@@ -1,7 +1,14 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Chart } from 'react-chartjs-2';
+import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import queryString from 'query-string';
-import { useGetConnectedHostsQuery, useResetHostConnectionErrorMutation } from '../../redux/monitoring/monitoringApi';
+import configSelectors from '../../redux/config/configSelectors';
+import {
+  useGetConnectedHostsQuery,
+  useGetTurnoverByTypeQuery,
+  useResetHostConnectionErrorMutation,
+} from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
 import { Box, Card, CardContent, CardHeader, IconButton, Link, Tooltip, Typography } from '@mui/material';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
@@ -10,9 +17,13 @@ import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
 import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import commonStyles from '../../styles/commonStyles.scss';
+import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
+import Spinner from '../../Components/Spinner/Spinner';
 import TypographyOverflowTooltip from '../../Components/TypographyOverflowTooltip/TypographyOverflowTooltip';
+import { getFlowChartData } from '../../utils/chartUtils';
 import { filterObjectByKeys } from '../../utils/helpers';
+import dayjs from 'dayjs';
 
 const headCells = [
   {
@@ -72,6 +83,15 @@ const headCells = [
 ];
 
 export default function ConnectedServers() {
+  return (
+    <>
+      <ConnectedServersList />
+      <ConnectedServersFlow sx={{ mt: 3 }} />
+    </>
+  );
+}
+
+const ConnectedServersList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [queryConfig, setQueryConfig] = useState({
     page: 1,
@@ -107,13 +127,13 @@ export default function ConnectedServers() {
       id: host.id,
       name: host.name,
       url: (
-        <Link href={host.url} target="_blank">
-          <TypographyOverflowTooltip variant="tableText2" color="black.main">
+        <Link href={host.url} rel="nofollow noopener noreferrer" target="_blank">
+          <TypographyOverflowTooltip variant="tableText2" color="dark.main">
             {host.url}
           </TypographyOverflowTooltip>
         </Link>
       ),
-      wallet: <FormattedWalletAddress wallet={host.walletAddress} />,
+      wallet: <FormattedWalletAddress wallet={host.walletAddress} sx={{ fontFamily: 'Monospace' }} />,
       lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
       campaigns: host.campaignCount,
       sites: host.siteCount,
@@ -204,4 +224,62 @@ export default function ConnectedServers() {
       </CardContent>
     </Card>
   );
-}
+};
+
+const ConnectedServersFlow = (props) => {
+  const adServerAddress = useSelector(configSelectors.getAppData).AdServer.WalletAddress;
+  const [dateFrom, setDateFrom] = useState(dayjs().startOf('month'));
+  const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    'filter[date][from]': dateFrom?.format(),
+    'filter[date][to]': dateTo?.format(),
+  }));
+  const [chartData, setChartData] = useState({ datasets: [] });
+
+  const { data: dspExpenseTurnoverResponse, isFetching: isFetchingDspExpense } = useGetTurnoverByTypeQuery(
+    { ...queryConfig, type: 'DspExpense' },
+    { refetchOnMountOrArgChange: true },
+  );
+  const { data: sspIncomeTurnoverResponse, isFetching: isFetchingSspIncome } = useGetTurnoverByTypeQuery(
+    { ...queryConfig, type: 'SspIncome' },
+    { refetchOnMountOrArgChange: true },
+  );
+
+  useEffect(() => {
+    setQueryConfig((prevState) => ({
+      ...prevState,
+      'filter[date][from]': dateFrom?.format(),
+      'filter[date][to]': dateTo?.format(),
+    }));
+  }, [dateFrom, dateTo]);
+
+  useEffect(() => {
+    const sspIncomeData = sspIncomeTurnoverResponse?.data || [];
+    const dspExpenseData = dspExpenseTurnoverResponse?.data || [];
+    setChartData(getFlowChartData(sspIncomeData, dspExpenseData, adServerAddress));
+  }, [dspExpenseTurnoverResponse, sspIncomeTurnoverResponse]);
+
+  return (
+    <Card width="full" {...props}>
+      <CardHeader title="Flow" />
+      <CardContent>
+        <Typography variant="body1">Sankey diagram below presents transfers between connected servers.</Typography>
+        <DateRangePicker
+          sx={{ mt: 2 }}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          disabled={isFetchingDspExpense || isFetchingSspIncome}
+          onDateFromChange={setDateFrom}
+          onDateToChange={setDateTo}
+        />
+        {isFetchingDspExpense || isFetchingSspIncome ? (
+          <Spinner />
+        ) : (
+          <Box sx={{ mt: 2, maxWidth: '60%', textAlign: 'center' }}>
+            {chartData.datasets.length > 0 ? <Chart type={'sankey'} data={chartData} /> : <Typography variant="b800">No data</Typography>}
+          </Box>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

@@ -6,6 +6,9 @@ enum AdServerConfig implements ConfigEnum
 {
     public const MODULE = 'AdServer';
 
+    case AdsTxtCheckDemandEnabled;
+    case AdsTxtCheckSupplyEnabled;
+    case AdsTxtDomain;
     case AdvertiserApplyFormUrl;
     case AllowZoneInIframe;
     case AutoConfirmationEnabled;

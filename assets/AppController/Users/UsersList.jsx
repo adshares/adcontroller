@@ -262,7 +262,7 @@ export default function UsersList() {
             </Box>
           ),
           email: user.email,
-          connectedWallet: <FormattedWalletAddress wallet={user.connectedWallet.address} />,
+          connectedWallet: <FormattedWalletAddress wallet={user.connectedWallet.address} sx={{ fontFamily: 'Monospace' }} />,
           walletBalance: formatMoney(user.adsharesWallet.walletBalance, 2) + ' ADS',
           bonusBalance: formatMoney(user.adsharesWallet.bonusBalance, 2) + ' ADS',
           role: parseRoles(user.roles),

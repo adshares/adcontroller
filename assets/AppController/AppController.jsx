@@ -50,6 +50,10 @@ import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import commonStyles from '../styles/commonStyles.scss';
+import { Chart, CategoryScale, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
+import { SankeyController, Flow } from 'chartjs-chart-sankey';
+
+Chart.register(CategoryScale, Tooltip, Flow, Legend, LinearScale, LineElement, PointElement, SankeyController, Title);
 
 const insertIf = (condition, element) => {
   return condition ? [element] : [];

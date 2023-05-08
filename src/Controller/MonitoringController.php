@@ -27,6 +27,13 @@ class MonitoringController extends AbstractController
         'events/latest',
         'events/types',
         'hosts',
+        'turnover',
+        'turnover/chart/hour',
+        'turnover/chart/day',
+        'turnover/chart/week',
+        'turnover/chart/month',
+        'turnover/DspExpense',
+        'turnover/SspIncome',
         'users',
         'wallet',
     ];

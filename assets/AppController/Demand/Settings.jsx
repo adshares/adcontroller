@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import { useCreateNotification, useForm } from '../../hooks';
 import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../utils/helpers';
-import { useSetBannerSettingsConfigMutation, useSetCampaignSettingsConfigMutation } from '../../redux/config/configApi';
-import { changeBannerSettingsInformation, changeCampaignSettingsInformation } from '../../redux/config/configSlice';
+import {
+  useSetBannerSettingsConfigMutation,
+  useSetCampaignSettingsConfigMutation,
+  useSetSettlementOptionsConfigMutation,
+} from '../../redux/config/configApi';
+import { changeAdServerConfiguration } from '../../redux/config/configSlice';
 import {
   Box,
   Button,
@@ -12,7 +16,9 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   InputAdornment,
   InputLabel,
@@ -24,6 +30,7 @@ export default function Settings() {
     <>
       <CampaignSettingsCard />
       <BannerSettingsCard sx={{ mt: 3 }} />
+      <SettlementOptionsCard sx={{ mt: 3 }} />
     </>
   );
 }
@@ -57,7 +64,7 @@ const CampaignSettingsCard = (props) => {
     const response = await setCampaignSettingsConfig(body);
 
     if (response.data && response.data.message === 'OK') {
-      dispatch(changeCampaignSettingsInformation(response.data.data));
+      dispatch(changeAdServerConfiguration(response.data.data));
       createSuccessNotification();
     }
   };
@@ -173,7 +180,7 @@ const BannerSettingsCard = (props) => {
     const response = await setBannerSettingsConfig(body);
 
     if (response.data && response.data.message === 'OK') {
-      dispatch(changeBannerSettingsInformation(response.data.data));
+      dispatch(changeAdServerConfiguration(response.data.data));
       createSuccessNotification();
     }
   };
@@ -267,6 +274,51 @@ const BannerSettingsCard = (props) => {
 
       <CardActions>
         <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
+          Save
+        </Button>
+      </CardActions>
+    </Card>
+  );
+};
+
+const SettlementOptionsCard = (props) => {
+  const appData = useSelector(configSelectors.getAppData);
+  const [setSettlementOptionsConfig, { isLoading }] = useSetSettlementOptionsConfigMutation();
+  const dispatch = useDispatch();
+  const { createSuccessNotification } = useCreateNotification();
+  const [AdsTxtCheckDemandEnabled, setAdsTxtCheckDemandEnabled] = useState(appData.AdServer.AdsTxtCheckDemandEnabled);
+
+  const onSaveClick = async () => {
+    const body = {
+      ...(appData.AdServer.AdsTxtCheckDemandEnabled === AdsTxtCheckDemandEnabled ? {} : { AdsTxtCheckDemandEnabled }),
+    };
+
+    const response = await setSettlementOptionsConfig(body);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeAdServerConfiguration(response.data.data));
+      createSuccessNotification();
+    }
+  };
+
+  return (
+    <Card {...props}>
+      <CardHeader title="Settlement options" />
+
+      <CardContent>
+        <FormControlLabel
+          sx={{ display: 'block', mt: 3, mb: 3, ml: -1.5 }}
+          label="Verify ads.txt on sites"
+          control={<Checkbox checked={AdsTxtCheckDemandEnabled} onChange={() => setAdsTxtCheckDemandEnabled((prevState) => !prevState)} />}
+        />
+      </CardContent>
+
+      <CardActions>
+        <Button
+          disabled={isLoading || appData.AdServer.AdsTxtCheckDemandEnabled === AdsTxtCheckDemandEnabled}
+          type="button"
+          variant="contained"
+          onClick={onSaveClick}
+        >
           Save
         </Button>
       </CardActions>

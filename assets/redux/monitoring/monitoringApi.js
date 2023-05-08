@@ -53,6 +53,35 @@ export const monitoringApi = createApi({
         };
       },
     }),
+    getTurnover: builder.query({
+      query: (queryConfig) => {
+        const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
+        return {
+          url: `/api/turnover?${queryParams}`,
+          method: 'GET',
+        };
+      },
+    }),
+    getTurnoverByType: builder.query({
+      query: (queryConfig) => {
+        const { type, ...filters } = queryConfig;
+        const queryParams = queryString.stringify(filters, { skipNull: true, arrayFormat: 'bracket' });
+        return {
+          url: `/api/turnover/${type}?${queryParams}`,
+          method: 'GET',
+        };
+      },
+    }),
+    getTurnoverChart: builder.query({
+      query: (queryConfig) => {
+        const { chartResolution, ...filters } = queryConfig;
+        const queryParams = queryString.stringify(filters, { skipNull: true, arrayFormat: 'bracket' });
+        return {
+          url: `/api/turnover/chart/${chartResolution}?${queryParams}`,
+          method: 'GET',
+        };
+      },
+    }),
     getUsersList: builder.query({
       query: (queryConfig) => {
         const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
@@ -159,6 +188,9 @@ export const {
   useGetEventsQuery,
   useGetEventsLatestQuery,
   useGetEventTypesQuery,
+  useGetTurnoverQuery,
+  useGetTurnoverByTypeQuery,
+  useGetTurnoverChartQuery,
   useGetUsersListQuery,
   useConfirmUserMutation,
   useSwitchToAdminMutation,

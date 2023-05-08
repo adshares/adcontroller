@@ -3,12 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
 import monitoringSelectors from '../../redux/monitoring/monitoringSelectors';
 import { useSetWalletConfigMutation, useSetColdWalletConfigMutation, useGetWalletNodeMutation } from '../../redux/config/configApi';
-import { useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
+import { useGetTurnoverQuery, useGetWalletMonitoringQuery } from '../../redux/monitoring/monitoringApi';
 import { changeColdWalletConfigInformation, changeWalletConfigInformation } from '../../redux/config/configSlice';
 import { useForm, useSkipFirstRenderEffect, useCreateNotification } from '../../hooks';
 import { adsToClicks, clicksToAds, formatMoney, returnNumber } from '../../utils/helpers';
 import { validateAddress } from '@adshares/ads';
+import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
+import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import Spinner from '../../Components/Spinner/Spinner';
+import TurnoverChart from '../../Components/TurnoverCharts/TurnoverChart';
 import {
   Box,
   Button,
@@ -19,7 +22,9 @@ import {
   Checkbox,
   Collapse,
   FormControlLabel,
+  Grid,
   IconButton,
+  Link,
   TextField,
   Tooltip,
   Typography,
@@ -28,6 +33,13 @@ import InfoIcon from '@mui/icons-material/Info';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import commonStyles from '../../styles/commonStyles.scss';
+import dayjs from 'dayjs';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 export default function Wallet() {
   return (
@@ -130,7 +142,7 @@ const WalletSettingsCard = (props) => {
         <>
           <Collapse in={!editMode} timeout="auto">
             <Typography variant="h3">
-              Wallet address: <Typography variant="b800">{appData.AdServer.WalletAddress} ADS</Typography>
+              Wallet address: <FormattedWalletAddress wallet={appData.AdServer.WalletAddress} variant="b800" />
             </Typography>
           </Collapse>
           <Collapse in={editMode} timeout="auto" unmountOnExit>
@@ -212,6 +224,44 @@ const WalletSettingsCard = (props) => {
 };
 
 const WalletStatusCard = (props) => {
+  const [dateFrom, setDateFrom] = useState(dayjs().startOf('month'));
+  const [dateTo, setDateTo] = useState(dayjs().endOf('day'));
+  const [queryConfig, setQueryConfig] = useState(() => ({
+    'filter[date][from]': dateFrom?.format(),
+    'filter[date][to]': dateTo?.format(),
+  }));
+  const [dspRows, setDspRows] = useState(() => []);
+  const [sspRows, setSspRows] = useState(() => []);
+
+  useEffect(() => {
+    setQueryConfig((prevState) => ({
+      ...prevState,
+      'filter[date][from]': dateFrom?.format(),
+      'filter[date][to]': dateTo?.format(),
+    }));
+  }, [dateFrom, dateTo]);
+
+  const { data: turnoverResponse, isFetching } = useGetTurnoverQuery(queryConfig, { refetchOnMountOrArgChange: true });
+
+  useEffect(() => {
+    if (!turnoverResponse?.data) {
+      return;
+    }
+    setDspRows(() => [
+      { name: 'dspAdvertisersExpense', description: 'Advertisers expense', amount: turnoverResponse.data.dspAdvertisersExpense },
+      { name: 'dspLicenseFee', description: 'License fee', amount: turnoverResponse.data.dspLicenseFee },
+      { name: 'dspOperatorFee', description: 'Operator fee', amount: turnoverResponse.data.dspOperatorFee },
+      { name: 'dspCommunityFee', description: 'Community fee', amount: turnoverResponse.data.dspCommunityFee },
+      { name: 'dspExpense', description: 'Expense', amount: turnoverResponse.data.dspExpense },
+    ]);
+    setSspRows(() => [
+      { name: 'sspIncome', description: 'Income', amount: turnoverResponse.data.sspIncome },
+      { name: 'sspLicenseFee', description: 'License fee', amount: turnoverResponse.data.sspLicenseFee },
+      { name: 'sspOperatorFee', description: 'Operator fee', amount: turnoverResponse.data.sspOperatorFee },
+      { name: 'sspPublishersIncome', description: 'Publishers income', amount: turnoverResponse.data.sspPublishersIncome },
+    ]);
+  }, [turnoverResponse]);
+
   const monitoringWalletInfo = useSelector(monitoringSelectors.getMonitoringWalletInfo);
   useGetWalletMonitoringQuery([], {
     pollingInterval: 3000,
@@ -225,6 +275,7 @@ const WalletStatusCard = (props) => {
           Total balance: <Typography variant="b800">{formatMoney(monitoringWalletInfo.balance, 5)} ADS</Typography>
         </Typography>
         <Typography variant="body1" sx={{ mt: 1 }}>
+          {/* eslint-disable-next-line max-len */}
           Total balance of all user accounts. This amount should be at least equal to the sum of funds accumulated in hot and cold wallets.{' '}
           <Typography variant="b600">The amount exceeding this value is the operator's profit</Typography>.
         </Typography>
@@ -236,6 +287,73 @@ const WalletStatusCard = (props) => {
         <Typography variant="body1" sx={{ mt: 1 }}>
           The total amount of all bonuses that have been added to user accounts but have not yet been used up.
         </Typography>
+      </CardContent>
+      <CardContent>
+        <Typography variant="h3">Turnover</Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          Cash flows by category. Money flow is explained in{' '}
+          <Link href={'https://docs.adshares.net/protocol/payments/index.html'} rel="nofollow noopener noreferrer" target="_blank">
+            the docs
+          </Link>
+          .
+        </Typography>
+        <DateRangePicker
+          sx={{ mt: 2 }}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          disabled={isFetching}
+          onDateFromChange={setDateFrom}
+          onDateToChange={setDateTo}
+        />
+        {!isFetching && (
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid item xs={6}>
+              <TableContainer sx={{ maxWidth: 600 }}>
+                <Table aria-label="Turnover data table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>DSP</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {dspRows.map((row) => (
+                      <TableRow key={row.name}>
+                        <TableCell component="th" scope="row">
+                          {row.description}
+                        </TableCell>
+                        <TableCell align="right">{formatMoney(row.amount, 5)} ADS</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+            <Grid item xs={6}>
+              <TableContainer sx={{ maxWidth: 600 }}>
+                <Table aria-label="Turnover data table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>SSP</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sspRows.map((row) => (
+                      <TableRow key={row.name}>
+                        <TableCell component="th" scope="row">
+                          {row.description}
+                        </TableCell>
+                        <TableCell align="right">{formatMoney(row.amount, 5)} ADS</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        )}
+        <TurnoverChart dateFrom={dateFrom} dateTo={dateTo} />
       </CardContent>
     </Card>
   );
@@ -309,6 +427,7 @@ const ColdWalletSettingsCard = (props) => {
                 <Tooltip
                   sx={{ ml: 2 }}
                   title={
+                    // eslint-disable-next-line max-len
                     'Set a minimum amount required to run operations. In case the amount drops below the specified threshold, you will be notified via e-mail.'
                   }
                 >
@@ -337,6 +456,7 @@ const ColdWalletSettingsCard = (props) => {
                 <Tooltip
                   sx={{ ml: 2 }}
                   title={
+                    // eslint-disable-next-line max-len
                     'Set a maximum amount that can be stored on a hot wallet. All funds exceeding this amount will be automatically transferred to your cold wallet.'
                   }
                 >
