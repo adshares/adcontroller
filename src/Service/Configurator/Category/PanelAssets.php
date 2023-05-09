@@ -7,6 +7,7 @@ use App\Entity\Enum\PanelAssetConfig;
 use App\Entity\PanelAsset;
 use App\Exception\InvalidArgumentException;
 use App\Messenger\Message\AdPanelReload;
+use App\Messenger\Message\AdControllerReload;
 use App\Repository\ConfigurationRepository;
 use App\Repository\PanelAssetRepository;
 use App\Service\Env\AdPanelEnvVar;
@@ -233,6 +234,7 @@ class PanelAssets implements ConfiguratorCategory
         }
         $this->assetRepository->remove($assets);
         $this->bus->dispatch(new AdPanelReload());
+        $this->bus->dispatch(new AdControllerReload());
 
         return $removedFileIds;
     }
@@ -247,6 +249,7 @@ class PanelAssets implements ConfiguratorCategory
         $envEditor->setOne(AdPanelEnvVar::BrandAssetsDirectory->value, $directory);
 
         $this->bus->dispatch(new AdPanelReload());
+        $this->bus->dispatch(new AdControllerReload());
     }
 
     public function buildUrl(string $filePath): string
