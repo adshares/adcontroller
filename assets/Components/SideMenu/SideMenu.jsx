@@ -54,12 +54,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     '& .MuiDrawer-paper': closedMixin(theme),
   }),
   '& .MuiDrawer-paper::-webkit-scrollbar': {
-    backgroundColor: theme.palette.deep.dark,
+    backgroundColor: theme.palette.primary.dark,
     width: '8px',
     borderRadius: '10px',
   },
   '& .MuiDrawer-paper::-webkit-scrollbar-thumb': {
-    backgroundColor: theme.palette.blue.main,
+    backgroundColor: theme.palette.info.main,
     borderRadius: '10px',
   },
 }));
@@ -156,14 +156,14 @@ const getMappedMenuItems = (items) => {
                     <ListItemIcon>
                       {React.createElement(children.icon, {
                         sx: { transform: children.rotateIcon && `rotate(${children.rotateIcon})` },
-                        color: children.path === location.pathname ? 'blue' : 'white',
+                        color: children.path === location.pathname ? 'primary' : 'white',
                       })}
                     </ListItemIcon>
                     <ListItemText
                       primary={children.name}
                       primaryTypographyProps={{
                         sx: {
-                          color: children.path === location.pathname ? 'blue.main' : 'white.main',
+                          color: children.path === location.pathname ? 'info.main' : 'white.main',
                           margin: 0,
                           fontVariationSettings: '"wght" 500',
                         },
@@ -183,14 +183,14 @@ const getMappedMenuItems = (items) => {
             <ListItemIcon>
               {React.createElement(item.icon, {
                 sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                color: item.path === location.pathname ? 'blue' : 'white',
+                color: item.path === location.pathname ? 'info' : 'white',
               })}
             </ListItemIcon>
             <ListItemText
               primary={item.name}
               primaryTypographyProps={{
                 sx: {
-                  color: item.path === location.pathname ? 'blue.main' : 'white.main',
+                  color: item.path === location.pathname ? 'info.main' : 'white.main',
                   margin: 0,
                   fontVariationSettings: '"wght" 600',
                 },
@@ -243,7 +243,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
             )}
           </Link>
         </Toolbar>
-        <Divider sx={{ borderColor: 'deep.main' }} />
+        <Divider sx={{ borderColor: 'primary.main' }} />
         <List disablePadding>{items}</List>
       </Drawer>
     )
