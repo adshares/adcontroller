@@ -137,7 +137,7 @@ const getMappedMenuItems = (items) => {
             </AccordionSummary>
             <AccordionDetails
               sx={{
-                backgroundColor: 'deep.main',
+                backgroundColor: 'primaryAlt.main',
                 boxShadow: 'inset 0px 4px 4px rgba(0, 0, 0, 0.25)',
                 pl: 0,
                 pr: 0,
@@ -212,7 +212,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
       <Drawer
         PaperProps={{
           sx: {
-            backgroundColor: 'navy.main',
+            backgroundColor: 'primary.main',
           },
         }}
         open={showSideMenu}
