@@ -15,4 +15,4 @@ if [ $? -ne 0 ]; then exit 1; fi
 yarn build
 if [ $? -ne 0 ]; then exit 1; fi
 
-bash deploy/reload.sh
+deploy/reload.sh
