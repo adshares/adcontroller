@@ -219,6 +219,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: secondaryAlt,
+        },
+      },
+    },
     MuiIconButton: {
       styleOverrides: {
         root: {
