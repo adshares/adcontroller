@@ -14,6 +14,7 @@ class AdControllerReloadHandler
     private const TIMEOUT = 15 * 60;
 
     public function __construct(
+        private readonly string $appDirectory,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -25,7 +26,7 @@ class AdControllerReloadHandler
 
     private function reload(): void
     {
-        $process = new Process(['deploy/reload.sh']);
+        $process = new Process(['deploy/reload.sh'], $this->$appDirectory);
         $process->setTimeout(self::TIMEOUT);
         $process->run();
         $process->wait();
