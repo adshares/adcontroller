@@ -111,7 +111,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: bodyBg,
+          backgroundColor: primary,
           '@font-face': {
             fontFamily: 'Montserrat',
             fontStyle: 'normal',
