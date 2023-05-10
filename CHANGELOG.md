@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Turnover monitoring
 - Link to wallet on list
 - Ads.txt configuration
+- The favicons now also change on AdServer and AdController
 
 ## [1.2.8] - 2023-02-14
 ### Fixed
