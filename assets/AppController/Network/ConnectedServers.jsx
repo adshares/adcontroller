@@ -160,7 +160,7 @@ const ConnectedServersList = () => {
         )) ||
         (host.status === 'initialization' && (
           <Tooltip title="Initialization in progress">
-            <SyncOutlinedIcon color="info" />
+            <SyncOutlinedIcon color="secondaryAlt" />
           </Tooltip>
         )),
       version: host.infoJson?.version || 'no data',
@@ -205,7 +205,7 @@ const ConnectedServersList = () => {
 
   return (
     <Card width="full">
-      <CardHeader title="Connected servers" />
+      <CardHeader title="IconConnected servers" />
       <CardContent>
         <TableData
           headCells={headCells} // array of objects {id, label, ...additional params}
