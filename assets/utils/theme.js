@@ -40,6 +40,7 @@ const theme = createTheme({
     bodyBg: {
       main: bodyBg,
     },
+
     info: {
       main: info,
     },
@@ -199,6 +200,24 @@ const theme = createTheme({
           },
         },
       ],
+    },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          '&.Mui-checked': {
+            color: bodyColor,
+          },
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          '&.Mui-checked': {
+            color: bodyColor,
+          },
+        },
+      },
     },
     MuiIconButton: {
       styleOverrides: {
