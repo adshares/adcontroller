@@ -135,7 +135,7 @@ const WalletSettingsCard = (props) => {
       <Box className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignBaseline}`}>
         <CardHeader title="Hot wallet" />
         <IconButton type="button" onClick={toggleEditMode}>
-          {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
+          {editMode ? <CloseIcon color="error" /> : <EditIcon color="secondaryAlt" />}
         </IconButton>
       </Box>
       <CardContent>

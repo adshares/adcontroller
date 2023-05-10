@@ -758,7 +758,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableText1" color="white.main">
+                    <Typography variant="tableText1" color="secondary.main">
                       Min height {height}{' '}
                       {changedFiles.hasOwnProperty(id) && (
                         <Typography component="span" variant="body2" color="error.main">

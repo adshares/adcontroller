@@ -40,7 +40,9 @@ const theme = createTheme({
     bodyBg: {
       main: bodyBg,
     },
-
+    bodyColor: {
+      main: bodyColor,
+    },
     info: {
       main: info,
     },
@@ -223,6 +225,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: secondaryAlt,
+        },
+      },
+    },
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          color: bodyColor,
         },
       },
     },
