@@ -40,6 +40,9 @@ const theme = createTheme({
     bodyBg: {
       main: bodyBg,
     },
+    bodyColor: {
+      main: bodyColor,
+    },
     info: {
       main: info,
     },
@@ -111,7 +114,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: bodyBg,
+          backgroundColor: gray,
           '@font-face': {
             fontFamily: 'Montserrat',
             fontStyle: 'normal',
@@ -171,7 +174,7 @@ const theme = createTheme({
           minWidth: '150px',
           padding: '8px 20px',
           boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
-          color: bodyColor,
+          color: secondary,
           '&.Mui-disabled': {
             cursor: 'not-allowed',
             pointerEvents: 'fill',
@@ -199,6 +202,38 @@ const theme = createTheme({
           },
         },
       ],
+    },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          '&.Mui-checked': {
+            color: bodyColor,
+          },
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          '&.Mui-checked': {
+            color: bodyColor,
+          },
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: secondaryAlt,
+        },
+      },
+    },
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          color: bodyColor,
+        },
+      },
     },
     MuiIconButton: {
       styleOverrides: {

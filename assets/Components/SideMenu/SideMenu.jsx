@@ -59,7 +59,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     borderRadius: '10px',
   },
   '& .MuiDrawer-paper::-webkit-scrollbar-thumb': {
-    backgroundColor: theme.palette.info.main,
+    backgroundColor: theme.palette.secondary.main,
     borderRadius: '10px',
   },
 }));
@@ -125,19 +125,19 @@ const getMappedMenuItems = (items) => {
                   backgroundColor: 'rgba(0, 47, 54, 0.5)',
                 },
               }}
-              expandIcon={<ArrowDropDownIcon color="white" />}
+              expandIcon={<ArrowDropDownIcon color='secondary' />}
             >
               <ListItemIcon>
                 {React.createElement(item.icon, {
                   sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                  color: 'white',
+                  color: 'secondary',
                 })}
               </ListItemIcon>
-              <Typography sx={{ color: 'white.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
+              <Typography sx={{ color: 'secondary.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
             </AccordionSummary>
             <AccordionDetails
               sx={{
-                backgroundColor: 'deep.main',
+                backgroundColor: 'primaryAlt.main',
                 boxShadow: 'inset 0px 4px 4px rgba(0, 0, 0, 0.25)',
                 pl: 0,
                 pr: 0,
@@ -156,14 +156,14 @@ const getMappedMenuItems = (items) => {
                     <ListItemIcon>
                       {React.createElement(children.icon, {
                         sx: { transform: children.rotateIcon && `rotate(${children.rotateIcon})` },
-                        color: children.path === location.pathname ? 'primary' : 'white',
+                        color: children.path === location.pathname ? 'secondaryAlt' : 'secondary',
                       })}
                     </ListItemIcon>
                     <ListItemText
                       primary={children.name}
                       primaryTypographyProps={{
                         sx: {
-                          color: children.path === location.pathname ? 'info.main' : 'white.main',
+                          color: children.path === location.pathname ? 'secondaryAlt.main' : 'secondary.main',
                           margin: 0,
                           fontVariationSettings: '"wght" 500',
                         },
@@ -183,14 +183,14 @@ const getMappedMenuItems = (items) => {
             <ListItemIcon>
               {React.createElement(item.icon, {
                 sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                color: item.path === location.pathname ? 'info' : 'white',
+                color: item.path === location.pathname ? 'secondaryAlt' : 'secondary',
               })}
             </ListItemIcon>
             <ListItemText
               primary={item.name}
               primaryTypographyProps={{
                 sx: {
-                  color: item.path === location.pathname ? 'info.main' : 'white.main',
+                  color: item.path === location.pathname ? 'secondaryAlt.main' : 'secondary.main',
                   margin: 0,
                   fontVariationSettings: '"wght" 600',
                 },
@@ -212,7 +212,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
       <Drawer
         PaperProps={{
           sx: {
-            backgroundColor: 'navy.main',
+            backgroundColor: 'primary.main',
           },
         }}
         open={showSideMenu}
@@ -226,7 +226,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
               sx={{
                 width: 32,
                 height: 32,
-                color: 'white.main',
+                color: 'secondary.main',
               }}
             />
             {showSideMenu && (
@@ -237,7 +237,7 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
                   mb: 1,
                   width: 79,
                   height: 9,
-                  color: 'white.main',
+                  color: 'secondary.main',
                 }}
               />
             )}

@@ -200,7 +200,7 @@ const PropertiesDialog = ({ data }) => {
         <DialogTitle component="div" className={`${commonStyles.flex} ${commonStyles.justifySpaceBetween} ${commonStyles.alignCenter}`}>
           <Typography variant="h6">Details</Typography>
           <IconButton onClick={() => setOpen(false)}>
-            <CloseIcon />
+            <CloseIcon sx={{ color: 'secondary' }} />
           </IconButton>
         </DialogTitle>
         <DialogContent>
@@ -227,7 +227,7 @@ const PropertiesDialog = ({ data }) => {
             </TableBody>
           </Table>
 
-          <Box sx={{ backgroundColor: '#f6f6f6', padding: 1, borderRadius: 1, maxHeight: '400px', overflow: 'auto' }}>
+          <Box sx={{ backgroundColor: 'gray', color: 'bodyColor', padding: 1, borderRadius: 1, maxHeight: '400px', overflow: 'auto' }}>
             <Typography component="pre" variant="body2">
               {JSON.stringify(data.properties, null, 2)}
             </Typography>
