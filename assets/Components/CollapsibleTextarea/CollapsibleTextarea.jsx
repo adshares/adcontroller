@@ -71,7 +71,7 @@ const CollapsibleTextarea = (props) => {
       InputProps={{
         endAdornment: (
           <InputAdornment position="end" sx={{ mt: 1.5 }}>
-            <KeyboardArrowDownIcon id="toggleCollapsedButton" color={collapsed ? 'primary' : 'grey'} />
+            <KeyboardArrowDownIcon id="toggleCollapsedButton" color={collapsed ? 'secondary' : 'gray'} />
           </InputAdornment>
         ),
       }}
