@@ -224,7 +224,7 @@ const theme = createTheme({
     MuiLink: {
       styleOverrides: {
         root: {
-          color: secondaryAlt,
+          color: dark,
         },
       },
     },
@@ -249,6 +249,9 @@ const theme = createTheme({
             color: mutedBg,
             cursor: 'not-allowed',
             pointerEvents: 'fill',
+          },
+          '&[tabindex]:not(.Mui-disabled)': {
+            color: dark,
           },
         },
       },
@@ -429,6 +432,20 @@ const theme = createTheme({
         },
       },
     },
+    // MuiTablePagination: {
+    //   styleOverrides: {
+    //     root: {
+    //       '&-actions > .MuiSvgIcon': {
+    //         color: warning,
+    //         styleOverrides: {
+    //           root: {
+    //             color: warning,
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
     MuiAlert: {
       styleOverrides: {
         root: {
