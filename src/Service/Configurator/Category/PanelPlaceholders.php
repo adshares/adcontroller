@@ -5,6 +5,7 @@ namespace App\Service\Configurator\Category;
 use App\Entity\Enum\AdPanelConfig;
 use App\Exception\InvalidArgumentException;
 use App\Messenger\Message\AdPanelReload;
+use App\Messenger\Message\AdControllerReload;
 use App\Repository\ConfigurationRepository;
 use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
@@ -60,6 +61,7 @@ class PanelPlaceholders implements ConfiguratorCategory
                 ]
             ];
             $this->bus->dispatch(new AdPanelReload());
+            $this->bus->dispatch(new AdControllerReload());
             unset($input[AdPanelConfig::PlaceholderStyleCss->name]);
             if (empty($input)) {
                 return $result;
