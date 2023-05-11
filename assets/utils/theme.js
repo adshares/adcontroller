@@ -235,6 +235,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiCircularProgress: {
+      styleOverrides: {
+        root: {
+          color: secondary,
+        },
+      },
+    },
     MuiIconButton: {
       styleOverrides: {
         root: {
@@ -500,6 +507,7 @@ const theme = createTheme({
           '& .MuiDialog-paper': {
             padding: '9px 22px 30px 22px',
             backgroundColor: primaryAlt,
+            color: secondary,
           },
         },
       },
