@@ -26,7 +26,7 @@ class AdControllerReloadHandler
 
     private function reload(): void
     {
-        $process = new Process(['deploy/reload.sh'], $this->$appDirectory);
+        $process = new Process(['deploy/reload.sh'], $this->appDirectory);
         $process->setTimeout(self::TIMEOUT);
         $process->run();
         $process->wait();
