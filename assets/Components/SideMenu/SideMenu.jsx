@@ -15,7 +15,6 @@ import ListItemText from '@mui/material/ListItemText';
 import { AccordionDetails, AccordionSummary, Box, Link, Typography } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import commonStyles from '../../styles/commonStyles.scss';
-import Icon from '../Icon/Icon';
 import configuration from '../../controllerConfig/configuration';
 
 const drawerWidth = 292;
@@ -204,7 +203,7 @@ const getMappedMenuItems = (items) => {
   });
 };
 
-const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) => {
+const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
   const items = getMappedMenuItems(menuItems);
   const { AdServer } = useSelector(configSelectors.getAppData);
 

@@ -373,7 +373,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
   };
 
   return (
-    <Box sx={{ height: '638px', overflow: 'auto' }}>
+    <Box sx={{ height: '712px', overflow: 'auto' }}>
       <Button variant="contained" component="label">
         <FileUploadIcon />
         Upload
