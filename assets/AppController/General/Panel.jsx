@@ -188,7 +188,7 @@ const RebrandingCard = (props) => {
   const [activeTab, setActiveTab] = React.useState('requiredAssets');
   const [saveButton, setSaveButton] = React.useState({});
   const requiredFavicons = ['Favicon16x16', 'Favicon32x32', 'Favicon48x48', 'Favicon96x96'];
-  const requiredLogos = ['LogoH30'];
+  const requiredLogos = ['LogoH30', 'SimpleLogoH30'];
 
   const handleTabChange = (e, newActiveTab) => {
     setActiveTab(newActiveTab);
@@ -645,6 +645,14 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
           }
           break;
 
+        case 'SimpleLogoH30':
+          if (height >= 30) {
+            updateComponentState(name, file);
+          } else {
+            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
+          }
+          break;
+
         default:
           break;
       }
@@ -664,7 +672,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
   };
 
   return (
-    <Box sx={{ height: '638px', overflow: 'auto' }}>
+    <Box sx={{ height: '712px', overflow: 'auto' }}>
       <Box>
         <Typography variant="h3" component="h3">
           Favicons
@@ -740,26 +748,25 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
         <Table sx={{ mt: 3, backgroundColor: 'primary.main' }}>
           <TableBody>
             {requiredLogos.map((id) => {
-              const height = id.match(/(\d+)/)[0];
               return (
                 <TableRow key={id}>
                   <TableCell width="45%">
                     {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
-                      <SvgIcon sx={{ fontSize: height + 'px' }}>
+                      <SvgIcon>
                         <RestoreIcon color="error" />
                       </SvgIcon>
                     ) : (
                       <Box
                         component="img"
                         src={changedFiles[id]?.preview || `${configuration.basePath}/assets/panel/${id}?${Date.now()}`}
-                        height={height + 'px'}
                         maxWidth="100%"
+                        height="30px"
                       />
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableText1" color="white.main">
-                      Min height {height}{' '}
+                    <Typography variant="tableText1" color="secondary.main">
+                      {id === 'LogoH30' ? 'Logo' : 'Simple logo'}
                       {changedFiles.hasOwnProperty(id) && (
                         <Typography component="span" variant="body2" color="error.main">
                           pending for save
