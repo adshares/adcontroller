@@ -12,20 +12,23 @@ import { getFlowChartData } from '../../utils/chartUtils';
 import ServiceStatusTable from '../../Components/ServiceStatusTable/ServiceStatusTable';
 import Spinner from '../../Components/Spinner/Spinner';
 import TurnoverChart from '../../Components/TurnoverCharts/TurnoverChart';
+import authSelectors from '../../redux/auth/authSelectors';
 import configSelectors from '../../redux/config/configSelectors';
 import { useGetTurnoverByTypeQuery } from '../../redux/monitoring/monitoringApi';
 
 export default function Dashboard() {
+  const currentUser = useSelector(authSelectors.getUser);
+  const isAdmin = currentUser.roles.includes('admin');
   return (
     <>
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          <Turnover />
-          <Events dataType="latest" sx={{ mt: 2 }} />
+          {isAdmin && <Turnover />}
+          <Events dataType="latest" sx={{ mt: isAdmin ? 2 : 0 }} />
         </Grid>
         <Grid item xs={6}>
           <ServiceStatus />
-          <Flow sx={{ mt: 2 }} />
+          {isAdmin && <Flow sx={{ mt: 2 }} />}
         </Grid>
       </Grid>
     </>

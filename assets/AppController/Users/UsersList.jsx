@@ -79,7 +79,6 @@ const headCells = [
     alignContent: 'left',
     sortable: true,
   },
-
   {
     id: 'connectedWallet',
     label: 'Wallet',
@@ -502,7 +501,7 @@ const UserActionsMenu = ({ currentUser, user, actions }) => {
             Confirm
           </MenuItem>
         )}
-        {isRegularUser && !user.isBanned && (
+        {isSelfAdmin && isRegularUser && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
@@ -513,7 +512,7 @@ const UserActionsMenu = ({ currentUser, user, actions }) => {
             Switch to admin
           </MenuItem>
         )}
-        {isRegularUser && !user.isBanned && (
+        {isSelfAdmin && isRegularUser && !user.isBanned && (
           <MenuItem
             sx={{ color: 'warning.main' }}
             onClick={() => {
