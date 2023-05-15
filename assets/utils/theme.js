@@ -183,6 +183,9 @@ const theme = createTheme({
           '&:hover': {
             boxShadow: 'none',
           },
+          '&.MuiButton-text': {
+            color: 'inherit',
+          },
         },
       },
       variants: [
@@ -251,7 +254,7 @@ const theme = createTheme({
             pointerEvents: 'fill',
           },
           '&[tabindex]:not(.Mui-disabled)': {
-            color: dark,
+            color: 'inherit',
           },
         },
       },
@@ -269,7 +272,7 @@ const theme = createTheme({
       variants: [
         {
           props: {
-            customvariant: 'outlined',
+            customVariant: 'outlined',
           },
           style: {
             boxShadow: 'none',
@@ -408,6 +411,7 @@ const theme = createTheme({
         root: {
           '&.MuiTableCell-root': {
             borderColor: gray,
+            color: 'inherit',
           },
           '&.MuiTableCell-head': {
             fontSize: '16px',
