@@ -40,6 +40,9 @@ const theme = createTheme({
     bodyBg: {
       main: bodyBg,
     },
+    bodyColor: {
+      main: bodyColor,
+    },
     info: {
       main: info,
     },
@@ -111,7 +114,7 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: bodyBg,
+          backgroundColor: gray,
           '@font-face': {
             fontFamily: 'Montserrat',
             fontStyle: 'normal',
@@ -171,7 +174,7 @@ const theme = createTheme({
           minWidth: '150px',
           padding: '8px 20px',
           boxShadow: '4px 4px 5px rgba(0, 0, 0, 0.25)',
-          color: bodyColor,
+          color: secondary,
           '&.Mui-disabled': {
             cursor: 'not-allowed',
             pointerEvents: 'fill',
@@ -179,6 +182,9 @@ const theme = createTheme({
           },
           '&:hover': {
             boxShadow: 'none',
+          },
+          '&.MuiButton-text': {
+            color: 'inherit',
           },
         },
       },
@@ -200,6 +206,45 @@ const theme = createTheme({
         },
       ],
     },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          '&.Mui-checked': {
+            color: bodyColor,
+          },
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          '&.Mui-checked': {
+            color: bodyColor,
+          },
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: dark,
+        },
+      },
+    },
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          color: bodyColor,
+        },
+      },
+    },
+    MuiCircularProgress: {
+      styleOverrides: {
+        root: {
+          color: secondary,
+        },
+      },
+    },
     MuiIconButton: {
       styleOverrides: {
         root: {
@@ -207,6 +252,9 @@ const theme = createTheme({
             color: mutedBg,
             cursor: 'not-allowed',
             pointerEvents: 'fill',
+          },
+          '&[tabindex]:not(.Mui-disabled)': {
+            color: 'inherit',
           },
         },
       },
@@ -224,7 +272,7 @@ const theme = createTheme({
       variants: [
         {
           props: {
-            customvariant: 'outlined',
+            customVariant: 'outlined',
           },
           style: {
             boxShadow: 'none',
@@ -363,6 +411,7 @@ const theme = createTheme({
         root: {
           '&.MuiTableCell-root': {
             borderColor: gray,
+            color: 'inherit',
           },
           '&.MuiTableCell-head': {
             fontSize: '16px',
@@ -383,6 +432,15 @@ const theme = createTheme({
           },
           '&.Mui-active > .MuiTableSortLabel-icon': {
             color: infoBg,
+          },
+        },
+      },
+    },
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          '&.MuiSelect-icon': {
+            color: dark,
           },
         },
       },
@@ -465,6 +523,7 @@ const theme = createTheme({
           '& .MuiDialog-paper': {
             padding: '9px 22px 30px 22px',
             backgroundColor: primaryAlt,
+            color: secondary,
           },
         },
       },

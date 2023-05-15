@@ -53,18 +53,18 @@ export default function MenuAppBar({ mode = 'app', showProtectedOptions = false,
         )}
         {showProtectedOptions && mode === 'installer' && <Typography variant="h3">Installer</Typography>}
         {showProtectedOptions && mode === 'app' && (
-          <IconButton size="large" color="inherit" onClick={() => toggleSideMenu(!showSideMenu)}>
+          <IconButton size="large" color="secondary" onClick={() => toggleSideMenu(!showSideMenu)}>
             <MenuIcon />
           </IconButton>
         )}
         {showProtectedOptions && (
           <Box sx={{ ml: 'auto' }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
             {appData.AdPanel.Url && (
-              <Link href={appData.AdPanel.Url} color="inherit" underline="hover" variant="body1">
+              <Link href={appData.AdPanel.Url} color="secondary" underline="hover" variant="body1">
                 BACK TO ADPANEL
               </Link>
             )}
-            <IconButton size="large" onClick={handleMenu} color="inherit">
+            <IconButton size="large" onClick={handleMenu} color="secondary">
               <AccountCircleOutlinedIcon />
             </IconButton>
             <Menu

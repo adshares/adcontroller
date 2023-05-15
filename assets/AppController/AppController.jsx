@@ -267,7 +267,7 @@ function AppController() {
             />
 
             {isAppDataLoading && (
-              <Dialog open={isAppDataLoading}>
+              <Dialog sx={{ color: 'secondary' }} open={isAppDataLoading}>
                 <DialogTitle>App data loading</DialogTitle>
 
                 <DialogContent>

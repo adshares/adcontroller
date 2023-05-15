@@ -125,7 +125,7 @@ const getMappedMenuItems = (items) => {
                   backgroundColor: 'rgba(0, 47, 54, 0.5)',
                 },
               }}
-              expandIcon={<ArrowDropDownIcon color="secondary" />}
+              expandIcon={<ArrowDropDownIcon color='secondary' />}
             >
               <ListItemIcon>
                 {React.createElement(item.icon, {

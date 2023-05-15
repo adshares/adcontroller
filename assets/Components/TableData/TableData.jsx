@@ -1115,7 +1115,7 @@ export default function TableData({
         </Table>
       </TableContainer>
       {!isDataLoading && !rows.length && (
-        <Typography align="center" variant="h2" color="info.main" sx={{ mt: 4, mb: 4 }}>
+        <Typography align="center" variant="h2" color="secondaryAlt.main" sx={{ mt: 4, mb: 4 }}>
           NO RESULTS
         </Typography>
       )}
