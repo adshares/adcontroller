@@ -67,7 +67,7 @@ function License() {
           subheader={!isLoading && error && 'No license. Configure an open-source license'}
         />
         <IconButton type="button" onClick={toggleEditMode}>
-          {editMode ? <CloseIcon color="error" /> : <EditIcon color="primary" />}
+          {editMode ? <CloseIcon color="error" /> : <EditIcon color="secondaryAlt" />}
         </IconButton>
       </Box>
 

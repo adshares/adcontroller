@@ -252,12 +252,7 @@ function AppController() {
 
   return (
     <Box className={`${commonStyles.flex}`}>
-      <SideMenu
-        enableSideMenu={isLoggedIn && !!currentUser.name}
-        showSideMenu={showSideMenu}
-        toggleSideMenu={toggleSideMenu}
-        menuItems={appModules}
-      />
+      <SideMenu enableSideMenu={isLoggedIn && !!currentUser.name} showSideMenu={showSideMenu} menuItems={appModules} />
       <Box sx={{ flexGrow: 1, width: 'calc(100% - 292px)' }}>
         <MenuAppBar showProtectedOptions={!!currentUser.name} showSideMenu={showSideMenu} toggleSideMenu={toggleSideMenu} />
         {isUserChecking && <Spinner />}
@@ -272,7 +267,7 @@ function AppController() {
             />
 
             {isAppDataLoading && (
-              <Dialog open={isAppDataLoading}>
+              <Dialog sx={{ color: 'secondary' }} open={isAppDataLoading}>
                 <DialogTitle>App data loading</DialogTitle>
 
                 <DialogContent>
