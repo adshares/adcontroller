@@ -59,6 +59,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import InfoIcon from '@mui/icons-material/Info';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
+import { Role } from '../../Enum/Roles';
 import commonStyles from '../../styles/commonStyles.scss';
 
 const headCells = [
@@ -150,11 +151,6 @@ const FILTER_QUERY = 'filter[query]';
 const FILTER_ROLE = 'filter[role]';
 const FILTER_EMAIL_CONFIRMED = 'filter[emailConfirmed]';
 const FILTER_ADMIN_CONFIRMED = 'filter[adminConfirmed]';
-const ROLE_ADMIN = 'admin';
-const ROLE_MODERATOR = 'moderator';
-const ROLE_AGENCY = 'agency';
-const ROLE_ADVERTISER = 'advertiser';
-const ROLE_PUBLISHER = 'publisher';
 const tableQueryParams = [PAGE, LIMIT, ORDER_BY];
 const customFilterQueryParams = [FILTER_QUERY, FILTER_ROLE, FILTER_EMAIL_CONFIRMED, FILTER_ADMIN_CONFIRMED];
 const possibleQueryParams = [...tableQueryParams, ...customFilterQueryParams];
@@ -217,11 +213,11 @@ export default function UsersList() {
 
   const parseRoles = useCallback(
     (roles) => {
-      const isAdmin = roles.includes(ROLE_ADMIN);
-      const isModerator = roles.includes(ROLE_MODERATOR);
-      const isAgency = roles.includes(ROLE_AGENCY);
-      const isAdvertiser = roles.includes(ROLE_ADVERTISER);
-      const isPublisher = roles.includes(ROLE_PUBLISHER);
+      const isAdmin = roles.includes(Role.ADMIN);
+      const isModerator = roles.includes(Role.MODERATOR);
+      const isAgency = roles.includes(Role.AGENCY);
+      const isAdvertiser = roles.includes(Role.ADVERTISER);
+      const isPublisher = roles.includes(Role.PUBLISHER);
       if (isAdmin) {
         return 'Admin';
       } else if (isModerator) {
@@ -336,14 +332,14 @@ const UserActionsMenu = ({ currentUser, user, actions }) => {
   const [banUser, { isLoading: banUserPending }] = useBanUserMutation();
   const [unbanUser, { isLoading: unbanUserPending }] = useUnbanUserMutation();
   const [deleteUser, { isLoading: deleteUserPending }] = useDeleteUserMutation();
-  const isAdmin = user.roles.includes(ROLE_ADMIN);
-  const isModerator = user.roles.includes(ROLE_MODERATOR);
-  const isAgency = user.roles.includes(ROLE_AGENCY);
-  const isAdvertiser = user.roles.includes(ROLE_ADVERTISER);
-  const isPublisher = user.roles.includes(ROLE_PUBLISHER);
+  const isAdmin = user.roles.includes(Role.ADMIN);
+  const isModerator = user.roles.includes(Role.MODERATOR);
+  const isAgency = user.roles.includes(Role.AGENCY);
+  const isAdvertiser = user.roles.includes(Role.ADVERTISER);
+  const isPublisher = user.roles.includes(Role.PUBLISHER);
   const isRegularUser = !isAdmin && !isModerator && !isAgency;
   const isSelfRow = currentUser.name === user.email;
-  const isSelfAdmin = currentUser.roles.includes(ROLE_ADMIN);
+  const isSelfAdmin = currentUser.roles.includes(Role.ADMIN);
 
   const isActionPending = useMemo(() => {
     return (
@@ -986,11 +982,11 @@ const FilterByRole = ({ customFiltersHandler, customFilters }) => {
         <MenuItem value="">
           <em>All</em>
         </MenuItem>
-        <MenuItem value={ROLE_ADMIN}>Admin</MenuItem>
-        <MenuItem value={ROLE_AGENCY}>Agency</MenuItem>
-        <MenuItem value={ROLE_MODERATOR}>Moderator</MenuItem>
-        <MenuItem value={ROLE_ADVERTISER}>Advertiser</MenuItem>
-        <MenuItem value={ROLE_PUBLISHER}>Publisher</MenuItem>
+        <MenuItem value={Role.ADMIN}>Admin</MenuItem>
+        <MenuItem value={Role.AGENCY}>Agency</MenuItem>
+        <MenuItem value={Role.MODERATOR}>Moderator</MenuItem>
+        <MenuItem value={Role.ADVERTISER}>Advertiser</MenuItem>
+        <MenuItem value={Role.PUBLISHER}>Publisher</MenuItem>
       </Select>
     </FormControl>
   );

@@ -12,13 +12,14 @@ import { getFlowChartData } from '../../utils/chartUtils';
 import ServiceStatusTable from '../../Components/ServiceStatusTable/ServiceStatusTable';
 import Spinner from '../../Components/Spinner/Spinner';
 import TurnoverChart from '../../Components/TurnoverCharts/TurnoverChart';
+import { Role } from '../../Enum/Roles';
 import authSelectors from '../../redux/auth/authSelectors';
 import configSelectors from '../../redux/config/configSelectors';
 import { useGetTurnoverByTypeQuery } from '../../redux/monitoring/monitoringApi';
 
 export default function Dashboard() {
   const currentUser = useSelector(authSelectors.getUser);
-  const isAdmin = currentUser.roles.includes('admin');
+  const isAdmin = currentUser.roles.includes(Role.ADMIN);
   return (
     <>
       <Grid container spacing={2}>
