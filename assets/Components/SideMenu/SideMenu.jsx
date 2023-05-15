@@ -12,10 +12,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { AccordionDetails, AccordionSummary, Link, Typography } from '@mui/material';
+import { AccordionDetails, AccordionSummary, Box, Link, Typography } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import commonStyles from '../../styles/commonStyles.scss';
-import Icon from '../Icon/Icon';
+import configuration from '../../controllerConfig/configuration';
 
 const drawerWidth = 292;
 
@@ -59,7 +59,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     borderRadius: '10px',
   },
   '& .MuiDrawer-paper::-webkit-scrollbar-thumb': {
-    backgroundColor: theme.palette.info.main,
+    backgroundColor: theme.palette.secondary.main,
     borderRadius: '10px',
   },
 }));
@@ -125,19 +125,19 @@ const getMappedMenuItems = (items) => {
                   backgroundColor: 'rgba(0, 47, 54, 0.5)',
                 },
               }}
-              expandIcon={<ArrowDropDownIcon color="white" />}
+              expandIcon={<ArrowDropDownIcon color="secondary" />}
             >
               <ListItemIcon>
                 {React.createElement(item.icon, {
                   sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                  color: 'white',
+                  color: 'secondary',
                 })}
               </ListItemIcon>
-              <Typography sx={{ color: 'white.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
+              <Typography sx={{ color: 'secondary.main', fontVariationSettings: '"wght" 600' }}>{item.name}</Typography>
             </AccordionSummary>
             <AccordionDetails
               sx={{
-                backgroundColor: 'deep.main',
+                backgroundColor: 'primaryAlt.main',
                 boxShadow: 'inset 0px 4px 4px rgba(0, 0, 0, 0.25)',
                 pl: 0,
                 pr: 0,
@@ -156,14 +156,14 @@ const getMappedMenuItems = (items) => {
                     <ListItemIcon>
                       {React.createElement(children.icon, {
                         sx: { transform: children.rotateIcon && `rotate(${children.rotateIcon})` },
-                        color: children.path === location.pathname ? 'primary' : 'white',
+                        color: children.path === location.pathname ? 'secondaryAlt' : 'secondary',
                       })}
                     </ListItemIcon>
                     <ListItemText
                       primary={children.name}
                       primaryTypographyProps={{
                         sx: {
-                          color: children.path === location.pathname ? 'info.main' : 'white.main',
+                          color: children.path === location.pathname ? 'secondaryAlt.main' : 'secondary.main',
                           margin: 0,
                           fontVariationSettings: '"wght" 500',
                         },
@@ -183,14 +183,14 @@ const getMappedMenuItems = (items) => {
             <ListItemIcon>
               {React.createElement(item.icon, {
                 sx: { transform: item.rotateIcon && `rotate(${item.rotateIcon})` },
-                color: item.path === location.pathname ? 'info' : 'white',
+                color: item.path === location.pathname ? 'secondaryAlt' : 'secondary',
               })}
             </ListItemIcon>
             <ListItemText
               primary={item.name}
               primaryTypographyProps={{
                 sx: {
-                  color: item.path === location.pathname ? 'info.main' : 'white.main',
+                  color: item.path === location.pathname ? 'secondaryAlt.main' : 'secondary.main',
                   margin: 0,
                   fontVariationSettings: '"wght" 600',
                 },
@@ -203,7 +203,7 @@ const getMappedMenuItems = (items) => {
   });
 };
 
-const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) => {
+const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
   const items = getMappedMenuItems(menuItems);
   const { AdServer } = useSelector(configSelectors.getAppData);
 
@@ -212,33 +212,27 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
       <Drawer
         PaperProps={{
           sx: {
-            backgroundColor: 'navy.main',
+            backgroundColor: 'primary.main',
           },
         }}
         open={showSideMenu}
-        onClose={() => toggleSideMenu(false)}
         variant="permanent"
       >
-        <Toolbar sx={{ pl: 2 }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-          <Link href={AdServer.LandingUrl} target="_self">
-            <Icon
-              name="logo"
-              sx={{
-                width: 32,
-                height: 32,
-                color: 'white.main',
-              }}
-            />
-            {showSideMenu && (
-              <Icon
-                name="adSharesText"
-                sx={{
-                  ml: 1,
-                  mb: 1,
-                  width: 79,
-                  height: 9,
-                  color: 'white.main',
-                }}
+        <Toolbar sx={{ pl: 2, maxHeight: '64px' }}>
+          <Link
+            href={AdServer.LandingUrl}
+            target="_self"
+            sx={{ height: '100%', width: '100%' }}
+            className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
+          >
+            {showSideMenu ? (
+              <Box component="img" src={`${configuration.basePath}/assets/panel/LogoH30?${Date.now()}`} maxHeight="100%" maxWidth="100%" />
+            ) : (
+              <Box
+                component="img"
+                src={`${configuration.basePath}/assets/panel/SimpleLogoH30?${Date.now()}`}
+                maxHeight="100%"
+                maxWidth="100%"
               />
             )}
           </Link>
