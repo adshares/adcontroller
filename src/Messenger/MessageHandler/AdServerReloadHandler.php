@@ -3,42 +3,42 @@
 namespace App\Messenger\MessageHandler;
 
 use App\Exception\UnexpectedResponseException;
-use App\Messenger\Message\AdControllerReload;
+use App\Messenger\Message\AdServerReload;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Process\Process;
 
 #[AsMessageHandler]
-class AdControllerReloadHandler
+class AdServerReloadHandler
 {
     private const TIMEOUT = 15 * 60;
 
     public function __construct(
-        private readonly string $appDirectory,
+        private readonly string $adServerHomeDirectory,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function __invoke(AdControllerReload $message): void
+    public function __invoke(AdServerReload $message): void
     {
         $this->reload();
     }
 
     private function reload(): void
     {
-        $process = new Process(['deploy/reload.sh'], $this->appDirectory);
+        $process = new Process(['deploy/reload.sh'], $this->adServerHomeDirectory);
         $process->setTimeout(self::TIMEOUT);
         $process->run();
         $process->wait();
 
         if (!$process->isSuccessful()) {
             $this->logger->error(
-                sprintf('AdController reload failed (std): %s', self::formatOutput($process->getOutput()))
+                sprintf('AdServer reload failed (std): %s', self::formatOutput($process->getOutput()))
             );
             $this->logger->error(
-                sprintf('AdController reload failed (err): %s', self::formatOutput($process->getErrorOutput()))
+                sprintf('AdServer reload failed (err): %s', self::formatOutput($process->getErrorOutput()))
             );
-            throw new UnexpectedResponseException('AdController reload failed');
+            throw new UnexpectedResponseException('AdServer reload failed');
         }
     }
 

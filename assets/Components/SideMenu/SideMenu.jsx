@@ -12,10 +12,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { AccordionDetails, AccordionSummary, Link, Typography } from '@mui/material';
+import { AccordionDetails, AccordionSummary, Box, Link, Typography } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import commonStyles from '../../styles/commonStyles.scss';
-import Icon from '../Icon/Icon';
+import configuration from '../../controllerConfig/configuration';
 
 const drawerWidth = 292;
 
@@ -203,7 +203,7 @@ const getMappedMenuItems = (items) => {
   });
 };
 
-const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) => {
+const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
   const items = getMappedMenuItems(menuItems);
   const { AdServer } = useSelector(configSelectors.getAppData);
 
@@ -216,29 +216,23 @@ const SideMenu = ({ showSideMenu, toggleSideMenu, enableSideMenu, menuItems }) =
           },
         }}
         open={showSideMenu}
-        onClose={() => toggleSideMenu(false)}
         variant="permanent"
       >
-        <Toolbar sx={{ pl: 2 }} className={`${commonStyles.flex} ${commonStyles.justifyCenter}`}>
-          <Link href={AdServer.LandingUrl} target="_self">
-            <Icon
-              name="logo"
-              sx={{
-                width: 32,
-                height: 32,
-                color: 'secondary.main',
-              }}
-            />
-            {showSideMenu && (
-              <Icon
-                name="adSharesText"
-                sx={{
-                  ml: 1,
-                  mb: 1,
-                  width: 79,
-                  height: 9,
-                  color: 'secondary.main',
-                }}
+        <Toolbar sx={{ pl: 2, maxHeight: '64px' }}>
+          <Link
+            href={AdServer.LandingUrl}
+            target="_self"
+            sx={{ height: '100%', width: '100%' }}
+            className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
+          >
+            {showSideMenu ? (
+              <Box component="img" src={`${configuration.basePath}/assets/panel/LogoH30?${Date.now()}`} maxHeight="100%" maxWidth="100%" />
+            ) : (
+              <Box
+                component="img"
+                src={`${configuration.basePath}/assets/panel/SimpleLogoH30?${Date.now()}`}
+                maxHeight="100%"
+                maxWidth="100%"
               />
             )}
           </Link>

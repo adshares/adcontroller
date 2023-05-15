@@ -8,6 +8,7 @@ use App\Entity\PanelAsset;
 use App\Exception\InvalidArgumentException;
 use App\Messenger\Message\AdPanelReload;
 use App\Messenger\Message\AdControllerReload;
+use App\Messenger\Message\AdServerReload;
 use App\Repository\ConfigurationRepository;
 use App\Repository\PanelAssetRepository;
 use App\Service\Env\AdPanelEnvVar;
@@ -235,6 +236,7 @@ class PanelAssets implements ConfiguratorCategory
         $this->assetRepository->remove($assets);
         $this->bus->dispatch(new AdPanelReload());
         $this->bus->dispatch(new AdControllerReload());
+        $this->bus->dispatch(new AdServerReload());
 
         return $removedFileIds;
     }
@@ -250,6 +252,7 @@ class PanelAssets implements ConfiguratorCategory
 
         $this->bus->dispatch(new AdPanelReload());
         $this->bus->dispatch(new AdControllerReload());
+        $this->bus->dispatch(new AdServerReload());
     }
 
     public function buildUrl(string $filePath): string
@@ -300,6 +303,7 @@ class PanelAssets implements ConfiguratorCategory
     {
         return [
             PanelAssetConfig::LogoH30->name,
+            PanelAssetConfig::SimpleLogoH30->name,
         ];
     }
 

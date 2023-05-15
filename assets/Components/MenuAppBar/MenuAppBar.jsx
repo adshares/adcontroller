@@ -25,7 +25,7 @@ export default function MenuAppBar({ mode = 'app', showProtectedOptions = false,
   };
 
   return (
-    <AppBar position="sticky" color="muted" sx={{ boxShadow: 'none' }}>
+    <AppBar position="sticky" color="light" sx={{ boxShadow: 'none' }}>
       <Toolbar>
         {!showProtectedOptions && (
           <>
