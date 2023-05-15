@@ -436,20 +436,15 @@ const theme = createTheme({
         },
       },
     },
-    // MuiTablePagination: {
-    //   styleOverrides: {
-    //     root: {
-    //       '&-actions > .MuiSvgIcon': {
-    //         color: warning,
-    //         styleOverrides: {
-    //           root: {
-    //             color: warning,
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // },
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          '&.MuiSelect-icon': {
+            color: dark,
+          },
+        },
+      },
+    },
     MuiAlert: {
       styleOverrides: {
         root: {
