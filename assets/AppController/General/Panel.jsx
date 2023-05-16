@@ -188,7 +188,7 @@ const RebrandingCard = (props) => {
   const [activeTab, setActiveTab] = React.useState('requiredAssets');
   const [saveButton, setSaveButton] = React.useState({});
   const requiredFavicons = ['Favicon16x16', 'Favicon32x32', 'Favicon48x48', 'Favicon96x96'];
-  const requiredLogos = ['LogoH30', 'SimpleLogoH30'];
+  const requiredLogos = ['LogoH30', 'SimpleLogoH30', 'DarkModeLogoH30', 'DarkModeSimpleLogoH30'];
 
   const handleTabChange = (e, newActiveTab) => {
     setActiveTab(newActiveTab);
@@ -373,7 +373,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
   };
 
   return (
-    <Box sx={{ height: '712px', overflow: 'auto' }}>
+    <Box sx={{ height: '856px', overflow: 'auto' }}>
       <Button variant="contained" component="label">
         <FileUploadIcon />
         Upload
@@ -653,6 +653,22 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
           }
           break;
 
+        case 'DarkModeLogoH30':
+          if (height >= 30) {
+            updateComponentState(name, file);
+          } else {
+            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
+          }
+          break;
+
+        case 'DarkModeSimpleLogoH30':
+          if (height >= 30) {
+            updateComponentState(name, file);
+          } else {
+            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
+          }
+          break;
+
         default:
           break;
       }
@@ -672,7 +688,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
   };
 
   return (
-    <Box sx={{ height: '712px', overflow: 'auto' }}>
+    <Box sx={{ height: '856px', overflow: 'auto' }}>
       <Box>
         <Typography variant="h3" component="h3">
           Favicons
@@ -765,14 +781,17 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableText1" color="secondary.main">
-                      {id === 'LogoH30' ? 'Logo' : 'Simple logo'}
-                      {changedFiles.hasOwnProperty(id) && (
-                        <Typography component="span" variant="body2" color="error.main">
-                          pending for save
-                        </Typography>
-                      )}
+                    <Typography variant="tableText1" color="secondary.main" component="p">
+                      {(id === 'LogoH30' && 'Logo') ||
+                        (id === 'SimpleLogoH30' && 'Simple logo') ||
+                        (id === 'DarkModeLogoH30' && 'Dark mode logo') ||
+                        (id === 'DarkModeSimpleLogoH30' && 'Simple dark mode logo')}
                     </Typography>
+                    {changedFiles.hasOwnProperty(id) && (
+                      <Typography component="p" variant="body2" color="error.main">
+                        pending for save
+                      </Typography>
+                    )}
                   </TableCell>
                   <TableCell align="left" width="20%">
                     <Tooltip title="Change image">

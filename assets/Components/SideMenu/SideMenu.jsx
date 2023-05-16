@@ -125,7 +125,7 @@ const getMappedMenuItems = (items) => {
                   backgroundColor: 'rgba(0, 47, 54, 0.5)',
                 },
               }}
-              expandIcon={<ArrowDropDownIcon color='secondary' />}
+              expandIcon={<ArrowDropDownIcon color="secondary" />}
             >
               <ListItemIcon>
                 {React.createElement(item.icon, {
@@ -226,14 +226,31 @@ const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
             className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
           >
             {showSideMenu ? (
-              <Box component="img" src={`${configuration.basePath}/assets/panel/LogoH30?${Date.now()}`} maxHeight="100%" maxWidth="100%" />
+              <picture>
+                <source
+                  srcSet={`${configuration.basePath}/assets/panel/DarkModeLogoH30?${Date.now()}`}
+                  media="(prefers-color-scheme:dark)"
+                />
+                <Box
+                  component="img"
+                  src={`${configuration.basePath}/assets/panel/LogoH30?${Date.now()}`}
+                  maxHeight="100%"
+                  maxWidth="100%"
+                />
+              </picture>
             ) : (
-              <Box
-                component="img"
-                src={`${configuration.basePath}/assets/panel/SimpleLogoH30?${Date.now()}`}
-                maxHeight="100%"
-                maxWidth="100%"
-              />
+              <picture>
+                <source
+                  srcSet={`${configuration.basePath}/assets/panel/DarkModeSimpleLogoH30?${Date.now()}`}
+                  media="(prefers-color-scheme:dark)"
+                />
+                <Box
+                  component="img"
+                  src={`${configuration.basePath}/assets/panel/SimpleLogoH30?${Date.now()}`}
+                  maxHeight="100%"
+                  maxWidth="100%"
+                />
+              </picture>
             )}
           </Link>
         </Toolbar>
