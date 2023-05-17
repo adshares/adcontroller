@@ -584,6 +584,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
   const [changedFiles, setChangedFiles] = useState({});
   const { enqueueSnackbar } = useSnackbar();
   const { createSuccessNotification } = useCreateNotification();
+  const timeStamp = Date.now();
 
   useEffect(() => {
     actions.setBtnConfig({
@@ -755,7 +756,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     ) : (
                       <Box
                         component="img"
-                        src={changedFiles[id]?.preview || `${configuration.basePath}/build/${name}?${Date.now()}`}
+                        src={changedFiles[id]?.preview || `${configuration.basePath}/build/assets/${name}?${timeStamp}`}
                         height={height + 'px'}
                         width={width + 'px'}
                       />
@@ -818,7 +819,12 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     ) : (
                       <Box
                         component="img"
-                        src={changedFiles[id]?.preview || `${configuration.basePath}/build/${name}?${Date.now()}`}
+                        src={changedFiles[id]?.preview || `${configuration.basePath}/build/assets/${name}?${timeStamp}`}
+                        onError={(e) => {
+                          e.target.src = `${configuration.basePath}/build/assets/${
+                            (id === 'LogoDarkModeH30' && 'logo.png') || (id === 'LogoSimpleDarkModeH30' && 'logo-simple.png')
+                          }?${timeStamp}`;
+                        }}
                         maxWidth="100%"
                         height="30px"
                       />

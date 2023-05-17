@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
@@ -206,6 +206,8 @@ const getMappedMenuItems = (items) => {
 const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
   const items = getMappedMenuItems(menuItems);
   const { AdServer } = useSelector(configSelectors.getAppData);
+  const logoRef = useRef(null);
+  const logoSimpleRef = useRef(null);
 
   return (
     enableSideMenu && (
@@ -228,27 +230,35 @@ const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
             {showSideMenu ? (
               <picture>
                 <source
-                  srcSet={`${configuration.basePath}/assets/panel/DarkModeLogoH30?${Date.now()}`}
+                  srcSet={`${configuration.basePath}/build/assets/logo-dark-mode.png`}
                   media="(prefers-color-scheme:dark)"
+                  ref={logoRef}
                 />
                 <Box
                   component="img"
-                  src={`${configuration.basePath}/assets/panel/LogoH30?${Date.now()}`}
+                  src={`${configuration.basePath}/build/assets/logo.png`}
                   maxHeight="100%"
                   maxWidth="100%"
+                  onError={() => {
+                    logoRef.current.srcset = `${configuration.basePath}/build/assets/logo.png`;
+                  }}
                 />
               </picture>
             ) : (
               <picture>
                 <source
-                  srcSet={`${configuration.basePath}/assets/panel/DarkModeSimpleLogoH30?${Date.now()}`}
+                  srcSet={`${configuration.basePath}/build/assets/logo-simple-dark-mode.png`}
                   media="(prefers-color-scheme:dark)"
+                  ref={logoSimpleRef}
                 />
                 <Box
                   component="img"
-                  src={`${configuration.basePath}/assets/panel/SimpleLogoH30?${Date.now()}`}
+                  src={`${configuration.basePath}/build/assets/logo-simple.png`}
                   maxHeight="100%"
                   maxWidth="100%"
+                  onError={() => {
+                    logoSimpleRef.current.srcset = `${configuration.basePath}/build/assets/logo-simple.png`;
+                  }}
                 />
               </picture>
             )}
