@@ -4,10 +4,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{% block title %}AdController{% endblock %}</title>
-        <link rel="icon" type="image/png" href="/panel-assets/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/png" href="/panel-assets/favicon-48x48.png" sizes="48x48" />
-        <link rel="icon" type="image/png" href="/panel-assets/favicon-32x32.png" sizes="32x32" />
-        <link rel="icon" type="image/png" href="/panel-assets/favicon-16x16.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="{{ asset('build/favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/png" href="{{ asset('build/favicon-48x48.png') }}" sizes="48x48" />
+        <link rel="icon" type="image/png" href="{{ asset('build/favicon-32x32.png') }}" sizes="32x32" />
+        <link rel="icon" type="image/png" href="{{ asset('build/favicon-16x16.png') }}" sizes="16x16" />
         {% block stylesheets %}
             {{ encore_entry_link_tags('css/app') }}
         {% endblock %}

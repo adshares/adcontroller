@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-mkdir -p public/panel-assets
-cp -fr public/panel-assets-default/* public/panel-assets
-find var/panel-assets -name "favicon-*" -exec cp {} public/panel-assets \;
-find var/panel-assets -name "*.css" -exec cp {} public/panel-assets/custom.css \;
+cp -fr public/assets-default/* public/build
+find var/panel-assets -maxdepth 1 -name "favicon*" -exec cp {} public/build \;
+find var/panel-assets -maxdepth 1 -name "logo*" -exec cp {} public/build \;
+find var/panel-assets -maxdepth 1 -name "*.css" -exec cp {} public/build/custom.css \;
