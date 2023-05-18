@@ -221,14 +221,12 @@ const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
         variant="permanent"
       >
         <Toolbar sx={{ pl: 2, maxHeight: '64px' }}>
-          <Link
-            href={AdServer.LandingUrl}
-            target="_self"
-            sx={{ height: '100%', width: '100%' }}
-            className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
-          >
+          <Link href={AdServer.LandingUrl} target="_self" sx={{ height: '100%', width: '100%' }}>
             {showSideMenu ? (
-              <picture>
+              <picture
+                style={{ height: '100%', width: '100%' }}
+                className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
+              >
                 <source
                   srcSet={`${configuration.basePath}/build/assets/logo-dark-mode.png`}
                   media="(prefers-color-scheme:dark)"
@@ -245,7 +243,10 @@ const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
                 />
               </picture>
             ) : (
-              <picture>
+              <picture
+                style={{ height: '100%', width: '100%' }}
+                className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
+              >
                 <source
                   srcSet={`${configuration.basePath}/build/assets/logo-simple-dark-mode.png`}
                   media="(prefers-color-scheme:dark)"
