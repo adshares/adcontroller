@@ -584,7 +584,6 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
   const [changedFiles, setChangedFiles] = useState({});
   const { enqueueSnackbar } = useSnackbar();
   const { createSuccessNotification } = useCreateNotification();
-  const timeStamp = Date.now();
 
   useEffect(() => {
     actions.setBtnConfig({
@@ -746,17 +745,18 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
             {Object.entries(requiredFavicons).map(([id, name]) => {
               const width = id.match(/(\d+)/)[0];
               const height = id.match(/(\d+)/)[1];
+              const isWasChanged = changedFiles.hasOwnProperty(id);
               return (
                 <TableRow key={id}>
                   <TableCell width="45%">
-                    {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
+                    {isWasChanged && changedFiles[id]?.action === 'restoreDefault' ? (
                       <SvgIcon sx={{ fontSize: height + 'px' }}>
                         <RestoreIcon color="error" />
                       </SvgIcon>
                     ) : (
                       <Box
                         component="img"
-                        src={changedFiles[id]?.preview || `${configuration.basePath}/build/assets/${name}?${timeStamp}`}
+                        src={isWasChanged ? changedFiles[id]?.preview : `${configuration.basePath}/build/assets/${name}`}
                         height={height + 'px'}
                         width={width + 'px'}
                       />
@@ -765,7 +765,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                   <TableCell align="left" width="35%">
                     <Typography variant="tableText1">
                       {width}x{height}{' '}
-                      {changedFiles.hasOwnProperty(id) && (
+                      {isWasChanged && (
                         <Typography component="span" variant="body2" color="error">
                           pending for save
                         </Typography>
@@ -786,7 +786,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                       </IconButton>
                     </Tooltip>
 
-                    <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="black" onClick={onUndoClick(id)}>
+                    <IconButton disabled={!isWasChanged} size="small" color="black" onClick={onUndoClick(id)}>
                       <Tooltip title="Undo changes">
                         <UndoIcon />
                       </Tooltip>
@@ -809,21 +809,22 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
         <Table sx={{ mt: 3, backgroundColor: 'primary.main' }}>
           <TableBody>
             {Object.entries(requiredLogos).map(([id, name]) => {
+              const isWasChanged = changedFiles.hasOwnProperty(id);
               return (
                 <TableRow key={id}>
                   <TableCell width="45%">
-                    {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
+                    {isWasChanged && changedFiles[id]?.action === 'restoreDefault' ? (
                       <SvgIcon>
                         <RestoreIcon color="error" />
                       </SvgIcon>
                     ) : (
                       <Box
                         component="img"
-                        src={changedFiles[id]?.preview || `${configuration.basePath}/build/assets/${name}?${timeStamp}`}
+                        src={isWasChanged ? changedFiles[id]?.preview : `${configuration.basePath}/build/assets/${name}`}
                         onError={(e) => {
                           e.target.src = `${configuration.basePath}/build/assets/${
                             (id === 'LogoDarkModeH30' && 'logo.png') || (id === 'LogoSimpleDarkModeH30' && 'logo-simple.png')
-                          }?${timeStamp}`;
+                          }`;
                         }}
                         maxWidth="100%"
                         height="30px"
@@ -899,7 +900,9 @@ const ConfirmationDialog = ({ open, setOpen, onConfirm }) => {
             onClick={async () => {
               setIsPending(true);
               await onConfirm();
-              window.location.reload();
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
             }}
           >
             Confirm
