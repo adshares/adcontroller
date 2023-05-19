@@ -205,16 +205,16 @@ const RebrandingCard = (props) => {
   const [saveButton, setSaveButton] = React.useState({});
   const [confirmationDialogOpen, setConfirmationDialogOpen] = React.useState(false);
   const requiredFavicons = {
-    Favicon16x16: 'favicon-16x16.png',
-    Favicon32x32: 'favicon-32x32.png',
-    Favicon48x48: 'favicon-48x48.png',
-    Favicon96x96: 'favicon-96x96.png',
+    Favicon16x16: { name: 'favicon-16x16.png', desc: '16x16' },
+    Favicon32x32: { name: 'favicon-32x32.png', desc: '32x32' },
+    Favicon48x48: { name: 'favicon-48x48.png', desc: '48x48' },
+    Favicon96x96: { name: 'favicon-96x96.png', desc: '96x96' },
   };
   const requiredLogos = {
-    LogoH30: 'logo.png',
-    LogoSimpleH30: 'logo-simple.png',
-    LogoDarkModeH30: 'logo-dark-mode.png',
-    LogoSimpleDarkModeH30: 'logo-simple-dark-mode.png',
+    LogoH30: { name: 'logo.png', desc: 'Logo' },
+    LogoSimpleH30: { name: 'logo-simple.png', desc: 'Simple logo' },
+    LogoDarkModeH30: { name: 'logo-dark-mode.png', desc: 'Dark mode logo' },
+    LogoSimpleDarkModeH30: { name: 'logo-simple-dark-mode.png', desc: 'Simple dark mode logo' },
   };
 
   const handleTabChange = (e, newActiveTab) => {
@@ -682,29 +682,8 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
           break;
 
         case 'LogoH30':
-          if (height >= 30) {
-            updateComponentState(name, file);
-          } else {
-            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
-          }
-          break;
-
         case 'LogoSimpleH30':
-          if (height >= 30) {
-            updateComponentState(name, file);
-          } else {
-            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
-          }
-          break;
-
         case 'LogoDarkModeH30':
-          if (height >= 30) {
-            updateComponentState(name, file);
-          } else {
-            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
-          }
-          break;
-
         case 'LogoSimpleDarkModeH30':
           if (height >= 30) {
             updateComponentState(name, file);
@@ -742,9 +721,9 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
         </Typography>
         <Table sx={{ mt: 3 }}>
           <TableBody>
-            {Object.entries(requiredFavicons).map(([id, name]) => {
-              const width = id.match(/(\d+)/)[0];
-              const height = id.match(/(\d+)/)[1];
+            {Object.entries(requiredFavicons).map(([id, { name, desc }]) => {
+              const width = desc.match(/(\d+)/)[0];
+              const height = desc.match(/(\d+)/)[1];
               const isWasChanged = changedFiles.hasOwnProperty(id);
               return (
                 <TableRow key={id}>
@@ -763,14 +742,14 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableText1">
-                      {width}x{height}{' '}
-                      {isWasChanged && (
-                        <Typography component="span" variant="body2" color="error">
-                          pending for save
-                        </Typography>
-                      )}
+                    <Typography variant="tableText1" component="p">
+                      {desc}
                     </Typography>
+                    {isWasChanged && (
+                      <Typography component="p" variant="body2" color="error">
+                        pending for save
+                      </Typography>
+                    )}
                   </TableCell>
                   <TableCell align="left" width="20%">
                     <Tooltip title="Change image">
@@ -808,7 +787,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
         </Typography>
         <Table sx={{ mt: 3, backgroundColor: 'primary.main' }}>
           <TableBody>
-            {Object.entries(requiredLogos).map(([id, name]) => {
+            {Object.entries(requiredLogos).map(([id, { name, desc }]) => {
               const isWasChanged = changedFiles.hasOwnProperty(id);
               return (
                 <TableRow key={id}>
@@ -833,10 +812,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                   </TableCell>
                   <TableCell align="left" width="35%">
                     <Typography variant="tableText1" color="secondary.main" component="p">
-                      {(id === 'LogoH30' && 'Logo') ||
-                        (id === 'LogoSimpleH30' && 'Simple logo') ||
-                        (id === 'LogoDarkModeH30' && 'Dark mode logo') ||
-                        (id === 'LogoSimpleDarkModeH30' && 'Simple dark mode logo')}
+                      {desc}
                     </Typography>
                     {changedFiles.hasOwnProperty(id) && (
                       <Typography component="p" variant="body2" color="error.main">
