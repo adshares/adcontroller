@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Hide dashboard charts for moderator
 - User list actions for moderator
+- Error notification for Bad Request
 
 ## [1.3.0] - 2023-05-15
 ### Added
