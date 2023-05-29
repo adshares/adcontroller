@@ -257,4 +257,13 @@ class ConfiguratorController extends AbstractController
             : Response::HTTP_BAD_GATEWAY;
         throw new HttpException($statusCode, $exception->getMessage());
     }
+
+    #[Route('/supply-placeholders', name: 'upload_placeholders', methods: ['POST'])]
+    public function uploadPlaceholders(
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
+        $data = $adServerConfigurationClient->uploadPlaceholder($request);
+        return $this->jsonOk($data);
+    }
 }

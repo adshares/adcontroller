@@ -9,10 +9,13 @@ use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -499,5 +502,36 @@ class AdServerConfigurationClient
             ]
         );
         $this->checkStatusCode($response);
+    }
+
+    public function uploadPlaceholder(Request $request): array
+    {
+        $files = $request->files;
+        $formFields = [];
+        /** @var UploadedFile $file */
+        foreach ($files->getIterator() as $key => $file) {
+            $formFields[$key] = new DataPart($file->getContent(), $file->getClientOriginalName(), $file->getMimeType());
+        }
+        $formFields['medium'] = $request->get('medium');
+        if (null !== ($vendor = $request->get('vendor'))) {
+            $formFields['vendor'] = $vendor;
+        }
+        $formFields['type'] = $request->get('type');
+        $formData = new FormDataPart($formFields);
+
+        $response = $this->httpClient->request(
+            'POST',
+            $this->buildUri('creatives/placeholder'),
+            [
+                'headers' => array_merge(
+                    $formData->getPreparedHeaders()->toArray(),
+                    $this->getRequestHeaders(),
+                ),
+                'body' => $formData->bodyToIterable(),
+            ],
+        );
+        $this->checkStatusCode($response);
+
+        return json_decode($response->getContent(), true);
     }
 }

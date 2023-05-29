@@ -21,6 +21,7 @@ import Base from './General/Base';
 import SMTP from './General/SMTP';
 import License from './General/License';
 import NetworkSettings from './Network/Settings';
+import Placeholders from './Supply/Placeholders';
 import RejectedDomains from './Supply/RejectedDomains';
 import SupplySettings from './Supply/Settings';
 import DemandSettings from './Demand/Settings';
@@ -37,6 +38,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
+import Collections from '@mui/icons-material/Collections';
 import PercentIcon from '@mui/icons-material/Percent';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
@@ -111,6 +113,12 @@ const getAppModules = (currentUser) => {
           path: '/supply/settings',
           component: SupplySettings,
           icon: SettingsOutlinedIcon,
+        }),
+        ...insertIf(isAdmin, {
+          name: 'Placeholders',
+          path: '/supply/placeholders',
+          component: Placeholders,
+          icon: Collections,
         }),
         {
           name: 'Rejected domains',
