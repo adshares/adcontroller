@@ -303,7 +303,9 @@ class PanelAssets implements ConfiguratorCategory
     {
         return [
             PanelAssetConfig::LogoH30->name,
-            PanelAssetConfig::SimpleLogoH30->name,
+            PanelAssetConfig::LogoSimpleH30->name,
+            PanelAssetConfig::LogoDarkModeH30->name,
+            PanelAssetConfig::LogoSimpleDarkModeH30->name,
         ];
     }
 
