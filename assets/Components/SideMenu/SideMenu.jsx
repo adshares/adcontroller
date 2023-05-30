@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
@@ -125,7 +125,7 @@ const getMappedMenuItems = (items) => {
                   backgroundColor: 'rgba(0, 47, 54, 0.5)',
                 },
               }}
-              expandIcon={<ArrowDropDownIcon color='secondary' />}
+              expandIcon={<ArrowDropDownIcon color="secondary" />}
             >
               <ListItemIcon>
                 {React.createElement(item.icon, {
@@ -206,6 +206,8 @@ const getMappedMenuItems = (items) => {
 const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
   const items = getMappedMenuItems(menuItems);
   const { AdServer } = useSelector(configSelectors.getAppData);
+  const logoRef = useRef(null);
+  const logoSimpleRef = useRef(null);
 
   return (
     enableSideMenu && (
@@ -219,21 +221,47 @@ const SideMenu = ({ showSideMenu, enableSideMenu, menuItems }) => {
         variant="permanent"
       >
         <Toolbar sx={{ pl: 2, maxHeight: '64px' }}>
-          <Link
-            href={AdServer.LandingUrl}
-            target="_self"
-            sx={{ height: '100%', width: '100%' }}
-            className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
-          >
+          <Link href={AdServer.LandingUrl} target="_self" sx={{ height: '100%', width: '100%' }}>
             {showSideMenu ? (
-              <Box component="img" src={`${configuration.basePath}/assets/panel/LogoH30?${Date.now()}`} maxHeight="100%" maxWidth="100%" />
+              <picture
+                style={{ height: '100%', width: '100%' }}
+                className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
+              >
+                <source
+                  srcSet={`${configuration.basePath}/build/assets/logo-dark-mode.png`}
+                  media="(prefers-color-scheme:dark)"
+                  ref={logoRef}
+                />
+                <Box
+                  component="img"
+                  src={`${configuration.basePath}/build/assets/logo.png`}
+                  maxHeight="100%"
+                  maxWidth="100%"
+                  onError={() => {
+                    logoRef.current.srcset = `${configuration.basePath}/build/assets/logo.png`;
+                  }}
+                />
+              </picture>
             ) : (
-              <Box
-                component="img"
-                src={`${configuration.basePath}/assets/panel/SimpleLogoH30?${Date.now()}`}
-                maxHeight="100%"
-                maxWidth="100%"
-              />
+              <picture
+                style={{ height: '100%', width: '100%' }}
+                className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}
+              >
+                <source
+                  srcSet={`${configuration.basePath}/build/assets/logo-simple-dark-mode.png`}
+                  media="(prefers-color-scheme:dark)"
+                  ref={logoSimpleRef}
+                />
+                <Box
+                  component="img"
+                  src={`${configuration.basePath}/build/assets/logo-simple.png`}
+                  maxHeight="100%"
+                  maxWidth="100%"
+                  onError={() => {
+                    logoSimpleRef.current.srcset = `${configuration.basePath}/build/assets/logo-simple.png`;
+                  }}
+                />
+              </picture>
             )}
           </Link>
         </Toolbar>
