@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-mkdir -p public/panel-assets
-cp -fr public/panel-assets-default/* public/panel-assets
-find var/panel-assets -name "favicon-*" -exec cp {} public/panel-assets \;
-find var/panel-assets -name "*.css" -exec cp {} public/panel-assets/custom.css \;
+APP_ASSETS=public/build/assets
+APP_ASSETS_DEFAULT=public/assets-default
+UPLOADED_ASSETS=var/panel-assets
+
+rm -rf $APP_ASSETS
+mkdir -p $APP_ASSETS
+cp -fr $APP_ASSETS_DEFAULT/* $APP_ASSETS
+find $UPLOADED_ASSETS -maxdepth 1 -name "favicon*" -exec cp {} $APP_ASSETS \;
+find $UPLOADED_ASSETS -maxdepth 1 -name "logo*" -exec cp {} $APP_ASSETS \;
+find $UPLOADED_ASSETS -maxdepth 1 -name "custom.*.css" -exec cp {} $APP_ASSETS/custom.css \;
