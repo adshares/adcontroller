@@ -1,3 +1,5 @@
+import theme from '../utils/theme';
+
 export function* colorGenerator() {
   const colors = [
     '#36a2eb',
@@ -28,27 +30,38 @@ export function getFlowChartData(sspIncomeData, dspExpenseData, adServerAddress)
   const colorGeneratorInstance = colorGenerator();
   const colorByAddress = {};
   const data = [];
+  const labels = {};
   for (const entry of sspIncomeData) {
     if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
       colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
     }
+    const from = `DSP ${entry.adsAddress}`;
     data.push({
-      from: `DSP ${entry.adsAddress}`,
+      from: from,
       to: adServerAddress,
       flow: entry.amount / 1e11,
       color: colorByAddress[entry.adsAddress].from,
     });
+    labels[from] = entry.name;
+    if (adServerAddress === entry.adsAddress) {
+      labels[adServerAddress] = entry.name;
+    }
   }
   for (const entry of dspExpenseData) {
     if (!colorByAddress.hasOwnProperty(entry.adsAddress)) {
       colorByAddress[entry.adsAddress] = colorGeneratorInstance.next().value;
     }
+    const to = `SSP ${entry.adsAddress}`;
     data.push({
       from: adServerAddress,
-      to: `SSP ${entry.adsAddress}`,
+      to: to,
       flow: entry.amount / 1e11,
       color: colorByAddress[entry.adsAddress].to,
     });
+    labels[to] = entry.name;
+    if (adServerAddress === entry.adsAddress) {
+      labels[adServerAddress] = entry.name;
+    }
   }
 
   const colorCallback = (c) => c.dataset.data[c.dataIndex]?.color || 0;
@@ -56,9 +69,11 @@ export function getFlowChartData(sspIncomeData, dspExpenseData, adServerAddress)
   if (data.length > 0) {
     datasets.push({
       data,
+      color: theme.palette.text.primary,
       colorFrom: colorCallback,
       colorTo: colorCallback,
       colorMode: 'to',
+      labels,
     });
   }
   return { datasets };

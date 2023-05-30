@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Custom logos support in dark mode 
-
+- Custom logos support in dark mode
+### Changed
+- AdServers' name on flow chart label
 ### Fixed
 - Hide dashboard charts for moderator
 - User list actions for moderator
