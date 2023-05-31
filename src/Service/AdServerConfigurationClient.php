@@ -504,7 +504,12 @@ class AdServerConfigurationClient
         $this->checkStatusCode($response);
     }
 
-    public function uploadPlaceholder(Request $request): array
+    public function fetchCreativePlaceholders(Request $request): array
+    {
+        return $this->getData($this->buildUri('creatives/placeholder'), $request->query);
+    }
+
+    public function uploadCreativePlaceholders(Request $request): array
     {
         $files = $request->files;
         $formFields = [];
@@ -533,5 +538,29 @@ class AdServerConfigurationClient
         $this->checkStatusCode($response);
 
         return json_decode($response->getContent(), true);
+    }
+
+    public function deleteCreativePlaceholder(string $uuid): void
+    {
+        $this->deleteData($this->buildUri(sprintf('creatives/placeholder/%s', $uuid)));
+    }
+
+    public function fetchTaxonomyMedia(): array
+    {
+        return $this->getData($this->buildUri('taxonomy/media'));
+    }
+
+    public function fetchTaxonomyMedium(string $medium, ?string $vendor = null)
+    {
+        $inputBag = new InputBag();
+        if (null !== $vendor) {
+            $inputBag->set('vendor', $vendor);
+        }
+        return $this->getData($this->buildUri(sprintf('taxonomy/media/%s', $medium)), $inputBag);
+    }
+
+    public function fetchTaxonomyVendors(string $medium): array
+    {
+        return $this->getData($this->buildUri(sprintf('taxonomy/media/%s/vendors', $medium)));
     }
 }

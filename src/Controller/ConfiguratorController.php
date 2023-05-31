@@ -194,7 +194,7 @@ class ConfiguratorController extends AbstractController
     {
         try {
             $service = $this->container->get($category . '-config');
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface) {
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
             throw new UnprocessableEntityHttpException(sprintf('Unsupported category (%s)', $category));
         }
 
@@ -236,6 +236,96 @@ class ConfiguratorController extends AbstractController
         return $this->jsonOk($changes);
     }
 
+    #[Route('/supply-placeholders', name: 'fetch_placeholders', methods: ['GET'])]
+    public function fetchPlaceholders(
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
+        try {
+            $data = $adServerConfigurationClient->fetchCreativePlaceholders($request);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/supply-placeholders', name: 'upload_placeholders', methods: ['POST'])]
+    public function uploadPlaceholders(
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
+        try {
+            $data = $adServerConfigurationClient->uploadCreativePlaceholders($request);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/supply-placeholders/{uuid}', name: 'upload_placeholders', methods: ['DELETE'])]
+    public function deletePlaceholders(
+        string $uuid,
+        AdServerConfigurationClient $adServerConfigurationClient,
+    ): JsonResponse {
+        try {
+            $adServerConfigurationClient->deleteCreativePlaceholder($uuid);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+        return $this->jsonOk();
+    }
+
+    #[Route('/taxonomy/media', name: 'taxonomy_media', methods: ['GET'])]
+    public function fetchTaxonomyMedia(
+        AdServerConfigurationClient $adServerConfigurationClient,
+    ): JsonResponse {
+        try {
+            $data = $adServerConfigurationClient->fetchTaxonomyMedia();
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/taxonomy/media/{medium}', name: 'taxonomy_medium', methods: ['GET'])]
+    public function fetchTaxonomyMedium(
+        string $medium,
+        AdServerConfigurationClient $adServerConfigurationClient,
+        Request $request,
+    ): JsonResponse {
+        try {
+            $data = $adServerConfigurationClient->fetchTaxonomyMedium($medium, $request->query->get('vendor'));
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+        return $this->jsonOk($data);
+    }
+
+    #[Route('/taxonomy/media/{medium}/vendors', name: 'taxonomy_vendors', methods: ['GET'])]
+    public function fetchTaxonomyVendors(
+        string $medium,
+        AdServerConfigurationClient $adServerConfigurationClient,
+    ): JsonResponse {
+        try {
+            $data = $adServerConfigurationClient->fetchTaxonomyVendors($medium);
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+        return $this->jsonOk($data);
+    }
+
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), self::CONFIGURATION_SERVICES);
@@ -256,14 +346,5 @@ class ConfiguratorController extends AbstractController
             ? $exception->getCode()
             : Response::HTTP_BAD_GATEWAY;
         throw new HttpException($statusCode, $exception->getMessage());
-    }
-
-    #[Route('/supply-placeholders', name: 'upload_placeholders', methods: ['POST'])]
-    public function uploadPlaceholders(
-        AdServerConfigurationClient $adServerConfigurationClient,
-        Request $request,
-    ): JsonResponse {
-        $data = $adServerConfigurationClient->uploadPlaceholder($request);
-        return $this->jsonOk($data);
     }
 }
