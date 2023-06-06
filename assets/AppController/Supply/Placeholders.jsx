@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Card, CardContent, CardHeader, FormControl, InputLabel, MenuItem } from '@mui/material';
 import { useGetMediaQuery, useGetVendorListQuery, useGetTaxonomyQuery } from '../../redux/taxonomy/taxonomyApi';
 import Spinner from '../../Components/Spinner/Spinner';
@@ -16,43 +16,54 @@ export default function Placeholders() {
 const PlaceholdersCard = (props) => {
   const [fileList, setFileList] = useState(null);
   const [selectedMedium, setMedium] = useState({
-    medium: null,
+    medium: 'web',
     vendor: null,
   });
-  const { data: media, isFetching: isMediaFetching, isSuccess: isMediaFetchingSuccess } = useGetMediaQuery();
-  const {
-    data: vendorList,
-    isFetching: isVendorListFetching,
-    isSuccess: isVendorListFetchingSuccess,
-  } = useGetVendorListQuery(
+  const { data: media, isFetching: isMediaFetching } = useGetMediaQuery();
+  const { data: vendors, isFetching: isVendorListFetching } = useGetVendorListQuery(
     { medium: selectedMedium.medium },
     {
       refetchOnMountOrArgChange: true,
-      skip: !selectedMedium.medium || selectedMedium.medium === 'web',
+      skip: selectedMedium.medium === 'web',
     },
   );
-  const { data: taxonomy, isLoading: isTaxonomyLoading } = useGetTaxonomyQuery(selectedMedium, {
+  const { data: taxonomy, isFetching: isTaxonomyFetching } = useGetTaxonomyQuery(selectedMedium, {
     refetchOnMountOrArgChange: true,
-    skip: !selectedMedium.medium || (selectedMedium.medium === 'metaverse' && !selectedMedium.vendor),
+    skip: selectedMedium.medium === 'metaverse' && !selectedMedium.vendor,
   });
 
-  useEffect(() => {
-    if (media?.data?.data) {
-      setMedium((prevState) => ({
-        ...prevState,
-        medium: Object.keys(media.data.data).find((medium) => medium === 'web') || Object.keys(media.data.data)[0],
-      }));
+  const listOfMedia = useMemo(() => media?.data.data, [media]);
+  const listOfVendors = useMemo(() => {
+    if (selectedMedium.medium === 'web') {
+      return;
     }
-  }, [media]);
+    return vendors?.data.data && Array.isArray(vendors?.data.data) ? undefined : vendors?.data.data;
+  }, [vendors, selectedMedium.medium]);
 
   useEffect(() => {
-    if (selectedMedium.medium !== 'web' && vendorList?.data?.data) {
+    if (listOfVendors) {
+      const vendor = Object.keys(listOfVendors).find((vendor) => vendor === 'decentraland') || Object.keys(listOfVendors)[0] || null;
       setMedium((prevState) => ({
         ...prevState,
-        vendor: Object.keys(vendorList.data.data).find((vendor) => vendor === 'decentraland') || Object.keys(vendorList.data.data)[0],
+        vendor,
       }));
     }
-  }, [vendorList, selectedMedium.medium]);
+  }, [vendors, selectedMedium.medium]);
+
+  const handleMediumChange = (event) => {
+    const medium = event.target.value;
+    setMedium((prevState) => ({
+      ...prevState,
+      medium,
+      ...(medium === 'web' ? { vendor: null } : {}),
+    }));
+  };
+
+  const handleVendorChange = (event) =>
+    setMedium((prevState) => ({
+      ...prevState,
+      vendor: event.target.value,
+    }));
 
   const handleFileChange = (event) => {
     setFileList(event.target.files);
@@ -90,60 +101,40 @@ const PlaceholdersCard = (props) => {
         <Box className={`${commonStyles.flex}`}>
           {isMediaFetching && <Spinner />}
 
-          {selectedMedium.medium && isMediaFetchingSuccess && (
-            <Box sx={{ minWidth: '14.5rem', mr: 3 }}>
+          <Box sx={{ width: '100%', maxWidth: '14.5rem', mr: 3 }}>
+            {listOfMedia && (
               <FormControl fullWidth customvariant="highLabel">
                 <InputLabel id="selectMedium">Medium</InputLabel>
-                <Select
-                  id="selectMedium"
-                  color="secondary"
-                  value={selectedMedium.medium}
-                  onChange={(e) =>
-                    setMedium((prevState) => ({
-                      ...prevState,
-                      medium: e.target.value,
-                      ...(e.target.value === 'web' ? { vendor: null } : {}),
-                    }))
-                  }
-                >
-                  {Object.entries(media.data.data).map((medium) => (
+                <Select id="selectMedium" color="secondary" value={selectedMedium.medium} onChange={handleMediumChange}>
+                  {Object.entries(listOfMedia).map((medium) => (
                     <MenuItem key={medium[0]} value={medium[0]}>
                       {medium[1]}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
-            </Box>
-          )}
+            )}
+          </Box>
 
-          {selectedMedium.vendor && (
-            <Box sx={{ minWidth: '14.5rem', mr: 3 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              {isVendorListFetching ? (
-                <Spinner sx={{ minWidth: '14.5rem', mr: 3, mt: 2 }} />
-              ) : (
+          <Box sx={{ width: '100%', maxWidth: '14.5rem' }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+            {isVendorListFetching ? (
+              <Spinner sx={{ minWidth: '14.5rem', mr: 3, mt: 2 }} />
+            ) : (
+              listOfVendors &&
+              selectedMedium.vendor && (
                 <FormControl fullWidth customvariant="highLabel">
                   <InputLabel id="selectVendor">Vendor</InputLabel>
-                  <Select
-                    id="selectVendor"
-                    color="secondary"
-                    value={selectedMedium.vendor}
-                    onChange={(e) =>
-                      setMedium((prevState) => ({
-                        ...prevState,
-                        vendor: e.target.value,
-                      }))
-                    }
-                  >
-                    {Object.entries(vendorList.data.data).map((vendor) => (
+                  <Select id="selectVendor" color="secondary" value={selectedMedium.vendor} onChange={handleVendorChange}>
+                    {Object.entries(listOfVendors).map((vendor) => (
                       <MenuItem key={vendor[0]} value={vendor[0]}>
                         {vendor[1]}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
-              )}
-            </Box>
-          )}
+              )
+            )}
+          </Box>
         </Box>
 
         <div>
