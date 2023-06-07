@@ -266,7 +266,7 @@ class ConfiguratorController extends AbstractController
         return $this->jsonOk($data);
     }
 
-    #[Route('/supply-placeholders/{uuid}', name: 'upload_placeholders', methods: ['DELETE'])]
+    #[Route('/supply-placeholders/{uuid}', name: 'delete_placeholders', methods: ['DELETE'])]
     public function deletePlaceholders(
         string $uuid,
         AdServerConfigurationClient $adServerConfigurationClient,
