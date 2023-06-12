@@ -36,10 +36,23 @@ export const taxonomyApi = createApi({
         };
       },
     }),
+    uploadSupplyPlaceholders: builder.mutation({
+      query: (body) => ({
+        url: '/api/supply-placeholders',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetMediaQuery, useGetVendorListQuery, useGetTaxonomyQuery, useGetPlaceholdersQuery } = taxonomyApi;
+export const {
+  useGetMediaQuery,
+  useGetVendorListQuery,
+  useGetTaxonomyQuery,
+  useGetPlaceholdersQuery,
+  useUploadSupplyPlaceholdersMutation,
+} = taxonomyApi;
 
 // // placeholders
 // fetch('http://localhost:8030/api/supply-placeholders')

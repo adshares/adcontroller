@@ -1,22 +1,40 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
   Dialog,
+  DialogActions,
   DialogContent,
+  DialogTitle,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Modal,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
-import { useGetMediaQuery, useGetVendorListQuery, useGetTaxonomyQuery, useGetPlaceholdersQuery } from '../../redux/taxonomy/taxonomyApi';
+import {
+  useGetMediaQuery,
+  useGetVendorListQuery,
+  useGetTaxonomyQuery,
+  useGetPlaceholdersQuery,
+  useUploadSupplyPlaceholdersMutation,
+} from '../../redux/taxonomy/taxonomyApi';
 import Spinner from '../../Components/Spinner/Spinner';
 import { Select } from '@mui/material';
 import commonStyles from '../../styles/commonStyles.scss';
 import TableData from '../../Components/TableData/TableData';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useCreateNotification } from '../../hooks';
 
 export default function Placeholders() {
   return (
@@ -54,7 +72,8 @@ const FILTER_MEDIUM = 'filter[medium]';
 const FILTER_VENDOR = 'filter[vendor]';
 
 const PlaceholdersCard = (props) => {
-  const [fileList, setFileList] = useState(null);
+  const { createSuccessNotification } = useCreateNotification();
+  const [fileList, setFileList] = useState([]);
   const [selectedMedium, setMedium] = useState({
     medium: 'web',
     vendor: null,
@@ -78,7 +97,11 @@ const PlaceholdersCard = (props) => {
   //   skip: selectedMedium.medium === 'metaverse' && !selectedMedium.vendor,
   // });
 
-  const { data: placeholders, isFetching: isPlaceholdersFetching } = useGetPlaceholdersQuery(
+  const {
+    data: placeholders,
+    isFetching: isPlaceholdersFetching,
+    refetch: refetchPlaceholders,
+  } = useGetPlaceholdersQuery(
     {
       [FILTER_MEDIUM]: selectedMedium.medium,
       [FILTER_VENDOR]: selectedMedium.vendor,
@@ -89,6 +112,7 @@ const PlaceholdersCard = (props) => {
       skip: selectedMedium.medium === 'metaverse' && !selectedMedium.vendor,
     },
   );
+  const [uploadSupplyPlaceholders] = useUploadSupplyPlaceholdersMutation();
   const [isPreviewOpen, setPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -127,36 +151,51 @@ const PlaceholdersCard = (props) => {
     }));
 
   const handleFileChange = (event) => {
-    setFileList(event.target.files);
+    const { files } = event.target;
+    console.log(files);
+    setFileList((prevState) => {
+      return [
+        ...prevState,
+        ...Object.keys(files).reduce(
+          (acc, val) => [
+            ...acc,
+            {
+              file: files[val],
+              name: files[val].name,
+              isImage: files[val].type.split('/')[0] === 'image',
+              isNameValid: !files[val].name.includes(' '),
+            },
+          ],
+          [],
+        ),
+      ];
+    });
+    event.target.value = '';
   };
-
-  const handleUploadClick = () => {
-    if (!fileList) {
+  
+  const handleUploadClick = async () => {
+    if (!fileList.length) {
       return;
     }
 
     const data = new FormData();
-    files.forEach((file, i) => {
-      data.append(`file-${i}`, file, file.name);
+    fileList.forEach((file, i) => {
+      data.append(`file-${i}`, file.file, file.name);
     });
-    data.append('medium', 'web');
-    // data.append('vendor', null);
+    data.append('medium', selectedMedium.medium);
     data.append('type', 'image');
+    if (selectedMedium.vendor) {
+      data.append('vendor', selectedMedium.vendor);
+    }
 
-    // upload
-    fetch('http://localhost:8030/api/supply-placeholders', {
-      method: 'POST',
-      body: data,
-    })
-      .then((res) => {
-        console.log(res);
-        return res.json();
-      })
-      .then((data) => console.log(data))
-      .catch((err) => console.error(err));
+    const response = await uploadSupplyPlaceholders(data);
+
+    if (response.data && response.data.message === 'OK') {
+      setFileList([]);
+      refetchPlaceholders();
+      createSuccessNotification();
+    }
   };
-
-  const files = fileList ? [...fileList] : [];
 
   const handleTableChanges = (event) => {
     setQueryConfig({
@@ -233,24 +272,33 @@ const PlaceholdersCard = (props) => {
               )}
             </Box>
 
-            <Box sx={{ width: '100%', maxWidth: '14.5rem' }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-              {isVendorListFetching ? (
-                <Spinner sx={{ minWidth: '14.5rem', mr: 3, mt: 2 }} />
-              ) : (
-                memoizedVendors &&
-                selectedMedium.vendor && (
-                  <FormControl fullWidth customvariant="highLabel">
-                    <InputLabel id="selectVendor">Vendor</InputLabel>
-                    <Select id="selectVendor" color="secondary" value={selectedMedium.vendor} onChange={handleVendorChange}>
-                      {Object.entries(memoizedVendors).map((vendor) => (
-                        <MenuItem key={vendor[0]} value={vendor[0]}>
-                          {vendor[1]}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )
-              )}
+            {(memoizedVendors || isVendorListFetching) && (
+              <Box sx={{ width: '100%', maxWidth: '14.5rem', mr: 3 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
+                {isVendorListFetching ? (
+                  <Spinner sx={{ minWidth: '14.5rem', mr: 3, mt: 2 }} />
+                ) : (
+                  memoizedVendors &&
+                  selectedMedium.vendor && (
+                    <FormControl fullWidth customvariant="highLabel">
+                      <InputLabel id="selectVendor">Vendor</InputLabel>
+                      <Select id="selectVendor" color="secondary" value={selectedMedium.vendor} onChange={handleVendorChange}>
+                        {Object.entries(memoizedVendors).map((vendor) => (
+                          <MenuItem key={vendor[0]} value={vendor[0]}>
+                            {vendor[1]}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                )}
+              </Box>
+            )}
+            <Box className={`${commonStyles.flex} ${commonStyles.alignEnd}`} sx={{ pb: 1 }}>
+              <Button variant="contained" component="label">
+                <FileUploadIcon />
+                Upload
+                <input hidden accept="image/*" type="file" multiple onChange={handleFileChange} />
+              </Button>
             </Box>
           </Box>
 
@@ -271,22 +319,12 @@ const PlaceholdersCard = (props) => {
               showLastButton: true,
             }}
           />
-
-          <div>
-            <input type="file" onChange={handleFileChange} multiple />
-            <ul>
-              {files.map((file, i) => (
-                <li key={i}>
-                  {file.name} - {file.type}
-                </li>
-              ))}
-            </ul>
-            <button onClick={handleUploadClick}>Upload</button>
-          </div>
         </CardContent>
       </Card>
 
       <PreviewDialog isOpen={isPreviewOpen} previewUrl={previewUrl} onClose={handlePreviewClose} />
+
+      <UploadFilesDialog files={fileList} setFiles={setFileList} onConfirm={handleUploadClick} />
     </>
   );
 };
@@ -297,6 +335,57 @@ const PreviewDialog = ({ isOpen, previewUrl, onClose }) => {
       <Modal open={isOpen} onClose={onClose} className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}>
         <Box component="img" src={previewUrl} alt="Placeholder preview" sx={{ maxWidth: '80%' }} />
       </Modal>
+    )
+  );
+};
+
+const UploadFilesDialog = ({ files, setFiles, onConfirm }) => {
+  return (
+    files.length > 0 && (
+      <Dialog fullWidth maxWidth="md" open={files.length > 0} onClose={() => setFiles([])}>
+        <DialogTitle component="div">
+          <Typography variant="h3">Selected files</Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Table>
+            <TableBody>
+              {files.map((file) => (
+                <TableRow key={file.name}>
+                  <TableCell width="10%">
+                    <Box component="img" height="40px" src={URL.createObjectURL(file.file)}></Box>
+                  </TableCell>
+                  <TableCell width="85%" align="left">
+                    <Box display="grid">
+                      <Typography variant="tableText1" noWrap>
+                        {file.name}
+                      </Typography>
+                      {!file.isImage && <Typography color="error">File must be image</Typography>}
+                      {file.isImage && !file.isNameValid && (
+                        <Typography color="error">File name cannot contain blank characters</Typography>
+                      )}
+                    </Box>
+                  </TableCell>
+                  <TableCell width="5%">
+                    <Tooltip title="Remove file">
+                      <IconButton color="primary" onClick={() => setFiles((prevState) => prevState.filter((el) => el.name !== file.name))}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={() => setFiles([])}>
+            Close
+          </Button>
+          <Button variant="contained" disabled={files.some((file) => !file.isImage || !file.isNameValid)} onClick={onConfirm}>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     )
   );
 };
