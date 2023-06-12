@@ -43,6 +43,12 @@ export const taxonomyApi = createApi({
         body,
       }),
     }),
+    deleteSupplyPlaceholder: builder.mutation({
+      query: ({ uuid }) => ({
+        url: `/api/supply-placeholders/${uuid}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
@@ -52,30 +58,5 @@ export const {
   useGetTaxonomyQuery,
   useGetPlaceholdersQuery,
   useUploadSupplyPlaceholdersMutation,
+  useDeleteSupplyPlaceholderMutation,
 } = taxonomyApi;
-
-// // placeholders
-// fetch('http://localhost:8030/api/supply-placeholders')
-//   .then((res) => res.json())
-//   .then((data) => console.log(data))
-//   .catch((err) => console.error(err));
-//
-// const parsed = {
-//   'filter[medium]': 'metaverse',
-//   'filter[vendor]': 'decentraland',
-// };
-// const query = queryString.stringify(parsed);
-// // placeholders with filter
-// fetch(`http://localhost:8030/api/supply-placeholders?${query}`)
-//   .then((res) => res.json())
-//   .then((data) => console.log(data))
-//   .catch((err) => console.error(err));
-//
-// const uuid = 'e1ef118b-c0a1-49f8-8f77-244a8b04b553';
-// // delete placeholder
-// fetch(`http://localhost:8030/api/supply-placeholders/${uuid}`, {
-//   method: 'DELETE',
-// })
-//   .then((res) => res.json())
-//   .then((data) => console.log(data))
-//   .catch((err) => console.error(err));

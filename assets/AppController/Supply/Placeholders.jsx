@@ -27,6 +27,7 @@ import {
   useGetTaxonomyQuery,
   useGetPlaceholdersQuery,
   useUploadSupplyPlaceholdersMutation,
+  useDeleteSupplyPlaceholderMutation,
 } from '../../redux/taxonomy/taxonomyApi';
 import Spinner from '../../Components/Spinner/Spinner';
 import { Select } from '@mui/material';
@@ -35,6 +36,7 @@ import TableData from '../../Components/TableData/TableData';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCreateNotification } from '../../hooks';
+import RestoreIcon from '@mui/icons-material/Restore';
 
 export default function Placeholders() {
   return (
@@ -112,9 +114,11 @@ const PlaceholdersCard = (props) => {
       skip: selectedMedium.medium === 'metaverse' && !selectedMedium.vendor,
     },
   );
-  const [uploadSupplyPlaceholders] = useUploadSupplyPlaceholdersMutation();
+  const [uploadSupplyPlaceholders, { isLoading: uploadingInProgress }] = useUploadSupplyPlaceholdersMutation();
+  const [deleteSupplyPlaceholder, { isLoading: deletingInProgress }] = useDeleteSupplyPlaceholderMutation();
   const [isPreviewOpen, setPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [restoreDefaultConfirmation, setRestoreDefaultConfirmation] = useState({ isOpen: false, uuid: null });
 
   const memoizedMedia = useMemo(() => media?.data.data, [media]);
   const memoizedVendors = useMemo(() => {
@@ -152,7 +156,6 @@ const PlaceholdersCard = (props) => {
 
   const handleFileChange = (event) => {
     const { files } = event.target;
-    console.log(files);
     setFileList((prevState) => {
       return [
         ...prevState,
@@ -172,7 +175,7 @@ const PlaceholdersCard = (props) => {
     });
     event.target.value = '';
   };
-  
+
   const handleUploadClick = async () => {
     if (!fileList.length) {
       return;
@@ -205,6 +208,34 @@ const PlaceholdersCard = (props) => {
     });
   };
 
+  const showPlaceholderPreview = (url) => {
+    setPreviewOpen(true);
+    setPreviewUrl(url);
+  };
+
+  const handlePreviewClose = () => {
+    setPreviewOpen(false);
+    setPreviewUrl(null);
+  };
+
+  const handleRestoreDefaultClick = (uuid) => {
+    setRestoreDefaultConfirmation({ isOpen: true, uuid });
+  };
+
+  const closeConfirmationDialog = () => {
+    setRestoreDefaultConfirmation({ isOpen: false, uuid: null });
+  };
+
+  const confirmRestoreDefault = async (uuid) => {
+    const response = await deleteSupplyPlaceholder({ uuid });
+
+    if (response.data && response.data.message === 'OK') {
+      closeConfirmationDialog();
+      refetchPlaceholders();
+      createSuccessNotification();
+    }
+  };
+
   const rows = useMemo(() => {
     return memoizedPlaceholders
       ? memoizedPlaceholders.data.map((placeholder) => {
@@ -233,21 +264,22 @@ const PlaceholdersCard = (props) => {
                 </Typography>
               </>
             ),
-            actions: <Box>Actions</Box>,
+            actions: (
+              <Tooltip title="Restore default">
+                <IconButton
+                  component="label"
+                  color="error"
+                  disabled={placeholder.isDefault}
+                  onClick={() => handleRestoreDefaultClick(placeholder.id)}
+                >
+                  <RestoreIcon />
+                </IconButton>
+              </Tooltip>
+            ),
           };
         })
       : [];
   }, [placeholders]);
-
-  const showPlaceholderPreview = (url) => {
-    setPreviewOpen(true);
-    setPreviewUrl(url);
-  };
-
-  const handlePreviewClose = () => {
-    setPreviewOpen(false);
-    setPreviewUrl(null);
-  };
 
   return (
     <>
@@ -324,7 +356,14 @@ const PlaceholdersCard = (props) => {
 
       <PreviewDialog isOpen={isPreviewOpen} previewUrl={previewUrl} onClose={handlePreviewClose} />
 
-      <UploadFilesDialog files={fileList} setFiles={setFileList} onConfirm={handleUploadClick} />
+      <UploadFilesDialog files={fileList} setFiles={setFileList} onConfirm={handleUploadClick} inProgress={uploadingInProgress} />
+
+      <ConfirmationDialog
+        confirmationObject={restoreDefaultConfirmation}
+        onClose={closeConfirmationDialog}
+        onConfirm={confirmRestoreDefault}
+        inProgress={deletingInProgress}
+      />
     </>
   );
 };
@@ -339,7 +378,7 @@ const PreviewDialog = ({ isOpen, previewUrl, onClose }) => {
   );
 };
 
-const UploadFilesDialog = ({ files, setFiles, onConfirm }) => {
+const UploadFilesDialog = ({ files, setFiles, onConfirm, inProgress }) => {
   return (
     files.length > 0 && (
       <Dialog fullWidth maxWidth="md" open={files.length > 0} onClose={() => setFiles([])}>
@@ -381,11 +420,30 @@ const UploadFilesDialog = ({ files, setFiles, onConfirm }) => {
           <Button variant="outlined" onClick={() => setFiles([])}>
             Close
           </Button>
-          <Button variant="contained" disabled={files.some((file) => !file.isImage || !file.isNameValid)} onClick={onConfirm}>
+          <Button variant="contained" disabled={files.some((file) => !file.isImage || !file.isNameValid) || inProgress} onClick={onConfirm}>
             Confirm
           </Button>
         </DialogActions>
       </Dialog>
     )
+  );
+};
+
+const ConfirmationDialog = ({ confirmationObject, onClose, onConfirm, inProgress }) => {
+  return (
+    <Dialog open={confirmationObject.isOpen} onClose={onClose}>
+      <DialogTitle component="div">
+        <Typography variant="h6">Confirm restore default? Saved placeholder will be deleted</Typography>
+      </DialogTitle>
+
+      <DialogActions>
+        <Button variant="outlined" onClick={onClose}>
+          Close
+        </Button>
+        <Button variant="contained" color="error" onClick={() => onConfirm(confirmationObject.uuid)} disabled={!!inProgress}>
+          Confirm
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
