@@ -253,9 +253,6 @@ const theme = createTheme({
             cursor: 'not-allowed',
             pointerEvents: 'fill',
           },
-          '&[tabindex]:not(.Mui-disabled)': {
-            color: 'inherit',
-          },
         },
       },
     },

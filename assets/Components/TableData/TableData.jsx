@@ -323,7 +323,7 @@ const ColumnSubMenu = ({ cellOptions, sxButton, onMenuItemClick, columnsPinnedTo
   return (
     <>
       <Tooltip title="Column options">
-        <IconButton sx={sxButton} size="small" onClick={handleOpenMenu}>
+        <IconButton sx={sxButton} size="small" onClick={handleOpenMenu} color="inherit">
           <MoreVertIcon fontSize="small" color="black" />
         </IconButton>
       </Tooltip>
@@ -566,7 +566,7 @@ const EnhancedTableHead = ({
                 onMouseLeave={() => setShowColumnSubmenu(null)}
               >
                 <Box
-                  className={`${commonStyles.flex} ${commonStyles.alignCenter} 
+                  className={`${commonStyles.flex} ${commonStyles.alignCenter}
                   ${
                     headCell.alignContent
                       ? (headCell.alignContent === 'center' && commonStyles.justifyCenter) ||
