@@ -256,6 +256,15 @@ const theme = createTheme({
         },
       },
     },
+    MuiTablePagination: {
+      styleOverrides: {
+        root: {
+          '& .MuiIconButton-root': {
+            color: 'inherit',
+          },
+        },
+      },
+    },
     MuiCard: {
       defaultProps: {
         width: 'fix',
