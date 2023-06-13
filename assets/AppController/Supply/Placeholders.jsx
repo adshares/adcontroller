@@ -50,19 +50,19 @@ const headCells = [
   {
     id: 'placeholder',
     label: 'Placeholder',
-    cellWidth: '70%',
+    cellWidth: '85%',
     alignContent: 'left',
   },
   {
     id: 'data',
     label: 'Data',
-    cellWidth: '15%',
+    cellWidth: '10%',
     alignContent: 'left',
   },
   {
     id: 'actions',
     label: 'Actions',
-    cellWidth: '15%',
+    cellWidth: '5%',
     alignContent: 'left',
     pinToRight: true,
   },
