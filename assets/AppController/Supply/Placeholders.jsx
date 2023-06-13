@@ -12,6 +12,7 @@ import {
   FormControl,
   IconButton,
   InputLabel,
+  Link,
   MenuItem,
   Modal,
   Table,
@@ -24,7 +25,6 @@ import {
 import {
   useGetMediaQuery,
   useGetVendorListQuery,
-  useGetTaxonomyQuery,
   useGetPlaceholdersQuery,
   useUploadSupplyPlaceholdersMutation,
   useDeleteSupplyPlaceholderMutation,
@@ -94,10 +94,6 @@ const PlaceholdersCard = (props) => {
       skip: selectedMedium.medium === 'web',
     },
   );
-  // const { data: taxonomy, isFetching: isTaxonomyFetching } = useGetTaxonomyQuery(selectedMedium, {
-  //   refetchOnMountOrArgChange: true,
-  //   skip: selectedMedium.medium === 'metaverse' && !selectedMedium.vendor,
-  // });
 
   const {
     data: placeholders,
@@ -284,7 +280,24 @@ const PlaceholdersCard = (props) => {
   return (
     <>
       <Card {...props}>
-        <CardHeader title="Placeholders" subheader="Set creatives which will be presented to the user in case of missing campaigns." />
+        <CardHeader
+          title="Placeholders"
+          subheader={
+            <>
+              <Typography>Set creatives which will be presented to the user in case of missing campaigns.</Typography>
+              <Link
+                underline="hover"
+                color="secondary"
+                href="https://docs.adshares.net/protocol/taxonomy/index.html"
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+              >
+                See available placeholders properties
+              </Link>
+            </>
+          }
+        />
+
         <CardContent>
           <Box className={`${commonStyles.flex}`}>
             {isMediaFetching && <Spinner />}

@@ -18,15 +18,6 @@ export const taxonomyApi = createApi({
         method: 'GET',
       }),
     }),
-    getTaxonomy: builder.query({
-      query: ({ medium, vendor }) => {
-        const queryParams = queryString.stringify({ vendor }, { skipNull: true });
-        return {
-          url: `/api/taxonomy/media/${medium}?${queryParams}`,
-          method: 'GET',
-        };
-      },
-    }),
     getPlaceholders: builder.query({
       query: (queryConfig) => {
         const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
@@ -55,7 +46,6 @@ export const taxonomyApi = createApi({
 export const {
   useGetMediaQuery,
   useGetVendorListQuery,
-  useGetTaxonomyQuery,
   useGetPlaceholdersQuery,
   useUploadSupplyPlaceholdersMutation,
   useDeleteSupplyPlaceholderMutation,
