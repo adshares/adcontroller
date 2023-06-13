@@ -466,7 +466,7 @@ const UserActionsMenu = ({ currentUser, user, actions }) => {
   return (
     <>
       <IconButton
-        color="black"
+        color="bodyColor"
         disabled={isActionPending || (!isSelfAdmin && !isSelfRow && (isAdmin || isModerator))}
         onClick={handleMenuOpen}
       >
