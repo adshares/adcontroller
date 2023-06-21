@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -24,7 +24,6 @@ import {
 } from '@mui/material';
 import {
   useGetMediaQuery,
-  useGetVendorListQuery,
   useGetPlaceholdersQuery,
   useUploadSupplyPlaceholdersMutation,
   useDeleteSupplyPlaceholderMutation,
@@ -71,15 +70,11 @@ const headCells = [
 const PAGE = 'page';
 const LIMIT = 'limit';
 const FILTER_MEDIUM = 'filter[medium]';
-const FILTER_VENDOR = 'filter[vendor]';
 
 const PlaceholdersCard = (props) => {
   const { createSuccessNotification } = useCreateNotification();
   const [fileList, setFileList] = useState([]);
-  const [selectedMedium, setMedium] = useState({
-    medium: 'web',
-    vendor: null,
-  });
+  const [medium, setMedium] = useState('web');
   const [queryConfig, setQueryConfig] = useState(() => ({
     page: 1,
     limit: 20,
@@ -87,13 +82,6 @@ const PlaceholdersCard = (props) => {
     orderBy: null,
   }));
   const { data: media, isFetching: isMediaFetching } = useGetMediaQuery();
-  const { data: vendors, isFetching: isVendorListFetching } = useGetVendorListQuery(
-    { medium: selectedMedium.medium },
-    {
-      refetchOnMountOrArgChange: true,
-      skip: selectedMedium.medium === 'web',
-    },
-  );
 
   const {
     data: placeholders,
@@ -101,13 +89,11 @@ const PlaceholdersCard = (props) => {
     refetch: refetchPlaceholders,
   } = useGetPlaceholdersQuery(
     {
-      [FILTER_MEDIUM]: selectedMedium.medium,
-      [FILTER_VENDOR]: selectedMedium.vendor,
+      [FILTER_MEDIUM]: medium,
       ...queryConfig,
     },
     {
       refetchOnMountOrArgChange: true,
-      skip: selectedMedium.medium === 'metaverse' && !selectedMedium.vendor,
     },
   );
   const [uploadSupplyPlaceholders, { isLoading: uploadingInProgress }] = useUploadSupplyPlaceholdersMutation();
@@ -117,38 +103,11 @@ const PlaceholdersCard = (props) => {
   const [restoreDefaultConfirmation, setRestoreDefaultConfirmation] = useState({ isOpen: false, uuid: null });
 
   const memoizedMedia = useMemo(() => media?.data.data, [media]);
-  const memoizedVendors = useMemo(() => {
-    if (selectedMedium.medium === 'web') {
-      return;
-    }
-    return vendors?.data.data && Array.isArray(vendors?.data.data) ? undefined : vendors?.data.data;
-  }, [vendors, selectedMedium.medium]);
   const memoizedPlaceholders = useMemo(() => placeholders?.data, [placeholders]);
 
-  useEffect(() => {
-    if (memoizedVendors) {
-      const vendor = Object.keys(memoizedVendors).find((vendor) => vendor === 'decentraland') || Object.keys(memoizedVendors)[0] || null;
-      setMedium((prevState) => ({
-        ...prevState,
-        vendor,
-      }));
-    }
-  }, [vendors, selectedMedium.medium]);
-
   const handleMediumChange = (event) => {
-    const medium = event.target.value;
-    setMedium((prevState) => ({
-      ...prevState,
-      medium,
-      ...(medium === 'web' ? { vendor: null } : {}),
-    }));
+    setMedium(() => event.target.value);
   };
-
-  const handleVendorChange = (event) =>
-    setMedium((prevState) => ({
-      ...prevState,
-      vendor: event.target.value,
-    }));
 
   const handleFileChange = (event) => {
     const { files } = event.target;
@@ -181,11 +140,8 @@ const PlaceholdersCard = (props) => {
     fileList.forEach((file, i) => {
       data.append(`file-${i}`, file.file, file.name);
     });
-    data.append('medium', selectedMedium.medium);
+    data.append('medium', medium);
     data.append('type', 'image');
-    if (selectedMedium.vendor) {
-      data.append('vendor', selectedMedium.vendor);
-    }
 
     const response = await uploadSupplyPlaceholders(data);
 
@@ -242,10 +198,10 @@ const PlaceholdersCard = (props) => {
                 <Box
                   sx={{ maxHeight: '100%', maxWidth: '100%' }}
                   component="img"
-                  src={placeholder.url.replace('https://app.web3ads.net', 'http://localhost:8010')}
+                  src={placeholder.url}
                   alt={placeholder.mime}
                   onClick={() => {
-                    showPlaceholderPreview(placeholder.url.replace('https://app.web3ads.net', 'http://localhost:8010'));
+                    showPlaceholderPreview(placeholder.url);
                   }}
                 />
               </Box>
@@ -306,7 +262,7 @@ const PlaceholdersCard = (props) => {
               {memoizedMedia && (
                 <FormControl fullWidth customvariant="highLabel">
                   <InputLabel id="selectMedium">Medium</InputLabel>
-                  <Select id="selectMedium" color="secondary" value={selectedMedium.medium} onChange={handleMediumChange}>
+                  <Select id="selectMedium" color="secondary" value={medium} onChange={handleMediumChange}>
                     {Object.entries(memoizedMedia).map((medium) => (
                       <MenuItem key={medium[0]} value={medium[0]}>
                         {medium[1]}
@@ -317,27 +273,6 @@ const PlaceholdersCard = (props) => {
               )}
             </Box>
 
-            {(memoizedVendors || isVendorListFetching) && (
-              <Box sx={{ width: '100%', maxWidth: '14.5rem', mr: 3 }} className={`${commonStyles.flex} ${commonStyles.alignCenter}`}>
-                {isVendorListFetching ? (
-                  <Spinner sx={{ minWidth: '14.5rem', mr: 3, mt: 2 }} />
-                ) : (
-                  memoizedVendors &&
-                  selectedMedium.vendor && (
-                    <FormControl fullWidth customvariant="highLabel">
-                      <InputLabel id="selectVendor">Vendor</InputLabel>
-                      <Select id="selectVendor" color="secondary" value={selectedMedium.vendor} onChange={handleVendorChange}>
-                        {Object.entries(memoizedVendors).map((vendor) => (
-                          <MenuItem key={vendor[0]} value={vendor[0]}>
-                            {vendor[1]}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                )}
-              </Box>
-            )}
             <Box className={`${commonStyles.flex} ${commonStyles.alignEnd}`} sx={{ pb: 1 }}>
               <Button variant="contained" component="label">
                 <FileUploadIcon />

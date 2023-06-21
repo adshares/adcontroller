@@ -12,17 +12,11 @@ export const taxonomyApi = createApi({
         method: 'GET',
       }),
     }),
-    getVendorList: builder.query({
-      query: ({ medium }) => ({
-        url: `/api/taxonomy/media/${medium}/vendors`,
-        method: 'GET',
-      }),
-    }),
     getPlaceholders: builder.query({
       query: (queryConfig) => {
         const queryParams = queryString.stringify(queryConfig, { skipNull: true, arrayFormat: 'bracket' });
         return {
-          url: `http://localhost:8030/api/supply-placeholders?${queryParams}`,
+          url: `/api/supply-placeholders?${queryParams}`,
           method: 'GET',
         };
       },
@@ -43,10 +37,5 @@ export const taxonomyApi = createApi({
   }),
 });
 
-export const {
-  useGetMediaQuery,
-  useGetVendorListQuery,
-  useGetPlaceholdersQuery,
-  useUploadSupplyPlaceholdersMutation,
-  useDeleteSupplyPlaceholderMutation,
-} = taxonomyApi;
+export const { useGetMediaQuery, useGetPlaceholdersQuery, useUploadSupplyPlaceholdersMutation, useDeleteSupplyPlaceholderMutation } =
+  taxonomyApi;
