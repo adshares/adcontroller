@@ -275,7 +275,7 @@ const PlaceholdersCard = (props) => {
                   component="label"
                   color="error"
                   disabled={placeholder.isDefault}
-                  onClick={() => handleRestoreDefaultClick(placeholder.id)}
+                  onClick={() => !placeholder.isDefault && handleRestoreDefaultClick(placeholder.id)}
                 >
                   <RestoreIcon />
                 </IconButton>
