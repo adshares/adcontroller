@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
   Dialog,
@@ -26,6 +27,7 @@ import {
   useGetMediaQuery,
   useGetPlaceholdersQuery,
   useUploadSupplyPlaceholdersMutation,
+  useUploadSupplyPlaceholdersSeedMutation,
   useDeleteSupplyPlaceholderMutation,
 } from '../../redux/taxonomy/taxonomyApi';
 import Spinner from '../../Components/Spinner/Spinner';
@@ -40,7 +42,8 @@ import RestoreIcon from '@mui/icons-material/Restore';
 export default function Placeholders() {
   return (
     <>
-      <PlaceholdersCard />
+      <PlaceholdersSeed />
+      <PlaceholdersCard sx={{ mt: 3 }} />
     </>
   );
 }
@@ -70,6 +73,56 @@ const headCells = [
 const PAGE = 'page';
 const LIMIT = 'limit';
 const FILTER_MEDIUM = 'filter[medium]';
+
+const PlaceholdersSeed = (props) => {
+  const { createSuccessNotification } = useCreateNotification();
+  const [uploadSupplyPlaceholdersSeed, { isLoading }] = useUploadSupplyPlaceholdersSeedMutation();
+  const [file, setFile] = useState(null);
+
+  const onSeedChange = (event) => {
+    const { files } = event.target;
+    setFile(() => files[0]);
+    event.target.value = '';
+  };
+
+  const onSaveClick = async () => {
+    if (!file) {
+      return;
+    }
+
+    const data = new FormData();
+    data.append(`seed`, file, file.name);
+    data.append('color', 'FFFFFF');
+
+    const response = await uploadSupplyPlaceholdersSeed(data);
+
+    if (response.data && response.data.message === 'OK') {
+      createSuccessNotification();
+    }
+  };
+
+  return (
+    <Card {...props}>
+      <CardHeader title="Placeholders' seed" subheader={<Typography>Set image which will be used as default placeholder.</Typography>} />
+      <CardContent>
+        <Box className={`${commonStyles.flex}`}>
+          <Button variant="contained" component="label">
+            <FileUploadIcon />
+            Upload
+            <input hidden accept="image/*" type="file" onChange={onSeedChange} />
+          </Button>
+        </Box>
+        {file && <Box component="img" height="200px" src={URL.createObjectURL(file)}></Box>}
+      </CardContent>
+
+      <CardActions>
+        <Button disabled={!file || isLoading} onClick={onSaveClick} variant="contained" type="button">
+          Set as default
+        </Button>
+      </CardActions>
+    </Card>
+  );
+};
 
 const PlaceholdersCard = (props) => {
   const { createSuccessNotification } = useCreateNotification();

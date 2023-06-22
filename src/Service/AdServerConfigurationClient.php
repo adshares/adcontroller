@@ -143,6 +143,8 @@ class AdServerConfigurationClient
     private const SITE_FILTERING_EXCLUDE = 'siteFilteringExclude';
     private const SITE_FILTERING_REQUIRE = 'siteFilteringRequire';
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'siteVerificationTimeThreshold';
+    public const SUPPLY_PLACEHOLDER_COLOR = 'supplyPlaceholderColor';
+    public const SUPPLY_PLACEHOLDER_FILE = 'supplyPlaceholderFile';
     public const SUPPORT_CHAT = 'supportChat';
     public const SUPPORT_EMAIL = 'supportEmail';
     public const SUPPORT_TELEGRAM = 'supportTelegram';
@@ -324,6 +326,8 @@ class AdServerConfigurationClient
             AdServerConfig::RejectedDomains->name => self::REJECTED_DOMAINS,
             AdServerConfig::SiteAcceptBannersManually->name => self::SITE_ACCEPT_BANNERS_MANUALLY,
             AdServerConfig::SiteClassifierLocalBanners->name => self::SITE_CLASSIFIER_LOCAL_BANNERS,
+            AdServerConfig::SupplyPlaceholderColor->name => self::SUPPLY_PLACEHOLDER_COLOR,
+            AdServerConfig::SupplyPlaceholderFile->name => self::SUPPLY_PLACEHOLDER_FILE,
             AdServerConfig::UploadLimitImage->name => self::UPLOAD_LIMIT_IMAGE,
             AdServerConfig::UploadLimitModel->name => self::UPLOAD_LIMIT_MODEL,
             AdServerConfig::UploadLimitVideo->name => self::UPLOAD_LIMIT_VIDEO,

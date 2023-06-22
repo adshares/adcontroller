@@ -28,6 +28,13 @@ export const taxonomyApi = createApi({
         body,
       }),
     }),
+    uploadSupplyPlaceholdersSeed: builder.mutation({
+      query: (body) => ({
+        url: '/api/supply-placeholders-seed',
+        method: 'POST',
+        body,
+      }),
+    }),
     deleteSupplyPlaceholder: builder.mutation({
       query: ({ uuid }) => ({
         url: `/api/supply-placeholders/${uuid}`,
@@ -37,5 +44,10 @@ export const taxonomyApi = createApi({
   }),
 });
 
-export const { useGetMediaQuery, useGetPlaceholdersQuery, useUploadSupplyPlaceholdersMutation, useDeleteSupplyPlaceholderMutation } =
-  taxonomyApi;
+export const {
+  useGetMediaQuery,
+  useGetPlaceholdersQuery,
+  useUploadSupplyPlaceholdersMutation,
+  useUploadSupplyPlaceholdersSeedMutation,
+  useDeleteSupplyPlaceholderMutation,
+} = taxonomyApi;

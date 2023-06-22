@@ -30,6 +30,7 @@ use App\Service\Configurator\Category\Regulations;
 use App\Service\Configurator\Category\RejectedDomains;
 use App\Service\Configurator\Category\SiteOptions;
 use App\Service\Configurator\Category\Smtp;
+use App\Service\Configurator\Category\SupplyPlaceholderSeed;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\Configurator\Category\Whitelist;
 use App\Service\Configurator\Category\ZoneOptions;
@@ -279,6 +280,26 @@ class ConfiguratorController extends AbstractController
             $this->rethrowUnexpectedResponseException($exception);
         }
         return $this->jsonOk();
+    }
+
+    #[Route('/supply-placeholders-seed', name: 'upload_placeholders_seed', methods: ['POST'])]
+    public function uploadPlaceholdersSeed(SupplyPlaceholderSeed $supplyPlaceholderSeed, Request $request): JsonResponse
+    {
+        $content = [
+            'color' => $request->request->get('color'),
+            'seed' => $request->files->get('seed'),
+        ];
+
+        try {
+            $data = $supplyPlaceholderSeed->process($content);
+        } catch (InvalidArgumentException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage());
+        } catch (ServiceNotPresent $exception) {
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, $exception->getMessage());
+        } catch (UnexpectedResponseException $exception) {
+            $this->rethrowUnexpectedResponseException($exception);
+        }
+        return $this->jsonOk($data);
     }
 
     #[Route('/taxonomy/media', name: 'taxonomy_media', methods: ['GET'])]
