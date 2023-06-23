@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Box,
   Button,
@@ -23,6 +24,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import configSelectors from '../../redux/config/configSelectors';
 import {
   useGetMediaQuery,
   useGetPlaceholdersQuery,
@@ -75,9 +77,15 @@ const LIMIT = 'limit';
 const FILTER_MEDIUM = 'filter[medium]';
 
 const PlaceholdersSeed = (props) => {
+  const appData = useSelector(configSelectors.getAppData);
   const { createSuccessNotification } = useCreateNotification();
   const [uploadSupplyPlaceholdersSeed, { isLoading }] = useUploadSupplyPlaceholdersSeedMutation();
   const [file, setFile] = useState(null);
+  const [color, setColor] = useState(`#${appData.AdServer.SupplyPlaceholderColor}`);
+
+  const onColorChange = (event) => {
+    setColor(() => event.target.value);
+  };
 
   const onSeedChange = (event) => {
     const { files } = event.target;
@@ -92,7 +100,7 @@ const PlaceholdersSeed = (props) => {
 
     const data = new FormData();
     data.append(`seed`, file, file.name);
-    data.append('color', 'FFFFFF');
+    data.append('color', color.substring(1).toUpperCase());
 
     const response = await uploadSupplyPlaceholdersSeed(data);
 
@@ -105,7 +113,7 @@ const PlaceholdersSeed = (props) => {
     <Card {...props}>
       <CardHeader title="Placeholders' seed" subheader={<Typography>Set image which will be used as default placeholder.</Typography>} />
       <CardContent>
-        <Box className={`${commonStyles.flex}`}>
+        <Box sx={{ mb: 1 }}>
           <Button variant="contained" component="label">
             <FileUploadIcon />
             Upload
@@ -113,6 +121,10 @@ const PlaceholdersSeed = (props) => {
           </Button>
         </Box>
         {file && <Box component="img" height="200px" src={URL.createObjectURL(file)}></Box>}
+        <Box>
+          <input type="color" id="color" name="color" value={color} onChange={onColorChange} />
+          <label htmlFor="color">Background color</label>
+        </Box>
       </CardContent>
 
       <CardActions>
