@@ -159,6 +159,11 @@ const PlaceholdersCard = (props) => {
   const memoizedPlaceholders = useMemo(() => placeholders?.data, [placeholders]);
 
   const handleMediumChange = (event) => {
+    setQueryConfig((prevState) => ({
+      ...prevState,
+      cursor: null,
+      page: 1,
+    }));
     setMedium(() => event.target.value);
   };
 
