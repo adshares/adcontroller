@@ -800,6 +800,10 @@ export default function TableData({
   const sortableColumns = headCells.filter((cell) => cell.sortable).map((cell) => cell.id);
 
   useEffect(() => {
+    setPage(Number(paginationParams.page - 1));
+  }, [paginationParams.page]);
+
+  useEffect(() => {
     if (isNaN(page)) {
       setPage(0);
     }
