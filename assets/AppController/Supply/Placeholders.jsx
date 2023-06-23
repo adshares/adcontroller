@@ -120,7 +120,12 @@ const PlaceholdersSeed = (props) => {
             <input hidden accept="image/*" type="file" onChange={onSeedChange} />
           </Button>
         </Box>
-        {file && <Box component="img" height="200px" src={URL.createObjectURL(file)}></Box>}
+        <Box
+          component="img"
+          sx={{ display: 'none', maxHeight: '200px', maxWidth: '100%' }}
+          src={file ? URL.createObjectURL(file) : '/assets/placeholders-seed'}
+          onLoad={(event) => (event.target.style.display = 'inline-block')}
+        />
         <Box>
           <input type="color" id="color" name="color" value={color} onChange={onColorChange} />
           <label htmlFor="color">Background color</label>
@@ -390,7 +395,7 @@ const PreviewDialog = ({ isOpen, previewUrl, onClose }) => {
   return (
     previewUrl && (
       <Modal open={isOpen} onClose={onClose} className={`${commonStyles.flex} ${commonStyles.justifyCenter} ${commonStyles.alignCenter}`}>
-        <Box component="img" src={previewUrl} alt="Placeholder preview" sx={{ maxWidth: '80%' }} />
+        <Box component="img" src={previewUrl} alt="Placeholder preview" sx={{ maxHeight: '80%', maxWidth: '80%' }} />
       </Modal>
     )
   );
