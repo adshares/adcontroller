@@ -56,5 +56,9 @@
   &.alignBaseline {
     align-items: baseline;
   }
+
+  &.alignEnd {
+    align-items: flex-end;
+  }
 }
 

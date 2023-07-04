@@ -253,7 +253,13 @@ const theme = createTheme({
             cursor: 'not-allowed',
             pointerEvents: 'fill',
           },
-          '&[tabindex]:not(.Mui-disabled)': {
+        },
+      },
+    },
+    MuiTablePagination: {
+      styleOverrides: {
+        root: {
+          '& .MuiIconButton-root': {
             color: 'inherit',
           },
         },

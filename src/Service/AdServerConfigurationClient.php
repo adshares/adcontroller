@@ -9,10 +9,13 @@ use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -140,6 +143,8 @@ class AdServerConfigurationClient
     private const SITE_FILTERING_EXCLUDE = 'siteFilteringExclude';
     private const SITE_FILTERING_REQUIRE = 'siteFilteringRequire';
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'siteVerificationTimeThreshold';
+    public const SUPPLY_PLACEHOLDER_COLOR = 'supplyPlaceholderColor';
+    public const SUPPLY_PLACEHOLDER_FILE = 'supplyPlaceholderFile';
     public const SUPPORT_CHAT = 'supportChat';
     public const SUPPORT_EMAIL = 'supportEmail';
     public const SUPPORT_TELEGRAM = 'supportTelegram';
@@ -321,6 +326,8 @@ class AdServerConfigurationClient
             AdServerConfig::RejectedDomains->name => self::REJECTED_DOMAINS,
             AdServerConfig::SiteAcceptBannersManually->name => self::SITE_ACCEPT_BANNERS_MANUALLY,
             AdServerConfig::SiteClassifierLocalBanners->name => self::SITE_CLASSIFIER_LOCAL_BANNERS,
+            AdServerConfig::SupplyPlaceholderColor->name => self::SUPPLY_PLACEHOLDER_COLOR,
+            AdServerConfig::SupplyPlaceholderFile->name => self::SUPPLY_PLACEHOLDER_FILE,
             AdServerConfig::UploadLimitImage->name => self::UPLOAD_LIMIT_IMAGE,
             AdServerConfig::UploadLimitModel->name => self::UPLOAD_LIMIT_MODEL,
             AdServerConfig::UploadLimitVideo->name => self::UPLOAD_LIMIT_VIDEO,
@@ -499,5 +506,65 @@ class AdServerConfigurationClient
             ]
         );
         $this->checkStatusCode($response);
+    }
+
+    public function fetchCreativePlaceholders(Request $request): array
+    {
+        return $this->getData($this->buildUri('creatives/placeholder'), $request->query);
+    }
+
+    public function uploadCreativePlaceholders(Request $request): array
+    {
+        $files = $request->files;
+        $formFields = [];
+        /** @var UploadedFile $file */
+        foreach ($files->getIterator() as $key => $file) {
+            $formFields[$key] = new DataPart($file->getContent(), $file->getClientOriginalName(), $file->getMimeType());
+        }
+        $formFields['medium'] = $request->get('medium');
+        if (null !== ($vendor = $request->get('vendor'))) {
+            $formFields['vendor'] = $vendor;
+        }
+        $formFields['type'] = $request->get('type');
+        $formData = new FormDataPart($formFields);
+
+        $response = $this->httpClient->request(
+            'POST',
+            $this->buildUri('creatives/placeholder'),
+            [
+                'headers' => array_merge(
+                    $formData->getPreparedHeaders()->toArray(),
+                    $this->getRequestHeaders(),
+                ),
+                'body' => $formData->bodyToIterable(),
+            ],
+        );
+        $this->checkStatusCode($response);
+
+        return json_decode($response->getContent(), true);
+    }
+
+    public function deleteCreativePlaceholder(string $uuid): void
+    {
+        $this->deleteData($this->buildUri(sprintf('creatives/placeholder/%s', $uuid)));
+    }
+
+    public function fetchTaxonomyMedia(): array
+    {
+        return $this->getData($this->buildUri('taxonomy/media'));
+    }
+
+    public function fetchTaxonomyMedium(string $medium, ?string $vendor = null)
+    {
+        $inputBag = new InputBag();
+        if (null !== $vendor) {
+            $inputBag->set('vendor', $vendor);
+        }
+        return $this->getData($this->buildUri(sprintf('taxonomy/media/%s', $medium)), $inputBag);
+    }
+
+    public function fetchTaxonomyVendors(string $medium): array
+    {
+        return $this->getData($this->buildUri(sprintf('taxonomy/media/%s/vendors', $medium)));
     }
 }
