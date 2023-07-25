@@ -205,7 +205,7 @@ const ConnectedServersList = () => {
 
   return (
     <Card width="full">
-      <CardHeader title="IconConnected servers" />
+      <CardHeader title="Connected servers" />
       <CardContent>
         <TableData
           headCells={headCells} // array of objects {id, label, ...additional params}

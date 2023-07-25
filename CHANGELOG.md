@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2023-07-25
+### Added
+- Custom logos support in dark mode
+- Setting placeholders for creatives
+### Changed
+- AdServers' name on flow chart label
+### Fixed
+- Hide dashboard charts for moderator
+- User list actions for moderator
+- Error notification for Bad Request
+- Warning about refund applies to advertiser commission
+
 ## [1.3.0] - 2023-05-15
 ### Added
 - Turnover and token flow monitoring
@@ -118,7 +130,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.3.0...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.4.0...develop
+[1.4.0]: https://github.com/adshares/adcontroller/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/adshares/adcontroller/compare/v1.2.8...v1.3.0
 [1.2.8]: https://github.com/adshares/adcontroller/compare/v1.2.7...v1.2.8
 [1.2.7]: https://github.com/adshares/adcontroller/compare/v1.2.6...v1.2.7

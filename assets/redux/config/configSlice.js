@@ -72,6 +72,7 @@ const initialState = {
       AdsTxtCheckDemandEnabled: null,
       AdsTxtCheckSupplyEnabled: null,
       AdsTxtDomain: null,
+      SupplyPlaceholderColor: 'FFFFFF',
     },
     AdUser: {
       InternalUrl: null,

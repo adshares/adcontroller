@@ -70,6 +70,7 @@ const PlaceholdersCard = (props) => {
     },
   });
   const { createSuccessNotification } = useCreateNotification();
+  const [confirmationDialogOpen, setConfirmationDialogOpen] = React.useState(false);
 
   useSkipFirstRenderEffect(() => {
     form.resetForm();
@@ -91,104 +92,130 @@ const PlaceholdersCard = (props) => {
   };
 
   return (
-    <Card {...props}>
-      <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
-      <CardContent>
-        <Box component="form" onChange={(e) => form.onChange(e)} onFocus={(e) => form.setTouched(e)}>
-          <TextField
-            sx={{ mb: 3 }}
-            value={form.fields.PlaceholderIndexTitle}
-            color="secondary"
-            customvariant="highLabel"
-            name="PlaceholderIndexTitle"
-            label="Title"
-            fullWidth
-          />
-          <CollapsibleTextarea
-            collapsible
-            value={form.fields.PlaceholderIndexDescription}
-            sx={{ mb: 3 }}
-            color="secondary"
-            customvariant="highLabel"
-            name="PlaceholderIndexDescription"
-            label="Description"
-            multiline
-            rows={8}
-            fullWidth
-          />
-          <TextField
-            value={form.fields.PlaceholderIndexKeywords}
-            sx={{ mb: 3 }}
-            color="secondary"
-            customvariant="highLabel"
-            name="PlaceholderIndexKeywords"
-            label="Keywords"
-            fullWidth
-          />
-          <CollapsibleTextarea
-            collapsible
-            value={form.fields.PlaceholderIndexMetaTags}
-            sx={{ mb: 3 }}
-            color="secondary"
-            customvariant="highLabel"
-            name="PlaceholderIndexMetaTags"
-            label="Custom meta tags"
-            multiline
-            rows={8}
-            fullWidth
-          />
-          <CollapsibleTextarea
-            collapsible
-            value={form.fields.PlaceholderRobotsTxt}
-            sx={{ mb: 3 }}
-            color="secondary"
-            customvariant="highLabel"
-            name="PlaceholderRobotsTxt"
-            label="robots.txt"
-            multiline
-            rows={8}
-            fullWidth
-          />
-          <CollapsibleTextarea
-            collapsible
-            value={form.fields.PlaceholderLoginInfo}
-            sx={{ mb: 3 }}
-            color="secondary"
-            customvariant="highLabel"
-            name="PlaceholderLoginInfo"
-            label="Login page info (HTML)"
-            multiline
-            rows={20}
-            fullWidth
-          />
-          <CollapsibleTextarea
-            collapsible
-            value={form.fields.PlaceholderStyleCss}
-            color="secondary"
-            customvariant="highLabel"
-            name="PlaceholderStyleCss"
-            label="AdPanel styles (CSS)"
-            multiline
-            rows={20}
-            fullWidth
-          />
-        </Box>
-      </CardContent>
+    <>
+      <Card {...props}>
+        <CardHeader title="Panel metadata" subheader="Set the ad server panel metadata" />
+        <CardContent>
+          <Box component="form" onChange={(e) => form.onChange(e)} onFocus={(e) => form.setTouched(e)}>
+            <TextField
+              sx={{ mb: 3 }}
+              value={form.fields.PlaceholderIndexTitle}
+              color="secondary"
+              customvariant="highLabel"
+              name="PlaceholderIndexTitle"
+              label="Title"
+              fullWidth
+            />
+            <CollapsibleTextarea
+              collapsible
+              value={form.fields.PlaceholderIndexDescription}
+              sx={{ mb: 3 }}
+              color="secondary"
+              customvariant="highLabel"
+              name="PlaceholderIndexDescription"
+              label="Description"
+              multiline
+              rows={8}
+              fullWidth
+            />
+            <TextField
+              value={form.fields.PlaceholderIndexKeywords}
+              sx={{ mb: 3 }}
+              color="secondary"
+              customvariant="highLabel"
+              name="PlaceholderIndexKeywords"
+              label="Keywords"
+              fullWidth
+            />
+            <CollapsibleTextarea
+              collapsible
+              value={form.fields.PlaceholderIndexMetaTags}
+              sx={{ mb: 3 }}
+              color="secondary"
+              customvariant="highLabel"
+              name="PlaceholderIndexMetaTags"
+              label="Custom meta tags"
+              multiline
+              rows={8}
+              fullWidth
+            />
+            <CollapsibleTextarea
+              collapsible
+              value={form.fields.PlaceholderRobotsTxt}
+              sx={{ mb: 3 }}
+              color="secondary"
+              customvariant="highLabel"
+              name="PlaceholderRobotsTxt"
+              label="robots.txt"
+              multiline
+              rows={8}
+              fullWidth
+            />
+            <CollapsibleTextarea
+              collapsible
+              value={form.fields.PlaceholderLoginInfo}
+              sx={{ mb: 3 }}
+              color="secondary"
+              customvariant="highLabel"
+              name="PlaceholderLoginInfo"
+              label="Login page info (HTML)"
+              multiline
+              rows={20}
+              fullWidth
+            />
+            <CollapsibleTextarea
+              collapsible
+              value={form.fields.PlaceholderStyleCss}
+              color="secondary"
+              customvariant="highLabel"
+              name="PlaceholderStyleCss"
+              label="AdPanel styles (CSS)"
+              multiline
+              rows={20}
+              fullWidth
+            />
+          </Box>
+        </CardContent>
 
-      <CardActions>
-        <Button disabled={isLoading || !form.isFormWasChanged} onClick={onSaveClick} variant="contained" type="button">
-          Save
-        </Button>
-      </CardActions>
-    </Card>
+        <CardActions>
+          <Button
+            disabled={isLoading || !form.isFormWasChanged}
+            onClick={() => {
+              if (form.changedFields.PlaceholderStyleCss) {
+                setConfirmationDialogOpen(true);
+              } else {
+                onSaveClick();
+              }
+            }}
+            variant="contained"
+            type="button"
+          >
+            Save
+          </Button>
+        </CardActions>
+      </Card>
+
+      <ConfirmationDialog open={confirmationDialogOpen} setOpen={setConfirmationDialogOpen} onConfirm={onSaveClick} />
+    </>
   );
 };
 
 const RebrandingCard = (props) => {
   const [activeTab, setActiveTab] = React.useState('requiredAssets');
   const [saveButton, setSaveButton] = React.useState({});
-  const requiredFavicons = ['Favicon16x16', 'Favicon32x32', 'Favicon48x48', 'Favicon96x96'];
-  const requiredLogos = ['LogoH30', 'SimpleLogoH30'];
+  const [confirmationDialogOpen, setConfirmationDialogOpen] = React.useState(false);
+  const requiredFavicons = {
+    Favicon16x16: { name: 'favicon-16x16.png', desc: '16x16' },
+    Favicon32x32: { name: 'favicon-32x32.png', desc: '32x32' },
+    Favicon48x48: { name: 'favicon-48x48.png', desc: '48x48' },
+    Favicon96x96: { name: 'favicon-96x96.png', desc: '96x96' },
+  };
+  const requiredLogos = {
+    LogoH30: { name: 'logo.png', desc: 'Logo' },
+    LogoSimpleH30: { name: 'logo-simple.png', desc: 'Simple logo' },
+    LogoDarkModeH30: { name: 'logo-dark-mode.png', desc: 'Dark mode logo' },
+    LogoSimpleDarkModeH30: { name: 'logo-simple-dark-mode.png', desc: 'Simple dark mode logo' },
+  };
 
   const handleTabChange = (e, newActiveTab) => {
     setActiveTab(newActiveTab);
@@ -201,30 +228,47 @@ const RebrandingCard = (props) => {
   };
 
   return (
-    <Card {...props}>
-      <CardHeader title="Rebranding" subheader="Customize the ad server panel." />
-      <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
-        <TabContext value={activeTab}>
-          <TabList onChange={handleTabChange}>
-            <Tab label="Required assets" value="requiredAssets" />
-            <Tab label="Additional assets" value="additionalAssets" />
-          </TabList>
-          <TabPanel value="requiredAssets">
-            <RequiredAssetsTable actions={{ setBtnConfig }} requiredFavicons={requiredFavicons} requiredLogos={requiredLogos} />
-          </TabPanel>
-          <TabPanel value="additionalAssets">
-            <AdditionalAssets actions={{ setBtnConfig }} rejectedAssets={[...requiredLogos, ...requiredFavicons]} />
-          </TabPanel>
-        </TabContext>
-      </CardContent>
-      <CardActions>
-        <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
-          <Button variant="contained" type="button" disabled={saveButton.disabled} onClick={saveButton.onSaveClick}>
-            Save
-          </Button>
-        </Box>
-      </CardActions>
-    </Card>
+    <>
+      <Card {...props}>
+        <CardHeader title="Rebranding" subheader="Customize the ad server panel." />
+        <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
+          <TabContext value={activeTab}>
+            <TabList onChange={handleTabChange}>
+              <Tab label="Required assets" value="requiredAssets" />
+              <Tab label="Additional assets" value="additionalAssets" />
+            </TabList>
+            <TabPanel value="requiredAssets">
+              <RequiredAssetsTable actions={{ setBtnConfig }} requiredFavicons={requiredFavicons} requiredLogos={requiredLogos} />
+            </TabPanel>
+            <TabPanel value="additionalAssets">
+              <AdditionalAssets
+                actions={{ setBtnConfig }}
+                rejectedAssets={[...Object.keys(requiredLogos), ...Object.keys(requiredFavicons)]}
+              />
+            </TabPanel>
+          </TabContext>
+        </CardContent>
+        <CardActions>
+          <Box className={`${commonStyles.card} ${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+            <Button
+              variant="contained"
+              type="button"
+              disabled={saveButton.disabled}
+              onClick={() => {
+                if (saveButton.tab === 'requiredAssets') {
+                  setConfirmationDialogOpen(true);
+                } else {
+                  saveButton.onSaveClick();
+                }
+              }}
+            >
+              Save
+            </Button>
+          </Box>
+        </CardActions>
+      </Card>
+      <ConfirmationDialog open={confirmationDialogOpen} setOpen={setConfirmationDialogOpen} onConfirm={saveButton.onSaveClick} />
+    </>
   );
 };
 
@@ -373,7 +417,7 @@ const AdditionalAssets = ({ rejectedAssets, actions }) => {
   };
 
   return (
-    <Box sx={{ height: '712px', overflow: 'auto' }}>
+    <Box sx={{ height: '856px', overflow: 'auto' }}>
       <Button variant="contained" component="label">
         <FileUploadIcon />
         Upload
@@ -638,14 +682,9 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
           break;
 
         case 'LogoH30':
-          if (height >= 30) {
-            updateComponentState(name, file);
-          } else {
-            enqueueSnackbar('Image should be with min height 30', { variant: 'error' });
-          }
-          break;
-
-        case 'SimpleLogoH30':
+        case 'LogoSimpleH30':
+        case 'LogoDarkModeH30':
+        case 'LogoSimpleDarkModeH30':
           if (height >= 30) {
             updateComponentState(name, file);
           } else {
@@ -672,7 +711,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
   };
 
   return (
-    <Box sx={{ height: '712px', overflow: 'auto' }}>
+    <Box sx={{ height: '856px', overflow: 'auto' }}>
       <Box>
         <Typography variant="h3" component="h3">
           Favicons
@@ -682,34 +721,35 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
         </Typography>
         <Table sx={{ mt: 3 }}>
           <TableBody>
-            {requiredFavicons.map((id) => {
-              const width = id.match(/(\d+)/)[0];
-              const height = id.match(/(\d+)/)[1];
+            {Object.entries(requiredFavicons).map(([id, { name, desc }]) => {
+              const width = desc.match(/(\d+)/)[0];
+              const height = desc.match(/(\d+)/)[1];
+              const isWasChanged = changedFiles.hasOwnProperty(id);
               return (
                 <TableRow key={id}>
                   <TableCell width="45%">
-                    {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
+                    {isWasChanged && changedFiles[id]?.action === 'restoreDefault' ? (
                       <SvgIcon sx={{ fontSize: height + 'px' }}>
                         <RestoreIcon color="error" />
                       </SvgIcon>
                     ) : (
                       <Box
                         component="img"
-                        src={changedFiles[id]?.preview || `${configuration.basePath}/assets/panel/${id}?${Date.now()}`}
+                        src={isWasChanged ? changedFiles[id]?.preview : `${configuration.basePath}/build/assets/${name}`}
                         height={height + 'px'}
                         width={width + 'px'}
                       />
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableText1">
-                      {width}x{height}{' '}
-                      {changedFiles.hasOwnProperty(id) && (
-                        <Typography component="span" variant="body2" color="error">
-                          pending for save
-                        </Typography>
-                      )}
+                    <Typography variant="tableText1" component="p">
+                      {desc}
                     </Typography>
+                    {isWasChanged && (
+                      <Typography component="p" variant="body2" color="error">
+                        pending for save
+                      </Typography>
+                    )}
                   </TableCell>
                   <TableCell align="left" width="20%">
                     <Tooltip title="Change image">
@@ -725,7 +765,7 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
                       </IconButton>
                     </Tooltip>
 
-                    <IconButton disabled={!changedFiles.hasOwnProperty(id)} size="small" color="black" onClick={onUndoClick(id)}>
+                    <IconButton disabled={!isWasChanged} size="small" color="black" onClick={onUndoClick(id)}>
                       <Tooltip title="Undo changes">
                         <UndoIcon />
                       </Tooltip>
@@ -747,32 +787,38 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
         </Typography>
         <Table sx={{ mt: 3, backgroundColor: 'primary.main' }}>
           <TableBody>
-            {requiredLogos.map((id) => {
+            {Object.entries(requiredLogos).map(([id, { name, desc }]) => {
+              const isWasChanged = changedFiles.hasOwnProperty(id);
               return (
                 <TableRow key={id}>
                   <TableCell width="45%">
-                    {changedFiles.hasOwnProperty(id) && changedFiles[id]?.action === 'restoreDefault' ? (
+                    {isWasChanged && changedFiles[id]?.action === 'restoreDefault' ? (
                       <SvgIcon>
                         <RestoreIcon color="error" />
                       </SvgIcon>
                     ) : (
                       <Box
                         component="img"
-                        src={changedFiles[id]?.preview || `${configuration.basePath}/assets/panel/${id}?${Date.now()}`}
+                        src={isWasChanged ? changedFiles[id]?.preview : `${configuration.basePath}/build/assets/${name}`}
+                        onError={(e) => {
+                          e.target.src = `${configuration.basePath}/build/assets/${
+                            (id === 'LogoDarkModeH30' && 'logo.png') || (id === 'LogoSimpleDarkModeH30' && 'logo-simple.png')
+                          }`;
+                        }}
                         maxWidth="100%"
                         height="30px"
                       />
                     )}
                   </TableCell>
                   <TableCell align="left" width="35%">
-                    <Typography variant="tableText1" color="secondary.main">
-                      {id === 'LogoH30' ? 'Logo' : 'Simple logo'}
-                      {changedFiles.hasOwnProperty(id) && (
-                        <Typography component="span" variant="body2" color="error.main">
-                          pending for save
-                        </Typography>
-                      )}
+                    <Typography variant="tableText1" color="secondary.main" component="p">
+                      {desc}
                     </Typography>
+                    {changedFiles.hasOwnProperty(id) && (
+                      <Typography component="p" variant="body2" color="error.main">
+                        pending for save
+                      </Typography>
+                    )}
                   </TableCell>
                   <TableCell align="left" width="20%">
                     <Tooltip title="Change image">
@@ -801,5 +847,44 @@ const RequiredAssetsTable = ({ requiredFavicons, requiredLogos, actions }) => {
         </Table>
       </Box>
     </Box>
+  );
+};
+
+const ConfirmationDialog = ({ open, setOpen, onConfirm }) => {
+  const [isPending, setIsPending] = useState(false);
+  return (
+    <Dialog
+      fullWidth
+      maxWidth="xs"
+      open={open}
+      onClose={() => {
+        setOpen(false);
+      }}
+    >
+      <DialogTitle>Saving will reload the page. Do you want to continue?</DialogTitle>
+      {isPending ? (
+        <DialogContent>
+          <Spinner />
+        </DialogContent>
+      ) : (
+        <DialogActions>
+          <Button variant="outlined" onClick={() => setOpen(false)}>
+            Close
+          </Button>
+          <Button
+            variant="contained"
+            onClick={async () => {
+              setIsPending(true);
+              await onConfirm();
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
+            }}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      )}
+    </Dialog>
   );
 };

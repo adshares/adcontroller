@@ -8,6 +8,7 @@ import { monitoringApi } from './monitoring/monitoringApi';
 import monitoringSlice from './monitoring/monitoringSlice';
 import { synchronizationApi } from './synchronization/synchronizationApi';
 import synchronizationSlice from './synchronization/synchronizationSlice';
+import { taxonomyApi } from './taxonomy/taxonomyApi';
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,8 @@ export const store = configureStore({
 
     [monitoringApi.reducerPath]: monitoringApi.reducer,
     monitoringSlice: monitoringSlice,
+
+    [taxonomyApi.reducerPath]: taxonomyApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
@@ -31,6 +34,7 @@ export const store = configureStore({
       configApi.middleware,
       monitoringApi.middleware,
       synchronizationApi.middleware,
+      taxonomyApi.middleware,
     ),
   devTools: process.env.NODE_ENV === 'development',
 });

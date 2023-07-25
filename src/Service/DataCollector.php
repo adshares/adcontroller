@@ -81,6 +81,8 @@ class DataCollector
         AdServerConfigurationClient::REGISTRATION_MODE => AdServerConfig::RegistrationMode,
         AdServerConfigurationClient::SITE_ACCEPT_BANNERS_MANUALLY => AdServerConfig::SiteAcceptBannersManually,
         AdServerConfigurationClient::SITE_CLASSIFIER_LOCAL_BANNERS => AdServerConfig::SiteClassifierLocalBanners,
+        AdServerConfigurationClient::SUPPLY_PLACEHOLDER_COLOR => AdServerConfig::SupplyPlaceholderColor,
+        AdServerConfigurationClient::SUPPLY_PLACEHOLDER_FILE => AdServerConfig::SupplyPlaceholderFile,
         AdServerConfigurationClient::UPLOAD_LIMIT_IMAGE => AdServerConfig::UploadLimitImage,
         AdServerConfigurationClient::UPLOAD_LIMIT_MODEL => AdServerConfig::UploadLimitModel,
         AdServerConfigurationClient::UPLOAD_LIMIT_VIDEO => AdServerConfig::UploadLimitVideo,

@@ -49,6 +49,8 @@ enum AdServerConfig implements ConfigEnum
     case RejectedDomains;
     case SiteAcceptBannersManually;
     case SiteClassifierLocalBanners;
+    case SupplyPlaceholderColor;
+    case SupplyPlaceholderFile;
     case Terms;
     case UploadLimitImage;
     case UploadLimitModel;

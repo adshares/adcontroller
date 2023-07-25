@@ -179,9 +179,9 @@ function Commissions() {
                 {form.touchedFields.ReferralRefundCommission && form.errorObj.ReferralRefundCommission.helperText}
               </FormHelperText>
             </FormControl>
-            <Collapse in={Number(form.fields.OperatorRxFee) < Number(form.fields.ReferralRefundCommission)} timeout="auto">
+            <Collapse in={Number(form.fields.OperatorTxFee) < Number(form.fields.ReferralRefundCommission)} timeout="auto">
               <Alert sx={{ mt: 3 }} severity="warning">
-                <Typography variant="alert">The refund should be no more than the publisher's commission.</Typography>
+                <Typography variant="alert">The refund should be no more than the advertiser's commission.</Typography>
               </Alert>
             </Collapse>
           </CardContent>

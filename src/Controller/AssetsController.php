@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\AdServerConfig;
 use App\Entity\Enum\PanelAssetConfig;
+use App\Repository\ConfigurationRepository;
 use App\Repository\PanelAssetRepository;
 use App\Service\Configurator\Category\PanelAssets;
 use Psr\Log\LoggerInterface;
@@ -58,6 +60,27 @@ class AssetsController extends AbstractController
             echo $content;
         });
         $response->headers->set('Content-Type', $mimeType);
+
+        return $response;
+    }
+
+    #[Route('/placeholders-seed', name: 'fetch_placeholders_seed', methods: ['GET'])]
+    public function fetchPlaceholdersSeed(ConfigurationRepository $repository, LoggerInterface $logger): Response
+    {
+        $fileName = $repository->fetchValueByEnum(AdServerConfig::SupplyPlaceholderFile);
+        if (!$fileName || !file_exists($fileName)) {
+            $logger->error(sprintf('Seed file (%s) does not exist', $fileName ?? 'null'));
+            throw new NotFoundHttpException();
+        }
+        if (false === ($content = @file_get_contents($fileName))) {
+            $logger->error(sprintf('Seed file (%s) cannot be read: (%s)', $fileName, error_get_last()['message']));
+            throw new NotFoundHttpException();
+        }
+
+        $response = new StreamedResponse(function () use ($content) {
+            echo $content;
+        });
+        $response->headers->set('Content-Type', 'image/png');
 
         return $response;
     }
