@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.3.1] - 2023-07-25
 ### Added
 - Custom logos support in dark mode
 - Setting placeholders for creatives
@@ -128,7 +130,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.3.0...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.3.1...develop
+[1.3.1]: https://github.com/adshares/adcontroller/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/adshares/adcontroller/compare/v1.2.8...v1.3.0
 [1.2.8]: https://github.com/adshares/adcontroller/compare/v1.2.7...v1.2.8
 [1.2.7]: https://github.com/adshares/adcontroller/compare/v1.2.6...v1.2.7
