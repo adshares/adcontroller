@@ -19,5 +19,13 @@ class LaravelEnvReloader implements EnvReloader
         if (!$process->isSuccessful()) {
             throw new ReloadException(sprintf('Cannot reload env variables in dir %s', $this->homeDirectory));
         }
+
+        $process = new Process(['php', 'artisan', 'optimize'], $this->homeDirectory);
+        $process->setTimeout(5);
+        $process->run();
+        $process->wait();
+        if (!$process->isSuccessful()) {
+            throw new ReloadException(sprintf('Cannot optimize env variables in dir %s', $this->homeDirectory));
+        }
     }
 }
