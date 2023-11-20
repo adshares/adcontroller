@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2023-11-20
+### Fixed
+- Installer step colors
+
 ## [1.4.0] - 2023-07-25
 ### Added
 - Custom logos support in dark mode
@@ -130,7 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.4.0...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.4.1...develop
+[1.4.1]: https://github.com/adshares/adcontroller/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/adshares/adcontroller/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/adshares/adcontroller/compare/v1.2.8...v1.3.0
 [1.2.8]: https://github.com/adshares/adcontroller/compare/v1.2.7...v1.2.8
