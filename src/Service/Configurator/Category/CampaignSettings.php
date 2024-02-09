@@ -28,6 +28,7 @@ class CampaignSettings implements ConfiguratorCategory
     private static function fields(): array
     {
         return [
+            AdServerConfig::CampaignExperimentMinBudget->name,
             AdServerConfig::CampaignMinBudget->name,
             AdServerConfig::CampaignMinCpa->name,
             AdServerConfig::CampaignMinCpm->name,

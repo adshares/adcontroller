@@ -62,6 +62,8 @@ class AdServerConfigurationClient
     private const BTC_WITHDRAW_FEE = 'btcWithdrawFee';
     private const BTC_WITHDRAW_MAX_AMOUNT = 'btcWithdrawMaxAmount';
     private const BTC_WITHDRAW_MIN_AMOUNT = 'btcWithdrawMinAmount';
+    public const CAMPAIGN_EXPERIMENT_MIN_BUDGET = 'campaignExperimentMinBudget';
+    public const CAMPAIGN_EXPERIMENT_MIN_BUDGET_FOR_CPA_REQUIRED = 'campaignExperimentMinBudgetForCpaRequired';
     public const CAMPAIGN_MIN_BUDGET = 'campaignMinBudget';
     public const CAMPAIGN_MIN_CPA = 'campaignMinCpa';
     public const CAMPAIGN_MIN_CPM = 'campaignMinCpm';
@@ -145,6 +147,7 @@ class AdServerConfigurationClient
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'siteVerificationTimeThreshold';
     public const SUPPLY_PLACEHOLDER_COLOR = 'supplyPlaceholderColor';
     public const SUPPLY_PLACEHOLDER_FILE = 'supplyPlaceholderFile';
+    public const SUPPLY_SMART_LINK_ENABLED = 'supplySmartLinkEnabled';
     public const SUPPORT_CHAT = 'supportChat';
     public const SUPPORT_EMAIL = 'supportEmail';
     public const SUPPORT_TELEGRAM = 'supportTelegram';
@@ -299,6 +302,7 @@ class AdServerConfigurationClient
             AdServerConfig::AutoWithdrawalLimitEth->name => self::AUTO_WITHDRAWAL_LIMIT_ETH,
             AdServerConfig::BannerRotateInterval->name => self::BANNER_ROTATE_INTERVAL,
             AdServerConfig::CampaignMinBudget->name => self::CAMPAIGN_MIN_BUDGET,
+            AdServerConfig::CampaignExperimentMinBudget->name => self::CAMPAIGN_EXPERIMENT_MIN_BUDGET,
             AdServerConfig::CampaignMinCpa->name => self::CAMPAIGN_MIN_CPA,
             AdServerConfig::CampaignMinCpm->name => self::CAMPAIGN_MIN_CPM,
             AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
