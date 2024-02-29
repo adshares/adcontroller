@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
-import { useSetInventoryWhitelistConfigMutation } from '../../redux/config/configApi';
-import { changeInventoryWhitelistInformation } from '../../redux/config/configSlice';
-import { useCreateNotification } from '../../hooks';
+import {
+  useSetInventoryWhitelistConfigMutation,
+  useSetJoiningFeeConfigMutation,
+} from '../../redux/config/configApi'
+import { changeAdServerConfiguration, changeInventoryWhitelistInformation } from '../../redux/config/configSlice'
+import { useCreateNotification, useForm } from '../../hooks'
 import ListOfInputs from '../../Components/ListOfInputs/ListOfInputs';
 import {
+  Box,
   Button,
   Card,
   CardActions,
@@ -14,16 +18,22 @@ import {
   Checkbox,
   Collapse,
   FormControl,
-  FormControlLabel,
+  FormControlLabel, FormHelperText,
   FormLabel,
   Grid,
+  InputLabel,
+  OutlinedInput,
   Radio,
   RadioGroup,
-} from '@mui/material';
+} from '@mui/material'
 import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTooltip/FormControlLabelWithTooltip';
+import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../utils/helpers'
 
 export default function Settings() {
-  return <NetworkSettingsCard />;
+  return <>
+    <NetworkSettingsCard />
+    <JoiningFeeSettings sx={{ mt: 3 }} />
+  </>;
 }
 
 function NetworkSettingsCard(props) {
@@ -284,3 +294,95 @@ function NetworkSettingsCard(props) {
     </Card>
   );
 }
+
+const JoiningFeeSettings = (props) => {
+  const appData = useSelector(configSelectors.getAppData);
+  const [setJoiningFeeConfig, { isLoading }] = useSetJoiningFeeConfigMutation();
+  const dispatch = useDispatch();
+  const { createSuccessNotification } = useCreateNotification();
+  const [JoiningFeeEnabled, setJoiningFeeEnabled] = useState(appData.AdServer.JoiningFeeEnabled);
+  const joiningFeeMinValue = clicksToAds(appData.AdServer.JoiningFeeMinValue || 0);
+  const form = useForm({
+    initialFields: {
+      JoiningFeeValue: clicksToAds(appData.AdServer.JoiningFeeValue || 0).toString(),
+    },
+    validation: {
+      JoiningFeeValue: ['required', 'number'],
+    },
+  });
+
+  const onSaveClick = async () => {
+    const body = {
+      JoiningFeeEnabled,
+      JoiningFeeValue: adsToClicks(returnNumber(form.fields.JoiningFeeValue)),
+    };
+
+    const response = await setJoiningFeeConfig(body);
+    if (response.data && response.data.message === 'OK') {
+      dispatch(changeAdServerConfiguration(response.data.data));
+      createSuccessNotification();
+    }
+  };
+
+  return (
+    <Card {...props}>
+      <CardHeader title="Joining fee" subheader="Set fee required from SSP to accept inventory request." />
+
+      <CardContent>
+        <FormControl margin="dense">
+          <FormControlLabel
+            label="Joining fee enabled"
+            control={<Checkbox checked={JoiningFeeEnabled} onChange={() => setJoiningFeeEnabled((prevState) => !prevState)} />}
+          />
+        </FormControl>
+
+        <Box component="form" onChange={form.onChange} onFocus={form.setTouched}>
+          <FormControl
+            fullWidth
+            error={
+              form.touchedFields.JoiningFeeValue &&
+              (!form.errorObj.JoiningFeeValue.isValid || form.fields.JoiningFeeValue < joiningFeeMinValue)
+            }
+            customvariant="highLabel"
+            sx={{ mb: 3 }}
+          >
+            <InputLabel htmlFor="JoiningFeeValue">Required joining fee [ADS]</InputLabel>
+            <OutlinedInput
+              color="secondary"
+              id="JoiningFeeValue"
+              name="JoiningFeeValue"
+              type="number"
+              value={setDecimalPlaces(form.fields.JoiningFeeValue, 2)}
+              inputProps={{ autoComplete: 'off', min: 0 }}
+            />
+            <FormHelperText id="JoiningFeeValueHelper">
+              {
+                (form.touchedFields.JoiningFeeValue && form.errorObj.JoiningFeeValue.helperText) ||
+                (
+                  form.fields.JoiningFeeValue < joiningFeeMinValue &&
+                  `Value must be greater than the ${joiningFeeMinValue} ADS`
+                )
+              }
+            </FormHelperText>
+          </FormControl>
+        </Box>
+      </CardContent>
+
+      <CardActions>
+        <Button
+          disabled={
+            isLoading ||
+            !form.isFormValid ||
+            form.fields.JoiningFeeValue < joiningFeeMinValue ||
+            (appData.AdServer.JoiningFeeEnabled === JoiningFeeEnabled && !form.isFormWasChanged)
+        }
+          onClick={onSaveClick}
+          variant="contained"
+          type="button"
+        >
+          Save
+        </Button>
+      </CardActions>
+    </Card>
+  );
+};

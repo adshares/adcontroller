@@ -108,6 +108,9 @@ class AdServerConfigurationClient
     private const INVOICE_COMPANY_VAT_ID = 'invoiceCompanyVatId';
     private const INVOICE_ENABLED = 'invoiceEnabled';
     private const INVOICE_NUMBER_FORMAT = 'invoiceNumberFormat';
+    public const JOINING_FEE_ENABLED = 'joiningFeeEnabled';
+    public const JOINING_FEE_MIN_VALUE = 'joiningFeeMinValue';
+    public const JOINING_FEE_VALUE = 'joiningFeeValue';
     public const LANDING_URL = 'landingUrl';
     private const LAST_UPDATED_IMPRESSION_ID = 'lastUpdatedImpressionId';
     private const MAIL_FROM_ADDRESS = 'mailFromAddress';
@@ -317,6 +320,9 @@ class AdServerConfigurationClient
             AdServerConfig::InventoryExportWhitelist->name => self::INVENTORY_EXPORT_WHITELIST,
             AdServerConfig::InventoryImportWhitelist->name => self::INVENTORY_IMPORT_WHITELIST,
             AdServerConfig::InventoryWhitelist->name => self::INVENTORY_WHITELIST,
+            AdServerConfig::JoiningFeeEnabled->name => self::JOINING_FEE_ENABLED,
+            AdServerConfig::JoiningFeeMinValue->name => self::JOINING_FEE_MIN_VALUE,
+            AdServerConfig::JoiningFeeValue->name => self::JOINING_FEE_VALUE,
             AdServerConfig::LandingUrl->name => self::LANDING_URL,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
             AdServerConfig::Name->name => self::ADSERVER_NAME,

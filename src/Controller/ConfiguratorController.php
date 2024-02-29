@@ -22,6 +22,7 @@ use App\Service\Configurator\Category\ColdWallet;
 use App\Service\Configurator\Category\Commission;
 use App\Service\Configurator\Category\CrmNotifications;
 use App\Service\Configurator\Category\DemandSettlementOptions;
+use App\Service\Configurator\Category\JoiningFee;
 use App\Service\Configurator\Category\License;
 use App\Service\Configurator\Category\PanelAssets;
 use App\Service\Configurator\Category\PanelPlaceholders;
@@ -58,6 +59,7 @@ class ConfiguratorController extends AbstractController
         'cold-wallet-config' => ColdWallet::class,
         'commission-config' => Commission::class,
         'crm-notifications-config' => CrmNotifications::class,
+        'joining-fee-config' => JoiningFee::class,
         'license-config' => License::class,
         'panel-placeholders-config' => PanelPlaceholders::class,
         'registration-config' => Registration::class,
