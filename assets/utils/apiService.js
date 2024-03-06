@@ -97,6 +97,18 @@ const getWalletNodeHost = async (body) => {
   }
 };
 
+const sendJoiningFee = async (walletAddress, amount) => {
+  const body = {
+    walletAddress,
+    amount,
+  };
+  try {
+    return await request(`${configuration.basePath}/api/joining_fee`, 'POST', true, body);
+  } catch (err) {
+    throw new HttpError(err.message, err.data);
+  }
+};
+
 export default {
   createUser,
   sendStepData,
@@ -105,4 +117,5 @@ export default {
   getCommunityLicense,
   getLicenseByKey,
   getWalletNodeHost,
+  sendJoiningFee,
 };

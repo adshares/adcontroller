@@ -375,7 +375,7 @@ const JoiningFeeSettings = (props) => {
             !form.isFormValid ||
             form.fields.JoiningFeeValue < joiningFeeMinValue ||
             (appData.AdServer.JoiningFeeEnabled === JoiningFeeEnabled && !form.isFormWasChanged)
-        }
+          }
           onClick={onSaveClick}
           variant="contained"
           type="button"
