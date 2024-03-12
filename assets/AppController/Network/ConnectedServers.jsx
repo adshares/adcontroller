@@ -28,6 +28,7 @@ import {
   Typography,
 } from '@mui/material';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
+import CheckIcon from '@mui/icons-material/Check';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import PaidIcon from '@mui/icons-material/Paid';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
@@ -160,7 +161,16 @@ const ConnectedServersList = () => {
       wallet: (
         <>
           <FormattedWalletAddress wallet={host.walletAddress} sx={{ fontFamily: 'Monospace' }} />
-          <Tooltip title={'Paid ' + clicksToAds(host.paid) + ' ADS'}>
+          <Tooltip
+            title={
+              <React.Fragment>
+                {'Paid ' + clicksToAds(host.paid) + ' ADS'}<br/>
+                {'DSP requires ' + clicksToAds(host.infoJson.joiningFee) + ' ADS'}
+                {host.paid >= host.infoJson.joiningFee && (<CheckIcon fontSize="inherit" color="success" />)}
+                {host.paid < host.infoJson.joiningFee && (<CloseOutlinedIcon fontSize="inherit" color="error" />)}
+              </React.Fragment>
+            }
+          >
             <IconButton sx={{ ml: 1 }} size="small" color="secondary" onClick={() => handleJoiningFeeDialogOpen(host.walletAddress)}>
               <PaidIcon fontSize="inherit" />
             </IconButton>
