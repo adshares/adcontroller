@@ -3,12 +3,10 @@
 namespace App\Service\Configurator\Category;
 
 use App\Entity\Enum\AdServerConfig;
-use App\Entity\Enum\AppConfig;
 use App\Exception\InvalidArgumentException;
 use App\Repository\ConfigurationRepository;
 use App\Service\DataCollector;
 use App\Utility\ArrayUtils;
-use App\Utility\FormatUtils;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class JoiningFee implements ConfiguratorCategory

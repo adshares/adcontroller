@@ -53,7 +53,7 @@ class DataCollector
         AdServerConfigurationClient::AUTO_WITHDRAWAL_LIMIT_BTC => AdServerConfig::AutoWithdrawalLimitBtc,
         AdServerConfigurationClient::AUTO_WITHDRAWAL_LIMIT_ETH => AdServerConfig::AutoWithdrawalLimitEth,
         AdServerConfigurationClient::BANNER_ROTATE_INTERVAL => AdServerConfig::BannerRotateInterval,
-        AdServerConfigurationClient::CAMPAIGN_EXPERIMENT_MIN_BUDGET => AdServerConfig::CampaignExperimentMinBudget,
+        AdServerConfigurationClient::CAMPAIGN_BOOST_MIN_BUDGET => AdServerConfig::CampaignBoostMinBudget,
         AdServerConfigurationClient::CAMPAIGN_MIN_BUDGET => AdServerConfig::CampaignMinBudget,
         AdServerConfigurationClient::CAMPAIGN_MIN_CPA => AdServerConfig::CampaignMinCpa,
         AdServerConfigurationClient::CAMPAIGN_MIN_CPM => AdServerConfig::CampaignMinCpm,

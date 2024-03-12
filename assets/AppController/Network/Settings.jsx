@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configSelectors from '../../redux/config/configSelectors';
-import {
-  useSetInventoryWhitelistConfigMutation,
-  useSetJoiningFeeConfigMutation,
-} from '../../redux/config/configApi'
-import { changeAdServerConfiguration, changeInventoryWhitelistInformation } from '../../redux/config/configSlice'
-import { useCreateNotification, useForm } from '../../hooks'
+import { useSetInventoryWhitelistConfigMutation, useSetJoiningFeeConfigMutation } from '../../redux/config/configApi';
+import { changeAdServerConfiguration, changeInventoryWhitelistInformation } from '../../redux/config/configSlice';
+import { useCreateNotification, useForm } from '../../hooks';
 import ListOfInputs from '../../Components/ListOfInputs/ListOfInputs';
 import {
   Box,
@@ -18,22 +15,25 @@ import {
   Checkbox,
   Collapse,
   FormControl,
-  FormControlLabel, FormHelperText,
+  FormControlLabel,
+  FormHelperText,
   FormLabel,
   Grid,
   InputLabel,
   OutlinedInput,
   Radio,
   RadioGroup,
-} from '@mui/material'
+} from '@mui/material';
 import FormControlLabelWithTooltip from '../../Components/FormControlLabelWithTooltip/FormControlLabelWithTooltip';
-import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../utils/helpers'
+import { adsToClicks, clicksToAds, returnNumber, setDecimalPlaces } from '../../utils/helpers';
 
 export default function Settings() {
-  return <>
-    <NetworkSettingsCard />
-    <JoiningFeeSettings sx={{ mt: 3 }} />
-  </>;
+  return (
+    <>
+      <NetworkSettingsCard />
+      <JoiningFeeSettings sx={{ mt: 3 }} />
+    </>
+  );
 }
 
 function NetworkSettingsCard(props) {
@@ -356,13 +356,8 @@ const JoiningFeeSettings = (props) => {
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
             <FormHelperText id="JoiningFeeValueHelper">
-              {
-                (form.touchedFields.JoiningFeeValue && form.errorObj.JoiningFeeValue.helperText) ||
-                (
-                  form.fields.JoiningFeeValue < joiningFeeMinValue &&
-                  `Value must be greater than the ${joiningFeeMinValue} ADS`
-                )
-              }
+              {(form.touchedFields.JoiningFeeValue && form.errorObj.JoiningFeeValue.helperText) ||
+                (form.fields.JoiningFeeValue < joiningFeeMinValue && `Value must be greater than the ${joiningFeeMinValue} ADS`)}
             </FormHelperText>
           </FormControl>
         </Box>

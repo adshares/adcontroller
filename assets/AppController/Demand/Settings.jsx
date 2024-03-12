@@ -41,13 +41,13 @@ const CampaignSettingsCard = (props) => {
   const [setCampaignSettingsConfig, { isLoading }] = useSetCampaignSettingsConfigMutation();
   const form = useForm({
     initialFields: {
-      CampaignExperimentMinBudget: clicksToAds(appData.AdServer.CampaignExperimentMinBudget || 0).toString(),
+      CampaignBoostMinBudget: clicksToAds(appData.AdServer.CampaignBoostMinBudget || 0).toString(),
       CampaignMinBudget: clicksToAds(appData.AdServer.CampaignMinBudget || 0).toString(),
       CampaignMinCpa: clicksToAds(appData.AdServer.CampaignMinCpa || 0).toString(),
       CampaignMinCpm: clicksToAds(appData.AdServer.CampaignMinCpm || 0).toString(),
     },
     validation: {
-      CampaignExperimentMinBudget: ['number'],
+      CampaignBoostMinBudget: ['number'],
       CampaignMinBudget: ['number'],
       CampaignMinCpa: ['number'],
       CampaignMinCpm: ['number'],
@@ -100,22 +100,22 @@ const CampaignSettingsCard = (props) => {
 
           <FormControl
             fullWidth
-            error={form.touchedFields.CampaignExperimentMinBudget && !form.errorObj.CampaignExperimentMinBudget.isValid}
+            error={form.touchedFields.CampaignBoostMinBudget && !form.errorObj.CampaignBoostMinBudget.isValid}
             customvariant="highLabel"
             sx={{ mb: 3 }}
           >
-            <InputLabel htmlFor="CampaignExperimentMinBudget">Minimal campaign budget for experiments</InputLabel>
+            <InputLabel htmlFor="CampaignBoostMinBudget">Minimal campaign boost budget</InputLabel>
             <OutlinedInput
               color="secondary"
-              id="CampaignExperimentMinBudget"
-              name="CampaignExperimentMinBudget"
+              id="CampaignBoostMinBudget"
+              name="CampaignBoostMinBudget"
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              value={setDecimalPlaces(form.fields.CampaignExperimentMinBudget, 2)}
+              value={setDecimalPlaces(form.fields.CampaignBoostMinBudget, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
-            <FormHelperText id="CampaignExperimentMinBudgetHelper">
-              {form.touchedFields.CampaignExperimentMinBudget && form.errorObj.CampaignExperimentMinBudget.helperText}
+            <FormHelperText id="CampaignBoostMinBudgetHelper">
+              {form.touchedFields.CampaignBoostMinBudget && form.errorObj.CampaignBoostMinBudget.helperText}
             </FormHelperText>
           </FormControl>
 

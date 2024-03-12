@@ -62,8 +62,8 @@ class AdServerConfigurationClient
     private const BTC_WITHDRAW_FEE = 'btcWithdrawFee';
     private const BTC_WITHDRAW_MAX_AMOUNT = 'btcWithdrawMaxAmount';
     private const BTC_WITHDRAW_MIN_AMOUNT = 'btcWithdrawMinAmount';
-    public const CAMPAIGN_EXPERIMENT_MIN_BUDGET = 'campaignExperimentMinBudget';
-    public const CAMPAIGN_EXPERIMENT_MIN_BUDGET_FOR_CPA_REQUIRED = 'campaignExperimentMinBudgetForCpaRequired';
+    public const CAMPAIGN_BOOST_MIN_BUDGET = 'campaignBoostMinBudget';
+    public const CAMPAIGN_BOOST_MIN_BUDGET_FOR_CPA_REQUIRED = 'campaignBoostMinBudgetForCpaRequired';
     public const CAMPAIGN_MIN_BUDGET = 'campaignMinBudget';
     public const CAMPAIGN_MIN_CPA = 'campaignMinCpa';
     public const CAMPAIGN_MIN_CPM = 'campaignMinCpm';
@@ -305,7 +305,7 @@ class AdServerConfigurationClient
             AdServerConfig::AutoWithdrawalLimitEth->name => self::AUTO_WITHDRAWAL_LIMIT_ETH,
             AdServerConfig::BannerRotateInterval->name => self::BANNER_ROTATE_INTERVAL,
             AdServerConfig::CampaignMinBudget->name => self::CAMPAIGN_MIN_BUDGET,
-            AdServerConfig::CampaignExperimentMinBudget->name => self::CAMPAIGN_EXPERIMENT_MIN_BUDGET,
+            AdServerConfig::CampaignBoostMinBudget->name => self::CAMPAIGN_BOOST_MIN_BUDGET,
             AdServerConfig::CampaignMinCpa->name => self::CAMPAIGN_MIN_CPA,
             AdServerConfig::CampaignMinCpm->name => self::CAMPAIGN_MIN_CPM,
             AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
