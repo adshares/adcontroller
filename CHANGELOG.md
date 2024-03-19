@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2024-09-19
+### Added
+- Sending joining fee
+- Campaign minimal boost setting
+### Fixed
+- Installer config reload
+
 ## [1.4.1] - 2023-11-20
 ### Fixed
 - Installer step colors
@@ -134,7 +141,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installer
 - Project setup
 
-[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.4.1...develop
+[Unreleased]: https://github.com/adshares/adcontroller/compare/v1.5.0...develop
+[1.5.0]: https://github.com/adshares/adcontroller/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/adshares/adcontroller/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/adshares/adcontroller/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/adshares/adcontroller/compare/v1.2.8...v1.3.0

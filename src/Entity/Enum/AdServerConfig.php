@@ -18,6 +18,7 @@ enum AdServerConfig implements ConfigEnum
     case AutoWithdrawalLimitBtc;
     case AutoWithdrawalLimitEth;
     case BannerRotateInterval;
+    case CampaignBoostMinBudget;
     case CampaignMinBudget;
     case CampaignMinCpa;
     case CampaignMinCpm;
@@ -34,6 +35,9 @@ enum AdServerConfig implements ConfigEnum
     case InventoryImportWhitelist;
     case InventoryPrivate;
     case InventoryWhitelist;
+    case JoiningFeeEnabled;
+    case JoiningFeeMinValue;
+    case JoiningFeeValue;
     case LandingUrl;
     case LicenseData;
     case LicenseKey;

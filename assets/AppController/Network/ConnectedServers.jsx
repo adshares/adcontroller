@@ -10,9 +10,27 @@ import {
   useResetHostConnectionErrorMutation,
 } from '../../redux/monitoring/monitoringApi';
 import TableData from '../../Components/TableData/TableData';
-import { Box, Card, CardContent, CardHeader, IconButton, Link, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Link,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
+import CheckIcon from '@mui/icons-material/Check';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import PaidIcon from '@mui/icons-material/Paid';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
 import PublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
@@ -21,8 +39,10 @@ import DateRangePicker from '../../Components/DateRangePicker/DateRangePicker';
 import FormattedWalletAddress from '../../Components/FormatedWalletAddress/FormattedWalletAddress';
 import Spinner from '../../Components/Spinner/Spinner';
 import TypographyOverflowTooltip from '../../Components/TypographyOverflowTooltip/TypographyOverflowTooltip';
+import { useCreateNotification } from '../../hooks';
+import apiService from '../../utils/apiService';
 import { getFlowChartData } from '../../utils/chartUtils';
-import { filterObjectByKeys } from '../../utils/helpers';
+import { adsToClicks, clicksToAds, filterObjectByKeys } from '../../utils/helpers';
 import dayjs from 'dayjs';
 
 const headCells = [
@@ -92,6 +112,7 @@ export default function ConnectedServers() {
 }
 
 const ConnectedServersList = () => {
+  const { createErrorNotification, createSuccessNotification } = useCreateNotification();
   const [searchParams, setSearchParams] = useSearchParams();
   const [queryConfig, setQueryConfig] = useState({
     page: 1,
@@ -105,6 +126,10 @@ const ConnectedServersList = () => {
       ['page', 'limit'],
     ),
   });
+  const [joiningFeeSending, setJoiningFeeSending] = useState(false);
+  const [joiningFeeDialogOpen, setJoiningFeeDialogOpen] = useState(false);
+  const [joiningFeeDialogWalletAddress, setJoiningFeeDialogWalletAddress] = useState('');
+  const joiningFeeDefaultAmount = 100;
   const [resetHostConnectionError] = useResetHostConnectionErrorMutation();
   const { data: response, isFetching, refetch } = useGetConnectedHostsQuery(queryConfig, { refetchOnMountOrArgChange: true });
 
@@ -133,7 +158,25 @@ const ConnectedServersList = () => {
           </TypographyOverflowTooltip>
         </Link>
       ),
-      wallet: <FormattedWalletAddress wallet={host.walletAddress} sx={{ fontFamily: 'Monospace' }} />,
+      wallet: (
+        <>
+          <FormattedWalletAddress wallet={host.walletAddress} sx={{ fontFamily: 'Monospace' }} />
+          <Tooltip
+            title={
+              <React.Fragment>
+                {'Paid ' + clicksToAds(host.paid) + ' ADS'}<br/>
+                {'DSP requires ' + clicksToAds(host.infoJson.joiningFee) + ' ADS'}
+                {host.paid >= host.infoJson.joiningFee && (<CheckIcon fontSize="inherit" color="success" />)}
+                {host.paid < host.infoJson.joiningFee && (<CloseOutlinedIcon fontSize="inherit" color="error" />)}
+              </React.Fragment>
+            }
+          >
+            <IconButton sx={{ ml: 1 }} size="small" color="secondary" onClick={() => handleJoiningFeeDialogOpen(host.walletAddress)}>
+              <PaidIcon fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+        </>
+      ),
       lastSync: (host.lastSynchronization && new Date(host.lastSynchronization).toLocaleString()) || '',
       campaigns: host.campaignCount,
       sites: host.siteCount,
@@ -203,10 +246,29 @@ const ConnectedServersList = () => {
     }));
   };
 
+  const handleJoiningFeeDialogOpen = (walletAddress) => {
+    setJoiningFeeDialogWalletAddress(walletAddress || '');
+    setJoiningFeeDialogOpen(true);
+  };
+
+  const handleJoiningFeeDialogClose = () => {
+    setJoiningFeeDialogOpen(false);
+  };
+
   return (
     <Card width="full">
       <CardHeader title="Connected servers" />
       <CardContent>
+        <Box className={`${commonStyles.flex} ${commonStyles.justifyFlexEnd}`}>
+          <Button
+            onClick={() => handleJoiningFeeDialogOpen()}
+            variant="contained"
+            sx={{ mb: 2 }}
+            startIcon={<PaidIcon />}
+          >
+            Send joining fee
+          </Button>
+        </Box>
         <TableData
           headCells={headCells} // array of objects {id, label, ...additional params}
           rows={rows} // array of objects { id: (uniq, required), key: (must be same of cell id) value }
@@ -221,6 +283,67 @@ const ConnectedServersList = () => {
             showLastButton: true,
           }}
         />
+        <Dialog
+          open={joiningFeeDialogOpen}
+          onClose={handleJoiningFeeDialogClose}
+          PaperProps={{
+            component: 'form',
+            onSubmit: (event) => {
+              event.preventDefault();
+              const formData = new FormData(event.currentTarget);
+              const formJson = Object.fromEntries(formData);
+
+              setJoiningFeeSending(true);
+              apiService
+                .sendJoiningFee(formJson.address, adsToClicks(+formJson.amount))
+                .then(() => {
+                  createSuccessNotification({ message: 'Joining fee sent' });
+                  handleJoiningFeeDialogClose();
+                  refetch();
+                })
+                .catch((err) => {
+                  createErrorNotification(err);
+                })
+                .finally(() => setJoiningFeeSending(false));
+            },
+          }}
+        >
+          <DialogTitle>Send joining fee</DialogTitle>
+          <DialogContent>
+            <DialogContentText>Here you can send additional ADS to increase your reputation.</DialogContentText>
+            <TextField
+              required
+              margin="dense"
+              id="address"
+              name="address"
+              label="Address"
+              type="text"
+              fullWidth
+              variant="standard"
+              autoComplete="off"
+              value={joiningFeeDialogWalletAddress}
+            />
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="amount"
+              name="amount"
+              label="Amount [ADS]"
+              type="number"
+              fullWidth
+              variant="standard"
+              autoComplete="off"
+              defaultValue={joiningFeeDefaultAmount}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleJoiningFeeDialogClose}>Cancel</Button>
+            <Button disabled={joiningFeeSending} type="submit">
+              Send
+            </Button>
+          </DialogActions>
+        </Dialog>
       </CardContent>
     </Card>
   );

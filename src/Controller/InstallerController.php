@@ -9,6 +9,7 @@ use App\Exception\InvalidArgumentException;
 use App\Exception\ServiceNotPresent;
 use App\Exception\UnexpectedResponseException;
 use App\Repository\ConfigurationRepository;
+use App\Service\AdServerJoiningFeeSender;
 use App\Service\Configurator\Category\Wallet;
 use App\Service\DataCollector;
 use App\Service\Installer\Step\BaseStep;
@@ -18,15 +19,19 @@ use App\Service\Installer\Step\LicenseStep;
 use App\Service\Installer\Step\SmtpStep;
 use App\Service\Installer\Step\StatusStep;
 use App\Service\Installer\Step\WalletStep;
+use App\Utility\Validator\AdsAccountValidator;
+use App\Utility\Validator\ClickAmountValidator;
 use App\ValueObject\AccountId;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api', name: 'api_')]
@@ -35,6 +40,7 @@ class InstallerController extends AbstractController
     public function __construct(
         private readonly ConfigurationRepository $repository,
         private readonly DataCollector $dataCollector,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -150,6 +156,32 @@ class InstallerController extends AbstractController
         $licenseStep->claimCommunityLicense();
 
         return $this->getStep('license');
+    }
+
+    #[Route('/joining_fee', name: 'joining_fee', methods: ['POST'])]
+    public function sendJoiningFee(
+        AdServerJoiningFeeSender $adServerJoiningFeeSender,
+        Request $request,
+    ): Response {
+        $content = json_decode($request->getContent(), true);
+        if (!isset($content['walletAddress']) || !(new AdsAccountValidator())->valid($content['walletAddress'])) {
+            throw new UnprocessableEntityHttpException('Field `walletAddress` must be a valid ADS account');
+        }
+        if (
+            !isset($content['amount']) ||
+            !(new ClickAmountValidator())->valid($content['amount'])
+        ) {
+            throw new UnprocessableEntityHttpException('Field `amount` must be an amount in clicks');
+        }
+
+        try {
+            $adServerJoiningFeeSender->send($content['walletAddress'], $content['amount']);
+        } catch (ProcessFailedException $exception) {
+            $this->logger->warning('Sending joining fee failed', ['exception' => $exception]);
+            throw new UnprocessableEntityHttpException('Joining fee cannot be sent');
+        }
+
+        return new Response();
     }
 
     public static function getSubscribedServices(): array
