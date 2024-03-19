@@ -79,6 +79,13 @@ export const configApi = createApi({
         body,
       }),
     }),
+    setJoiningFeeConfig: builder.mutation({
+      query: (body) => ({
+        url: '/api/config/joining-fee',
+        method: 'PATCH',
+        body,
+      }),
+    }),
     setSettlementOptionsConfig: builder.mutation({
       query: (body) => ({
         url: '/api/config/demand/settlement-options',
@@ -191,6 +198,7 @@ export const {
   useSetColdWalletConfigMutation,
   useSetCommissionsConfigMutation,
   useSetInventoryWhitelistConfigMutation,
+  useSetJoiningFeeConfigMutation,
   useSetSettlementOptionsConfigMutation,
   useSetSiteOptionsConfigMutation,
   useSetZoneOptionsConfigMutation,

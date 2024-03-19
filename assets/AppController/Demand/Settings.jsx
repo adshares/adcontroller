@@ -41,11 +41,13 @@ const CampaignSettingsCard = (props) => {
   const [setCampaignSettingsConfig, { isLoading }] = useSetCampaignSettingsConfigMutation();
   const form = useForm({
     initialFields: {
+      CampaignBoostMinBudget: clicksToAds(appData.AdServer.CampaignBoostMinBudget || 0).toString(),
       CampaignMinBudget: clicksToAds(appData.AdServer.CampaignMinBudget || 0).toString(),
       CampaignMinCpa: clicksToAds(appData.AdServer.CampaignMinCpa || 0).toString(),
       CampaignMinCpm: clicksToAds(appData.AdServer.CampaignMinCpm || 0).toString(),
     },
     validation: {
+      CampaignBoostMinBudget: ['number'],
       CampaignMinBudget: ['number'],
       CampaignMinCpa: ['number'],
       CampaignMinCpm: ['number'],
@@ -91,8 +93,29 @@ const CampaignSettingsCard = (props) => {
               value={setDecimalPlaces(form.fields.CampaignMinBudget, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
-            <FormHelperText id="CampaignMinBudget">
+            <FormHelperText id="CampaignMinBudgetHelper">
               {form.touchedFields.CampaignMinBudget && form.errorObj.CampaignMinBudget.helperText}
+            </FormHelperText>
+          </FormControl>
+
+          <FormControl
+            fullWidth
+            error={form.touchedFields.CampaignBoostMinBudget && !form.errorObj.CampaignBoostMinBudget.isValid}
+            customvariant="highLabel"
+            sx={{ mb: 3 }}
+          >
+            <InputLabel htmlFor="CampaignBoostMinBudget">Minimal campaign boost budget</InputLabel>
+            <OutlinedInput
+              color="secondary"
+              id="CampaignBoostMinBudget"
+              name="CampaignBoostMinBudget"
+              type="number"
+              startAdornment={<InputAdornment position="start">$</InputAdornment>}
+              value={setDecimalPlaces(form.fields.CampaignBoostMinBudget, 2)}
+              inputProps={{ autoComplete: 'off', min: 0 }}
+            />
+            <FormHelperText id="CampaignBoostMinBudgetHelper">
+              {form.touchedFields.CampaignBoostMinBudget && form.errorObj.CampaignBoostMinBudget.helperText}
             </FormHelperText>
           </FormControl>
 
@@ -112,7 +135,7 @@ const CampaignSettingsCard = (props) => {
               value={setDecimalPlaces(form.fields.CampaignMinCpa, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
-            <FormHelperText id="CampaignMinCpa">
+            <FormHelperText id="CampaignMinCpaHelper">
               {form.touchedFields.CampaignMinCpa && form.errorObj.CampaignMinCpa.helperText}
             </FormHelperText>
           </FormControl>
@@ -132,7 +155,7 @@ const CampaignSettingsCard = (props) => {
               value={setDecimalPlaces(form.fields.CampaignMinCpm, 2)}
               inputProps={{ autoComplete: 'off', min: 0 }}
             />
-            <FormHelperText id="CampaignMinCpm">
+            <FormHelperText id="CampaignMinCpmHelper">
               {form.touchedFields.CampaignMinCpm && form.errorObj.CampaignMinCpm.helperText}
             </FormHelperText>
           </FormControl>

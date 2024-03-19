@@ -62,6 +62,8 @@ class AdServerConfigurationClient
     private const BTC_WITHDRAW_FEE = 'btcWithdrawFee';
     private const BTC_WITHDRAW_MAX_AMOUNT = 'btcWithdrawMaxAmount';
     private const BTC_WITHDRAW_MIN_AMOUNT = 'btcWithdrawMinAmount';
+    public const CAMPAIGN_BOOST_MIN_BUDGET = 'campaignBoostMinBudget';
+    public const CAMPAIGN_BOOST_MIN_BUDGET_FOR_CPA_REQUIRED = 'campaignBoostMinBudgetForCpaRequired';
     public const CAMPAIGN_MIN_BUDGET = 'campaignMinBudget';
     public const CAMPAIGN_MIN_CPA = 'campaignMinCpa';
     public const CAMPAIGN_MIN_CPM = 'campaignMinCpm';
@@ -106,6 +108,9 @@ class AdServerConfigurationClient
     private const INVOICE_COMPANY_VAT_ID = 'invoiceCompanyVatId';
     private const INVOICE_ENABLED = 'invoiceEnabled';
     private const INVOICE_NUMBER_FORMAT = 'invoiceNumberFormat';
+    public const JOINING_FEE_ENABLED = 'joiningFeeEnabled';
+    public const JOINING_FEE_MIN_VALUE = 'joiningFeeMinValue';
+    public const JOINING_FEE_VALUE = 'joiningFeeValue';
     public const LANDING_URL = 'landingUrl';
     private const LAST_UPDATED_IMPRESSION_ID = 'lastUpdatedImpressionId';
     private const MAIL_FROM_ADDRESS = 'mailFromAddress';
@@ -145,6 +150,7 @@ class AdServerConfigurationClient
     private const SITE_VERIFICATION_NOTIFICATION_TIME_THRESHOLD = 'siteVerificationTimeThreshold';
     public const SUPPLY_PLACEHOLDER_COLOR = 'supplyPlaceholderColor';
     public const SUPPLY_PLACEHOLDER_FILE = 'supplyPlaceholderFile';
+    public const SUPPLY_SMART_LINK_ENABLED = 'supplySmartLinkEnabled';
     public const SUPPORT_CHAT = 'supportChat';
     public const SUPPORT_EMAIL = 'supportEmail';
     public const SUPPORT_TELEGRAM = 'supportTelegram';
@@ -299,6 +305,7 @@ class AdServerConfigurationClient
             AdServerConfig::AutoWithdrawalLimitEth->name => self::AUTO_WITHDRAWAL_LIMIT_ETH,
             AdServerConfig::BannerRotateInterval->name => self::BANNER_ROTATE_INTERVAL,
             AdServerConfig::CampaignMinBudget->name => self::CAMPAIGN_MIN_BUDGET,
+            AdServerConfig::CampaignBoostMinBudget->name => self::CAMPAIGN_BOOST_MIN_BUDGET,
             AdServerConfig::CampaignMinCpa->name => self::CAMPAIGN_MIN_CPA,
             AdServerConfig::CampaignMinCpm->name => self::CAMPAIGN_MIN_CPM,
             AdServerConfig::ColdWalletAddress->name => self::COLD_WALLET_ADDRESS,
@@ -313,6 +320,9 @@ class AdServerConfigurationClient
             AdServerConfig::InventoryExportWhitelist->name => self::INVENTORY_EXPORT_WHITELIST,
             AdServerConfig::InventoryImportWhitelist->name => self::INVENTORY_IMPORT_WHITELIST,
             AdServerConfig::InventoryWhitelist->name => self::INVENTORY_WHITELIST,
+            AdServerConfig::JoiningFeeEnabled->name => self::JOINING_FEE_ENABLED,
+            AdServerConfig::JoiningFeeMinValue->name => self::JOINING_FEE_MIN_VALUE,
+            AdServerConfig::JoiningFeeValue->name => self::JOINING_FEE_VALUE,
             AdServerConfig::LandingUrl->name => self::LANDING_URL,
             AdServerConfig::LicenseKey->name => self::ADSHARES_LICENSE_KEY,
             AdServerConfig::Name->name => self::ADSERVER_NAME,
